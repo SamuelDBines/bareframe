@@ -1,0 +1,30 @@
+:host {
+	--bf-hero-font: var(--bf-theme-font-family, inherit);
+	--bf-hero-radius: var(--bf-theme-radius-md, 8px);
+	--bf-hero-border-width: var(--bf-theme-border-width, 1px);
+	--bf-hero-border-style: var(--bf-theme-border-style, solid);
+	--bf-hero-border-color: var(--bf-theme-hero-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-hero-bg: var(--bf-theme-hero-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-hero-color: var(--bf-theme-hero-color, var(--bf-theme-text-1, #0f172a));
+	--bf-hero-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-hero-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-hero-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-hero-font);
+	color: var(--bf-hero-color);
+}
+
+.root {
+	background: var(--bf-hero-bg);
+	color: var(--bf-hero-color);
+	border-width: var(--bf-hero-border-width);
+	border-style: var(--bf-hero-border-style);
+	border-color: var(--bf-hero-border-color);
+	border-radius: var(--bf-hero-radius);
+	padding: var(--bf-hero-padding-y) var(--bf-hero-padding-x);
+	transition: var(--bf-hero-transition);
+}

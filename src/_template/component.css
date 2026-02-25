@@ -1,0 +1,23 @@
+:host {
+	--bf-component-font: var(--bf-theme-font-family, inherit);
+	--bf-component-radius: var(--bf-theme-radius-md, 8px);
+	--bf-component-border-width: var(--bf-theme-border-width, 1px);
+	--bf-component-border-style: var(--bf-theme-border-style, solid);
+	--bf-component-border-color: var(--bf-theme-border-1, #cbd5e1);
+	--bf-component-bg: var(--bf-theme-surface-1, #ffffff);
+	--bf-component-color: var(--bf-theme-text-1, #0f172a);
+	--bf-component-focus-ring-width: var(--bf-theme-focus-ring-width, 2px);
+	--bf-component-focus-ring-style: var(--bf-theme-focus-ring-style, solid);
+	--bf-component-focus-ring-color: var(--bf-theme-focus-ring-color, #93c5fd);
+	--bf-component-focus-ring-offset: var(--bf-theme-focus-ring-offset, 2px);
+	--bf-component-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-component-font);
+	color: var(--bf-component-color);
+}
+
+/* Copy this file and replace `component` with the real component name. */

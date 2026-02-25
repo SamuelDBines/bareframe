@@ -1,0 +1,30 @@
+:host {
+	--bf-video-player-font: var(--bf-theme-font-family, inherit);
+	--bf-video-player-radius: var(--bf-theme-radius-md, 8px);
+	--bf-video-player-border-width: var(--bf-theme-border-width, 1px);
+	--bf-video-player-border-style: var(--bf-theme-border-style, solid);
+	--bf-video-player-border-color: var(--bf-theme-video-player-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-video-player-bg: var(--bf-theme-video-player-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-video-player-color: var(--bf-theme-video-player-color, var(--bf-theme-text-1, #0f172a));
+	--bf-video-player-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-video-player-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-video-player-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-video-player-font);
+	color: var(--bf-video-player-color);
+}
+
+.root {
+	background: var(--bf-video-player-bg);
+	color: var(--bf-video-player-color);
+	border-width: var(--bf-video-player-border-width);
+	border-style: var(--bf-video-player-border-style);
+	border-color: var(--bf-video-player-border-color);
+	border-radius: var(--bf-video-player-radius);
+	padding: var(--bf-video-player-padding-y) var(--bf-video-player-padding-x);
+	transition: var(--bf-video-player-transition);
+}

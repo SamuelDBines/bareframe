@@ -1,0 +1,30 @@
+:host {
+	--bf-radio-font: var(--bf-theme-font-family, inherit);
+	--bf-radio-radius: var(--bf-theme-radius-md, 8px);
+	--bf-radio-border-width: var(--bf-theme-border-width, 1px);
+	--bf-radio-border-style: var(--bf-theme-border-style, solid);
+	--bf-radio-border-color: var(--bf-theme-radio-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-radio-bg: var(--bf-theme-radio-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-radio-color: var(--bf-theme-radio-color, var(--bf-theme-text-1, #0f172a));
+	--bf-radio-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-radio-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-radio-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-radio-font);
+	color: var(--bf-radio-color);
+}
+
+.root {
+	background: var(--bf-radio-bg);
+	color: var(--bf-radio-color);
+	border-width: var(--bf-radio-border-width);
+	border-style: var(--bf-radio-border-style);
+	border-color: var(--bf-radio-border-color);
+	border-radius: var(--bf-radio-radius);
+	padding: var(--bf-radio-padding-y) var(--bf-radio-padding-x);
+	transition: var(--bf-radio-transition);
+}

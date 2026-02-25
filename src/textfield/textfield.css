@@ -1,0 +1,30 @@
+:host {
+	--bf-textfield-font: var(--bf-theme-font-family, inherit);
+	--bf-textfield-radius: var(--bf-theme-radius-md, 8px);
+	--bf-textfield-border-width: var(--bf-theme-border-width, 1px);
+	--bf-textfield-border-style: var(--bf-theme-border-style, solid);
+	--bf-textfield-border-color: var(--bf-theme-textfield-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-textfield-bg: var(--bf-theme-textfield-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-textfield-color: var(--bf-theme-textfield-color, var(--bf-theme-text-1, #0f172a));
+	--bf-textfield-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-textfield-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-textfield-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-textfield-font);
+	color: var(--bf-textfield-color);
+}
+
+.root {
+	background: var(--bf-textfield-bg);
+	color: var(--bf-textfield-color);
+	border-width: var(--bf-textfield-border-width);
+	border-style: var(--bf-textfield-border-style);
+	border-color: var(--bf-textfield-border-color);
+	border-radius: var(--bf-textfield-radius);
+	padding: var(--bf-textfield-padding-y) var(--bf-textfield-padding-x);
+	transition: var(--bf-textfield-transition);
+}

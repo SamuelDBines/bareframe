@@ -1,0 +1,30 @@
+:host {
+	--bf-avatar-font: var(--bf-theme-font-family, inherit);
+	--bf-avatar-radius: var(--bf-theme-radius-md, 8px);
+	--bf-avatar-border-width: var(--bf-theme-border-width, 1px);
+	--bf-avatar-border-style: var(--bf-theme-border-style, solid);
+	--bf-avatar-border-color: var(--bf-theme-avatar-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-avatar-bg: var(--bf-theme-avatar-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-avatar-color: var(--bf-theme-avatar-color, var(--bf-theme-text-1, #0f172a));
+	--bf-avatar-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-avatar-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-avatar-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-avatar-font);
+	color: var(--bf-avatar-color);
+}
+
+.root {
+	background: var(--bf-avatar-bg);
+	color: var(--bf-avatar-color);
+	border-width: var(--bf-avatar-border-width);
+	border-style: var(--bf-avatar-border-style);
+	border-color: var(--bf-avatar-border-color);
+	border-radius: var(--bf-avatar-radius);
+	padding: var(--bf-avatar-padding-y) var(--bf-avatar-padding-x);
+	transition: var(--bf-avatar-transition);
+}

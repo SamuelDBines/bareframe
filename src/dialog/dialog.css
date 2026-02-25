@@ -1,0 +1,30 @@
+:host {
+	--bf-dialog-font: var(--bf-theme-font-family, inherit);
+	--bf-dialog-radius: var(--bf-theme-radius-md, 8px);
+	--bf-dialog-border-width: var(--bf-theme-border-width, 1px);
+	--bf-dialog-border-style: var(--bf-theme-border-style, solid);
+	--bf-dialog-border-color: var(--bf-theme-dialog-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-dialog-bg: var(--bf-theme-dialog-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-dialog-color: var(--bf-theme-dialog-color, var(--bf-theme-text-1, #0f172a));
+	--bf-dialog-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-dialog-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-dialog-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-dialog-font);
+	color: var(--bf-dialog-color);
+}
+
+.root {
+	background: var(--bf-dialog-bg);
+	color: var(--bf-dialog-color);
+	border-width: var(--bf-dialog-border-width);
+	border-style: var(--bf-dialog-border-style);
+	border-color: var(--bf-dialog-border-color);
+	border-radius: var(--bf-dialog-radius);
+	padding: var(--bf-dialog-padding-y) var(--bf-dialog-padding-x);
+	transition: var(--bf-dialog-transition);
+}

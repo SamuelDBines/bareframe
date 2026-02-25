@@ -1,0 +1,30 @@
+:host {
+	--bf-tree-view-font: var(--bf-theme-font-family, inherit);
+	--bf-tree-view-radius: var(--bf-theme-radius-md, 8px);
+	--bf-tree-view-border-width: var(--bf-theme-border-width, 1px);
+	--bf-tree-view-border-style: var(--bf-theme-border-style, solid);
+	--bf-tree-view-border-color: var(--bf-theme-tree-view-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-tree-view-bg: var(--bf-theme-tree-view-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-tree-view-color: var(--bf-theme-tree-view-color, var(--bf-theme-text-1, #0f172a));
+	--bf-tree-view-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-tree-view-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-tree-view-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-tree-view-font);
+	color: var(--bf-tree-view-color);
+}
+
+.root {
+	background: var(--bf-tree-view-bg);
+	color: var(--bf-tree-view-color);
+	border-width: var(--bf-tree-view-border-width);
+	border-style: var(--bf-tree-view-border-style);
+	border-color: var(--bf-tree-view-border-color);
+	border-radius: var(--bf-tree-view-radius);
+	padding: var(--bf-tree-view-padding-y) var(--bf-tree-view-padding-x);
+	transition: var(--bf-tree-view-transition);
+}

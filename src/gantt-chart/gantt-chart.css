@@ -1,0 +1,30 @@
+:host {
+	--bf-gantt-chart-font: var(--bf-theme-font-family, inherit);
+	--bf-gantt-chart-radius: var(--bf-theme-radius-md, 8px);
+	--bf-gantt-chart-border-width: var(--bf-theme-border-width, 1px);
+	--bf-gantt-chart-border-style: var(--bf-theme-border-style, solid);
+	--bf-gantt-chart-border-color: var(--bf-theme-gantt-chart-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-gantt-chart-bg: var(--bf-theme-gantt-chart-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-gantt-chart-color: var(--bf-theme-gantt-chart-color, var(--bf-theme-text-1, #0f172a));
+	--bf-gantt-chart-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-gantt-chart-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-gantt-chart-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-gantt-chart-font);
+	color: var(--bf-gantt-chart-color);
+}
+
+.root {
+	background: var(--bf-gantt-chart-bg);
+	color: var(--bf-gantt-chart-color);
+	border-width: var(--bf-gantt-chart-border-width);
+	border-style: var(--bf-gantt-chart-border-style);
+	border-color: var(--bf-gantt-chart-border-color);
+	border-radius: var(--bf-gantt-chart-radius);
+	padding: var(--bf-gantt-chart-padding-y) var(--bf-gantt-chart-padding-x);
+	transition: var(--bf-gantt-chart-transition);
+}

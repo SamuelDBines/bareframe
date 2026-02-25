@@ -1,0 +1,30 @@
+:host {
+	--bf-tooltip-font: var(--bf-theme-font-family, inherit);
+	--bf-tooltip-radius: var(--bf-theme-radius-md, 8px);
+	--bf-tooltip-border-width: var(--bf-theme-border-width, 1px);
+	--bf-tooltip-border-style: var(--bf-theme-border-style, solid);
+	--bf-tooltip-border-color: var(--bf-theme-tooltip-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-tooltip-bg: var(--bf-theme-tooltip-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-tooltip-color: var(--bf-theme-tooltip-color, var(--bf-theme-text-1, #0f172a));
+	--bf-tooltip-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-tooltip-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-tooltip-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-tooltip-font);
+	color: var(--bf-tooltip-color);
+}
+
+.root {
+	background: var(--bf-tooltip-bg);
+	color: var(--bf-tooltip-color);
+	border-width: var(--bf-tooltip-border-width);
+	border-style: var(--bf-tooltip-border-style);
+	border-color: var(--bf-tooltip-border-color);
+	border-radius: var(--bf-tooltip-radius);
+	padding: var(--bf-tooltip-padding-y) var(--bf-tooltip-padding-x);
+	transition: var(--bf-tooltip-transition);
+}

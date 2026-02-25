@@ -1,0 +1,30 @@
+:host {
+	--bf-upload-dropzone-font: var(--bf-theme-font-family, inherit);
+	--bf-upload-dropzone-radius: var(--bf-theme-radius-md, 8px);
+	--bf-upload-dropzone-border-width: var(--bf-theme-border-width, 1px);
+	--bf-upload-dropzone-border-style: var(--bf-theme-border-style, solid);
+	--bf-upload-dropzone-border-color: var(--bf-theme-upload-dropzone-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-upload-dropzone-bg: var(--bf-theme-upload-dropzone-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-upload-dropzone-color: var(--bf-theme-upload-dropzone-color, var(--bf-theme-text-1, #0f172a));
+	--bf-upload-dropzone-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-upload-dropzone-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-upload-dropzone-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-upload-dropzone-font);
+	color: var(--bf-upload-dropzone-color);
+}
+
+.root {
+	background: var(--bf-upload-dropzone-bg);
+	color: var(--bf-upload-dropzone-color);
+	border-width: var(--bf-upload-dropzone-border-width);
+	border-style: var(--bf-upload-dropzone-border-style);
+	border-color: var(--bf-upload-dropzone-border-color);
+	border-radius: var(--bf-upload-dropzone-radius);
+	padding: var(--bf-upload-dropzone-padding-y) var(--bf-upload-dropzone-padding-x);
+	transition: var(--bf-upload-dropzone-transition);
+}

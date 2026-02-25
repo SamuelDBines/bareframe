@@ -1,0 +1,30 @@
+:host {
+	--bf-autocomplete-font: var(--bf-theme-font-family, inherit);
+	--bf-autocomplete-radius: var(--bf-theme-radius-md, 8px);
+	--bf-autocomplete-border-width: var(--bf-theme-border-width, 1px);
+	--bf-autocomplete-border-style: var(--bf-theme-border-style, solid);
+	--bf-autocomplete-border-color: var(--bf-theme-autocomplete-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-autocomplete-bg: var(--bf-theme-autocomplete-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-autocomplete-color: var(--bf-theme-autocomplete-color, var(--bf-theme-text-1, #0f172a));
+	--bf-autocomplete-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-autocomplete-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-autocomplete-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-autocomplete-font);
+	color: var(--bf-autocomplete-color);
+}
+
+.root {
+	background: var(--bf-autocomplete-bg);
+	color: var(--bf-autocomplete-color);
+	border-width: var(--bf-autocomplete-border-width);
+	border-style: var(--bf-autocomplete-border-style);
+	border-color: var(--bf-autocomplete-border-color);
+	border-radius: var(--bf-autocomplete-radius);
+	padding: var(--bf-autocomplete-padding-y) var(--bf-autocomplete-padding-x);
+	transition: var(--bf-autocomplete-transition);
+}

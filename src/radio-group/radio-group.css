@@ -1,0 +1,30 @@
+:host {
+	--bf-radio-group-font: var(--bf-theme-font-family, inherit);
+	--bf-radio-group-radius: var(--bf-theme-radius-md, 8px);
+	--bf-radio-group-border-width: var(--bf-theme-border-width, 1px);
+	--bf-radio-group-border-style: var(--bf-theme-border-style, solid);
+	--bf-radio-group-border-color: var(--bf-theme-radio-group-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-radio-group-bg: var(--bf-theme-radio-group-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-radio-group-color: var(--bf-theme-radio-group-color, var(--bf-theme-text-1, #0f172a));
+	--bf-radio-group-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-radio-group-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-radio-group-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-radio-group-font);
+	color: var(--bf-radio-group-color);
+}
+
+.root {
+	background: var(--bf-radio-group-bg);
+	color: var(--bf-radio-group-color);
+	border-width: var(--bf-radio-group-border-width);
+	border-style: var(--bf-radio-group-border-style);
+	border-color: var(--bf-radio-group-border-color);
+	border-radius: var(--bf-radio-group-radius);
+	padding: var(--bf-radio-group-padding-y) var(--bf-radio-group-padding-x);
+	transition: var(--bf-radio-group-transition);
+}

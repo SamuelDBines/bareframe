@@ -1,0 +1,30 @@
+:host {
+	--bf-donut-chart-font: var(--bf-theme-font-family, inherit);
+	--bf-donut-chart-radius: var(--bf-theme-radius-md, 8px);
+	--bf-donut-chart-border-width: var(--bf-theme-border-width, 1px);
+	--bf-donut-chart-border-style: var(--bf-theme-border-style, solid);
+	--bf-donut-chart-border-color: var(--bf-theme-donut-chart-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-donut-chart-bg: var(--bf-theme-donut-chart-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-donut-chart-color: var(--bf-theme-donut-chart-color, var(--bf-theme-text-1, #0f172a));
+	--bf-donut-chart-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-donut-chart-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-donut-chart-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-donut-chart-font);
+	color: var(--bf-donut-chart-color);
+}
+
+.root {
+	background: var(--bf-donut-chart-bg);
+	color: var(--bf-donut-chart-color);
+	border-width: var(--bf-donut-chart-border-width);
+	border-style: var(--bf-donut-chart-border-style);
+	border-color: var(--bf-donut-chart-border-color);
+	border-radius: var(--bf-donut-chart-radius);
+	padding: var(--bf-donut-chart-padding-y) var(--bf-donut-chart-padding-x);
+	transition: var(--bf-donut-chart-transition);
+}

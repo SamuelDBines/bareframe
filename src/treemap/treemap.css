@@ -1,0 +1,30 @@
+:host {
+	--bf-treemap-font: var(--bf-theme-font-family, inherit);
+	--bf-treemap-radius: var(--bf-theme-radius-md, 8px);
+	--bf-treemap-border-width: var(--bf-theme-border-width, 1px);
+	--bf-treemap-border-style: var(--bf-theme-border-style, solid);
+	--bf-treemap-border-color: var(--bf-theme-treemap-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-treemap-bg: var(--bf-theme-treemap-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-treemap-color: var(--bf-theme-treemap-color, var(--bf-theme-text-1, #0f172a));
+	--bf-treemap-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-treemap-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-treemap-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-treemap-font);
+	color: var(--bf-treemap-color);
+}
+
+.root {
+	background: var(--bf-treemap-bg);
+	color: var(--bf-treemap-color);
+	border-width: var(--bf-treemap-border-width);
+	border-style: var(--bf-treemap-border-style);
+	border-color: var(--bf-treemap-border-color);
+	border-radius: var(--bf-treemap-radius);
+	padding: var(--bf-treemap-padding-y) var(--bf-treemap-padding-x);
+	transition: var(--bf-treemap-transition);
+}

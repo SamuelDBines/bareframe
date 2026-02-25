@@ -19,6 +19,9 @@
 }
 
 .root {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 	background: var(--bf-input-bg);
 	color: var(--bf-input-color);
 	border-width: var(--bf-input-border-width);
@@ -27,4 +30,60 @@
 	border-radius: var(--bf-input-radius);
 	padding: var(--bf-input-padding-y) var(--bf-input-padding-x);
 	transition: var(--bf-input-transition);
+}
+
+.field {
+	width: 100%;
+	min-width: 0;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	padding: 0;
+}
+
+.swatch,
+.format {
+	display: none;
+}
+
+.root.is-color .swatch,
+.root.is-color .format {
+	display: inline-flex;
+}
+
+.swatch {
+	width: 1.25rem;
+	height: 1.25rem;
+	border: 1px solid var(--bf-theme-border-1, #94a3b8);
+	border-radius: 4px;
+	cursor: pointer;
+	flex: 0 0 auto;
+}
+
+.format {
+	border: 0;
+	outline: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+	flex: 0 0 auto;
+}
+
+.picker {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+	width: 0;
+	height: 0;
+}
+
+.root.is-color.swatch-right .swatch {
+	order: 3;
+}
+
+.root.is-color.swatch-hidden .swatch {
+	display: none;
 }

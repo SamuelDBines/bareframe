@@ -28,3 +28,23 @@
 	padding: var(--bf-menu-padding-y) var(--bf-menu-padding-x);
 	transition: var(--bf-menu-transition);
 }
+
+.root[data-variant='context'][data-open='false'] {
+	display: none;
+}
+
+.root[data-variant='context'] {
+	min-width: 11rem;
+	box-shadow: 0 14px 36px rgba(2, 6, 23, 0.2);
+}
+
+.root ::slotted([item]) {
+	display: block;
+	padding: 0.45rem 0.6rem;
+	border-radius: 0.4rem;
+	cursor: pointer;
+}
+
+.root ::slotted([item]:hover) {
+	background: var(--bf-theme-surface-2, #f8fafc);
+}

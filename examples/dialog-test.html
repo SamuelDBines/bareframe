@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe dialog test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -52,7 +52,8 @@
     <div class="layout">
       <header>
         <h1>bf-dialog</h1>
-        <p>Modal or non-modal interaction window.</p>
+        <p>Unified dialog/sheet/popover/tooltip/panel primitive.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,21 +83,33 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-dialog>
-  <p><strong>dialog</strong> for contextual messages and focused interactions.</p>
+        <div class="stack">
   <div class="demo-row">
-    <bf-button>Confirm</bf-button>
-    <bf-button variant="secondary">Cancel</bf-button>
+    <bf-button bf-open="dialog-sheet" variant="secondary">Open Sheet</bf-button>
+    <bf-button bf-open="dialog-panel" variant="secondary">Open Panel</bf-button>
   </div>
-</bf-dialog>
+
+  <bf-dialog id="dialog-sheet" variant="bottom-sheet" label="Bottom sheet">
+    <p>Bottom sheet variant from the bottom edge.</p>
+    <bf-button bf-close="dialog-sheet">Close</bf-button>
+  </bf-dialog>
+
+  <bf-dialog id="dialog-panel" variant="panel" position="right" label="Panel">
+    <p>Panel variant anchored right.</p>
+    <bf-button bf-close="dialog-panel">Close</bf-button>
+  </bf-dialog>
+
+  <bf-dialog variant="popover" position="top-right">Popover-style content</bf-dialog>
+  <bf-dialog variant="tooltip" position="bottom-left">Tooltip-style hint</bf-dialog>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-button>button</bf-button>
-<bf-alert>alert</bf-alert>
-<bf-toast>toast</bf-toast>
+          <a href="./button-test.html">button</a>
+<a href="./toast-test.html">toast</a>
+<a href="./dialog-test.html">dialog</a>
         </div>
       </section>
 
@@ -94,14 +119,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

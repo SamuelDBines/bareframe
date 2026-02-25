@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe breadcrumb test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -53,6 +53,7 @@
       <header>
         <h1>bf-breadcrumb</h1>
         <p>Hierarchical path navigation.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,22 +83,43 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-breadcrumb>
-  <div class="demo-row">
-    <a href="#">Overview</a>
+        <div class="stack">
+  <bf-breadcrumb variant="default" separator="chevron">
+    <a href="#">Home</a>
     <a href="#">Projects</a>
+    <a href="#">Bareframe</a>
+    <span current>UI Kit</span>
+  </bf-breadcrumb>
+
+  <bf-breadcrumb variant="minimal" separator="slash">
+    <a href="#">Workspace</a>
     <a href="#">Settings</a>
-    <a href="#">Billing</a>
-  </div>
-</bf-breadcrumb>
+    <span current>Theme</span>
+  </bf-breadcrumb>
+
+  <bf-breadcrumb variant="minimal" separator="|">
+    <a href="#">Docs</a>
+    <a href="#">Design</a>
+    <span current>Tokens</span>
+  </bf-breadcrumb>
+
+  <bf-breadcrumb variant="pills" separator-icon="→" max="4">
+    <a href="#">Company</a>
+    <a href="#">Products</a>
+    <a href="#">Web</a>
+    <a href="#">Components</a>
+    <a href="#">Navigation</a>
+    <span current>Breadcrumbs</span>
+  </bf-breadcrumb>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-nav>nav</bf-nav>
-<bf-breadcrumb>breadcrumb</bf-breadcrumb>
-<bf-menu>menu</bf-menu>
+          <a href="./nav-test.html">nav</a>
+<a href="./breadcrumb-test.html">breadcrumb</a>
+<a href="./menu-test.html">menu</a>
         </div>
       </section>
 
@@ -95,14 +129,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

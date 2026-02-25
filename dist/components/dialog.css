@@ -13,12 +13,34 @@
 		var(--bf-theme-transition-color, color 120ms ease),
 		var(--bf-theme-transition-border, border-color 120ms ease);
 
+	--bf-dialog-backdrop: rgba(2, 6, 23, 0.45);
+	--bf-dialog-max-w: 36rem;
+	--bf-dialog-shadow: 0 18px 44px rgba(2, 6, 23, 0.28);
+
 	display: block;
 	font: var(--bf-dialog-font);
 	color: var(--bf-dialog-color);
+	z-index: 1100;
 }
 
 .root {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	align-items: center;
+	justify-items: center;
+	padding: 1rem;
+}
+
+.backdrop {
+	position: absolute;
+	inset: 0;
+	background: var(--bf-dialog-backdrop);
+}
+
+.panel {
+	position: relative;
+	width: min(100%, var(--bf-dialog-max-w));
 	background: var(--bf-dialog-bg);
 	color: var(--bf-dialog-color);
 	border-width: var(--bf-dialog-border-width);
@@ -27,4 +49,77 @@
 	border-radius: var(--bf-dialog-radius);
 	padding: var(--bf-dialog-padding-y) var(--bf-dialog-padding-x);
 	transition: var(--bf-dialog-transition);
+	box-shadow: var(--bf-dialog-shadow);
+}
+
+.root[data-open='false'] {
+	display: none;
+}
+
+.root[data-variant='tooltip'] .backdrop,
+.root[data-variant='popover'] .backdrop,
+.root[data-variant='panel'] .backdrop,
+.root[data-variant='sheet'] .backdrop,
+.root[data-variant='bottom-sheet'] .backdrop {
+	background: transparent;
+}
+
+.root[data-variant='tooltip'] .panel {
+	width: auto;
+	max-width: 18rem;
+	padding: 0.35rem 0.55rem;
+	border-radius: 6px;
+}
+
+.root[data-variant='popover'] .panel {
+	width: min(24rem, 100%);
+}
+
+.root[data-variant='sheet'] {
+	align-items: center;
+}
+
+.root[data-variant='bottom-sheet'] {
+	align-items: end;
+}
+
+.root[data-variant='bottom-sheet'] .panel {
+	width: min(100%, 42rem);
+	border-radius: 14px 14px 0 0;
+}
+
+.root[data-position='top'] {
+	align-items: start;
+}
+
+.root[data-position='bottom'] {
+	align-items: end;
+}
+
+.root[data-position='left'] {
+	justify-items: start;
+}
+
+.root[data-position='right'] {
+	justify-items: end;
+}
+
+.root[data-position='top-left'] {
+	align-items: start;
+	justify-items: start;
+}
+
+.root[data-position='top-right'] {
+	align-items: start;
+	justify-items: end;
+}
+
+.root[data-position='bottom-left'] {
+	align-items: end;
+	justify-items: start;
+}
+
+.root[data-position='bottom-right'] {
+	align-items: end;
+	justify-items: end;
 }

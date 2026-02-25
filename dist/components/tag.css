@@ -6,19 +6,26 @@
 	--bf-tag-border-color: var(--bf-theme-tag-border-color, var(--bf-theme-border-1, #cbd5e1));
 	--bf-tag-bg: var(--bf-theme-tag-bg, var(--bf-theme-surface-1, #ffffff));
 	--bf-tag-color: var(--bf-theme-tag-color, var(--bf-theme-text-1, #0f172a));
-	--bf-tag-padding-y: var(--bf-theme-space-2, 0.6rem);
-	--bf-tag-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-tag-padding-y: 0.35rem;
+	--bf-tag-padding-x: 0.55rem;
 	--bf-tag-transition:
 		var(--bf-theme-transition-bg, background-color 120ms ease),
 		var(--bf-theme-transition-color, color 120ms ease),
 		var(--bf-theme-transition-border, border-color 120ms ease);
 
-	display: block;
+	display: inline-block;
 	font: var(--bf-tag-font);
 	color: var(--bf-tag-color);
 }
 
 .root {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.3rem;
+	line-height: 1;
+	font-size: 0.82rem;
+	font-weight: 600;
 	background: var(--bf-tag-bg);
 	color: var(--bf-tag-color);
 	border-width: var(--bf-tag-border-width);
@@ -27,4 +34,30 @@
 	border-radius: var(--bf-tag-radius);
 	padding: var(--bf-tag-padding-y) var(--bf-tag-padding-x);
 	transition: var(--bf-tag-transition);
+}
+
+.root[data-size='sm'] {
+	font-size: 0.74rem;
+	padding: 0.22rem 0.42rem;
+}
+
+.root[data-size='lg'] {
+	font-size: 0.9rem;
+	padding: 0.45rem 0.68rem;
+}
+
+.root[data-variant='badge'] {
+	font-size: 0.72rem;
+	font-weight: 700;
+	min-width: 1.35rem;
+	padding: 0.14rem 0.42rem;
+	border-radius: 999px;
+}
+
+.root[data-variant='pill'] {
+	border-radius: 999px;
+}
+
+.root[data-variant='chip'] {
+	padding-right: 0.75rem;
 }

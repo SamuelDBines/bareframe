@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe wizard test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -52,7 +52,8 @@
     <div class="layout">
       <header>
         <h1>bf-wizard</h1>
-        <p>Guided step-by-step flow container.</p>
+        <p>Guided step flow that also supports stepper mode.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,18 +83,31 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-wizard>
-  <h3>wizard</h3>
-  <p>Reusable component composition block.</p>
-</bf-wizard>
+        <div class="stack">
+  <bf-wizard step="2" steps="Account, Plan, Team, Review"></bf-wizard>
+
+  <bf-wizard stepper step="3" steps="Draft, Review, Approve, Publish"></bf-wizard>
+
+  <bf-wizard id="onboarding" step="1">
+    <section title="Profile">
+      <p>Add your workspace profile details.</p>
+    </section>
+    <section title="Preferences">
+      <p>Set theme, notifications, and privacy preferences.</p>
+    </section>
+    <section title="Invite Team">
+      <p>Invite teammates to collaborate.</p>
+    </section>
+  </bf-wizard>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-card>card</bf-card>
-<bf-header>header</bf-header>
-<bf-footer>footer</bf-footer>
+          <a href="./card-test.html">card</a>
+<a href="./edge-test.html">edge</a>
+<a href="./nav-test.html">nav</a>
         </div>
       </section>
 
@@ -91,14 +117,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

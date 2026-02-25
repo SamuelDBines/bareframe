@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe toast test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -52,7 +52,8 @@
     <div class="layout">
       <header>
         <h1>bf-toast</h1>
-        <p>Ephemeral non-blocking message.</p>
+        <p>Unified toast/alert/notification/snackbar/banner primitive with type + position utilities.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,21 +83,22 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-toast>
-  <p><strong>toast</strong> for contextual messages and focused interactions.</p>
-  <div class="demo-row">
-    <bf-button>Confirm</bf-button>
-    <bf-button variant="secondary">Cancel</bf-button>
-  </div>
-</bf-toast>
+        <div class="stack">
+  <bf-toast banner info open>Banner notice for account-wide maintenance.</bf-toast>
+  <bf-toast toast info open>Default Toast</bf-toast>
+  <bf-toast alert warning open top right>Alert Toast (top-right)</bf-toast>
+  <bf-toast notification success open position="bottom-left">Notification Toast (bottom-left)</bf-toast>
+  <bf-toast snackbar open duration="2800">Snackbar (bottom-center default)</bf-toast>
+  <bf-toast error open duration="2200" position="top-center">Auto-hide Error (2.2s)</bf-toast>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-button>button</bf-button>
-<bf-alert>alert</bf-alert>
-<bf-toast>toast</bf-toast>
+          <a href="./button-test.html">button</a>
+<a href="./toast-test.html">toast</a>
+<a href="./dialog-test.html">dialog</a>
         </div>
       </section>
 
@@ -94,14 +108,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

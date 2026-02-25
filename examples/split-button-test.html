@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe split-button test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -53,6 +53,7 @@
       <header>
         <h1>bf-split-button</h1>
         <p>Primary action + secondary menu.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,19 +83,30 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <div class="demo-row">
-  <bf-split-button>Primary</bf-split-button>
-  <bf-split-button>Secondary</bf-split-button>
-  <bf-split-button>Tertiary</bf-split-button>
+        <div class="stack">
+  <p class="hint">Split button combines a primary action with secondary actions menu.</p>
+  <bf-split-button>
+    <div class="demo-row">
+      <bf-button>Deploy</bf-button>
+      <bf-dropdown>
+        <bf-button variant="secondary">More</bf-button>
+        <div stack style="min-width: 180px;">
+          <a href="#">Deploy to staging</a>
+          <a href="#">Deploy to production</a>
+          <a href="#">Schedule deploy</a>
+        </div>
+      </bf-dropdown>
+    </div>
+  </bf-split-button>
 </div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-button-group>button-group</bf-button-group>
-<bf-chip>chip</bf-chip>
-<bf-toggle>toggle</bf-toggle>
+          <a href="./card-test.html">card</a>
+<a href="./edge-test.html">edge</a>
+<a href="./nav-test.html">nav</a>
         </div>
       </section>
 
@@ -92,14 +116,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

@@ -134,3 +134,7 @@ button.secondary {
 		--bf-button-secondary-active-border-color
 	);
 }
+
+button.is-selected {
+	box-shadow: inset 0 0 0 2px var(--bf-theme-focus-ring-color, #93c5fd);
+}

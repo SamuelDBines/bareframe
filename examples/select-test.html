@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe select test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -52,7 +52,8 @@
     <div class="layout">
       <header>
         <h1>bf-select</h1>
-        <p>Single-choice dropdown selector.</p>
+        <p>Unified single/multi dropdown (`multi` for capped multi-select).</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -71,18 +84,28 @@
       <section class="panel">
         <h2>Primary Demo</h2>
         <div class="stack">
-  <label class="label">select Input</label>
-  <bf-select>Value</bf-select>
-  <p class="hint">Use this for reusable form flows with consistent validation styling.</p>
+  <bf-select label="Plan">
+    <option value="">Choose a plan</option>
+    <option value="starter">Starter</option>
+    <option value="pro" selected>Pro</option>
+    <option value="enterprise">Enterprise</option>
+  </bf-select>
+  <bf-select label="Team Access" multi="2">
+    <option value="analytics" selected>Analytics</option>
+    <option value="billing">Billing</option>
+    <option value="deployments" selected>Deployments</option>
+    <option value="settings">Settings</option>
+  </bf-select>
+  <p class="hint">Use <code>multi</code> for multi-select. Set <code>multi="2"</code> to cap selections.</p>
 </div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-form-field>form-field</bf-form-field>
-<bf-input>input</bf-input>
-<bf-button>button</bf-button>
+          <a href="./form-field-test.html">form-field</a>
+<a href="./input-test.html">input</a>
+<a href="./button-test.html">button</a>
         </div>
       </section>
 
@@ -92,14 +115,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

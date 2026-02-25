@@ -13,12 +13,16 @@
 		var(--bf-theme-transition-color, color 120ms ease),
 		var(--bf-theme-transition-border, border-color 120ms ease);
 
-	display: block;
+	display: inline-block;
 	font: var(--bf-radio-font);
 	color: var(--bf-radio-color);
 }
 
 .root {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
 	background: var(--bf-radio-bg);
 	color: var(--bf-radio-color);
 	border-width: var(--bf-radio-border-width);
@@ -27,4 +31,34 @@
 	border-radius: var(--bf-radio-radius);
 	padding: var(--bf-radio-padding-y) var(--bf-radio-padding-x);
 	transition: var(--bf-radio-transition);
+}
+
+input {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.dot {
+	width: 0.95rem;
+	height: 0.95rem;
+	border-radius: 999px;
+	border: 2px solid var(--bf-radio-border-color);
+	display: inline-block;
+	position: relative;
+}
+
+.dot::after {
+	content: '';
+	position: absolute;
+	inset: 0.15rem;
+	border-radius: 999px;
+	background: var(--bf-theme-button-primary-bg, #2563eb);
+	transform: scale(0);
+	transition: transform 120ms ease;
+}
+
+input:checked + .dot::after {
+	transform: scale(1);
 }

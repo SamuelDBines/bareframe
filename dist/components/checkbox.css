@@ -13,12 +13,16 @@
 		var(--bf-theme-transition-color, color 120ms ease),
 		var(--bf-theme-transition-border, border-color 120ms ease);
 
-	display: block;
+	display: inline-block;
 	font: var(--bf-checkbox-font);
 	color: var(--bf-checkbox-color);
 }
 
 .root {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
 	background: var(--bf-checkbox-bg);
 	color: var(--bf-checkbox-color);
 	border-width: var(--bf-checkbox-border-width);
@@ -27,4 +31,42 @@
 	border-radius: var(--bf-checkbox-radius);
 	padding: var(--bf-checkbox-padding-y) var(--bf-checkbox-padding-x);
 	transition: var(--bf-checkbox-transition);
+}
+
+input {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.box {
+	width: 0.95rem;
+	height: 0.95rem;
+	border-radius: 0.25rem;
+	border: 2px solid var(--bf-checkbox-border-color);
+	display: inline-block;
+	position: relative;
+}
+
+.box::after {
+	content: '';
+	position: absolute;
+	left: 0.2rem;
+	top: 0.02rem;
+	width: 0.28rem;
+	height: 0.55rem;
+	border-right: 2px solid var(--bf-theme-button-primary-color, #fff);
+	border-bottom: 2px solid var(--bf-theme-button-primary-color, #fff);
+	transform: rotate(45deg) scale(0);
+	transition: transform 120ms ease;
+}
+
+input:checked + .box {
+	background: var(--bf-theme-button-primary-bg, #2563eb);
+	border-color: var(--bf-theme-button-primary-bg, #2563eb);
+}
+
+input:checked + .box::after {
+	transform: rotate(45deg) scale(1);
 }

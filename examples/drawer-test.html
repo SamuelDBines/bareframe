@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe drawer test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -52,7 +52,8 @@
     <div class="layout">
       <header>
         <h1>bf-drawer</h1>
-        <p>Side panel for navigation or tools.</p>
+        <p>Slide-in surface from a direction with backdrop.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,21 +83,39 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-drawer>
-  <p><strong>drawer</strong> for contextual messages and focused interactions.</p>
+        <div class="stack">
   <div class="demo-row">
-    <bf-button>Confirm</bf-button>
-    <bf-button variant="secondary">Cancel</bf-button>
+    <bf-button bf-open="drawer-right">Right Drawer</bf-button>
+    <bf-button variant="secondary" bf-open="drawer-left">Left Drawer</bf-button>
+    <bf-button variant="secondary" bf-open="drawer-bottom">Bottom Drawer</bf-button>
   </div>
-</bf-drawer>
+
+  <bf-drawer id="drawer-right" side="right" label="Filters">
+    <h3 style="margin-top: 0;">Filters</h3>
+    <p>Right-side navigation/tools drawer.</p>
+    <bf-button bf-close="drawer-right">Done</bf-button>
+  </bf-drawer>
+
+  <bf-drawer id="drawer-left" side="left" label="Navigation">
+    <h3 style="margin-top: 0;">Navigation</h3>
+    <p>Left-side app navigation drawer.</p>
+    <bf-button bf-close="drawer-left">Close</bf-button>
+  </bf-drawer>
+
+  <bf-drawer id="drawer-bottom" side="bottom" label="Actions">
+    <h3 style="margin-top: 0;">Quick Actions</h3>
+    <p>Bottom drawer for contextual actions.</p>
+    <bf-button bf-close="drawer-bottom">Close</bf-button>
+  </bf-drawer>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-button>button</bf-button>
-<bf-alert>alert</bf-alert>
-<bf-toast>toast</bf-toast>
+          <a href="./button-test.html">button</a>
+<a href="./toast-test.html">toast</a>
+<a href="./dialog-test.html">dialog</a>
         </div>
       </section>
 
@@ -94,14 +125,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

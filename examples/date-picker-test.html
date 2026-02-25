@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe date-picker test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -53,6 +53,7 @@
       <header>
         <h1>bf-date-picker</h1>
         <p>Single-date input selector.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,19 +83,27 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <div class="stack">
-  <label class="label">date picker Input</label>
-  <bf-date-picker>Value</bf-date-picker>
-  <p class="hint">Use this for reusable form flows with consistent validation styling.</p>
-</div>
+        <bf-date-picker>
+  <div class="stack" style="max-width: 24rem;">
+    <bf-form-field>
+      <label class="label">Invoice Date</label>
+      <bf-input type="date" value="2026-03-08"></bf-input>
+    </bf-form-field>
+    <div class="demo-row">
+      <bf-button variant="secondary">Today</bf-button>
+      <bf-button variant="secondary">Clear</bf-button>
+    </div>
+    <p class="hint">Date picker is ideal for single-date forms with validation and locale formatting.</p>
+  </div>
+</bf-date-picker>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-form-field>form-field</bf-form-field>
-<bf-input>input</bf-input>
-<bf-button>button</bf-button>
+          <a href="./calendar-test.html">calendar</a>
+<a href="./date-picker-test.html">date-picker</a>
+<a href="./date-range-picker-test.html">date-range-picker</a>
         </div>
       </section>
 
@@ -92,14 +113,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

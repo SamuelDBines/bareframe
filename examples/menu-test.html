@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe menu test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -52,7 +52,8 @@
     <div class="layout">
       <header>
         <h1>bf-menu</h1>
-        <p>Action/menu container with keyboard support.</p>
+        <p>Unified menu/context-menu container with keyboard support.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,22 +83,30 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-menu>
-  <div class="demo-row">
-    <a href="#">Overview</a>
-    <a href="#">Projects</a>
-    <a href="#">Settings</a>
-    <a href="#">Billing</a>
+        <div class="stack">
+  <bf-menu>
+    <div item value="open">Open</div>
+    <div item value="rename">Rename</div>
+    <div item value="archive">Archive</div>
+  </bf-menu>
+
+  <div id="context-zone" style="min-height: 80px; border: 1px dashed var(--bf-theme-border-1, #cbd5e1); border-radius: 8px; padding: 0.8rem;">
+    Right-click in this area
   </div>
-</bf-menu>
+  <bf-menu context for="context-zone">
+    <div item value="copy">Copy</div>
+    <div item value="paste">Paste</div>
+    <div item value="delete">Delete</div>
+  </bf-menu>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-nav>nav</bf-nav>
-<bf-breadcrumb>breadcrumb</bf-breadcrumb>
-<bf-menu>menu</bf-menu>
+          <a href="./nav-test.html">nav</a>
+<a href="./breadcrumb-test.html">breadcrumb</a>
+<a href="./menu-test.html">menu</a>
         </div>
       </section>
 
@@ -95,14 +116,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

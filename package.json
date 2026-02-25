@@ -7,6 +7,8 @@
   "module": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
+    "./min": "./dist/bareframe.min.js",
+    "./bareframe.min.js": "./dist/bareframe.min.js",
     "./components/*.js": "./dist/components/*.js",
     "./themes/*.css": "./dist/themes/*.css",
     "./manifest.json": "./dist/manifest.json"
@@ -18,7 +20,7 @@
   "scripts": {
     "build": "node ./scripts/build.mjs",
     "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts ./scripts/build.mjs",
-    "serve": "python3 -m http.server 8088",
+    "serve": "cd examples && ln -sfn ../src src && ln -sfn ../themes themes && ln -sfn ../dist dist && python3 -m http.server 8088",
     "generate:index": "node ./scripts/generate-index.mjs",
     "prepack": "npm run build",
     "pack:preview": "npm pack --dry-run"
@@ -30,5 +32,8 @@
     "design-system",
     "bareframe"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.27.3"
+  }
 }

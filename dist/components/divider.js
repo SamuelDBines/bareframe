@@ -1,4 +1,6 @@
 class BfDivider extends HTMLElement {
+	static observedAttributes = ['vertical', 'thickness'];
+
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
@@ -6,6 +8,7 @@ class BfDivider extends HTMLElement {
 
 	connectedCallback() {
 		if (this._initialized) {
+			this._sync();
 			return;
 		}
 		this._initialized = true;
@@ -20,11 +23,36 @@ class BfDivider extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'divider';
+		this.shadowRoot.replaceChildren(link, root);
+		this._root = root;
+		this._sync();
+	}
+
+	attributeChangedCallback() {
+		this._sync();
+	}
+
+	_sync() {
+		if (!this._root) {
+			return;
 		}
 
-		this.shadowRoot.replaceChildren(link, root);
+		const isVertical = this.hasAttribute('vertical');
+		this._root.dataset.orientation = isVertical ? 'vertical' : 'horizontal';
+
+		const raw = this.getAttribute('thickness');
+		if (!raw) {
+			this.style.removeProperty('--bf-divider-thickness');
+			return;
+		}
+
+		const parsed = Number.parseFloat(raw);
+		if (Number.isFinite(parsed)) {
+			this.style.setProperty('--bf-divider-thickness', `${parsed}px`);
+			return;
+		}
+
+		this.style.setProperty('--bf-divider-thickness', raw);
 	}
 }
 

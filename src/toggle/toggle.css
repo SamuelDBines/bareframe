@@ -19,6 +19,9 @@
 }
 
 .root {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.55rem;
 	background: var(--bf-toggle-bg);
 	color: var(--bf-toggle-color);
 	border-width: var(--bf-toggle-border-width);
@@ -27,4 +30,54 @@
 	border-radius: var(--bf-toggle-radius);
 	padding: var(--bf-toggle-padding-y) var(--bf-toggle-padding-x);
 	transition: var(--bf-toggle-transition);
+	cursor: pointer;
+}
+
+.track {
+	display: none;
+}
+
+.root[data-variant='switch'] {
+	border-color: transparent;
+	background: transparent;
+	padding: 0;
+}
+
+.root[data-variant='switch'] .track {
+	display: inline-flex;
+	align-items: center;
+	width: 2.2rem;
+	height: 1.3rem;
+	border-radius: 999px;
+	background: var(--bf-theme-surface-2, #cbd5e1);
+	padding: 0.15rem;
+	transition: background-color 140ms ease;
+}
+
+.root[data-variant='switch'] .thumb {
+	width: 1rem;
+	height: 1rem;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	transform: translateX(0);
+	transition: transform 140ms ease;
+}
+
+.root[data-variant='switch'].is-checked .track {
+	background: var(--bf-theme-button-primary-bg, #2563eb);
+}
+
+.root[data-variant='switch'].is-checked .thumb {
+	transform: translateX(0.9rem);
+}
+
+.root[data-variant='toggle'].is-checked {
+	background: color-mix(in srgb, var(--bf-theme-button-primary-bg, #2563eb) 12%, var(--bf-toggle-bg));
+	border-color: var(--bf-theme-button-primary-bg, #2563eb);
+}
+
+.root:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
 }

@@ -28,3 +28,14 @@
 	padding: var(--bf-list-padding-y) var(--bf-list-padding-x);
 	transition: var(--bf-list-transition);
 }
+
+.root ::slotted([item]) {
+	display: block;
+	padding: 0.45rem 0.6rem;
+	border-radius: 0.4rem;
+	cursor: pointer;
+}
+
+.root ::slotted([item]:hover) {
+	background: var(--bf-theme-surface-2, #f8fafc);
+}

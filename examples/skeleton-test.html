@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe skeleton test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -53,6 +53,7 @@
       <header>
         <h1>bf-skeleton</h1>
         <p>Loading placeholder for content blocks.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,18 +83,82 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-skeleton>
-  <h3>skeleton</h3>
-  <p>Reusable component composition block.</p>
-</bf-skeleton>
+        <div class="stack">
+  <p class="hint">Use <code>skeleton</code> on any element/component. Add a time like <code>skeleton="1400"</code> or <code>skeleton="1.4s"</code> to auto-reveal.</p>
+  <div class="demo-row">
+    <bf-button id="skeletonReplay" variant="secondary">Replay Loading</bf-button>
+  </div>
+  <div row>
+    <div col="6">
+      <bf-card id="sk-card" skeleton="1800">
+        <div stack="sm">
+          <img alt="" src="https://picsum.photos/seed/bf/640/360" style="width: 100%; border-radius: 12px;" />
+          <div class="demo-row" style="align-items: center;">
+            <bf-avatar name="Alex Rivera"></bf-avatar>
+            <div stack>
+              <strong>Async Content Card</strong>
+              <span class="hint">Loaded after 1.8s</span>
+            </div>
+          </div>
+          <p class="hint">Skeleton utility overlays this entire card while waiting for data.</p>
+          <bf-button>Open</bf-button>
+        </div>
+      </bf-card>
+    </div>
+    <div col="6">
+      <bf-card>
+        <div stack="sm">
+          <strong>List Loading Utility</strong>
+          <div stack="sm">
+            <div id="sk-row-1" class="demo-row" style="align-items: center;" skeleton="1200">
+              <bf-avatar name="Taylor"></bf-avatar>
+              <div stack style="flex: 1;">
+                <strong>Taylor</strong>
+                <span class="hint">Design System</span>
+              </div>
+            </div>
+            <div id="sk-row-2" class="demo-row" style="align-items: center;" skeleton="1700">
+              <bf-avatar name="Jordan"></bf-avatar>
+              <div stack style="flex: 1;">
+                <strong>Jordan</strong>
+                <span class="hint">Frontend Platform</span>
+              </div>
+            </div>
+            <div id="sk-row-3" class="demo-row" style="align-items: center;" skeleton="2.2s">
+              <bf-avatar name="Morgan"></bf-avatar>
+              <div stack style="flex: 1;">
+                <strong>Morgan</strong>
+                <span class="hint">Infra Team</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </bf-card>
+    </div>
+  </div>
+  <script>
+    document.getElementById('skeletonReplay')?.addEventListener('click', () => {
+      const targets = ['sk-card', 'sk-row-1', 'sk-row-2', 'sk-row-3']
+        .map((id) => document.getElementById(id))
+        .filter(Boolean);
+      targets.forEach((node) => node.removeAttribute('skeleton'));
+      requestAnimationFrame(() => {
+        document.getElementById('sk-card')?.setAttribute('skeleton', '1800');
+        document.getElementById('sk-row-1')?.setAttribute('skeleton', '1200');
+        document.getElementById('sk-row-2')?.setAttribute('skeleton', '1700');
+        document.getElementById('sk-row-3')?.setAttribute('skeleton', '2.2s');
+      });
+    });
+  </script>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-card>card</bf-card>
-<bf-header>header</bf-header>
-<bf-footer>footer</bf-footer>
+          <a href="./card-test.html">card</a>
+<a href="./edge-test.html">edge</a>
+<a href="./nav-test.html">nav</a>
         </div>
       </section>
 
@@ -91,14 +168,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

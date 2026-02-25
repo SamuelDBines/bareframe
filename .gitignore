@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+
+# Local example symlinks used by `npm run serve`
+examples/src
+examples/themes
+examples/dist

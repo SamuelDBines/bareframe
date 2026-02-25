@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe stack test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -53,6 +53,7 @@
       <header>
         <h1>bf-stack</h1>
         <p>Vertical/horizontal spacing layout helper.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,18 +83,37 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-stack>
-  <h3>stack</h3>
-  <p>Reusable component composition block.</p>
-</bf-stack>
+        <div stack="lg">
+  <div stack>
+    <strong>Global Stack Utility</strong>
+    <p class="hint">Use <code>stack</code> on any element, not just <code>bf-stack</code>.</p>
+  </div>
+
+  <div stack="sm">
+    <bf-button>Save</bf-button>
+    <bf-button variant="secondary">Preview</bf-button>
+    <bf-button variant="secondary">Cancel</bf-button>
+  </div>
+
+  <bf-card>
+    <div stack="md">
+      <h3 style="margin: 0;">Card Content</h3>
+      <p class="hint">This uses a plain <code>div stack</code> inside <code>bf-card</code>.</p>
+      <div row>
+        <div col="6"><bf-input placeholder="First name"></bf-input></div>
+        <div col="6"><bf-input placeholder="Last name"></bf-input></div>
+      </div>
+    </div>
+  </bf-card>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-card>card</bf-card>
-<bf-header>header</bf-header>
-<bf-footer>footer</bf-footer>
+          <a href="./card-test.html">card</a>
+<a href="./edge-test.html">edge</a>
+<a href="./nav-test.html">nav</a>
         </div>
       </section>
 
@@ -91,14 +123,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe timeline test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -53,6 +53,7 @@
       <header>
         <h1>bf-timeline</h1>
         <p>Sequential events over time.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -71,17 +84,24 @@
       <section class="panel">
         <h2>Primary Demo</h2>
         <bf-timeline>
-  <h3>timeline</h3>
-  <p>Reusable component composition block.</p>
+  <div class="stack">
+    <div class="tableish" style="grid-template-columns: 7rem 1fr;">
+      <div><strong>2026-02-01</strong></div><div>Requirements locked</div>
+      <div><strong>2026-02-12</strong></div><div>Alpha release to internal users</div>
+      <div><strong>2026-02-25</strong></div><div>Public beta rollout</div>
+      <div><strong>2026-03-10</strong></div><div>GA launch with onboarding docs</div>
+    </div>
+    <p class="hint">Use timeline for milestone history, audits, and roadmaps.</p>
+  </div>
 </bf-timeline>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-card>card</bf-card>
-<bf-header>header</bf-header>
-<bf-footer>footer</bf-footer>
+          <a href="./calendar-test.html">calendar</a>
+<a href="./date-picker-test.html">date-picker</a>
+<a href="./date-range-picker-test.html">date-range-picker</a>
         </div>
       </section>
 
@@ -91,14 +111,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

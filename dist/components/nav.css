@@ -19,6 +19,10 @@
 }
 
 .root {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--bf-nav-padding-x);
 	background: var(--bf-nav-bg);
 	color: var(--bf-nav-color);
 	border-width: var(--bf-nav-border-width);
@@ -27,4 +31,39 @@
 	border-radius: var(--bf-nav-radius);
 	padding: var(--bf-nav-padding-y) var(--bf-nav-padding-x);
 	transition: var(--bf-nav-transition);
+}
+
+::slotted([col]),
+::slotted([nav-col]) {
+	display: flex;
+	align-items: center;
+	gap: var(--bf-nav-padding-x);
+	min-width: 0;
+}
+
+::slotted([col]:first-child),
+::slotted([nav-col]:first-child) {
+	justify-content: flex-start;
+	flex: 1 1 0;
+}
+
+::slotted([col]:nth-child(2)),
+::slotted([nav-col]:nth-child(2)) {
+	justify-content: center;
+	flex: 1 1 0;
+}
+
+::slotted([col]:last-child),
+::slotted([nav-col]:last-child) {
+	justify-content: flex-end;
+	flex: 1 1 0;
+}
+
+::slotted([row]),
+::slotted([nav-row]) {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--bf-nav-padding-x);
+	width: 100%;
 }

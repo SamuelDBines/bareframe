@@ -1,30 +1,26 @@
 :host {
-	--bf-divider-font: var(--bf-theme-font-family, inherit);
-	--bf-divider-radius: var(--bf-theme-radius-md, 8px);
-	--bf-divider-border-width: var(--bf-theme-border-width, 1px);
-	--bf-divider-border-style: var(--bf-theme-border-style, solid);
 	--bf-divider-border-color: var(--bf-theme-divider-border-color, var(--bf-theme-border-1, #cbd5e1));
-	--bf-divider-bg: var(--bf-theme-divider-bg, var(--bf-theme-surface-1, #ffffff));
-	--bf-divider-color: var(--bf-theme-divider-color, var(--bf-theme-text-1, #0f172a));
-	--bf-divider-padding-y: var(--bf-theme-space-2, 0.6rem);
-	--bf-divider-padding-x: var(--bf-theme-space-3, 0.9rem);
-	--bf-divider-transition:
-		var(--bf-theme-transition-bg, background-color 120ms ease),
-		var(--bf-theme-transition-color, color 120ms ease),
-		var(--bf-theme-transition-border, border-color 120ms ease);
+	--bf-divider-thickness: 1px;
+	--bf-divider-min-length: 2rem;
 
 	display: block;
-	font: var(--bf-divider-font);
-	color: var(--bf-divider-color);
 }
 
 .root {
-	background: var(--bf-divider-bg);
-	color: var(--bf-divider-color);
-	border-width: var(--bf-divider-border-width);
-	border-style: var(--bf-divider-border-style);
-	border-color: var(--bf-divider-border-color);
-	border-radius: var(--bf-divider-radius);
-	padding: var(--bf-divider-padding-y) var(--bf-divider-padding-x);
-	transition: var(--bf-divider-transition);
+	box-sizing: border-box;
+	border-radius: 999px;
+	background: var(--bf-divider-border-color);
+	min-width: var(--bf-divider-min-length);
+}
+
+.root[data-orientation='horizontal'] {
+	height: var(--bf-divider-thickness);
+	width: 100%;
+}
+
+.root[data-orientation='vertical'] {
+	width: var(--bf-divider-thickness);
+	height: 100%;
+	min-height: var(--bf-divider-min-length);
+	min-width: 0;
 }

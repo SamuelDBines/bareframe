@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe canvas test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -53,6 +53,7 @@
       <header>
         <h1>bf-canvas</h1>
         <p>Drawing surface for custom rendering.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -71,12 +84,16 @@
       <section class="panel">
         <h2>Primary Demo</h2>
         <bf-canvas>
-  <div class="viz">
-    <div style="height: 30%"></div>
-    <div style="height: 62%"></div>
-    <div style="height: 44%"></div>
-    <div style="height: 84%"></div>
-    <div style="height: 58%"></div>
+  <div class="stack">
+    <div class="demo-row">
+      <bf-button variant="secondary">Select</bf-button>
+      <bf-button variant="secondary">Line</bf-button>
+      <bf-button variant="secondary">Rectangle</bf-button>
+      <bf-button variant="secondary">Text</bf-button>
+      <bf-button variant="secondary">Export</bf-button>
+    </div>
+    <div style="min-height: 180px; border: 1px dashed var(--bf-theme-border-1, #cbd5e1); border-radius: 10px; background: repeating-linear-gradient(0deg, rgba(148,163,184,0.08), rgba(148,163,184,0.08) 1px, transparent 1px, transparent 24px), repeating-linear-gradient(90deg, rgba(148,163,184,0.08), rgba(148,163,184,0.08) 1px, transparent 1px, transparent 24px);"></div>
+    <p class="hint">Canvas is intended as a drawing workspace (diagram/flow editor style).</p>
   </div>
 </bf-canvas>
       </section>
@@ -84,9 +101,9 @@
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-card>card</bf-card>
-<bf-filter-bar>filter-bar</bf-filter-bar>
-<bf-segmented-control>segmented-control</bf-segmented-control>
+          <a href="./canvas-test.html">canvas</a>
+<a href="./toolbar-test.html">toolbar</a>
+<a href="./dialog-test.html">dialog</a>
         </div>
       </section>
 
@@ -96,14 +113,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

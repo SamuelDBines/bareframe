@@ -13,12 +13,14 @@
 		var(--bf-theme-transition-color, color 120ms ease),
 		var(--bf-theme-transition-border, border-color 120ms ease);
 
-	display: block;
+	display: inline-block;
 	font: var(--bf-tab-font);
 	color: var(--bf-tab-color);
 }
 
 .root {
+	font: inherit;
+	cursor: pointer;
 	background: var(--bf-tab-bg);
 	color: var(--bf-tab-color);
 	border-width: var(--bf-tab-border-width);
@@ -27,4 +29,10 @@
 	border-radius: var(--bf-tab-radius);
 	padding: var(--bf-tab-padding-y) var(--bf-tab-padding-x);
 	transition: var(--bf-tab-transition);
+}
+
+.root.is-selected {
+	background: var(--bf-theme-button-primary-bg, #2563eb);
+	color: var(--bf-theme-button-primary-color, #ffffff);
+	border-color: var(--bf-theme-button-primary-border-color, #1d4ed8);
 }

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bareframe utilities test</title>
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
+    <style>
+      body {
+        font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+        margin: 2rem;
+        line-height: 1.45;
+        color: var(--bf-theme-text-1, #111827);
+        background: var(--bf-theme-surface-2, #f8fafc);
+      }
+
+      .layout { display: grid; gap: 1rem; max-width: 980px; }
+      .panel {
+        border: 1px solid var(--bf-theme-border-1, #d1d5db);
+        border-radius: 12px;
+        background: var(--bf-theme-surface-1, #ffffff);
+        padding: 1rem;
+      }
+      .theme-controls, .demo-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.7rem;
+      }
+      .stack { display: grid; gap: 0.5rem; }
+      .hint { margin: 0; color: var(--bf-theme-text-2, #4b5563); }
+      .swatch {
+        border: 1px dashed var(--bf-theme-border-1, #cbd5e1);
+        border-radius: 8px;
+        padding: 0.55rem;
+      }
+      .colbox {
+        min-height: 7.2rem;
+        border: 1px dashed var(--bf-theme-border-1, #cbd5e1);
+        border-radius: 8px;
+        padding: 0.45rem;
+      }
+      code { background: rgba(148, 163, 184, 0.2); padding: 0.1rem 0.35rem; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <header>
+        <h1>Utilities</h1>
+        <p>Global utility attributes that work across plain HTML and <code>bf-*</code> components.</p>
+        <p><a href="./index.html">Back to Examples</a></p>
+      </header>
+
+      <section class="panel">
+        <div class="theme-controls">
+          <label for="themeSelect">Theme</label>
+          <select id="themeSelect">
+            <option value="system">system</option>
+            <option value="light">light</option>
+            <option value="dark">dark</option>
+            <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
+          </select>
+          <span id="themeStatus"></span>
+        </div>
+      </section>
+
+      <section class="panel" stack="sm">
+        <h2 style="margin: 0;">Row + Col</h2>
+        <p class="hint">Alignment utilities: <code>row="left|center|right"</code> and <code>col="top|center|bottom"</code>.</p>
+        <div row="left" class="swatch"><bf-button>Left 1</bf-button><bf-button variant="secondary">Left 2</bf-button></div>
+        <div row="center" class="swatch"><bf-button>Center 1</bf-button><bf-button variant="secondary">Center 2</bf-button></div>
+        <div row="right" class="swatch"><bf-button>Right 1</bf-button><bf-button variant="secondary">Right 2</bf-button></div>
+
+        <div row>
+          <div col="top" class="colbox"><bf-tag>Top</bf-tag><bf-button>Action</bf-button></div>
+          <div col="center" class="colbox"><bf-tag>Center</bf-tag><bf-button>Action</bf-button></div>
+          <div col="bottom" class="colbox"><bf-tag>Bottom</bf-tag><bf-button>Action</bf-button></div>
+        </div>
+
+        <p class="hint">Grid spans still use numeric values: <code>col="3"</code> .. <code>col="12"</code>.</p>
+        <div row class="swatch">
+          <div col="3"><bf-card>3</bf-card></div>
+          <div col="6"><bf-card>6</bf-card></div>
+          <div col="3"><bf-card>3</bf-card></div>
+        </div>
+      </section>
+
+      <section class="panel" stack="sm">
+        <h2 style="margin: 0;">Stack</h2>
+        <p class="hint">Spacing utility on any element: <code>stack="xs|sm|md|lg|xl"</code>.</p>
+        <div stack="xs" class="swatch"><bf-tag>xs</bf-tag><bf-tag>gap</bf-tag><bf-tag>stack</bf-tag></div>
+        <div stack="md" class="swatch"><bf-tag>md</bf-tag><bf-tag>gap</bf-tag><bf-tag>stack</bf-tag></div>
+        <div stack="xl" class="swatch"><bf-tag>xl</bf-tag><bf-tag>gap</bf-tag><bf-tag>stack</bf-tag></div>
+      </section>
+
+      <section class="panel" stack="sm">
+        <h2 style="margin: 0;">Typography</h2>
+        <p typography="display">Display Utility</p>
+        <p typography="h1">Heading 1 Utility</p>
+        <p typography="h2">Heading 2 Utility</p>
+        <p typography="body">Body utility text for standard copy.</p>
+        <small typography="caption">Caption utility text.</small>
+        <span typography="label">Label utility text.</span>
+        <span typography="code">const mode = 'utility'</span>
+      </section>
+
+      <section class="panel" stack="sm">
+        <h2 style="margin: 0;">Skeleton Utility</h2>
+        <p class="hint">Attach loading state directly to target elements: <code>skeleton</code> or <code>skeleton="1200"</code>.</p>
+        <div id="utility-skel-row" row>
+          <bf-card id="utility-skel-card" col="6" skeleton="1500">
+            <div stack="sm">
+              <strong>Utility Loading Card</strong>
+              <p class="hint">This content appears after the skeleton delay.</p>
+              <bf-button>View</bf-button>
+            </div>
+          </bf-card>
+          <div col="6" skeleton="2s" class="swatch">
+            <strong>Plain Div Skeleton</strong>
+            <p class="hint">Works on regular HTML too.</p>
+          </div>
+        </div>
+        <div row>
+          <bf-button id="utilityReplay" variant="secondary">Replay Skeleton Utility</bf-button>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="./src/index.js"></script>
+    <script type="module">
+      const themeSelect = document.getElementById('themeSelect');
+      const themeStatus = document.getElementById('themeStatus');
+      const themeStylesheet = document.getElementById('themeStylesheet');
+
+      function applyTheme(theme) {
+        themeStylesheet.href = './themes/' + theme + '.css';
+        document.documentElement.setAttribute('data-bf-theme', theme);
+        themeStatus.textContent = 'Active: ' + theme;
+      }
+
+      themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+      applyTheme('system');
+
+      document.getElementById('utilityReplay')?.addEventListener('click', () => {
+        const card = document.getElementById('utility-skel-card');
+        const row = document.getElementById('utility-skel-row');
+        const divTarget = row?.querySelector('div[col="6"]');
+        if (!card || !divTarget) return;
+        card.removeAttribute('skeleton');
+        divTarget.removeAttribute('skeleton');
+        requestAnimationFrame(() => {
+          card.setAttribute('skeleton', '1500');
+          divTarget.setAttribute('skeleton', '2s');
+        });
+      });
+    </script>
+  </body>
+</html>

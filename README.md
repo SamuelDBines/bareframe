@@ -16,6 +16,12 @@ Register everything:
 import 'bareframe';
 ```
 
+Single-file production bundle:
+
+```js
+import 'bareframe/min';
+```
+
 Or import one component:
 
 ```js
@@ -29,6 +35,113 @@ import 'bareframe/themes/system.css';
 ```
 
 `system` is the default/recommended theme for bareframe.
+
+Optional layout utilities:
+
+```js
+import 'bareframe/themes/layout.css';
+```
+
+Grid-style column spans are supported with a 12-column model:
+
+```html
+<div row>
+  <div col="3">Sidebar</div>
+  <div col="9">Main</div>
+</div>
+```
+
+If `col` has no value, it auto-shares available width with siblings.
+
+Alignment utilities:
+
+```html
+<div row="left">...</div>
+<div row="center">...</div>
+<div row="right">...</div>
+
+<div col="top">...</div>
+<div col="center">...</div>
+<div col="bottom">...</div>
+```
+
+Skeleton can be used as a utility on any target element:
+
+```html
+<bf-card skeleton="1500">...</bf-card>
+<div skeleton="2s">...</div>
+```
+
+Typography utilities follow the same attribute pattern:
+
+```html
+<h1 typography="display">Dashboard</h1>
+<p typography="body">Body copy text.</p>
+<small typography="caption">Updated 2m ago</small>
+```
+
+Short boolean attributes are also supported:
+
+```html
+<small h1>Heading-sized small text</small>
+<span caption>Caption text</span>
+```
+
+Bareframe runtime defaults for all `bf-*` elements:
+
+- auto id assignment (and duplicate id collision repair)
+- `data-qa="test-<id>"` when missing
+- `data-translate="<html lang>"` when missing
+
+ID-driven controls for interactive components:
+
+```html
+<bf-button bf-open="account-modal">Open</bf-button>
+<bf-button bf-close="account-modal">Close</bf-button>
+<bf-button bf-toggle="account-modal">Toggle</bf-button>
+<bf-modal id="account-modal">...</bf-modal>
+```
+
+Accordion section control by id:
+
+```html
+<bf-button bf-open="docs:intro">Open intro</bf-button>
+<bf-accordion id="docs">
+  <section id="intro" title="Intro">...</section>
+</bf-accordion>
+```
+
+Group primitives (utility-first authoring):
+
+```html
+<bf-radio group="plan">Free</bf-radio>
+<bf-radio group="plan">Pro</bf-radio>
+
+<bf-button group="filters" multiple="2">A</bf-button>
+<bf-button group="filters" multiple="2">B</bf-button>
+<bf-button group="filters" multiple="2">C</bf-button>
+
+<bf-checkbox group="features" multiple="3">Logs</bf-checkbox>
+<bf-checkbox group="features" multiple="3">Alerts</bf-checkbox>
+```
+
+Menu/list item pattern:
+
+```html
+<bf-menu>
+  <div item>Profile</div>
+  <div item>Settings</div>
+</bf-menu>
+```
+
+Header/footer edge positioning (same API on both):
+
+```html
+<bf-edge sticky header>...</bf-edge>
+<bf-edge fixed footer>...</bf-edge>
+```
+
+You can also force placement with `position="top"` or `position="bottom"`.
 
 ## Why bareframe
 
@@ -102,7 +215,20 @@ Theme files live in `themes/`:
 - `themes/light.css`
 - `themes/dark.css`
 - `themes/sprint.css`
+- `themes/retro.css`
+- `themes/modern.css`
+- `themes/simple.css`
+- `themes/nature.css`
+- `themes/future.css`
+- `themes/aurora.css`
+- `themes/nebula.css`
+- `themes/desert.css`
+- `themes/matrix.css`
+- `themes/noir.css`
+- `themes/sunrise.css`
+- `themes/oceanic.css`
 - `themes/system.css` (follows OS preference with `prefers-color-scheme`)
+- `themes/layout.css` (`[row]` and `[col]` utility attributes)
 
 Use `system` as the default theme for apps:
 
@@ -188,6 +314,10 @@ npm run build
 npm run watch
 npm run pack:preview
 ```
+
+Production bundle output:
+
+- `dist/bareframe.min.js` (single minified JS file with inlined component CSS)
 
 ## Status
 

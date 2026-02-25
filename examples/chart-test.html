@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>bareframe chart test</title>
-    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -52,7 +52,8 @@
     <div class="layout">
       <header>
         <h1>bf-chart</h1>
-        <p>Generic chart wrapper with shared API.</p>
+        <p>Unified chart/graph primitive with variants (`bar`, `line`, `pie`, `graph`, etc.).</p>
+        <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
       <section class="panel">
@@ -63,6 +64,18 @@
             <option value="light">light</option>
             <option value="dark">dark</option>
             <option value="sprint">sprint</option>
+            <option value="retro">retro</option>
+            <option value="modern">modern</option>
+            <option value="simple">simple</option>
+            <option value="nature">nature</option>
+            <option value="future">future</option>
+            <option value="aurora">aurora</option>
+            <option value="nebula">nebula</option>
+            <option value="desert">desert</option>
+            <option value="matrix">matrix</option>
+            <option value="noir">noir</option>
+            <option value="sunrise">sunrise</option>
+            <option value="oceanic">oceanic</option>
           </select>
           <span id="themeStatus"></span>
         </div>
@@ -70,23 +83,35 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-chart>
-  <div class="viz">
-    <div style="height: 30%"></div>
-    <div style="height: 62%"></div>
-    <div style="height: 44%"></div>
-    <div style="height: 84%"></div>
-    <div style="height: 58%"></div>
+        <div stack="lg">
+  <p class="hint">Unified chart component using <code>variant</code> (or shorthand attributes) to switch renderer style.</p>
+  <div row>
+    <div col="6"><bf-chart variant="bar">Revenue by month</bf-chart></div>
+    <div col="6"><bf-chart variant="line">Conversion trend</bf-chart></div>
   </div>
-</bf-chart>
+  <div row>
+    <div col="4"><bf-chart variant="pie">Traffic split</bf-chart></div>
+    <div col="4"><bf-chart variant="donut">Plan share</bf-chart></div>
+    <div col="4"><bf-chart variant="gauge">SLA health</bf-chart></div>
+  </div>
+  <div row>
+    <div col="4"><bf-chart variant="heatmap">Weekly activity</bf-chart></div>
+    <div col="4"><bf-chart variant="treemap">Storage map</bf-chart></div>
+    <div col="4"><bf-chart variant="graph">Dependency graph</bf-chart></div>
+  </div>
+  <div row>
+    <div col="6"><bf-chart variant="gantt">Release plan</bf-chart></div>
+    <div col="6"><bf-chart variant="sparkline">Request latency</bf-chart></div>
+  </div>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <bf-card>card</bf-card>
-<bf-filter-bar>filter-bar</bf-filter-bar>
-<bf-segmented-control>segmented-control</bf-segmented-control>
+          <a href="./card-test.html">card</a>
+<a href="./filter-bar-test.html">filter-bar</a>
+<a href="./segmented-control-test.html">segmented-control</a>
         </div>
       </section>
 
@@ -96,14 +121,14 @@
       </section>
     </div>
 
-    <script type="module" src="../src/index.js"></script>
+    <script type="module" src="./src/index.js"></script>
     <script type="module">
       const themeSelect = document.getElementById('themeSelect');
       const themeStatus = document.getElementById('themeStatus');
       const themeStylesheet = document.getElementById('themeStylesheet');
 
       function applyTheme(theme) {
-        themeStylesheet.href = '../themes/' + theme + '.css';
+        themeStylesheet.href = './themes/' + theme + '.css';
         document.documentElement.setAttribute('data-bf-theme', theme);
         themeStatus.textContent = 'Active: ' + theme;
       }

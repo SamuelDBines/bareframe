@@ -19,12 +19,46 @@
 }
 
 .root {
+	position: relative;
 	background: var(--bf-select-bg);
 	color: var(--bf-select-color);
 	border-width: var(--bf-select-border-width);
 	border-style: var(--bf-select-border-style);
 	border-color: var(--bf-select-border-color);
 	border-radius: var(--bf-select-radius);
-	padding: var(--bf-select-padding-y) var(--bf-select-padding-x);
 	transition: var(--bf-select-transition);
+}
+
+select {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 100%;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	padding: var(--bf-select-padding-y) calc(var(--bf-select-padding-x) * 2.1)
+		var(--bf-select-padding-y) var(--bf-select-padding-x);
+}
+
+.root.is-multi select {
+	padding-right: var(--bf-select-padding-x);
+}
+
+.chevron {
+	position: absolute;
+	top: 50%;
+	right: var(--bf-select-padding-x);
+	width: 0.6rem;
+	height: 0.6rem;
+	transform: translateY(-60%) rotate(45deg);
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	opacity: 0.7;
+	pointer-events: none;
+}
+
+.root.is-multi .chevron {
+	display: none;
 }

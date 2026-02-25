@@ -1,7 +1,7 @@
+@import './layout.css';
+
 :root,
 [data-bf-theme='dark'] {
-	color-scheme: dark;
-
 	--bf-theme-font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
 	--bf-theme-border-width: 1px;
 	--bf-theme-border-style: solid;

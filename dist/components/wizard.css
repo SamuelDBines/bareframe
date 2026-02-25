@@ -1,17 +1,11 @@
 :host {
 	--bf-wizard-font: var(--bf-theme-font-family, inherit);
-	--bf-wizard-radius: var(--bf-theme-radius-md, 8px);
-	--bf-wizard-border-width: var(--bf-theme-border-width, 1px);
-	--bf-wizard-border-style: var(--bf-theme-border-style, solid);
+	--bf-wizard-radius: var(--bf-theme-radius-md, 10px);
 	--bf-wizard-border-color: var(--bf-theme-wizard-border-color, var(--bf-theme-border-1, #cbd5e1));
 	--bf-wizard-bg: var(--bf-theme-wizard-bg, var(--bf-theme-surface-1, #ffffff));
 	--bf-wizard-color: var(--bf-theme-wizard-color, var(--bf-theme-text-1, #0f172a));
-	--bf-wizard-padding-y: var(--bf-theme-space-2, 0.6rem);
-	--bf-wizard-padding-x: var(--bf-theme-space-3, 0.9rem);
-	--bf-wizard-transition:
-		var(--bf-theme-transition-bg, background-color 120ms ease),
-		var(--bf-theme-transition-color, color 120ms ease),
-		var(--bf-theme-transition-border, border-color 120ms ease);
+	--bf-wizard-accent: var(--bf-theme-button-primary-bg, #2563eb);
+	--bf-wizard-muted: var(--bf-theme-text-2, #64748b);
 
 	display: block;
 	font: var(--bf-wizard-font);
@@ -21,10 +15,81 @@
 .root {
 	background: var(--bf-wizard-bg);
 	color: var(--bf-wizard-color);
-	border-width: var(--bf-wizard-border-width);
-	border-style: var(--bf-wizard-border-style);
-	border-color: var(--bf-wizard-border-color);
+	border: 1px solid var(--bf-wizard-border-color);
 	border-radius: var(--bf-wizard-radius);
-	padding: var(--bf-wizard-padding-y) var(--bf-wizard-padding-x);
-	transition: var(--bf-wizard-transition);
+	padding: 0.85rem;
+	display: grid;
+	gap: 0.8rem;
+}
+
+.steps {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.55rem;
+}
+
+.steps li {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	color: var(--bf-wizard-muted);
+}
+
+.steps .dot {
+	width: 1.4rem;
+	height: 1.4rem;
+	border-radius: 999px;
+	border: 1px solid var(--bf-wizard-border-color);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.78rem;
+}
+
+.steps li.current {
+	color: var(--bf-wizard-color);
+	font-weight: 600;
+}
+
+.steps li.current .dot {
+	background: var(--bf-wizard-accent);
+	color: #fff;
+	border-color: var(--bf-wizard-accent);
+}
+
+.steps li.done .dot {
+	border-color: var(--bf-wizard-accent);
+	color: var(--bf-wizard-accent);
+}
+
+.content.is-empty {
+	display: none;
+}
+
+.actions {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.6rem;
+}
+
+.actions button {
+	border: 1px solid var(--bf-wizard-border-color);
+	background: var(--bf-theme-surface-1, #fff);
+	color: inherit;
+	border-radius: 7px;
+	padding: 0.35rem 0.7rem;
+	cursor: pointer;
+}
+
+.actions button:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.root[data-mode='stepper'] .content,
+.root[data-mode='stepper'] .actions {
+	display: none;
 }

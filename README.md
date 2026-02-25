@@ -185,6 +185,7 @@ All generated component demos are listed at:
 
 ```bash
 npm run build
+npm run watch
 npm run pack:preview
 ```
 

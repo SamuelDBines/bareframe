@@ -17,6 +17,8 @@
   ],
   "scripts": {
     "build": "node ./scripts/build.mjs",
+    "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts ./scripts/build.mjs",
+    "serve": "python3 -m http.server 8088",
     "generate:index": "node ./scripts/generate-index.mjs",
     "prepack": "npm run build",
     "pack:preview": "npm pack --dry-run"

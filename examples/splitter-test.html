@@ -1,81 +1,110 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>bareframe splitter test</title>
-		<link id="themeStylesheet" rel="stylesheet" href="../themes/light.css" />
-		<style>
-			body {
-				font-family: 'Avenir Next', 'Segoe UI', sans-serif;
-				margin: 2rem;
-				line-height: 1.45;
-				color: var(--bf-theme-text-1, #0f172a);
-				background: linear-gradient(180deg, var(--bf-theme-surface-2, #f8fafc), var(--bf-theme-surface-1, #ffffff));
-			}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bareframe splitter test</title>
+    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <style>
+      body {
+        font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+        margin: 2rem;
+        line-height: 1.45;
+        color: var(--bf-theme-text-1, #111827);
+        background: var(--bf-theme-surface-2, #f8fafc);
+      }
 
-			.panel {
-				padding: 1rem;
-				border: 1px solid var(--bf-theme-border-1, #cbd5e1);
-				border-radius: 12px;
-				background: var(--bf-theme-surface-1, #ffffff);
-				max-width: 860px;
-			}
+      .layout {
+        display: grid;
+        gap: 1rem;
+        max-width: 980px;
+      }
 
-			.theme-controls,
-			.demo-row {
-				display: flex;
-				align-items: center;
-				gap: 0.7rem;
-				flex-wrap: wrap;
-			}
+      .panel {
+        border: 1px solid var(--bf-theme-border-1, #d1d5db);
+        border-radius: 12px;
+        background: var(--bf-theme-surface-1, #ffffff);
+        padding: 1rem;
+      }
 
-			.stack { display: grid; gap: 0.55rem; }
-			.hint { margin: 0; color: var(--bf-theme-text-2, #334155); font-size: 0.9rem; }
-			.tableish { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 0.75rem; }
-			.viz { display: flex; align-items: end; height: 120px; gap: 0.5rem; }
-			.viz > div { width: 24px; background: var(--bf-theme-button-primary-bg, #2563eb); border-radius: 6px 6px 0 0; }
-			.media { min-height: 120px; display: grid; place-items: center; border: 1px dashed var(--bf-theme-border-1, #cbd5e1); border-radius: 8px; }
-			code { background: rgba(148, 163, 184, 0.15); padding: 0.1rem 0.35rem; border-radius: 6px; }
-		</style>
-	</head>
-	<body>
-		<h1>bf-splitter</h1>
-		<p>Resizable two-panel divider.</p>
+      .theme-controls,
+      .demo-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.7rem;
+      }
 
-		<div class="panel">
-			<div class="theme-controls">
-				<label for="themeSelect">Theme</label>
-				<select id="themeSelect">
-					<option value="light">light</option>
-					<option value="dark">dark</option>
-					<option value="sprint">sprint</option>
-					<option value="system">system</option>
-				</select>
-				<span id="themeStatus"></span>
-			</div>
+      .stack { display: grid; gap: 0.5rem; }
+      .label { font-weight: 600; }
+      .hint { margin: 0; color: var(--bf-theme-text-2, #4b5563); }
+      .tableish { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 0.75rem; }
+      .viz { display: flex; align-items: end; gap: 0.5rem; min-height: 120px; }
+      .viz > div {
+        width: 24px;
+        background: var(--bf-theme-button-primary-bg, #2563eb);
+        border-radius: 6px 6px 0 0;
+      }
+      code { background: rgba(148, 163, 184, 0.2); padding: 0.1rem 0.35rem; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <header>
+        <h1>bf-splitter</h1>
+        <p>Resizable two-panel divider.</p>
+      </header>
 
-			<h2>Demo</h2>
-			<bf-splitter>splitter</bf-splitter>
+      <section class="panel">
+        <div class="theme-controls">
+          <label for="themeSelect">Theme</label>
+          <select id="themeSelect">
+            <option value="system">system</option>
+            <option value="light">light</option>
+            <option value="dark">dark</option>
+            <option value="sprint">sprint</option>
+          </select>
+          <span id="themeStatus"></span>
+        </div>
+      </section>
 
-			<h2>Tag</h2>
-			<code>bf-splitter</code>
-		</div>
+      <section class="panel">
+        <h2>Primary Demo</h2>
+        <bf-splitter>
+  <h3>splitter</h3>
+  <p>Reusable component composition block.</p>
+</bf-splitter>
+      </section>
 
-		<script type="module" src="../src/splitter/splitter.js"></script>
-		<script type="module">
-			const themeSelect = document.getElementById('themeSelect');
-			const themeStatus = document.getElementById('themeStatus');
-			const themeStylesheet = document.getElementById('themeStylesheet');
+      <section class="panel">
+        <h2>Related Components</h2>
+        <div class="demo-row">
+          <bf-card>card</bf-card>
+<bf-header>header</bf-header>
+<bf-footer>footer</bf-footer>
+        </div>
+      </section>
 
-			function applyTheme(theme) {
-				themeStylesheet.href = '../themes/' + theme + '.css';
-				document.documentElement.setAttribute('data-bf-theme', theme);
-				themeStatus.textContent = 'Active: ' + theme;
-			}
+      <section class="panel">
+        <h2>Tag</h2>
+        <code>bf-splitter</code>
+      </section>
+    </div>
 
-			themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
-			applyTheme('light');
-		</script>
-	</body>
+    <script type="module" src="../src/index.js"></script>
+    <script type="module">
+      const themeSelect = document.getElementById('themeSelect');
+      const themeStatus = document.getElementById('themeStatus');
+      const themeStylesheet = document.getElementById('themeStylesheet');
+
+      function applyTheme(theme) {
+        themeStylesheet.href = '../themes/' + theme + '.css';
+        document.documentElement.setAttribute('data-bf-theme', theme);
+        themeStatus.textContent = 'Active: ' + theme;
+      }
+
+      themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+      applyTheme('system');
+    </script>
+  </body>
 </html>

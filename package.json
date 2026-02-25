@@ -1,0 +1,32 @@
+{
+  "name": "bareframe",
+  "version": "0.1.0",
+  "description": "Lightweight, dependency-free Web Components for reusable app UI.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./components/*.js": "./dist/components/*.js",
+    "./themes/*.css": "./dist/themes/*.css",
+    "./manifest.json": "./dist/manifest.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "generate:index": "node ./scripts/generate-index.mjs",
+    "prepack": "npm run build",
+    "pack:preview": "npm pack --dry-run"
+  },
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "ui",
+    "design-system",
+    "bareframe"
+  ],
+  "license": "MIT"
+}

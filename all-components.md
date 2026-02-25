@@ -162,6 +162,7 @@ Large, reusable Web Components list for app development. Ordered alphabetically 
 - **toggle**: Generic binary state control.
 - **toolbar**: Row of grouped controls and actions.
 - **tooltip**: Small anchored helper text bubble.
+- **typography**: Semantic text styles for headings, body, labels, and code.
 - **tree view**: Nested expandable hierarchy viewer.
 - **treemap**: Hierarchical data in proportional rectangles.
 

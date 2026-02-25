@@ -1,0 +1,30 @@
+:host {
+	--bf-list-font: var(--bf-theme-font-family, inherit);
+	--bf-list-radius: var(--bf-theme-radius-md, 8px);
+	--bf-list-border-width: var(--bf-theme-border-width, 1px);
+	--bf-list-border-style: var(--bf-theme-border-style, solid);
+	--bf-list-border-color: var(--bf-theme-list-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-list-bg: var(--bf-theme-list-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-list-color: var(--bf-theme-list-color, var(--bf-theme-text-1, #0f172a));
+	--bf-list-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-list-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-list-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-list-font);
+	color: var(--bf-list-color);
+}
+
+.root {
+	background: var(--bf-list-bg);
+	color: var(--bf-list-color);
+	border-width: var(--bf-list-border-width);
+	border-style: var(--bf-list-border-style);
+	border-color: var(--bf-list-border-color);
+	border-radius: var(--bf-list-radius);
+	padding: var(--bf-list-padding-y) var(--bf-list-padding-x);
+	transition: var(--bf-list-transition);
+}

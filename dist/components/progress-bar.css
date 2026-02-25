@@ -1,0 +1,30 @@
+:host {
+	--bf-progress-bar-font: var(--bf-theme-font-family, inherit);
+	--bf-progress-bar-radius: var(--bf-theme-radius-md, 8px);
+	--bf-progress-bar-border-width: var(--bf-theme-border-width, 1px);
+	--bf-progress-bar-border-style: var(--bf-theme-border-style, solid);
+	--bf-progress-bar-border-color: var(--bf-theme-progress-bar-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-progress-bar-bg: var(--bf-theme-progress-bar-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-progress-bar-color: var(--bf-theme-progress-bar-color, var(--bf-theme-text-1, #0f172a));
+	--bf-progress-bar-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-progress-bar-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-progress-bar-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-progress-bar-font);
+	color: var(--bf-progress-bar-color);
+}
+
+.root {
+	background: var(--bf-progress-bar-bg);
+	color: var(--bf-progress-bar-color);
+	border-width: var(--bf-progress-bar-border-width);
+	border-style: var(--bf-progress-bar-border-style);
+	border-color: var(--bf-progress-bar-border-color);
+	border-radius: var(--bf-progress-bar-radius);
+	padding: var(--bf-progress-bar-padding-y) var(--bf-progress-bar-padding-x);
+	transition: var(--bf-progress-bar-transition);
+}

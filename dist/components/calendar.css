@@ -1,0 +1,30 @@
+:host {
+	--bf-calendar-font: var(--bf-theme-font-family, inherit);
+	--bf-calendar-radius: var(--bf-theme-radius-md, 8px);
+	--bf-calendar-border-width: var(--bf-theme-border-width, 1px);
+	--bf-calendar-border-style: var(--bf-theme-border-style, solid);
+	--bf-calendar-border-color: var(--bf-theme-calendar-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-calendar-bg: var(--bf-theme-calendar-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-calendar-color: var(--bf-theme-calendar-color, var(--bf-theme-text-1, #0f172a));
+	--bf-calendar-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-calendar-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-calendar-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-calendar-font);
+	color: var(--bf-calendar-color);
+}
+
+.root {
+	background: var(--bf-calendar-bg);
+	color: var(--bf-calendar-color);
+	border-width: var(--bf-calendar-border-width);
+	border-style: var(--bf-calendar-border-style);
+	border-color: var(--bf-calendar-border-color);
+	border-radius: var(--bf-calendar-radius);
+	padding: var(--bf-calendar-padding-y) var(--bf-calendar-padding-x);
+	transition: var(--bf-calendar-transition);
+}

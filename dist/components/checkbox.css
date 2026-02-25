@@ -1,0 +1,30 @@
+:host {
+	--bf-checkbox-font: var(--bf-theme-font-family, inherit);
+	--bf-checkbox-radius: var(--bf-theme-radius-md, 8px);
+	--bf-checkbox-border-width: var(--bf-theme-border-width, 1px);
+	--bf-checkbox-border-style: var(--bf-theme-border-style, solid);
+	--bf-checkbox-border-color: var(--bf-theme-checkbox-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-checkbox-bg: var(--bf-theme-checkbox-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-checkbox-color: var(--bf-theme-checkbox-color, var(--bf-theme-text-1, #0f172a));
+	--bf-checkbox-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-checkbox-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-checkbox-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-checkbox-font);
+	color: var(--bf-checkbox-color);
+}
+
+.root {
+	background: var(--bf-checkbox-bg);
+	color: var(--bf-checkbox-color);
+	border-width: var(--bf-checkbox-border-width);
+	border-style: var(--bf-checkbox-border-style);
+	border-color: var(--bf-checkbox-border-color);
+	border-radius: var(--bf-checkbox-radius);
+	padding: var(--bf-checkbox-padding-y) var(--bf-checkbox-padding-x);
+	transition: var(--bf-checkbox-transition);
+}

@@ -1,0 +1,30 @@
+:host {
+	--bf-file-upload-font: var(--bf-theme-font-family, inherit);
+	--bf-file-upload-radius: var(--bf-theme-radius-md, 8px);
+	--bf-file-upload-border-width: var(--bf-theme-border-width, 1px);
+	--bf-file-upload-border-style: var(--bf-theme-border-style, solid);
+	--bf-file-upload-border-color: var(--bf-theme-file-upload-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-file-upload-bg: var(--bf-theme-file-upload-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-file-upload-color: var(--bf-theme-file-upload-color, var(--bf-theme-text-1, #0f172a));
+	--bf-file-upload-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-file-upload-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-file-upload-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-file-upload-font);
+	color: var(--bf-file-upload-color);
+}
+
+.root {
+	background: var(--bf-file-upload-bg);
+	color: var(--bf-file-upload-color);
+	border-width: var(--bf-file-upload-border-width);
+	border-style: var(--bf-file-upload-border-style);
+	border-color: var(--bf-file-upload-border-color);
+	border-radius: var(--bf-file-upload-radius);
+	padding: var(--bf-file-upload-padding-y) var(--bf-file-upload-padding-x);
+	transition: var(--bf-file-upload-transition);
+}

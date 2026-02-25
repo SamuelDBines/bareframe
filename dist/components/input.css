@@ -1,0 +1,30 @@
+:host {
+	--bf-input-font: var(--bf-theme-font-family, inherit);
+	--bf-input-radius: var(--bf-theme-radius-md, 8px);
+	--bf-input-border-width: var(--bf-theme-border-width, 1px);
+	--bf-input-border-style: var(--bf-theme-border-style, solid);
+	--bf-input-border-color: var(--bf-theme-input-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-input-bg: var(--bf-theme-input-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-input-color: var(--bf-theme-input-color, var(--bf-theme-text-1, #0f172a));
+	--bf-input-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-input-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-input-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-input-font);
+	color: var(--bf-input-color);
+}
+
+.root {
+	background: var(--bf-input-bg);
+	color: var(--bf-input-color);
+	border-width: var(--bf-input-border-width);
+	border-style: var(--bf-input-border-style);
+	border-color: var(--bf-input-border-color);
+	border-radius: var(--bf-input-radius);
+	padding: var(--bf-input-padding-y) var(--bf-input-padding-x);
+	transition: var(--bf-input-transition);
+}

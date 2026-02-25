@@ -1,0 +1,30 @@
+:host {
+	--bf-dropdown-font: var(--bf-theme-font-family, inherit);
+	--bf-dropdown-radius: var(--bf-theme-radius-md, 8px);
+	--bf-dropdown-border-width: var(--bf-theme-border-width, 1px);
+	--bf-dropdown-border-style: var(--bf-theme-border-style, solid);
+	--bf-dropdown-border-color: var(--bf-theme-dropdown-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-dropdown-bg: var(--bf-theme-dropdown-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-dropdown-color: var(--bf-theme-dropdown-color, var(--bf-theme-text-1, #0f172a));
+	--bf-dropdown-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-dropdown-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-dropdown-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-dropdown-font);
+	color: var(--bf-dropdown-color);
+}
+
+.root {
+	background: var(--bf-dropdown-bg);
+	color: var(--bf-dropdown-color);
+	border-width: var(--bf-dropdown-border-width);
+	border-style: var(--bf-dropdown-border-style);
+	border-color: var(--bf-dropdown-border-color);
+	border-radius: var(--bf-dropdown-radius);
+	padding: var(--bf-dropdown-padding-y) var(--bf-dropdown-padding-x);
+	transition: var(--bf-dropdown-transition);
+}

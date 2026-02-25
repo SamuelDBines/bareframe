@@ -1,0 +1,136 @@
+:host {
+	--bf-button-font: var(--bf-theme-font-family, inherit);
+	--bf-button-border-width: var(--bf-theme-border-width, 1px);
+	--bf-button-border-style: var(--bf-theme-border-style, solid);
+	--bf-button-border-radius: var(--bf-theme-radius-md, 6px);
+	--bf-button-padding-y: var(--bf-theme-space-2, 0.5rem);
+	--bf-button-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-button-cursor: var(--bf-theme-cursor-button, pointer);
+	--bf-button-opacity-hover: var(--bf-theme-opacity-hover, 0.95);
+	--bf-button-active-translate-y: var(--bf-theme-active-translate-y, 1px);
+	--bf-button-focus-outline-width: var(--bf-theme-focus-ring-width, 2px);
+	--bf-button-focus-outline-style: var(--bf-theme-focus-ring-style, solid);
+	--bf-button-focus-outline-color: var(--bf-theme-focus-ring-color, #93c5fd);
+	--bf-button-focus-outline-offset: var(--bf-theme-focus-ring-offset, 2px);
+	--bf-button-transition:
+		var(--bf-theme-transition-transform, transform 120ms ease),
+		var(--bf-theme-transition-opacity, opacity 120ms ease),
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	--bf-button-primary-bg: var(--bf-theme-button-primary-bg, #1d4ed8);
+	--bf-button-primary-color: var(--bf-theme-button-primary-color, #ffffff);
+	--bf-button-primary-border-color: var(
+		--bf-theme-button-primary-border-color,
+		transparent
+	);
+	--bf-button-primary-hover-bg: var(--bf-button-primary-bg);
+	--bf-button-primary-hover-color: var(--bf-button-primary-color);
+	--bf-button-primary-hover-border-color: var(--bf-button-primary-border-color);
+	--bf-button-primary-active-bg: var(--bf-button-primary-bg);
+	--bf-button-primary-active-color: var(--bf-button-primary-color);
+	--bf-button-primary-active-border-color: var(
+		--bf-button-primary-border-color
+	);
+
+	--bf-button-secondary-bg: var(--bf-theme-button-secondary-bg, #ffffff);
+	--bf-button-secondary-color: var(--bf-theme-button-secondary-color, #1d4ed8);
+	--bf-button-secondary-border-color: var(
+		--bf-theme-button-secondary-border-color,
+		#1d4ed8
+	);
+	--bf-button-secondary-hover-bg: var(--bf-button-secondary-bg);
+	--bf-button-secondary-hover-color: var(--bf-button-secondary-color);
+	--bf-button-secondary-hover-border-color: var(
+		--bf-button-secondary-border-color
+	);
+	--bf-button-secondary-active-bg: var(--bf-button-secondary-bg);
+	--bf-button-secondary-active-color: var(--bf-button-secondary-color);
+	--bf-button-secondary-active-border-color: var(
+		--bf-button-secondary-border-color
+	);
+
+	display: inline-block;
+}
+
+button {
+	--_bf-button-bg: var(--bf-button-primary-bg);
+	--_bf-button-color: var(--bf-button-primary-color);
+	--_bf-button-border-color: var(--bf-button-primary-border-color);
+	--_bf-button-hover-bg: var(--bf-button-primary-hover-bg);
+	--_bf-button-hover-color: var(--bf-button-primary-hover-color);
+	--_bf-button-hover-border-color: var(--bf-button-primary-hover-border-color);
+	--_bf-button-active-bg: var(--bf-button-primary-active-bg);
+	--_bf-button-active-color: var(--bf-button-primary-active-color);
+	--_bf-button-active-border-color: var(
+		--bf-button-primary-active-border-color
+	);
+
+	font: var(--bf-button-font);
+	border-width: var(--bf-button-border-width);
+	border-style: var(--bf-button-border-style);
+	border-color: var(--_bf-button-border-color);
+	border-radius: var(--bf-button-border-radius);
+	cursor: var(--bf-button-cursor);
+	padding: var(--bf-button-padding-y) var(--bf-button-padding-x);
+	transition: var(--bf-button-transition);
+	background: var(--_bf-button-bg);
+	color: var(--_bf-button-color);
+}
+
+button:hover {
+	opacity: var(--bf-button-opacity-hover);
+	background: var(--_bf-button-hover-bg);
+	color: var(--_bf-button-hover-color);
+	border-color: var(--_bf-button-hover-border-color);
+}
+
+button:active {
+	transform: translateY(var(--bf-button-active-translate-y));
+	background: var(--_bf-button-active-bg);
+	color: var(--_bf-button-active-color);
+	border-color: var(--_bf-button-active-border-color);
+}
+
+button:focus-visible {
+	outline-width: var(--bf-button-focus-outline-width);
+	outline-style: var(--bf-button-focus-outline-style);
+	outline-color: var(--bf-button-focus-outline-color);
+	outline-offset: var(--bf-button-focus-outline-offset);
+}
+
+button:disabled {
+	opacity: var(--bf-button-disabled-opacity, 0.55);
+	cursor: var(--bf-button-disabled-cursor, not-allowed);
+}
+
+button.primary {
+	--_bf-button-bg: var(--bf-button-primary-bg);
+	--_bf-button-color: var(--bf-button-primary-color);
+	--_bf-button-border-color: var(--bf-button-primary-border-color);
+	--_bf-button-hover-bg: var(--bf-button-primary-hover-bg);
+	--_bf-button-hover-color: var(--bf-button-primary-hover-color);
+	--_bf-button-hover-border-color: var(--bf-button-primary-hover-border-color);
+	--_bf-button-active-bg: var(--bf-button-primary-active-bg);
+	--_bf-button-active-color: var(--bf-button-primary-active-color);
+	--_bf-button-active-border-color: var(
+		--bf-button-primary-active-border-color
+	);
+}
+
+button.secondary {
+	--_bf-button-bg: var(--bf-button-secondary-bg);
+	--_bf-button-color: var(--bf-button-secondary-color);
+	--_bf-button-border-color: var(--bf-button-secondary-border-color);
+	--_bf-button-hover-bg: var(--bf-button-secondary-hover-bg);
+	--_bf-button-hover-color: var(--bf-button-secondary-hover-color);
+	--_bf-button-hover-border-color: var(
+		--bf-button-secondary-hover-border-color
+	);
+	--_bf-button-active-bg: var(--bf-button-secondary-active-bg);
+	--_bf-button-active-color: var(--bf-button-secondary-active-color);
+	--_bf-button-active-border-color: var(
+		--bf-button-secondary-active-border-color
+	);
+}

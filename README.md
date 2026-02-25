@@ -2,6 +2,34 @@
 
 Lightweight, dependency-free Web Components for building reusable UI across applications.
 
+## Install
+
+```bash
+npm install bareframe
+```
+
+## Package Usage
+
+Register everything:
+
+```js
+import 'bareframe';
+```
+
+Or import one component:
+
+```js
+import 'bareframe/components/button.js';
+```
+
+Load a theme:
+
+```js
+import 'bareframe/themes/system.css';
+```
+
+`system` is the default/recommended theme for bareframe.
+
 ## Why bareframe
 
 `bareframe` is built for one purpose: create components once and reuse them everywhere.
@@ -76,6 +104,12 @@ Theme files live in `themes/`:
 - `themes/sprint.css`
 - `themes/system.css` (follows OS preference with `prefers-color-scheme`)
 
+Use `system` as the default theme for apps:
+
+```html
+<link rel="stylesheet" href="./themes/system.css" />
+```
+
 Load one theme globally:
 
 ```html
@@ -146,6 +180,13 @@ This page lets you:
 All generated component demos are listed at:
 
 `http://localhost:8080/examples/index.html`
+
+## Build Package
+
+```bash
+npm run build
+npm run pack:preview
+```
 
 ## Status
 

@@ -36,7 +36,7 @@ Grouped by category to make overlap and consolidation opportunities easier to se
 - **autocomplete**: Text input with dynamic suggestions.
 - **checkbox**: Binary selection control.
 - **combobox**: Input + dropdown selection hybrid.
-- **file upload**: Pick/drag files with progress handling.
+- **file upload**: Unified single/multi file picker with optional dropzone variant.
 - **form field**: Label/help/error wrapper around controls.
 - **input**: Base input primitive with `type` support (email/password/number/color + color utilities).
 - **number field**: Numeric input with stepper behavior.
@@ -46,7 +46,6 @@ Grouped by category to make overlap and consolidation opportunities easier to se
 - **search**: Search input with clear and submit behavior.
 - **select**: Unified single/multi dropdown (`multi` for capped multi-select).
 - **toggle**: Unified toggle/switch control.
-- **upload dropzone**: Drag-and-drop file receiver.
 
 ## Date & Calendar Components
 

@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-02-25T23:09:02.144Z",
-  "componentCount": 74,
+  "generatedAt": "2026-02-25T23:26:07.533Z",
+  "componentCount": 73,
   "components": [
     "accordion",
     "action-list",
@@ -72,7 +72,6 @@
     "toggle",
     "toolbar",
     "tree-view",
-    "upload-dropzone",
     "video-player",
     "virtual-list",
     "wizard"

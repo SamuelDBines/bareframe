@@ -1,5 +1,5 @@
 const BF_ID_PREFIX = 'bf';
-const BF_TRANSLATE_DEFAULT = 'en-US';
+const BF_TRANSLATE_DEFAULT = 'en';
 const skeletonState = new WeakMap();
 
 function slugFromTagName(tagName) {
@@ -38,8 +38,7 @@ function applyTestingAndI18nDefaults(element, seenIds) {
 	}
 
 	if (!element.hasAttribute('data-translate')) {
-		const translateLocale =
-			document.documentElement.lang || navigator.language || BF_TRANSLATE_DEFAULT;
+		const translateLocale = document.documentElement.lang || BF_TRANSLATE_DEFAULT;
 		element.setAttribute('data-translate', translateLocale);
 	}
 }

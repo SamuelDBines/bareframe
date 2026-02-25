@@ -52,7 +52,7 @@
     <div class="layout">
       <header>
         <h1>bf-file-upload</h1>
-        <p>Pick/drag files with progress handling.</p>
+        <p>Unified single/multi file picker with optional dropzone variant.</p>
         <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
@@ -84,9 +84,24 @@
       <section class="panel">
         <h2>Primary Demo</h2>
         <div class="stack">
-  <label class="label">file upload Input</label>
-  <bf-file-upload>Value</bf-file-upload>
-  <p class="hint">Use this for reusable form flows with consistent validation styling.</p>
+  <p class="hint">Single component for file input and dropzone flows.</p>
+  <div row>
+    <div col="6">
+      <bf-file-upload label="Single file (input)" accept=".pdf,.doc,.docx"></bf-file-upload>
+    </div>
+    <div col="6">
+      <bf-file-upload multiple label="Multiple files (input)" accept="image/*,.pdf"></bf-file-upload>
+    </div>
+  </div>
+  <div row>
+    <div col="6">
+      <bf-file-upload dropzone dotted label="Dropzone single"></bf-file-upload>
+    </div>
+    <div col="6">
+      <bf-file-upload dropzone multiple dashed label="Dropzone multiple"></bf-file-upload>
+    </div>
+  </div>
+  <p class="hint">Use <code>dropzone</code>, <code>multiple</code>, and border style attrs <code>dotted</code>/<code>dashed</code>.</p>
 </div>
       </section>
 

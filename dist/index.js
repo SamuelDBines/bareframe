@@ -1706,26 +1706,173 @@ var BfFileUpload = class extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+    this._onRootClick = this._onRootClick.bind(this);
+    this._onInputChange = this._onInputChange.bind(this);
+    this._onDragOver = this._onDragOver.bind(this);
+    this._onDragLeave = this._onDragLeave.bind(this);
+    this._onDrop = this._onDrop.bind(this);
   }
   connectedCallback() {
     if (this._initialized) {
+      this._sync();
       return;
     }
     this._initialized = true;
-    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-file-upload-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-file-upload-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-file-upload-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-file-upload-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-file-upload-border-color%3A%20var(--bf-theme-file-upload-border-color%2C%20var(--bf-theme-border-1%2C%20%23cbd5e1))%3B%0A%09--bf-file-upload-bg%3A%20var(--bf-theme-file-upload-bg%2C%20var(--bf-theme-surface-1%2C%20%23ffffff))%3B%0A%09--bf-file-upload-color%3A%20var(--bf-theme-file-upload-color%2C%20var(--bf-theme-text-1%2C%20%230f172a))%3B%0A%09--bf-file-upload-padding-y%3A%20var(--bf-theme-space-2%2C%200.6rem)%3B%0A%09--bf-file-upload-padding-x%3A%20var(--bf-theme-space-3%2C%200.9rem)%3B%0A%09--bf-file-upload-transition%3A%0A%09%09var(--bf-theme-transition-bg%2C%20background-color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-color%2C%20color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-border%2C%20border-color%20120ms%20ease)%3B%0A%0A%09display%3A%20block%3B%0A%09font%3A%20var(--bf-file-upload-font)%3B%0A%09color%3A%20var(--bf-file-upload-color)%3B%0A%7D%0A%0A.root%20%7B%0A%09background%3A%20var(--bf-file-upload-bg)%3B%0A%09color%3A%20var(--bf-file-upload-color)%3B%0A%09border-width%3A%20var(--bf-file-upload-border-width)%3B%0A%09border-style%3A%20var(--bf-file-upload-border-style)%3B%0A%09border-color%3A%20var(--bf-file-upload-border-color)%3B%0A%09border-radius%3A%20var(--bf-file-upload-radius)%3B%0A%09padding%3A%20var(--bf-file-upload-padding-y)%20var(--bf-file-upload-padding-x)%3B%0A%09transition%3A%20var(--bf-file-upload-transition)%3B%0A%7D%0A", import.meta.url);
+    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-file-upload-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-file-upload-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-file-upload-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-file-upload-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-file-upload-border-color%3A%20var(%0A%09%09--bf-theme-file-upload-border-color%2C%0A%09%09var(--bf-theme-upload-dropzone-border-color%2C%20var(--bf-theme-border-1%2C%20%23cbd5e1))%0A%09)%3B%0A%09--bf-file-upload-bg%3A%20var(%0A%09%09--bf-theme-file-upload-bg%2C%0A%09%09var(--bf-theme-upload-dropzone-bg%2C%20var(--bf-theme-surface-1%2C%20%23ffffff))%0A%09)%3B%0A%09--bf-file-upload-color%3A%20var(%0A%09%09--bf-theme-file-upload-color%2C%0A%09%09var(--bf-theme-upload-dropzone-color%2C%20var(--bf-theme-text-1%2C%20%230f172a))%0A%09)%3B%0A%09--bf-file-upload-padding-y%3A%20var(--bf-theme-space-2%2C%200.6rem)%3B%0A%09--bf-file-upload-padding-x%3A%20var(--bf-theme-space-3%2C%200.9rem)%3B%0A%09--bf-file-upload-transition%3A%0A%09%09var(--bf-theme-transition-bg%2C%20background-color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-color%2C%20color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-border%2C%20border-color%20120ms%20ease)%3B%0A%0A%09display%3A%20block%3B%0A%09font%3A%20var(--bf-file-upload-font)%3B%0A%09color%3A%20var(--bf-file-upload-color)%3B%0A%7D%0A%0A.root%20%7B%0A%09display%3A%20grid%3B%0A%09gap%3A%200.45rem%3B%0A%09background%3A%20var(--bf-file-upload-bg)%3B%0A%09color%3A%20var(--bf-file-upload-color)%3B%0A%09border-width%3A%20var(--bf-file-upload-border-width)%3B%0A%09border-style%3A%20var(--bf-file-upload-border-style)%3B%0A%09border-color%3A%20var(--bf-file-upload-border-color)%3B%0A%09border-radius%3A%20var(--bf-file-upload-radius)%3B%0A%09padding%3A%20var(--bf-file-upload-padding-y)%20var(--bf-file-upload-padding-x)%3B%0A%09transition%3A%20var(--bf-file-upload-transition)%3B%0A%09cursor%3A%20pointer%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'dropzone'%5D%20%7B%0A%09min-height%3A%207rem%3B%0A%09align-content%3A%20center%3B%0A%09text-align%3A%20center%3B%0A%7D%0A%0A.root%5Bdata-border%3D'dotted'%5D%20%7B%0A%09border-style%3A%20dotted%3B%0A%7D%0A%0A.root%5Bdata-border%3D'dashed'%5D%20%7B%0A%09border-style%3A%20dashed%3B%0A%7D%0A%0A.root%5Bdata-drag%3D'over'%5D%20%7B%0A%09background%3A%20color-mix(in%20srgb%2C%20var(--bf-file-upload-bg)%2070%25%2C%20var(--bf-file-upload-border-color))%3B%0A%7D%0A%0A.root%5Bdata-disabled%3D'true'%5D%20%7B%0A%09opacity%3A%200.65%3B%0A%09cursor%3A%20not-allowed%3B%0A%7D%0A%0A.native%20%7B%0A%09display%3A%20none%3B%0A%7D%0A%0A.label%20%7B%0A%09font-weight%3A%20600%3B%0A%7D%0A%0A.meta%20%7B%0A%09color%3A%20var(--bf-theme-text-2%2C%20%23475569)%3B%0A%09font-size%3A%200.9em%3B%0A%7D%0A%0A.files%20%7B%0A%09display%3A%20flex%3B%0A%09flex-wrap%3A%20wrap%3B%0A%09gap%3A%200.35rem%3B%0A%7D%0A%0A.file%20%7B%0A%09display%3A%20inline-flex%3B%0A%09align-items%3A%20center%3B%0A%09gap%3A%200.25rem%3B%0A%09padding%3A%200.2rem%200.45rem%3B%0A%09border-radius%3A%20999px%3B%0A%09border%3A%201px%20solid%20color-mix(in%20srgb%2C%20var(--bf-file-upload-border-color)%2090%25%2C%20transparent)%3B%0A%09background%3A%20color-mix(in%20srgb%2C%20var(--bf-file-upload-bg)%2082%25%2C%20var(--bf-file-upload-border-color))%3B%0A%09font-size%3A%200.82em%3B%0A%7D%0A%0Aslot%3Anot(%3Aempty)%20%7B%0A%09display%3A%20block%3B%0A%7D%0A", import.meta.url);
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = cssUrl.href;
     const root = document.createElement("div");
     root.className = "root";
     root.setAttribute("part", "root");
-    root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "file upload";
-    }
+    root.innerHTML = `
+			<input class="native" type="file" />
+			<div class="label" part="label"></div>
+			<div class="meta" part="meta"></div>
+			<div class="files" part="files"></div>
+			<slot></slot>
+		`;
     this.shadowRoot.replaceChildren(link, root);
+    this._root = root;
+    this._input = root.querySelector(".native");
+    this._label = root.querySelector(".label");
+    this._meta = root.querySelector(".meta");
+    this._files = root.querySelector(".files");
+    root.addEventListener("click", this._onRootClick);
+    this._input.addEventListener("change", this._onInputChange);
+    root.addEventListener("dragover", this._onDragOver);
+    root.addEventListener("dragleave", this._onDragLeave);
+    root.addEventListener("drop", this._onDrop);
+    this._sync();
+  }
+  disconnectedCallback() {
+    if (!this._root || !this._input) {
+      return;
+    }
+    this._root.removeEventListener("click", this._onRootClick);
+    this._root.removeEventListener("dragover", this._onDragOver);
+    this._root.removeEventListener("dragleave", this._onDragLeave);
+    this._root.removeEventListener("drop", this._onDrop);
+    this._input.removeEventListener("change", this._onInputChange);
+  }
+  attributeChangedCallback() {
+    this._sync();
+  }
+  _variant() {
+    const explicit = (this.getAttribute("variant") || "").toLowerCase();
+    if (explicit === "dropzone" || this.hasAttribute("dropzone")) {
+      return "dropzone";
+    }
+    return "input";
+  }
+  _sync() {
+    if (!this._root || !this._input || !this._label || !this._meta || !this._files) {
+      return;
+    }
+    const variant = this._variant();
+    this._root.dataset.variant = variant;
+    this._root.dataset.border = this.hasAttribute("dotted") ? "dotted" : this.hasAttribute("dashed") ? "dashed" : "solid";
+    const disabled = this.hasAttribute("disabled");
+    this._root.dataset.disabled = disabled ? "true" : "false";
+    this._input.disabled = disabled;
+    if (this.hasAttribute("multiple")) {
+      this._input.multiple = true;
+      this._root.dataset.multiple = "true";
+    } else {
+      this._input.multiple = false;
+      this._root.dataset.multiple = "false";
+    }
+    const accept = this.getAttribute("accept") || "";
+    if (accept) {
+      this._input.setAttribute("accept", accept);
+    } else {
+      this._input.removeAttribute("accept");
+    }
+    this._label.textContent = this.getAttribute("label") || (variant === "dropzone" ? "Drop files here or click to browse" : "Choose file");
+    if (!this._selectedFiles || this._selectedFiles.length === 0) {
+      this._meta.textContent = this._input.multiple ? "No files selected" : "No file selected";
+      this._files.replaceChildren();
+    }
+  }
+  _onRootClick(event) {
+    if (this.hasAttribute("disabled")) {
+      return;
+    }
+    if (event.target instanceof Element && event.target.tagName.toLowerCase() === "a") {
+      return;
+    }
+    this._input.click();
+  }
+  _onInputChange() {
+    this._setFiles(this._input.files);
+  }
+  _onDragOver(event) {
+    if (this._variant() !== "dropzone" || this.hasAttribute("disabled")) {
+      return;
+    }
+    event.preventDefault();
+    this._root.dataset.drag = "over";
+  }
+  _onDragLeave() {
+    if (!this._root) {
+      return;
+    }
+    this._root.dataset.drag = "off";
+  }
+  _onDrop(event) {
+    if (this._variant() !== "dropzone" || this.hasAttribute("disabled")) {
+      return;
+    }
+    event.preventDefault();
+    this._root.dataset.drag = "off";
+    const list = event.dataTransfer?.files;
+    if (!list || list.length === 0) {
+      return;
+    }
+    this._setFiles(list);
+  }
+  _setFiles(fileList) {
+    const all = Array.from(fileList || []);
+    this._selectedFiles = this._input.multiple ? all : all.slice(0, 1);
+    this._meta.textContent = this._selectedFiles.length ? `${this._selectedFiles.length} file${this._selectedFiles.length === 1 ? "" : "s"} selected` : this._input.multiple ? "No files selected" : "No file selected";
+    const chips = this._selectedFiles.slice(0, 3).map((file) => {
+      const item = document.createElement("span");
+      item.className = "file";
+      item.textContent = file.name;
+      return item;
+    });
+    if (this._selectedFiles.length > 3) {
+      const more = document.createElement("span");
+      more.className = "file";
+      more.textContent = `+${this._selectedFiles.length - 3} more`;
+      chips.push(more);
+    }
+    this._files.replaceChildren(...chips);
+    this.dispatchEvent(
+      new CustomEvent("bf-change", {
+        bubbles: true,
+        composed: true,
+        detail: {
+          count: this._selectedFiles.length,
+          files: this._selectedFiles.map((file) => ({
+            name: file.name,
+            size: file.size,
+            type: file.type
+          }))
+        }
+      })
+    );
   }
 };
+__publicField(BfFileUpload, "observedAttributes", [
+  "variant",
+  "dropzone",
+  "multiple",
+  "accept",
+  "dotted",
+  "dashed",
+  "disabled"
+]);
 customElements.define("bf-file-upload", BfFileUpload);
 
 // src/filter-bar/filter-bar.js
@@ -4488,33 +4635,6 @@ var BfTreeView = class extends HTMLElement {
 };
 customElements.define("bf-tree-view", BfTreeView);
 
-// src/upload-dropzone/upload-dropzone.js
-var BfUploadDropzone = class extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: "open" });
-  }
-  connectedCallback() {
-    if (this._initialized) {
-      return;
-    }
-    this._initialized = true;
-    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-upload-dropzone-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-upload-dropzone-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-upload-dropzone-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-upload-dropzone-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-upload-dropzone-border-color%3A%20var(--bf-theme-upload-dropzone-border-color%2C%20var(--bf-theme-border-1%2C%20%23cbd5e1))%3B%0A%09--bf-upload-dropzone-bg%3A%20var(--bf-theme-upload-dropzone-bg%2C%20var(--bf-theme-surface-1%2C%20%23ffffff))%3B%0A%09--bf-upload-dropzone-color%3A%20var(--bf-theme-upload-dropzone-color%2C%20var(--bf-theme-text-1%2C%20%230f172a))%3B%0A%09--bf-upload-dropzone-padding-y%3A%20var(--bf-theme-space-2%2C%200.6rem)%3B%0A%09--bf-upload-dropzone-padding-x%3A%20var(--bf-theme-space-3%2C%200.9rem)%3B%0A%09--bf-upload-dropzone-transition%3A%0A%09%09var(--bf-theme-transition-bg%2C%20background-color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-color%2C%20color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-border%2C%20border-color%20120ms%20ease)%3B%0A%0A%09display%3A%20block%3B%0A%09font%3A%20var(--bf-upload-dropzone-font)%3B%0A%09color%3A%20var(--bf-upload-dropzone-color)%3B%0A%7D%0A%0A.root%20%7B%0A%09background%3A%20var(--bf-upload-dropzone-bg)%3B%0A%09color%3A%20var(--bf-upload-dropzone-color)%3B%0A%09border-width%3A%20var(--bf-upload-dropzone-border-width)%3B%0A%09border-style%3A%20var(--bf-upload-dropzone-border-style)%3B%0A%09border-color%3A%20var(--bf-upload-dropzone-border-color)%3B%0A%09border-radius%3A%20var(--bf-upload-dropzone-radius)%3B%0A%09padding%3A%20var(--bf-upload-dropzone-padding-y)%20var(--bf-upload-dropzone-padding-x)%3B%0A%09transition%3A%20var(--bf-upload-dropzone-transition)%3B%0A%7D%0A", import.meta.url);
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = cssUrl.href;
-    const root = document.createElement("div");
-    root.className = "root";
-    root.setAttribute("part", "root");
-    root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "upload dropzone";
-    }
-    this.shadowRoot.replaceChildren(link, root);
-  }
-};
-customElements.define("bf-upload-dropzone", BfUploadDropzone);
-
 // src/video-player/video-player.js
 var BfVideoPlayer = class extends HTMLElement {
   constructor() {
@@ -4716,7 +4836,7 @@ customElements.define("bf-wizard", BfWizard);
 
 // src/runtime/runtime.js
 var BF_ID_PREFIX = "bf";
-var BF_TRANSLATE_DEFAULT = "en-US";
+var BF_TRANSLATE_DEFAULT = "en";
 var skeletonState = /* @__PURE__ */ new WeakMap();
 function slugFromTagName(tagName) {
   return tagName.toLowerCase().replace(/^bf-/, "");
@@ -4747,7 +4867,7 @@ function applyTestingAndI18nDefaults(element, seenIds) {
     element.setAttribute("data-qa", `test-${id}`);
   }
   if (!element.hasAttribute("data-translate")) {
-    const translateLocale = document.documentElement.lang || navigator.language || BF_TRANSLATE_DEFAULT;
+    const translateLocale = document.documentElement.lang || BF_TRANSLATE_DEFAULT;
     element.setAttribute("data-translate", translateLocale);
   }
 }

@@ -91,7 +91,7 @@ Bareframe runtime defaults for all `bf-*` elements:
 
 - auto id assignment (and duplicate id collision repair)
 - `data-qa="test-<id>"` when missing
-- `data-translate="<html lang>"` when missing
+- `data-translate="<html lang>"` when missing (defaults to `en` if `<html lang>` is not set)
 
 ID-driven controls for interactive components:
 

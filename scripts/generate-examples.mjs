@@ -539,6 +539,29 @@ function primaryDemo(tag, name, slug, category) {
   <bf-input type="color" value="rgba(15, 23, 42, 0.85)" hex rgba left label="Overlay color"></bf-input>
 </div>`.trim();
 	}
+	if (slug === 'file-upload') {
+		return `
+<div class="stack">
+  <p class="hint">Single component for file input and dropzone flows.</p>
+  <div row>
+    <div col="6">
+      <bf-file-upload label="Single file (input)" accept=".pdf,.doc,.docx"></bf-file-upload>
+    </div>
+    <div col="6">
+      <bf-file-upload multiple label="Multiple files (input)" accept="image/*,.pdf"></bf-file-upload>
+    </div>
+  </div>
+  <div row>
+    <div col="6">
+      <bf-file-upload dropzone dotted label="Dropzone single"></bf-file-upload>
+    </div>
+    <div col="6">
+      <bf-file-upload dropzone multiple dashed label="Dropzone multiple"></bf-file-upload>
+    </div>
+  </div>
+  <p class="hint">Use <code>dropzone</code>, <code>multiple</code>, and border style attrs <code>dotted</code>/<code>dashed</code>.</p>
+</div>`.trim();
+	}
 	if (slug === 'toggle') {
 		return `
 <div class="stack">

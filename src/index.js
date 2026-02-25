@@ -68,7 +68,6 @@ import './toast/toast.js';
 import './toggle/toggle.js';
 import './toolbar/toolbar.js';
 import './tree-view/tree-view.js';
-import './upload-dropzone/upload-dropzone.js';
 import './video-player/video-player.js';
 import './virtual-list/virtual-list.js';
 import './wizard/wizard.js';

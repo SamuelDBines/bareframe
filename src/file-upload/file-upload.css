@@ -3,9 +3,18 @@
 	--bf-file-upload-radius: var(--bf-theme-radius-md, 8px);
 	--bf-file-upload-border-width: var(--bf-theme-border-width, 1px);
 	--bf-file-upload-border-style: var(--bf-theme-border-style, solid);
-	--bf-file-upload-border-color: var(--bf-theme-file-upload-border-color, var(--bf-theme-border-1, #cbd5e1));
-	--bf-file-upload-bg: var(--bf-theme-file-upload-bg, var(--bf-theme-surface-1, #ffffff));
-	--bf-file-upload-color: var(--bf-theme-file-upload-color, var(--bf-theme-text-1, #0f172a));
+	--bf-file-upload-border-color: var(
+		--bf-theme-file-upload-border-color,
+		var(--bf-theme-upload-dropzone-border-color, var(--bf-theme-border-1, #cbd5e1))
+	);
+	--bf-file-upload-bg: var(
+		--bf-theme-file-upload-bg,
+		var(--bf-theme-upload-dropzone-bg, var(--bf-theme-surface-1, #ffffff))
+	);
+	--bf-file-upload-color: var(
+		--bf-theme-file-upload-color,
+		var(--bf-theme-upload-dropzone-color, var(--bf-theme-text-1, #0f172a))
+	);
 	--bf-file-upload-padding-y: var(--bf-theme-space-2, 0.6rem);
 	--bf-file-upload-padding-x: var(--bf-theme-space-3, 0.9rem);
 	--bf-file-upload-transition:
@@ -19,6 +28,8 @@
 }
 
 .root {
+	display: grid;
+	gap: 0.45rem;
 	background: var(--bf-file-upload-bg);
 	color: var(--bf-file-upload-color);
 	border-width: var(--bf-file-upload-border-width);
@@ -27,4 +38,62 @@
 	border-radius: var(--bf-file-upload-radius);
 	padding: var(--bf-file-upload-padding-y) var(--bf-file-upload-padding-x);
 	transition: var(--bf-file-upload-transition);
+	cursor: pointer;
+}
+
+.root[data-variant='dropzone'] {
+	min-height: 7rem;
+	align-content: center;
+	text-align: center;
+}
+
+.root[data-border='dotted'] {
+	border-style: dotted;
+}
+
+.root[data-border='dashed'] {
+	border-style: dashed;
+}
+
+.root[data-drag='over'] {
+	background: color-mix(in srgb, var(--bf-file-upload-bg) 70%, var(--bf-file-upload-border-color));
+}
+
+.root[data-disabled='true'] {
+	opacity: 0.65;
+	cursor: not-allowed;
+}
+
+.native {
+	display: none;
+}
+
+.label {
+	font-weight: 600;
+}
+
+.meta {
+	color: var(--bf-theme-text-2, #475569);
+	font-size: 0.9em;
+}
+
+.files {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.file {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	padding: 0.2rem 0.45rem;
+	border-radius: 999px;
+	border: 1px solid color-mix(in srgb, var(--bf-file-upload-border-color) 90%, transparent);
+	background: color-mix(in srgb, var(--bf-file-upload-bg) 82%, var(--bf-file-upload-border-color));
+	font-size: 0.82em;
+}
+
+slot:not(:empty) {
+	display: block;
 }

@@ -40,9 +40,10 @@ jobs:
       - name: Prepare Examples Artifact
         run: |
           rm -rf examples/src examples/themes examples/dist
-          cp -R src examples/src
           cp -R themes examples/themes
           cp -R dist examples/dist
+          find examples -name '*.html' -type f -exec sed -i.bak "s#\\./src/index.js#\\./dist/bareframe.min.js#g" {} \;
+          find examples -name '*.bak' -type f -delete
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

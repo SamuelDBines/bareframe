@@ -83,14 +83,24 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-table>
-  <div class="tableish">
-    <div><strong>Name</strong></div><div><strong>Status</strong></div>
-    <div>Alpha</div><div>Active</div>
-    <div>Bravo</div><div>Pending</div>
-    <div>Charlie</div><div>Disabled</div>
+        <div class="stack">
+  <p class="hint">Straightforward table structure using utility attributes.</p>
+  <div table>
+    <div thead>
+      <div tr>
+        <div th>ID</div>
+        <div th>Project</div>
+        <div th>Status</div>
+        <div th>Owner</div>
+      </div>
+    </div>
+    <div tbody>
+      <div tr><div td>#1021</div><div td>Marketing Site</div><div td>Active</div><div td>Alex</div></div>
+      <div tr><div td>#1022</div><div td>Billing Revamp</div><div td>Review</div><div td>Jordan</div></div>
+      <div tr><div td>#1023</div><div td>Admin Dashboard</div><div td>Blocked</div><div td>Morgan</div></div>
+    </div>
   </div>
-</bf-table>
+</div>
       </section>
 
       <section class="panel">

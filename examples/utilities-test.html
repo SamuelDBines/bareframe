@@ -117,6 +117,25 @@
       </section>
 
       <section class="panel" stack="sm">
+        <h2 style="margin: 0;">Table Utilities</h2>
+        <p class="hint">Use <code>table</code>, <code>thead</code>, <code>tbody</code>, <code>tr</code>, <code>th</code>, and <code>td</code> directly on plain elements.</p>
+        <div table dense>
+          <div thead>
+            <div tr>
+              <div th>Key</div>
+              <div th>Value</div>
+              <div th>Note</div>
+            </div>
+          </div>
+          <div tbody>
+            <div tr><div td>layout</div><div td>row / col / stack</div><div td>Global utility attrs</div></div>
+            <div tr><div td>typography</div><div td>display, h1..code</div><div td>No class names required</div></div>
+            <div tr><div td>skeleton</div><div td>skeleton="1200"</div><div td>Auto-reveal supported</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" stack="sm">
         <h2 style="margin: 0;">Skeleton Utility</h2>
         <p class="hint">Attach loading state directly to target elements: <code>skeleton</code> or <code>skeleton="1200"</code>.</p>
         <div id="utility-skel-row" row>

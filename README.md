@@ -8,6 +8,12 @@ Lightweight, dependency-free Web Components for building reusable UI across appl
 npm install bareframe
 ```
 
+Links:
+
+- npm: https://www.npmjs.com/package/bareframe
+- GitHub Pages examples: https://samueldbines.github.io/bareframe/
+- Chart demo: https://samueldbines.github.io/bareframe/chart-test.html
+
 ## Package Usage
 
 Register everything:
@@ -46,8 +52,8 @@ Grid-style column spans are supported with a 12-column model:
 
 ```html
 <div row>
-  <div col="3">Sidebar</div>
-  <div col="9">Main</div>
+	<div col="3">Sidebar</div>
+	<div col="9">Main</div>
 </div>
 ```
 
@@ -63,6 +69,19 @@ Alignment utilities:
 <div col="top">...</div>
 <div col="center">...</div>
 <div col="bottom">...</div>
+```
+
+Table/data-grid utilities:
+
+```html
+<div table dense>
+  <div thead>
+    <div tr><div th>ID</div><div th>Name</div></div>
+  </div>
+  <div tbody>
+    <div tr><div td>1</div><div td>Alpha</div></div>
+  </div>
+</div>
 ```
 
 Skeleton can be used as a utility on any target element:
@@ -83,8 +102,7 @@ Typography utilities follow the same attribute pattern:
 Short boolean attributes are also supported:
 
 ```html
-<small h1>Heading-sized small text</small>
-<span caption>Caption text</span>
+<small h1>Heading-sized small text</small> <span caption>Caption text</span>
 ```
 
 Bareframe runtime defaults for all `bf-*` elements:
@@ -107,7 +125,7 @@ Accordion section control by id:
 ```html
 <bf-button bf-open="docs:intro">Open intro</bf-button>
 <bf-accordion id="docs">
-  <section id="intro" title="Intro">...</section>
+	<section id="intro" title="Intro">...</section>
 </bf-accordion>
 ```
 
@@ -129,16 +147,15 @@ Menu/list item pattern:
 
 ```html
 <bf-menu>
-  <div item>Profile</div>
-  <div item>Settings</div>
+	<div item>Profile</div>
+	<div item>Settings</div>
 </bf-menu>
 ```
 
 Header/footer edge positioning (same API on both):
 
 ```html
-<bf-edge sticky header>...</bf-edge>
-<bf-edge fixed footer>...</bf-edge>
+<bf-edge sticky header>...</bf-edge> <bf-edge fixed footer>...</bf-edge>
 ```
 
 You can also force placement with `position="top"` or `position="bottom"`.
@@ -306,6 +323,37 @@ This page lets you:
 All generated component demos are listed at:
 
 `http://localhost:8080/examples/index.html`
+
+Hosted examples:
+
+`https://samueldbines.github.io/bareframe/`
+
+## npm Publish Checklist
+
+1. Update version:
+
+```bash
+npm version patch
+```
+
+2. Build and verify package contents:
+
+```bash
+npm run build
+npm run pack:preview
+```
+
+3. Publish to npm:
+
+```bash
+npm publish
+```
+
+4. Push version tags:
+
+```bash
+git push origin main --follow-tags
+```
 
 ## Build Package
 

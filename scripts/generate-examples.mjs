@@ -723,6 +723,53 @@ function primaryDemo(tag, name, slug, category) {
   </bf-split-button>
 </div>`.trim();
 	}
+	if (slug === 'table') {
+		return `
+<div class="stack">
+  <p class="hint">Straightforward table structure using utility attributes.</p>
+  <div table>
+    <div thead>
+      <div tr>
+        <div th>ID</div>
+        <div th>Project</div>
+        <div th>Status</div>
+        <div th>Owner</div>
+      </div>
+    </div>
+    <div tbody>
+      <div tr><div td>#1021</div><div td>Marketing Site</div><div td>Active</div><div td>Alex</div></div>
+      <div tr><div td>#1022</div><div td>Billing Revamp</div><div td>Review</div><div td>Jordan</div></div>
+      <div tr><div td>#1023</div><div td>Admin Dashboard</div><div td>Blocked</div><div td>Morgan</div></div>
+    </div>
+  </div>
+</div>`.trim();
+	}
+	if (slug === 'data-grid') {
+		return `
+<div class="stack">
+  <p class="hint">Data-grid style table with utility attrs, dense spacing, and controls.</p>
+  <div row="right">
+    <bf-input placeholder="Filter rows..."></bf-input>
+    <bf-button variant="secondary">Export</bf-button>
+  </div>
+  <div table dense>
+    <div thead>
+      <div tr>
+        <div th>Account</div>
+        <div th>Region</div>
+        <div th>MRR</div>
+        <div th>Risk</div>
+      </div>
+    </div>
+    <div tbody>
+      <div tr><div td>Acme</div><div td>US</div><div td>$12,400</div><div td>Low</div></div>
+      <div tr><div td>Northwind</div><div td>EU</div><div td>$9,180</div><div td>Medium</div></div>
+      <div tr><div td>Globex</div><div td>APAC</div><div td>$15,920</div><div td>Low</div></div>
+      <div tr><div td>Initech</div><div td>US</div><div td>$5,640</div><div td>High</div></div>
+    </div>
+  </div>
+</div>`.trim();
+	}
 	if (category === 'forms') {
 		return `
 <div class="stack">
@@ -913,6 +960,25 @@ function utilitiesPageHtml() {
         <small typography="caption">Caption utility text.</small>
         <span typography="label">Label utility text.</span>
         <span typography="code">const mode = 'utility'</span>
+      </section>
+
+      <section class="panel" stack="sm">
+        <h2 style="margin: 0;">Table Utilities</h2>
+        <p class="hint">Use <code>table</code>, <code>thead</code>, <code>tbody</code>, <code>tr</code>, <code>th</code>, and <code>td</code> directly on plain elements.</p>
+        <div table dense>
+          <div thead>
+            <div tr>
+              <div th>Key</div>
+              <div th>Value</div>
+              <div th>Note</div>
+            </div>
+          </div>
+          <div tbody>
+            <div tr><div td>layout</div><div td>row / col / stack</div><div td>Global utility attrs</div></div>
+            <div tr><div td>typography</div><div td>display, h1..code</div><div td>No class names required</div></div>
+            <div tr><div td>skeleton</div><div td>skeleton="1200"</div><div td>Auto-reveal supported</div></div>
+          </div>
+        </div>
       </section>
 
       <section class="panel" stack="sm">
@@ -1154,6 +1220,13 @@ function indexHtml(entries) {
       <header>
         <h1>bareframe examples</h1>
         <p>Grouped by category to review overlap and reduce unnecessary components.</p>
+        <p>
+          <a href="https://www.npmjs.com/package/bareframe" target="_blank" rel="noreferrer">npm package</a>
+          ·
+          <a href="https://samueldbines.github.io/bareframe/" target="_blank" rel="noreferrer">github pages</a>
+          ·
+          <a href="https://samueldbines.github.io/bareframe/chart-test.html" target="_blank" rel="noreferrer">chart demo</a>
+        </p>
       </header>
 ${blocks}
     </div>

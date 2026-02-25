@@ -83,14 +83,29 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-data-grid>
-  <div class="tableish">
-    <div><strong>Name</strong></div><div><strong>Status</strong></div>
-    <div>Alpha</div><div>Active</div>
-    <div>Bravo</div><div>Pending</div>
-    <div>Charlie</div><div>Disabled</div>
+        <div class="stack">
+  <p class="hint">Data-grid style table with utility attrs, dense spacing, and controls.</p>
+  <div row="right">
+    <bf-input placeholder="Filter rows..."></bf-input>
+    <bf-button variant="secondary">Export</bf-button>
   </div>
-</bf-data-grid>
+  <div table dense>
+    <div thead>
+      <div tr>
+        <div th>Account</div>
+        <div th>Region</div>
+        <div th>MRR</div>
+        <div th>Risk</div>
+      </div>
+    </div>
+    <div tbody>
+      <div tr><div td>Acme</div><div td>US</div><div td>$12,400</div><div td>Low</div></div>
+      <div tr><div td>Northwind</div><div td>EU</div><div td>$9,180</div><div td>Medium</div></div>
+      <div tr><div td>Globex</div><div td>APAC</div><div td>$15,920</div><div td>Low</div></div>
+      <div tr><div td>Initech</div><div td>US</div><div td>$5,640</div><div td>High</div></div>
+    </div>
+  </div>
+</div>
       </section>
 
       <section class="panel">

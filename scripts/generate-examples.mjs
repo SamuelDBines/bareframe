@@ -112,7 +112,7 @@ function relatedByCategory(category) {
 		return ['bf-card', 'bf-filter-bar', 'bf-segmented-control'];
 	}
 	if (category === 'editor') {
-		return ['bf-code-block', 'bf-textarea', 'bf-input'];
+		return ['bf-editor', 'bf-input', 'bf-card'];
 	}
 	if (category === 'feedback') {
 		return ['bf-button', 'bf-toast', 'bf-dialog'];
@@ -216,6 +216,20 @@ function primaryDemo(tag, name, slug, category) {
     </div>
   </div>
 </bf-dropdown>`.trim();
+	}
+	if (slug === 'editor') {
+		return `
+<div class="stack">
+  <p class="hint">Unified editor with <code>code</code> and <code>richtext</code> modes.</p>
+  <div row>
+    <div col="6">
+      <bf-editor code value="function greet(name) {\n  return 'Hello ' + name;\n}\n\nconsole.log(greet('Bareframe'));" placeholder="Write code..."></bf-editor>
+    </div>
+    <div col="6">
+      <bf-editor richtext value="<h3>Release Notes</h3><p>Editor now supports <strong>rich text</strong> mode.</p><ul><li>Bold</li><li>Italic</li><li>Lists</li></ul>"></bf-editor>
+    </div>
+  </div>
+</div>`.trim();
 	}
 	if (slug === 'menu') {
 		return `
@@ -1213,9 +1227,18 @@ function indexHtml(entries) {
       h2 { margin-top: 0; font-size: 1.15rem; }
       ul { columns: 2; margin: 0; padding-left: 1rem; }
       li { margin: 0.35rem 0; }
+      #donate-button-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 999;
+      }
     </style>
   </head>
   <body>
+    <div id="donate-button-container">
+      <div id="donate-button"></div>
+    </div>
     <div class="layout">
       <header>
         <h1>bareframe examples</h1>
@@ -1230,6 +1253,18 @@ function indexHtml(entries) {
       </header>
 ${blocks}
     </div>
+    <script src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js" charset="UTF-8"></script>
+    <script>
+      PayPal.Donation.Button({
+        env:'production',
+        hosted_button_id:'LKTM22NDQDVW6',
+        image: {
+          src:'https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif',
+          alt:'Donate with PayPal button',
+          title:'PayPal - The safer, easier way to pay online!',
+        }
+      }).render('#donate-button');
+    </script>
   </body>
 </html>
 `;

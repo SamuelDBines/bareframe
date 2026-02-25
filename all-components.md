@@ -28,8 +28,7 @@ Grouped by category to make overlap and consolidation opportunities easier to se
 
 ## Editor Components
 
-- **code block**: Syntax-highlighted code presentation.
-- **textarea**: Multi-line text input control.
+- **editor**: Unified code and rich-text editor primitive.
 
 ## Form Components
 

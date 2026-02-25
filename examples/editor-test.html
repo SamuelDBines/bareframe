@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>bareframe textarea test</title>
+    <title>bareframe editor test</title>
     <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css" />
     <style>
       body {
@@ -51,8 +51,8 @@
   <body>
     <div class="layout">
       <header>
-        <h1>bf-textarea</h1>
-        <p>Multi-line text input control.</p>
+        <h1>bf-editor</h1>
+        <p>Unified code and rich-text editor primitive.</p>
         <p><a href="./index.html">Back to Examples</a></p>
       </header>
 
@@ -83,24 +83,35 @@
 
       <section class="panel">
         <h2>Primary Demo</h2>
-        <bf-textarea>
-  <h3>textarea</h3>
-  <p>Reusable component composition block.</p>
-</bf-textarea>
+        <div class="stack">
+  <p class="hint">Unified editor with <code>code</code> and <code>richtext</code> modes.</p>
+  <div row>
+    <div col="6">
+      <bf-editor code value="function greet(name) {
+  return 'Hello ' + name;
+}
+
+console.log(greet('Bareframe'));" placeholder="Write code..."></bf-editor>
+    </div>
+    <div col="6">
+      <bf-editor richtext value="<h3>Release Notes</h3><p>Editor now supports <strong>rich text</strong> mode.</p><ul><li>Bold</li><li>Italic</li><li>Lists</li></ul>"></bf-editor>
+    </div>
+  </div>
+</div>
       </section>
 
       <section class="panel">
         <h2>Related Components</h2>
         <div class="demo-row">
-          <a href="./code-block-test.html">code-block</a>
-<a href="./textarea-test.html">textarea</a>
+          <a href="./editor-test.html">editor</a>
 <a href="./input-test.html">input</a>
+<a href="./card-test.html">card</a>
         </div>
       </section>
 
       <section class="panel">
         <h2>Tag</h2>
-        <code>bf-textarea</code>
+        <code>bf-editor</code>
       </section>
     </div>
 

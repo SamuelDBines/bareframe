@@ -1037,33 +1037,6 @@ var BfCheckbox = class extends HTMLElement {
 __publicField(BfCheckbox, "observedAttributes", ["checked", "disabled", "label", "value"]);
 customElements.define("bf-checkbox", BfCheckbox);
 
-// src/code-block/code-block.js
-var BfCodeBlock = class extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: "open" });
-  }
-  connectedCallback() {
-    if (this._initialized) {
-      return;
-    }
-    this._initialized = true;
-    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-code-block-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-code-block-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-code-block-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-code-block-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-code-block-border-color%3A%20var(--bf-theme-code-block-border-color%2C%20var(--bf-theme-border-1%2C%20%23cbd5e1))%3B%0A%09--bf-code-block-bg%3A%20var(--bf-theme-code-block-bg%2C%20var(--bf-theme-surface-1%2C%20%23ffffff))%3B%0A%09--bf-code-block-color%3A%20var(--bf-theme-code-block-color%2C%20var(--bf-theme-text-1%2C%20%230f172a))%3B%0A%09--bf-code-block-padding-y%3A%20var(--bf-theme-space-2%2C%200.6rem)%3B%0A%09--bf-code-block-padding-x%3A%20var(--bf-theme-space-3%2C%200.9rem)%3B%0A%09--bf-code-block-transition%3A%0A%09%09var(--bf-theme-transition-bg%2C%20background-color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-color%2C%20color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-border%2C%20border-color%20120ms%20ease)%3B%0A%0A%09display%3A%20block%3B%0A%09font%3A%20var(--bf-code-block-font)%3B%0A%09color%3A%20var(--bf-code-block-color)%3B%0A%7D%0A%0A.root%20%7B%0A%09background%3A%20var(--bf-code-block-bg)%3B%0A%09color%3A%20var(--bf-code-block-color)%3B%0A%09border-width%3A%20var(--bf-code-block-border-width)%3B%0A%09border-style%3A%20var(--bf-code-block-border-style)%3B%0A%09border-color%3A%20var(--bf-code-block-border-color)%3B%0A%09border-radius%3A%20var(--bf-code-block-radius)%3B%0A%09padding%3A%20var(--bf-code-block-padding-y)%20var(--bf-code-block-padding-x)%3B%0A%09transition%3A%20var(--bf-code-block-transition)%3B%0A%7D%0A", import.meta.url);
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = cssUrl.href;
-    const root = document.createElement("div");
-    root.className = "root";
-    root.setAttribute("part", "root");
-    root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "code block";
-    }
-    this.shadowRoot.replaceChildren(link, root);
-  }
-};
-customElements.define("bf-code-block", BfCodeBlock);
-
 // src/combobox/combobox.js
 var BfCombobox = class extends HTMLElement {
   constructor() {
@@ -1619,6 +1592,157 @@ var BfEdge = class extends HTMLElement {
 };
 __publicField(BfEdge, "observedAttributes", ["position", "sticky", "fixed", "header", "footer"]);
 customElements.define("bf-edge", BfEdge);
+
+// src/editor/editor.js
+var BfEditor = class extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._onInput = this._onInput.bind(this);
+    this._onToolbarClick = this._onToolbarClick.bind(this);
+  }
+  connectedCallback() {
+    if (this._initialized) {
+      this._sync();
+      return;
+    }
+    this._initialized = true;
+    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-editor-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-editor-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-editor-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-editor-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-editor-border-color%3A%20var(--bf-theme-editor-border-color%2C%20var(--bf-theme-border-1%2C%20%23cbd5e1))%3B%0A%09--bf-editor-bg%3A%20var(--bf-theme-editor-bg%2C%20var(--bf-theme-surface-1%2C%20%23ffffff))%3B%0A%09--bf-editor-color%3A%20var(--bf-theme-editor-color%2C%20var(--bf-theme-text-1%2C%20%230f172a))%3B%0A%09--bf-editor-muted%3A%20var(--bf-theme-text-2%2C%20%2364748b)%3B%0A%09--bf-editor-code-bg%3A%20color-mix(in%20srgb%2C%20var(--bf-editor-bg)%2086%25%2C%20%230f172a%2014%25)%3B%0A%09--bf-editor-code-color%3A%20%23e2e8f0%3B%0A%0A%09display%3A%20block%3B%0A%09font%3A%20var(--bf-editor-font)%3B%0A%09color%3A%20var(--bf-editor-color)%3B%0A%7D%0A%0A.root%20%7B%0A%09background%3A%20var(--bf-editor-bg)%3B%0A%09color%3A%20var(--bf-editor-color)%3B%0A%09border-width%3A%20var(--bf-editor-border-width)%3B%0A%09border-style%3A%20var(--bf-editor-border-style)%3B%0A%09border-color%3A%20var(--bf-editor-border-color)%3B%0A%09border-radius%3A%20var(--bf-editor-radius)%3B%0A%09overflow%3A%20hidden%3B%0A%7D%0A%0A.toolbar%20%7B%0A%09display%3A%20none%3B%0A%09gap%3A%200.35rem%3B%0A%09padding%3A%200.5rem%3B%0A%09border-bottom%3A%201px%20solid%20var(--bf-editor-border-color)%3B%0A%09background%3A%20color-mix(in%20srgb%2C%20var(--bf-editor-bg)%2092%25%2C%20var(--bf-editor-border-color))%3B%0A%7D%0A%0A.toolbar%20button%20%7B%0A%09border%3A%201px%20solid%20var(--bf-editor-border-color)%3B%0A%09background%3A%20var(--bf-editor-bg)%3B%0A%09color%3A%20var(--bf-editor-color)%3B%0A%09border-radius%3A%206px%3B%0A%09padding%3A%200.22rem%200.45rem%3B%0A%09cursor%3A%20pointer%3B%0A%09font%3A%20inherit%3B%0A%09font-size%3A%200.85rem%3B%0A%7D%0A%0A.code-wrap%20%7B%0A%09display%3A%20grid%3B%0A%09grid-template-columns%3A%20auto%201fr%3B%0A%09min-height%3A%20220px%3B%0A%09background%3A%20var(--bf-editor-code-bg)%3B%0A%7D%0A%0A.line-numbers%20%7B%0A%09padding%3A%200.8rem%200.55rem%3B%0A%09margin%3A%200%3B%0A%09white-space%3A%20pre%3B%0A%09line-height%3A%201.45%3B%0A%09font-family%3A%20ui-monospace%2C%20SFMono-Regular%2C%20Menlo%2C%20Monaco%2C%20Consolas%2C%20'Liberation%20Mono'%2C%20'Courier%20New'%2C%20monospace%3B%0A%09font-size%3A%200.85rem%3B%0A%09color%3A%20color-mix(in%20srgb%2C%20var(--bf-editor-code-color)%2055%25%2C%20transparent)%3B%0A%09border-right%3A%201px%20solid%20color-mix(in%20srgb%2C%20var(--bf-editor-border-color)%2080%25%2C%20transparent)%3B%0A%09user-select%3A%20none%3B%0A%7D%0A%0A.code%20%7B%0A%09width%3A%20100%25%3B%0A%09min-height%3A%20220px%3B%0A%09resize%3A%20vertical%3B%0A%09padding%3A%200.8rem%3B%0A%09border%3A%200%3B%0A%09outline%3A%200%3B%0A%09background%3A%20transparent%3B%0A%09color%3A%20var(--bf-editor-code-color)%3B%0A%09font-family%3A%20ui-monospace%2C%20SFMono-Regular%2C%20Menlo%2C%20Monaco%2C%20Consolas%2C%20'Liberation%20Mono'%2C%20'Courier%20New'%2C%20monospace%3B%0A%09font-size%3A%200.9rem%3B%0A%09line-height%3A%201.45%3B%0A%7D%0A%0A.rich%20%7B%0A%09display%3A%20none%3B%0A%09min-height%3A%20220px%3B%0A%09padding%3A%200.8rem%3B%0A%09outline%3A%20none%3B%0A%09line-height%3A%201.5%3B%0A%7D%0A%0A.rich%3Aempty%3A%3Abefore%20%7B%0A%09content%3A%20attr(data-placeholder)%3B%0A%09color%3A%20var(--bf-editor-muted)%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'richtext'%5D%20.toolbar%20%7B%0A%09display%3A%20flex%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'richtext'%5D%20.code-wrap%20%7B%0A%09display%3A%20none%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'richtext'%5D%20.rich%20%7B%0A%09display%3A%20block%3B%0A%7D%0A%0A%3Ahost(%5Bdisabled%5D)%20%7B%0A%09opacity%3A%200.72%3B%0A%7D%0A%0A%3Ahost(%5Bdisabled%5D)%20.toolbar%20button%20%7B%0A%09cursor%3A%20not-allowed%3B%0A%7D%0A", import.meta.url);
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = cssUrl.href;
+    const root = document.createElement("div");
+    root.className = "root";
+    root.setAttribute("part", "root");
+    root.innerHTML = `
+			<div class="toolbar" part="toolbar">
+				<button type="button" data-cmd="bold" title="Bold"><b>B</b></button>
+				<button type="button" data-cmd="italic" title="Italic"><i>I</i></button>
+				<button type="button" data-cmd="underline" title="Underline"><u>U</u></button>
+				<button type="button" data-cmd="insertUnorderedList" title="Bullet List">\u2022 List</button>
+				<button type="button" data-cmd="insertOrderedList" title="Numbered List">1. List</button>
+			</div>
+			<div class="code-wrap" part="code-wrap">
+				<div class="line-numbers" part="line-numbers"></div>
+				<textarea class="code" part="code"></textarea>
+			</div>
+			<div class="rich" part="rich" contenteditable="true"></div>
+		</div>
+		`;
+    this.shadowRoot.replaceChildren(link, root);
+    this._root = root;
+    this._toolbar = root.querySelector(".toolbar");
+    this._codeWrap = root.querySelector(".code-wrap");
+    this._lineNumbers = root.querySelector(".line-numbers");
+    this._code = root.querySelector(".code");
+    this._rich = root.querySelector(".rich");
+    this._code.addEventListener("input", this._onInput);
+    this._rich.addEventListener("input", this._onInput);
+    this._toolbar.addEventListener("click", this._onToolbarClick);
+    this._sync();
+  }
+  disconnectedCallback() {
+    if (!this._code || !this._rich || !this._toolbar) {
+      return;
+    }
+    this._code.removeEventListener("input", this._onInput);
+    this._rich.removeEventListener("input", this._onInput);
+    this._toolbar.removeEventListener("click", this._onToolbarClick);
+  }
+  attributeChangedCallback() {
+    this._sync();
+  }
+  _variant() {
+    const explicit = (this.getAttribute("variant") || "").toLowerCase();
+    if (explicit === "richtext" || this.hasAttribute("richtext")) {
+      return "richtext";
+    }
+    if (explicit === "code" || this.hasAttribute("code")) {
+      return "code";
+    }
+    return "code";
+  }
+  _sync() {
+    if (!this._root || !this._code || !this._rich || !this._toolbar) {
+      return;
+    }
+    const variant = this._variant();
+    this._root.dataset.variant = variant;
+    const disabled = this.hasAttribute("disabled");
+    this._code.disabled = disabled;
+    this._rich.setAttribute("contenteditable", disabled ? "false" : "true");
+    const placeholder = this.getAttribute("placeholder") || (variant === "richtext" ? "Write rich content\u2026" : "Write code\u2026");
+    this._code.placeholder = placeholder;
+    this._rich.dataset.placeholder = placeholder;
+    const value = this.getAttribute("value");
+    if (value != null && this._lastSyncedValue !== value) {
+      if (variant === "richtext") {
+        this._rich.innerHTML = value;
+      } else {
+        this._code.value = value;
+        this._renderLineNumbers();
+      }
+      this._lastSyncedValue = value;
+    } else if (value == null && !this._hasUserInput) {
+      const initial = this.textContent.trim();
+      if (initial) {
+        if (variant === "richtext") {
+          this._rich.innerHTML = initial;
+        } else {
+          this._code.value = initial;
+          this._renderLineNumbers();
+        }
+        this._hasUserInput = true;
+      }
+    }
+    if (variant === "code") {
+      this._renderLineNumbers();
+    }
+  }
+  _onInput() {
+    const variant = this._variant();
+    this._hasUserInput = true;
+    if (variant === "code") {
+      this._renderLineNumbers();
+      this.setAttribute("value", this._code.value);
+      this._lastSyncedValue = this._code.value;
+      this._emitChange(this._code.value, "code");
+      return;
+    }
+    this.setAttribute("value", this._rich.innerHTML);
+    this._lastSyncedValue = this._rich.innerHTML;
+    this._emitChange(this._rich.innerHTML, "richtext");
+  }
+  _renderLineNumbers() {
+    const lineCount = Math.max(1, this._code.value.split("\n").length);
+    const text = Array.from({ length: lineCount }, (_, i) => String(i + 1)).join("\n");
+    this._lineNumbers.textContent = text;
+  }
+  _onToolbarClick(event) {
+    const button = event.target instanceof Element ? event.target.closest("button[data-cmd]") : null;
+    if (!button || this._variant() !== "richtext" || this.hasAttribute("disabled")) {
+      return;
+    }
+    const command = button.getAttribute("data-cmd");
+    if (!command) {
+      return;
+    }
+    this._rich.focus();
+    document.execCommand(command, false);
+    this._onInput();
+  }
+  _emitChange(value, mode) {
+    this.dispatchEvent(
+      new CustomEvent("bf-change", {
+        bubbles: true,
+        composed: true,
+        detail: { value, mode }
+      })
+    );
+  }
+};
+__publicField(BfEditor, "observedAttributes", ["variant", "code", "richtext", "placeholder", "value", "disabled"]);
+customElements.define("bf-editor", BfEditor);
 
 // src/empty-state/empty-state.js
 var BfEmptyState = class extends HTMLElement {
@@ -4194,33 +4318,6 @@ var BfTag = class extends HTMLElement {
 };
 __publicField(BfTag, "observedAttributes", ["variant", "badge", "chip", "pill", "size"]);
 customElements.define("bf-tag", BfTag);
-
-// src/textarea/textarea.js
-var BfTextarea = class extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: "open" });
-  }
-  connectedCallback() {
-    if (this._initialized) {
-      return;
-    }
-    this._initialized = true;
-    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-textarea-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-textarea-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-textarea-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-textarea-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-textarea-border-color%3A%20var(--bf-theme-textarea-border-color%2C%20var(--bf-theme-border-1%2C%20%23cbd5e1))%3B%0A%09--bf-textarea-bg%3A%20var(--bf-theme-textarea-bg%2C%20var(--bf-theme-surface-1%2C%20%23ffffff))%3B%0A%09--bf-textarea-color%3A%20var(--bf-theme-textarea-color%2C%20var(--bf-theme-text-1%2C%20%230f172a))%3B%0A%09--bf-textarea-padding-y%3A%20var(--bf-theme-space-2%2C%200.6rem)%3B%0A%09--bf-textarea-padding-x%3A%20var(--bf-theme-space-3%2C%200.9rem)%3B%0A%09--bf-textarea-transition%3A%0A%09%09var(--bf-theme-transition-bg%2C%20background-color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-color%2C%20color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-border%2C%20border-color%20120ms%20ease)%3B%0A%0A%09display%3A%20block%3B%0A%09font%3A%20var(--bf-textarea-font)%3B%0A%09color%3A%20var(--bf-textarea-color)%3B%0A%7D%0A%0A.root%20%7B%0A%09background%3A%20var(--bf-textarea-bg)%3B%0A%09color%3A%20var(--bf-textarea-color)%3B%0A%09border-width%3A%20var(--bf-textarea-border-width)%3B%0A%09border-style%3A%20var(--bf-textarea-border-style)%3B%0A%09border-color%3A%20var(--bf-textarea-border-color)%3B%0A%09border-radius%3A%20var(--bf-textarea-radius)%3B%0A%09padding%3A%20var(--bf-textarea-padding-y)%20var(--bf-textarea-padding-x)%3B%0A%09transition%3A%20var(--bf-textarea-transition)%3B%0A%7D%0A", import.meta.url);
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = cssUrl.href;
-    const root = document.createElement("div");
-    root.className = "root";
-    root.setAttribute("part", "root");
-    root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "textarea";
-    }
-    this.shadowRoot.replaceChildren(link, root);
-  }
-};
-customElements.define("bf-textarea", BfTextarea);
 
 // src/timeline/timeline.js
 var BfTimeline = class extends HTMLElement {

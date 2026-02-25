@@ -11,9 +11,18 @@
       h2 { margin-top: 0; font-size: 1.15rem; }
       ul { columns: 2; margin: 0; padding-left: 1rem; }
       li { margin: 0.35rem 0; }
+      #donate-button-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 999;
+      }
     </style>
   </head>
   <body>
+    <div id="donate-button-container">
+      <div id="donate-button"></div>
+    </div>
     <div class="layout">
       <header>
         <h1>bareframe examples</h1>
@@ -61,8 +70,7 @@
     <section>
       <h2>Editor Components</h2>
       <ul>
-      <li><a href="./code-block-test.html">code block</a></li>
-      <li><a href="./textarea-test.html">textarea</a></li>
+      <li><a href="./editor-test.html">editor</a></li>
       </ul>
     </section>
     <section>
@@ -156,5 +164,17 @@
       </ul>
     </section>
     </div>
+    <script src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js" charset="UTF-8"></script>
+    <script>
+      PayPal.Donation.Button({
+        env:'production',
+        hosted_button_id:'LKTM22NDQDVW6',
+        image: {
+          src:'https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif',
+          alt:'Donate with PayPal button',
+          title:'PayPal - The safer, easier way to pay online!',
+        }
+      }).render('#donate-button');
+    </script>
   </body>
 </html>

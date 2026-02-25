@@ -26,6 +26,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Package
+        run: npm run build
+
+      - name: Prepare Examples Artifact
+        run: |
+          rm -rf examples/src examples/themes examples/dist
+          cp -R src examples/src
+          cp -R themes examples/themes
+          cp -R dist examples/dist
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

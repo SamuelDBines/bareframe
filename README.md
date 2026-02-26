@@ -287,7 +287,7 @@ Reference:
 
 ## Button Test Example
 
-An example test harness is included at `examples/button-test.html`.
+An example test harness is included at `public/button-test.html`.
 
 From the project root, run:
 
@@ -297,7 +297,7 @@ python3 -m http.server 8080
 
 Then open:
 
-`http://localhost:8080/examples/button-test.html`
+`http://localhost:8080/public/button-test.html`
 
 This page lets you:
 
@@ -306,11 +306,11 @@ This page lets you:
 
 ## Accordion Test Example
 
-An example test harness is included at `examples/accordion-test.html`.
+An example test harness is included at `public/accordion-test.html`.
 
 Open:
 
-`http://localhost:8080/examples/accordion-test.html`
+`http://localhost:8080/public/accordion-test.html`
 
 This page lets you:
 
@@ -322,7 +322,7 @@ This page lets you:
 
 All generated component demos are listed at:
 
-`http://localhost:8080/examples/index.html`
+`http://localhost:8080/public/index.html`
 
 Hosted examples:
 
@@ -374,3 +374,15 @@ Early development. API and component patterns may evolve as the system grows.
 ## License
 
 MIT
+
+
+## Versioned Builds
+
+GitHub Pages also publishes versioned minified builds at:
+
+`https://samueldbines.github.io/bareframe/versions/`
+
+Each version folder contains:
+
+- `bareframe.min.js`
+- `manifest.json`

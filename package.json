@@ -20,10 +20,12 @@
   "scripts": {
     "build": "node ./scripts/build.mjs",
     "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts ./scripts/build.mjs",
-    "serve": "cd examples && ln -sfn ../src src && ln -sfn ../themes themes && ln -sfn ../dist dist && python3 -m http.server 8088",
+    "serve": "cd public && ln -sfn ../src src && ln -sfn ../themes themes && ln -sfn ../dist dist && python3 -m http.server 8088",
     "generate:index": "node ./scripts/generate-index.mjs",
     "prepack": "npm run build",
-    "pack:preview": "npm pack --dry-run"
+    "pack:preview": "npm pack --dry-run",
+    "generate:examples": "node ./scripts/generate-examples.mjs",
+    "generate:versions": "node ./scripts/generate-versions.mjs"
   },
   "keywords": [
     "web-components",

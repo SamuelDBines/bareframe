@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, '..');
 const componentsFile = path.join(root, 'all-components.md');
-const examplesDir = path.join(root, 'examples');
+const examplesDir = path.join(root, 'public');
 
 function slugify(value) {
 	return value
@@ -1249,6 +1249,8 @@ function indexHtml(entries) {
           <a href="https://samueldbines.github.io/bareframe/" target="_blank" rel="noreferrer">github pages</a>
           ·
           <a href="https://samueldbines.github.io/bareframe/chart-test.html" target="_blank" rel="noreferrer">chart demo</a>
+          ·
+          <a href="https://samueldbines.github.io/bareframe/versions/" target="_blank" rel="noreferrer">versions</a>
         </p>
       </header>
 ${blocks}

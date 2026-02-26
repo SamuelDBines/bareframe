@@ -1,4 +1,4 @@
-name: Deploy Examples To Pages
+name: Deploy Public To Pages
 
 on:
   push:
@@ -37,13 +37,18 @@ jobs:
       - name: Build Package
         run: npm run build
 
-      - name: Prepare Examples Artifact
+      - name: Generate Public Pages
         run: |
-          rm -rf examples/src examples/themes examples/dist
-          cp -R themes examples/themes
-          cp -R dist examples/dist
-          find examples -name '*.html' -type f -exec sed -i.bak "s#\\./src/index.js#\\./dist/bareframe.min.js#g" {} \;
-          find examples -name '*.bak' -type f -delete
+          node ./scripts/generate-examples.mjs
+          node ./scripts/generate-versions.mjs
+
+      - name: Prepare Public Artifact
+        run: |
+          rm -rf public/src public/themes public/dist
+          cp -R themes public/themes
+          cp -R dist public/dist
+          find public -name '*.html' -type f -exec sed -i.bak "s#\\./src/index.js#\\./dist/bareframe.min.js#g" {} \;
+          find public -name '*.bak' -type f -delete
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -51,7 +56,7 @@ jobs:
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: examples
+          path: public
 
       - name: Deploy To GitHub Pages
         id: deployment

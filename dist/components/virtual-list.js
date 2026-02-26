@@ -20,9 +20,6 @@ class BfVirtualList extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'virtual list';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

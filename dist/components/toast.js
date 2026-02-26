@@ -53,9 +53,6 @@ class BfToast extends HTMLElement {
 		this._close = root.querySelector('.close');
 		this._close.addEventListener('click', this._onCloseClick);
 
-		if (!this.textContent?.trim()) {
-			this.textContent = 'toast';
-		}
 		this._syncState();
 	}
 

@@ -20,9 +20,6 @@ class BfMessage extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'message';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

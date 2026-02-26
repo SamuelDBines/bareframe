@@ -20,9 +20,6 @@ class BfActionList extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'action list';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

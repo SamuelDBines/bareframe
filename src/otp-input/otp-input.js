@@ -20,9 +20,6 @@ class BfOtpInput extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'otp input';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

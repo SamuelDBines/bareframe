@@ -20,9 +20,6 @@ class BfLink extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'link';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

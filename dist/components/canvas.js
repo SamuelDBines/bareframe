@@ -20,9 +20,6 @@ class BfCanvas extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'canvas';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

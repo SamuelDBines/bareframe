@@ -32,9 +32,6 @@ class BfDrawer extends HTMLElement {
 		this._backdrop = root.querySelector('.backdrop');
 		this._backdrop.addEventListener('click', this._onBackdropClick);
 
-		if (!this.textContent?.trim()) {
-			this.textContent = 'drawer';
-		}
 
 		this._sync();
 	}

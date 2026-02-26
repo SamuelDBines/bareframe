@@ -123,10 +123,6 @@ class BfBreadcrumb extends HTMLElement {
 
 		this._list.replaceChildren();
 		if (!items.length) {
-			const fallback = document.createElement('li');
-			fallback.className = 'item';
-			fallback.textContent = 'breadcrumb';
-			this._list.append(fallback);
 			return;
 		}
 

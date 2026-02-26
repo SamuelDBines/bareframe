@@ -20,9 +20,6 @@ class BfLoadingIndicator extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'loading indicator';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

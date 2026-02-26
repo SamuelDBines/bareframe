@@ -21,9 +21,6 @@ class BfList extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'list';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 		this._slot = root.querySelector('slot');

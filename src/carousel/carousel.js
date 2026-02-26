@@ -20,9 +20,6 @@ class BfCarousel extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'carousel';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

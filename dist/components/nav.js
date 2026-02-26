@@ -20,9 +20,6 @@ class BfNav extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'nav';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

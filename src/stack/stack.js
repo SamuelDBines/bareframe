@@ -20,9 +20,6 @@ class BfStack extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'stack';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

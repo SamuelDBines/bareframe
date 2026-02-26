@@ -49,9 +49,6 @@ class BfDialog extends HTMLElement {
 		this._panel = root.querySelector('.panel');
 		this._backdrop.addEventListener('click', this._onBackdropClick);
 
-		if (!this.textContent?.trim()) {
-			this.textContent = 'dialog';
-		}
 
 		this._sync();
 	}

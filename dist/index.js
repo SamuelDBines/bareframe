@@ -150,9 +150,6 @@ var BfActionList = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "action list";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -177,9 +174,6 @@ var BfAnchor = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "anchor";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -473,9 +467,6 @@ var BfBottomNavigation = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "bottom navigation";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -592,10 +583,6 @@ var BfBreadcrumb = class extends HTMLElement {
     this._root.setAttribute("data-variant", this._variant());
     this._list.replaceChildren();
     if (!items.length) {
-      const fallback = document.createElement("li");
-      fallback.className = "item";
-      fallback.textContent = "breadcrumb";
-      this._list.append(fallback);
       return;
     }
     items.forEach((item, index) => {
@@ -646,7 +633,7 @@ var BfButton = class extends HTMLElement {
       return;
     }
     this._initialized = true;
-    const label = this.getAttribute("label") || "Button";
+    const label = this.getAttribute("label") || "";
     const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-button-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-button-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-button-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-button-border-radius%3A%20var(--bf-theme-radius-md%2C%206px)%3B%0A%09--bf-button-padding-y%3A%20var(--bf-theme-space-2%2C%200.5rem)%3B%0A%09--bf-button-padding-x%3A%20var(--bf-theme-space-3%2C%200.9rem)%3B%0A%09--bf-button-cursor%3A%20var(--bf-theme-cursor-button%2C%20pointer)%3B%0A%09--bf-button-opacity-hover%3A%20var(--bf-theme-opacity-hover%2C%200.95)%3B%0A%09--bf-button-active-translate-y%3A%20var(--bf-theme-active-translate-y%2C%201px)%3B%0A%09--bf-button-focus-outline-width%3A%20var(--bf-theme-focus-ring-width%2C%202px)%3B%0A%09--bf-button-focus-outline-style%3A%20var(--bf-theme-focus-ring-style%2C%20solid)%3B%0A%09--bf-button-focus-outline-color%3A%20var(--bf-theme-focus-ring-color%2C%20%2393c5fd)%3B%0A%09--bf-button-focus-outline-offset%3A%20var(--bf-theme-focus-ring-offset%2C%202px)%3B%0A%09--bf-button-transition%3A%0A%09%09var(--bf-theme-transition-transform%2C%20transform%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-opacity%2C%20opacity%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-bg%2C%20background-color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-color%2C%20color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-border%2C%20border-color%20120ms%20ease)%3B%0A%0A%09--bf-button-primary-bg%3A%20var(--bf-theme-button-primary-bg%2C%20%231d4ed8)%3B%0A%09--bf-button-primary-color%3A%20var(--bf-theme-button-primary-color%2C%20%23ffffff)%3B%0A%09--bf-button-primary-border-color%3A%20var(%0A%09%09--bf-theme-button-primary-border-color%2C%0A%09%09transparent%0A%09)%3B%0A%09--bf-button-primary-hover-bg%3A%20var(--bf-button-primary-bg)%3B%0A%09--bf-button-primary-hover-color%3A%20var(--bf-button-primary-color)%3B%0A%09--bf-button-primary-hover-border-color%3A%20var(--bf-button-primary-border-color)%3B%0A%09--bf-button-primary-active-bg%3A%20var(--bf-button-primary-bg)%3B%0A%09--bf-button-primary-active-color%3A%20var(--bf-button-primary-color)%3B%0A%09--bf-button-primary-active-border-color%3A%20var(%0A%09%09--bf-button-primary-border-color%0A%09)%3B%0A%0A%09--bf-button-secondary-bg%3A%20var(--bf-theme-button-secondary-bg%2C%20%23ffffff)%3B%0A%09--bf-button-secondary-color%3A%20var(--bf-theme-button-secondary-color%2C%20%231d4ed8)%3B%0A%09--bf-button-secondary-border-color%3A%20var(%0A%09%09--bf-theme-button-secondary-border-color%2C%0A%09%09%231d4ed8%0A%09)%3B%0A%09--bf-button-secondary-hover-bg%3A%20var(--bf-button-secondary-bg)%3B%0A%09--bf-button-secondary-hover-color%3A%20var(--bf-button-secondary-color)%3B%0A%09--bf-button-secondary-hover-border-color%3A%20var(%0A%09%09--bf-button-secondary-border-color%0A%09)%3B%0A%09--bf-button-secondary-active-bg%3A%20var(--bf-button-secondary-bg)%3B%0A%09--bf-button-secondary-active-color%3A%20var(--bf-button-secondary-color)%3B%0A%09--bf-button-secondary-active-border-color%3A%20var(%0A%09%09--bf-button-secondary-border-color%0A%09)%3B%0A%0A%09display%3A%20inline-block%3B%0A%7D%0A%0Abutton%20%7B%0A%09--_bf-button-bg%3A%20var(--bf-button-primary-bg)%3B%0A%09--_bf-button-color%3A%20var(--bf-button-primary-color)%3B%0A%09--_bf-button-border-color%3A%20var(--bf-button-primary-border-color)%3B%0A%09--_bf-button-hover-bg%3A%20var(--bf-button-primary-hover-bg)%3B%0A%09--_bf-button-hover-color%3A%20var(--bf-button-primary-hover-color)%3B%0A%09--_bf-button-hover-border-color%3A%20var(--bf-button-primary-hover-border-color)%3B%0A%09--_bf-button-active-bg%3A%20var(--bf-button-primary-active-bg)%3B%0A%09--_bf-button-active-color%3A%20var(--bf-button-primary-active-color)%3B%0A%09--_bf-button-active-border-color%3A%20var(%0A%09%09--bf-button-primary-active-border-color%0A%09)%3B%0A%0A%09font%3A%20var(--bf-button-font)%3B%0A%09border-width%3A%20var(--bf-button-border-width)%3B%0A%09border-style%3A%20var(--bf-button-border-style)%3B%0A%09border-color%3A%20var(--_bf-button-border-color)%3B%0A%09border-radius%3A%20var(--bf-button-border-radius)%3B%0A%09cursor%3A%20var(--bf-button-cursor)%3B%0A%09padding%3A%20var(--bf-button-padding-y)%20var(--bf-button-padding-x)%3B%0A%09transition%3A%20var(--bf-button-transition)%3B%0A%09background%3A%20var(--_bf-button-bg)%3B%0A%09color%3A%20var(--_bf-button-color)%3B%0A%7D%0A%0Abutton%3Ahover%20%7B%0A%09opacity%3A%20var(--bf-button-opacity-hover)%3B%0A%09background%3A%20var(--_bf-button-hover-bg)%3B%0A%09color%3A%20var(--_bf-button-hover-color)%3B%0A%09border-color%3A%20var(--_bf-button-hover-border-color)%3B%0A%7D%0A%0Abutton%3Aactive%20%7B%0A%09transform%3A%20translateY(var(--bf-button-active-translate-y))%3B%0A%09background%3A%20var(--_bf-button-active-bg)%3B%0A%09color%3A%20var(--_bf-button-active-color)%3B%0A%09border-color%3A%20var(--_bf-button-active-border-color)%3B%0A%7D%0A%0Abutton%3Afocus-visible%20%7B%0A%09outline-width%3A%20var(--bf-button-focus-outline-width)%3B%0A%09outline-style%3A%20var(--bf-button-focus-outline-style)%3B%0A%09outline-color%3A%20var(--bf-button-focus-outline-color)%3B%0A%09outline-offset%3A%20var(--bf-button-focus-outline-offset)%3B%0A%7D%0A%0Abutton%3Adisabled%20%7B%0A%09opacity%3A%20var(--bf-button-disabled-opacity%2C%200.55)%3B%0A%09cursor%3A%20var(--bf-button-disabled-cursor%2C%20not-allowed)%3B%0A%7D%0A%0Abutton.primary%20%7B%0A%09--_bf-button-bg%3A%20var(--bf-button-primary-bg)%3B%0A%09--_bf-button-color%3A%20var(--bf-button-primary-color)%3B%0A%09--_bf-button-border-color%3A%20var(--bf-button-primary-border-color)%3B%0A%09--_bf-button-hover-bg%3A%20var(--bf-button-primary-hover-bg)%3B%0A%09--_bf-button-hover-color%3A%20var(--bf-button-primary-hover-color)%3B%0A%09--_bf-button-hover-border-color%3A%20var(--bf-button-primary-hover-border-color)%3B%0A%09--_bf-button-active-bg%3A%20var(--bf-button-primary-active-bg)%3B%0A%09--_bf-button-active-color%3A%20var(--bf-button-primary-active-color)%3B%0A%09--_bf-button-active-border-color%3A%20var(%0A%09%09--bf-button-primary-active-border-color%0A%09)%3B%0A%7D%0A%0Abutton.secondary%20%7B%0A%09--_bf-button-bg%3A%20var(--bf-button-secondary-bg)%3B%0A%09--_bf-button-color%3A%20var(--bf-button-secondary-color)%3B%0A%09--_bf-button-border-color%3A%20var(--bf-button-secondary-border-color)%3B%0A%09--_bf-button-hover-bg%3A%20var(--bf-button-secondary-hover-bg)%3B%0A%09--_bf-button-hover-color%3A%20var(--bf-button-secondary-hover-color)%3B%0A%09--_bf-button-hover-border-color%3A%20var(%0A%09%09--bf-button-secondary-hover-border-color%0A%09)%3B%0A%09--_bf-button-active-bg%3A%20var(--bf-button-secondary-active-bg)%3B%0A%09--_bf-button-active-color%3A%20var(--bf-button-secondary-active-color)%3B%0A%09--_bf-button-active-border-color%3A%20var(%0A%09%09--bf-button-secondary-active-border-color%0A%09)%3B%0A%7D%0A%0Abutton.is-selected%20%7B%0A%09box-shadow%3A%20inset%200%200%200%202px%20var(--bf-theme-focus-ring-color%2C%20%2393c5fd)%3B%0A%7D%0A", import.meta.url);
     this.shadowRoot.innerHTML = "";
     const link = document.createElement("link");
@@ -677,7 +664,7 @@ var BfButton = class extends HTMLElement {
   }
   _onClick() {
     this._applyGroupSelection();
-    const label = this.getAttribute("label") || "Button";
+    const label = this.getAttribute("label") || "";
     const variant = this.getAttribute("variant") || "primary";
     this.dispatchEvent(
       new CustomEvent("bf-click", {
@@ -759,9 +746,6 @@ var BfCalendar = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "calendar";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -786,9 +770,6 @@ var BfCanvas = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "canvas";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -813,9 +794,6 @@ var BfCard = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "card";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -840,9 +818,6 @@ var BfCarousel = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "carousel";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1056,9 +1031,6 @@ var BfCombobox = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "combobox";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1083,9 +1055,6 @@ var BfCommandPalette = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "command palette";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1110,9 +1079,6 @@ var BfCountdown = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "countdown";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1137,9 +1103,6 @@ var BfDataGrid = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "data grid";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1164,9 +1127,6 @@ var BfDatePicker = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "date picker";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1191,9 +1151,6 @@ var BfDateRangePicker = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "date range picker";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1228,9 +1185,6 @@ var BfDialog = class extends HTMLElement {
     this._backdrop = root.querySelector(".backdrop");
     this._panel = root.querySelector(".panel");
     this._backdrop.addEventListener("click", this._onBackdropClick);
-    if (!this.textContent?.trim()) {
-      this.textContent = "dialog";
-    }
     this._sync();
   }
   attributeChangedCallback() {
@@ -1451,9 +1405,6 @@ var BfDrawer = class extends HTMLElement {
     this._root = root;
     this._backdrop = root.querySelector(".backdrop");
     this._backdrop.addEventListener("click", this._onBackdropClick);
-    if (!this.textContent?.trim()) {
-      this.textContent = "drawer";
-    }
     this._sync();
   }
   attributeChangedCallback() {
@@ -1538,9 +1489,6 @@ var BfDropdown = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "dropdown";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1566,9 +1514,6 @@ var BfEdge = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "edge";
-    }
     this.shadowRoot.replaceChildren(link, root);
     this._syncPosition();
   }
@@ -1763,9 +1708,6 @@ var BfEmptyState = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "empty state";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1790,9 +1732,6 @@ var BfErrorSummary = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "error summary";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -1817,9 +1756,6 @@ var BfFab = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "fab";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2018,9 +1954,6 @@ var BfFilterBar = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "filter bar";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2045,9 +1978,6 @@ var BfFormField = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "form field";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2072,9 +2002,6 @@ var BfGrid = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "grid";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2099,9 +2026,6 @@ var BfHero = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "hero";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2126,9 +2050,6 @@ var BfIcon = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "icon";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2153,9 +2074,6 @@ var BfImage = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "image";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2535,9 +2453,6 @@ var BfKeyValueList = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "key-value list";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2562,9 +2477,6 @@ var BfLink = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "link";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2590,9 +2502,6 @@ var BfList = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "list";
-    }
     this.shadowRoot.replaceChildren(link, root);
     this._slot = root.querySelector("slot");
     this._slot.addEventListener("slotchange", this._onSlotChange);
@@ -2656,9 +2565,6 @@ var BfLoadingIndicator = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "loading indicator";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2683,9 +2589,6 @@ var BfMap = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "map";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2714,9 +2617,6 @@ var BfMenu = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "menu";
-    }
     this.shadowRoot.replaceChildren(link, root);
     this._root = root;
     this._slot = root.querySelector("slot");
@@ -2866,9 +2766,6 @@ var BfMessage = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "message";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2893,9 +2790,6 @@ var BfMetricCard = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "metric card";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -2929,9 +2823,6 @@ var BfModal = class extends HTMLElement {
     this._root = root;
     this._backdrop = root.querySelector(".backdrop");
     this._backdrop.addEventListener("click", this._onBackdropClick);
-    if (!this.textContent?.trim()) {
-      this.textContent = "modal";
-    }
     this._sync();
   }
   attributeChangedCallback() {
@@ -3000,9 +2891,6 @@ var BfNav = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "nav";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -3027,9 +2915,6 @@ var BfNumberField = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "number field";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -3054,9 +2939,6 @@ var BfOtpInput = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "otp input";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -3081,9 +2963,6 @@ var BfPagination = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "pagination";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -3377,9 +3256,6 @@ var BfQuickActions = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "quick actions";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -3721,9 +3597,6 @@ var BfSearch = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "search";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -3748,9 +3621,6 @@ var BfSegmentedControl = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "segmented control";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -4093,9 +3963,6 @@ var BfSplitButton = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "split button";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -4120,9 +3987,6 @@ var BfSplitter = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "splitter";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -4147,9 +4011,6 @@ var BfStack = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "stack";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -4177,9 +4038,6 @@ var BfTab = class extends HTMLElement {
     root.setAttribute("part", "root");
     root.type = "button";
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "tab";
-    }
     this.shadowRoot.replaceChildren(link, root);
     this._button = root;
     root.addEventListener("click", this._onClick);
@@ -4258,9 +4116,6 @@ var BfTable = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "table";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -4286,9 +4141,6 @@ var BfTag = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "tag";
-    }
     this.shadowRoot.replaceChildren(link, root);
     this._root = root;
     this._sync();
@@ -4338,9 +4190,6 @@ var BfTimeline = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "timeline";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -4376,9 +4225,6 @@ var BfToast = class extends HTMLElement {
     this._icon = root.querySelector(".icon");
     this._close = root.querySelector(".close");
     this._close.addEventListener("click", this._onCloseClick);
-    if (!this.textContent?.trim()) {
-      this.textContent = "toast";
-    }
     this._syncState();
   }
   disconnectedCallback() {
@@ -4618,9 +4464,6 @@ var BfToggle = class extends HTMLElement {
     this._root = root;
     this._text = root.querySelector(".text");
     this._root.addEventListener("click", this._onClick);
-    if (!this.textContent?.trim()) {
-      this.textContent = "toggle";
-    }
     this._sync();
   }
   attributeChangedCallback() {
@@ -4697,9 +4540,6 @@ var BfToolbar = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "toolbar";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -4724,9 +4564,6 @@ var BfTreeView = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "tree view";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -4751,9 +4588,6 @@ var BfVideoPlayer = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "video player";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };
@@ -4778,9 +4612,6 @@ var BfVirtualList = class extends HTMLElement {
     root.className = "root";
     root.setAttribute("part", "root");
     root.innerHTML = "<slot></slot>";
-    if (!this.innerHTML.trim()) {
-      root.textContent = "virtual list";
-    }
     this.shadowRoot.replaceChildren(link, root);
   }
 };

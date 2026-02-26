@@ -32,9 +32,6 @@ class BfToggle extends HTMLElement {
 		this._root = root;
 		this._text = root.querySelector('.text');
 		this._root.addEventListener('click', this._onClick);
-		if (!this.textContent?.trim()) {
-			this.textContent = 'toggle';
-		}
 		this._sync();
 	}
 

@@ -20,9 +20,6 @@ class BfErrorSummary extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'error summary';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

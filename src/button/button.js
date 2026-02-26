@@ -13,7 +13,7 @@ class BfButton extends HTMLElement {
 			return;
 		}
 		this._initialized = true;
-		const label = this.getAttribute('label') || 'Button';
+		const label = this.getAttribute('label') || '';
 		const cssUrl = new URL('./button.css', import.meta.url);
 
 		this.shadowRoot.innerHTML = '';
@@ -52,7 +52,7 @@ class BfButton extends HTMLElement {
 
 	_onClick() {
 		this._applyGroupSelection();
-		const label = this.getAttribute('label') || 'Button';
+		const label = this.getAttribute('label') || '';
 		const variant = this.getAttribute('variant') || 'primary';
 		this.dispatchEvent(
 			new CustomEvent('bf-click', {

@@ -25,9 +25,6 @@ class BfTab extends HTMLElement {
 		root.type = 'button';
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'tab';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 		this._button = root;

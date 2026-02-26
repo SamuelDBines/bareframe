@@ -20,9 +20,6 @@ class BfAnchor extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'anchor';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

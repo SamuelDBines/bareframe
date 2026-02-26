@@ -20,9 +20,6 @@ class BfDataGrid extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'data grid';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

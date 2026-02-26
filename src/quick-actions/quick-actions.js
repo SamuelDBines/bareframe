@@ -20,9 +20,6 @@ class BfQuickActions extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'quick actions';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

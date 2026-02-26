@@ -20,9 +20,6 @@ class BfFormField extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'form field';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

@@ -20,9 +20,6 @@ class BfSplitButton extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'split button';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

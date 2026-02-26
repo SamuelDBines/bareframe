@@ -20,9 +20,6 @@ class BfVideoPlayer extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'video player';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

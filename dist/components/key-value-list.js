@@ -20,9 +20,6 @@ class BfKeyValueList extends HTMLElement {
 		root.setAttribute('part', 'root');
 		root.innerHTML = '<slot></slot>';
 
-		if (!this.innerHTML.trim()) {
-			root.textContent = 'key-value list';
-		}
 
 		this.shadowRoot.replaceChildren(link, root);
 	}

@@ -1,0 +1,64 @@
+@import './layout.css';
+
+:root,
+[data-bf-theme='modern'] {
+	color-scheme: light dark;
+
+	--bf-theme-font-family: 'Inter', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+	--bf-theme-border-width: 1px;
+	--bf-theme-border-style: solid;
+	--bf-theme-radius-md: 14px;
+	--bf-theme-space-2: 0.6rem;
+	--bf-theme-space-3: 1rem;
+	--bf-theme-cursor-button: pointer;
+	--bf-theme-opacity-hover: 0.97;
+	--bf-theme-active-translate-y: 1px;
+	--bf-theme-focus-ring-width: 2px;
+	--bf-theme-focus-ring-style: solid;
+	--bf-theme-focus-ring-color: #60a5fa;
+	--bf-theme-focus-ring-offset: 2px;
+	--bf-theme-surface-1: #ffffff;
+	--bf-theme-surface-2: #f3f6fb;
+	--bf-theme-text-1: #0b1220;
+	--bf-theme-text-2: #475569;
+	--bf-theme-border-1: #cbd5e1;
+
+	--bf-theme-button-primary-bg: #0ea5e9;
+	--bf-theme-button-primary-color: #f8fafc;
+	--bf-theme-button-primary-border-color: #0284c7;
+	--bf-theme-button-secondary-bg: #ffffff;
+	--bf-theme-button-secondary-color: #0f172a;
+	--bf-theme-button-secondary-border-color: #94a3b8;
+
+	--bf-theme-accordion-trigger-bg: #eef2ff;
+	--bf-theme-accordion-trigger-hover-bg: #e0e7ff;
+	--bf-theme-accordion-trigger-open-bg: #dbeafe;
+	--bf-theme-accordion-chevron-color: #334155;
+	--bf-theme-typography-color: var(--bf-theme-text-1);
+	--bf-theme-typography-line-height: 1.5;
+	--bf-theme-typography-display-size: 2.35rem;
+	--bf-theme-typography-h1-size: 1.85rem;
+	--bf-theme-typography-h2-size: 1.45rem;
+	--bf-theme-typography-h3-size: 1.15rem;
+	--bf-theme-typography-body-size: 1rem;
+	--bf-theme-typography-caption-size: 0.875rem;
+	--bf-theme-typography-label-size: 0.875rem;
+	--bf-theme-typography-code-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-bf-theme]),
+	[data-bf-theme='modern'] {
+		--bf-theme-surface-1: #0b1220;
+		--bf-theme-surface-2: #111827;
+		--bf-theme-text-1: #e2e8f0;
+		--bf-theme-text-2: #94a3b8;
+		--bf-theme-border-1: #334155;
+		--bf-theme-button-secondary-bg: #0f172a;
+		--bf-theme-button-secondary-color: #cbd5e1;
+		--bf-theme-button-secondary-border-color: #334155;
+		--bf-theme-accordion-trigger-bg: #172033;
+		--bf-theme-accordion-trigger-hover-bg: #1f2b44;
+		--bf-theme-accordion-trigger-open-bg: #1e293b;
+	}
+}

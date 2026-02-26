@@ -386,3 +386,4 @@ Each version folder contains:
 
 - `bareframe.min.js`
 - `manifest.json`
+- `themes/*.css`

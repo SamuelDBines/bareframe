@@ -40,13 +40,15 @@ async function ensureVersionSnapshot(version) {
 		path.join(distDir, 'manifest.json'),
 		path.join(versionDir, 'manifest.json'),
 	);
+	await fs.rm(path.join(versionDir, 'themes'), { recursive: true, force: true });
+	await fs.cp(path.join(distDir, 'themes'), path.join(versionDir, 'themes'), { recursive: true });
 }
 
 function versionsIndexHtml(versions, latest) {
 	const rows = versions
 		.map((version) => {
 			const latestBadge = version === latest ? ' <strong>(latest)</strong>' : '';
-			return `<li><a href="./${version}/bareframe.min.js">${version}</a>${latestBadge} · <a href="./${version}/manifest.json">manifest</a></li>`;
+			return `<li><a href="./${version}/bareframe.min.js">${version}</a>${latestBadge} · <a href="./${version}/manifest.json">manifest</a> · <a href="./${version}/themes/system.css">themes</a></li>`;
 		})
 		.join('\n');
 
@@ -76,6 +78,7 @@ function versionsIndexHtml(versions, latest) {
       <section>
         <h2>Latest</h2>
         <p><code>&lt;script type="module" src="https://samueldbines.github.io/bareframe/versions/${latest}/bareframe.min.js"&gt;&lt;/script&gt;</code></p>
+        <p><code>&lt;link rel="stylesheet" href="https://samueldbines.github.io/bareframe/versions/${latest}/themes/system.css" /&gt;</code></p>
       </section>
 
       <section>

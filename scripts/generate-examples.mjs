@@ -737,6 +737,50 @@ function primaryDemo(tag, name, slug, category) {
   </bf-split-button>
 </div>`.trim();
 	}
+	if (slug === 'link') {
+		return `
+<div class="stack" style="gap: 0.9rem;">
+  <div class="stack" style="gap: 0.35rem;">
+    <span class="label">Inline</span>
+    <bf-link variant="inline">
+      <a href="#">Overview</a>
+      <a href="#" aria-current="page">Projects</a>
+      <a href="#">Settings</a>
+      <a href="#">Billing</a>
+    </bf-link>
+  </div>
+
+  <div class="stack" style="gap: 0.35rem;">
+    <span class="label">Pill</span>
+    <bf-link variant="pill">
+      <a href="#">Dashboard</a>
+      <a href="#" aria-current="page">Usage</a>
+      <a href="#">Security</a>
+      <a href="#">Integrations</a>
+    </bf-link>
+  </div>
+
+  <div class="stack" style="gap: 0.35rem;">
+    <span class="label">Nav</span>
+    <bf-link variant="nav">
+      <a href="#">Home</a>
+      <a href="#">Components</a>
+      <a href="#" aria-current="page">Link</a>
+      <a href="#">Tokens</a>
+    </bf-link>
+  </div>
+
+  <div class="stack" style="gap: 0.35rem;">
+    <span class="label">Vertical Nav</span>
+    <bf-link variant="nav" vertical>
+      <a href="#">General</a>
+      <a href="#" aria-current="page">Appearance</a>
+      <a href="#">Security</a>
+      <a href="#">Billing</a>
+    </bf-link>
+  </div>
+</div>`.trim();
+	}
 	if (slug === 'table') {
 		return `
 <div class="stack">

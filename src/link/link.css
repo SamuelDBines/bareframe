@@ -1,30 +1,113 @@
 :host {
 	--bf-link-font: var(--bf-theme-font-family, inherit);
-	--bf-link-radius: var(--bf-theme-radius-md, 8px);
+	--bf-link-radius: var(--bf-theme-radius-md, 10px);
 	--bf-link-border-width: var(--bf-theme-border-width, 1px);
 	--bf-link-border-style: var(--bf-theme-border-style, solid);
-	--bf-link-border-color: var(--bf-theme-link-border-color, var(--bf-theme-border-1, #cbd5e1));
-	--bf-link-bg: var(--bf-theme-link-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-link-border-color: var(--bf-theme-link-border-color, color-mix(in srgb, var(--bf-theme-border-1, #cbd5e1) 80%, transparent));
+	--bf-link-bg: var(--bf-theme-link-bg, transparent);
 	--bf-link-color: var(--bf-theme-link-color, var(--bf-theme-text-1, #0f172a));
-	--bf-link-padding-y: var(--bf-theme-space-2, 0.6rem);
-	--bf-link-padding-x: var(--bf-theme-space-3, 0.9rem);
-	--bf-link-transition:
-		var(--bf-theme-transition-bg, background-color 120ms ease),
-		var(--bf-theme-transition-color, color 120ms ease),
-		var(--bf-theme-transition-border, border-color 120ms ease);
+	--bf-link-muted-color: var(--bf-theme-link-muted-color, var(--bf-theme-text-2, #475569));
+	--bf-link-accent: var(--bf-theme-link-accent, var(--bf-theme-button-primary-bg, #2563eb));
+	--bf-link-padding-y: var(--bf-theme-space-2, 0.45rem);
+	--bf-link-padding-x: var(--bf-theme-space-3, 0.7rem);
+	--bf-link-gap: var(--bf-theme-space-2, 0.45rem);
+	--bf-link-transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
 
-	display: block;
+	display: inline-block;
 	font: var(--bf-link-font);
 	color: var(--bf-link-color);
 }
 
 .root {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--bf-link-gap);
 	background: var(--bf-link-bg);
 	color: var(--bf-link-color);
+	transition: var(--bf-link-transition);
+}
+
+.root[data-vertical] {
+	flex-direction: column;
+	align-items: stretch;
+}
+
+.root[data-variant='inline'] {
+	padding: 0;
+}
+
+.root[data-variant='pill'] {
+	border-width: var(--bf-link-border-width);
+	border-style: var(--bf-link-border-style);
+	border-color: var(--bf-link-border-color);
+	border-radius: calc(var(--bf-link-radius) + 999px);
+	padding: 0.35rem;
+	background: color-mix(in srgb, var(--bf-theme-surface-1, #ffffff) 85%, transparent);
+}
+
+.root[data-variant='nav'] {
 	border-width: var(--bf-link-border-width);
 	border-style: var(--bf-link-border-style);
 	border-color: var(--bf-link-border-color);
 	border-radius: var(--bf-link-radius);
+	padding: 0.4rem;
+	background: color-mix(in srgb, var(--bf-theme-surface-1, #ffffff) 92%, transparent);
+}
+
+.root ::slotted(a),
+.root ::slotted([role='link']) {
+	color: var(--bf-link-muted-color);
+	text-decoration: none;
 	padding: var(--bf-link-padding-y) var(--bf-link-padding-x);
+	border-radius: calc(var(--bf-link-radius) - 2px);
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	outline: none;
 	transition: var(--bf-link-transition);
+}
+
+.root[data-variant='inline'] ::slotted(a),
+.root[data-variant='inline'] ::slotted([role='link']) {
+	padding: 0;
+	border-radius: 0;
+	text-decoration: underline;
+	text-underline-offset: 0.18em;
+	text-decoration-color: color-mix(in srgb, var(--bf-link-muted-color) 45%, transparent);
+}
+
+.root ::slotted(a:hover),
+.root ::slotted([role='link']:hover) {
+	background: color-mix(in srgb, var(--bf-link-accent) 10%, transparent);
+	color: var(--bf-link-color);
+}
+
+.root[data-variant='inline'] ::slotted(a:hover),
+.root[data-variant='inline'] ::slotted([role='link']:hover) {
+	background: transparent;
+	color: var(--bf-link-accent);
+	text-decoration-color: currentColor;
+}
+
+.root ::slotted(a:focus-visible),
+.root ::slotted([role='link']:focus-visible) {
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--bf-link-accent) 35%, transparent);
+}
+
+.root ::slotted(a[aria-current='page']),
+.root ::slotted(a[active]),
+.root ::slotted([role='link'][aria-current='page']),
+.root ::slotted([role='link'][active]) {
+	background: color-mix(in srgb, var(--bf-link-accent) 16%, transparent);
+	color: var(--bf-link-color);
+	font-weight: 600;
+}
+
+.root[data-variant='inline'] ::slotted(a[aria-current='page']),
+.root[data-variant='inline'] ::slotted(a[active]),
+.root[data-variant='inline'] ::slotted([role='link'][aria-current='page']),
+.root[data-variant='inline'] ::slotted([role='link'][active]) {
+	background: transparent;
+	color: var(--bf-link-accent);
 }

@@ -3,11 +3,11 @@
 	--bf-editor-radius: var(--bf-theme-radius-md, 8px);
 	--bf-editor-border-width: var(--bf-theme-border-width, 1px);
 	--bf-editor-border-style: var(--bf-theme-border-style, solid);
-	--bf-editor-border-color: var(--bf-theme-editor-border-color, var(--bf-theme-border-1, #cbd5e1));
-	--bf-editor-bg: var(--bf-theme-editor-bg, var(--bf-theme-surface-1, #ffffff));
-	--bf-editor-color: var(--bf-theme-editor-color, var(--bf-theme-text-1, #0f172a));
-	--bf-editor-muted: var(--bf-theme-text-2, #64748b);
-	--bf-editor-code-bg: color-mix(in srgb, var(--bf-editor-bg) 86%, #0f172a 14%);
+	--bf-editor-border-color: var(--bf-theme-editor-border-color, #1f2937);
+	--bf-editor-bg: var(--bf-theme-editor-bg, #000000);
+	--bf-editor-color: var(--bf-theme-editor-color, #f8fafc);
+	--bf-editor-muted: var(--bf-theme-editor-muted, #94a3b8);
+	--bf-editor-code-bg: color-mix(in srgb, var(--bf-editor-bg) 94%, #111827 6%);
 	--bf-editor-code-color: #e2e8f0;
 
 	display: block;

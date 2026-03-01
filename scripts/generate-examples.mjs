@@ -207,14 +207,11 @@ function primaryDemo(tag, name, slug, category) {
 	if (slug === 'dropdown') {
 		return `
 <bf-dropdown>
-  <div class="stack">
-    <bf-button>Actions</bf-button>
-    <div class="stack" style="max-width: 240px;">
-      <a href="#">Edit profile</a>
-      <a href="#">Team settings</a>
-      <a href="#">Sign out</a>
-    </div>
-  </div>
+  <bf-button slot="trigger">Actions</bf-button>
+  <button slot="content" item value="profile">Edit profile</button>
+  <button slot="content" item value="team">Team settings</button>
+  <button slot="content" item value="audit">Audit log</button>
+  <button slot="content" item value="signout">Sign out</button>
 </bf-dropdown>`.trim();
 	}
 	if (slug === 'editor') {

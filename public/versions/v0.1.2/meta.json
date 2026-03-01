@@ -1,0 +1,10 @@
+{
+  "version": "v0.1.2",
+  "from_ref": "v0.1.1",
+  "to_ref": "v0.1.2",
+  "from_commit": "1ba5012a8f4775e0919f619b076358f1abcd6a72",
+  "to_commit": "a83511342d4ff9877679e1a04ca7bb35b26abb7d",
+  "from_date_iso": "2026-02-25T23:39:04Z",
+  "to_date_iso": "2026-02-25T23:41:15Z",
+  "generated_at": "2026-03-01T21:26:30Z"
+}

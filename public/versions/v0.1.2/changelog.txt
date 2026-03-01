@@ -1,0 +1,8 @@
+Change log from v0.1.1 to v0.1.2
+
+[25th Feb 2026] Commit: c7ed4457033a97a0a0116350e70128dfb14ac310
+message: chore: prepare 0.1.2 release
+
+v0.1.2 [25th Feb 2026] Commit: a83511342d4ff9877679e1a04ca7bb35b26abb7d
+message: 0.1.2
+

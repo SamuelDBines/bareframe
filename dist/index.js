@@ -1475,23 +1475,229 @@ var BfDropdown = class extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+    this._onToggleClick = this._onToggleClick.bind(this);
+    this._onDocumentClick = this._onDocumentClick.bind(this);
+    this._onKeyDown = this._onKeyDown.bind(this);
+    this._onContentClick = this._onContentClick.bind(this);
+    this._onSlotChange = this._onSlotChange.bind(this);
   }
   connectedCallback() {
     if (this._initialized) {
+      this._sync();
       return;
     }
     this._initialized = true;
-    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-dropdown-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-dropdown-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-dropdown-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-dropdown-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-dropdown-border-color%3A%20var(--bf-theme-dropdown-border-color%2C%20var(--bf-theme-border-1%2C%20%23cbd5e1))%3B%0A%09--bf-dropdown-bg%3A%20var(--bf-theme-dropdown-bg%2C%20var(--bf-theme-surface-1%2C%20%23ffffff))%3B%0A%09--bf-dropdown-color%3A%20var(--bf-theme-dropdown-color%2C%20var(--bf-theme-text-1%2C%20%230f172a))%3B%0A%09--bf-dropdown-padding-y%3A%20var(--bf-theme-space-2%2C%200.6rem)%3B%0A%09--bf-dropdown-padding-x%3A%20var(--bf-theme-space-3%2C%200.9rem)%3B%0A%09--bf-dropdown-transition%3A%0A%09%09var(--bf-theme-transition-bg%2C%20background-color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-color%2C%20color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-border%2C%20border-color%20120ms%20ease)%3B%0A%0A%09display%3A%20block%3B%0A%09font%3A%20var(--bf-dropdown-font)%3B%0A%09color%3A%20var(--bf-dropdown-color)%3B%0A%7D%0A%0A.root%20%7B%0A%09background%3A%20var(--bf-dropdown-bg)%3B%0A%09color%3A%20var(--bf-dropdown-color)%3B%0A%09border-width%3A%20var(--bf-dropdown-border-width)%3B%0A%09border-style%3A%20var(--bf-dropdown-border-style)%3B%0A%09border-color%3A%20var(--bf-dropdown-border-color)%3B%0A%09border-radius%3A%20var(--bf-dropdown-radius)%3B%0A%09padding%3A%20var(--bf-dropdown-padding-y)%20var(--bf-dropdown-padding-x)%3B%0A%09transition%3A%20var(--bf-dropdown-transition)%3B%0A%7D%0A", import.meta.url);
+    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-dropdown-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-dropdown-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-dropdown-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-dropdown-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-dropdown-border-color%3A%20var(--bf-theme-dropdown-border-color%2C%20var(--bf-theme-border-1%2C%20%23cbd5e1))%3B%0A%09--bf-dropdown-bg%3A%20var(--bf-theme-dropdown-bg%2C%20var(--bf-theme-surface-1%2C%20%23ffffff))%3B%0A%09--bf-dropdown-color%3A%20var(--bf-theme-dropdown-color%2C%20var(--bf-theme-text-1%2C%20%230f172a))%3B%0A%09--bf-dropdown-muted%3A%20var(--bf-theme-text-2%2C%20%23475569)%3B%0A%09--bf-dropdown-accent%3A%20var(--bf-theme-button-primary-bg%2C%20%232563eb)%3B%0A%09--bf-dropdown-padding-y%3A%20var(--bf-theme-space-2%2C%200.45rem)%3B%0A%09--bf-dropdown-padding-x%3A%20var(--bf-theme-space-3%2C%200.75rem)%3B%0A%09--bf-dropdown-shadow%3A%200%2014px%2028px%20-18px%20rgba(2%2C%206%2C%2023%2C%200.45)%3B%0A%09--bf-dropdown-transition%3A%0A%09%09var(--bf-theme-transition-bg%2C%20background-color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-color%2C%20color%20120ms%20ease)%2C%0A%09%09var(--bf-theme-transition-border%2C%20border-color%20120ms%20ease)%2C%0A%09%09transform%20120ms%20ease%2C%0A%09%09opacity%20120ms%20ease%3B%0A%0A%09display%3A%20inline-block%3B%0A%09font%3A%20var(--bf-dropdown-font)%3B%0A%09color%3A%20var(--bf-dropdown-color)%3B%0A%09position%3A%20relative%3B%0A%7D%0A%0A.root%20%7B%0A%09position%3A%20relative%3B%0A%09color%3A%20var(--bf-dropdown-color)%3B%0A%7D%0A%0A.toggle%20%7B%0A%09display%3A%20inline-flex%3B%0A%09align-items%3A%20center%3B%0A%09gap%3A%200.45rem%3B%0A%09border%3A%200%3B%0A%09border-radius%3A%20var(--bf-dropdown-radius)%3B%0A%09background%3A%20transparent%3B%0A%09color%3A%20var(--bf-dropdown-color)%3B%0A%09padding%3A%200%3B%0A%09cursor%3A%20pointer%3B%0A%09font%3A%20inherit%3B%0A%09transition%3A%20var(--bf-dropdown-transition)%3B%0A%7D%0A%0A.toggle%3Ahover%20%7B%0A%09color%3A%20color-mix(in%20srgb%2C%20var(--bf-dropdown-accent)%2070%25%2C%20var(--bf-dropdown-color))%3B%0A%7D%0A%0A.toggle%3Afocus-visible%20%7B%0A%09outline%3A%20none%3B%0A%09box-shadow%3A%200%200%200%202px%20color-mix(in%20srgb%2C%20var(--bf-dropdown-accent)%2036%25%2C%20transparent)%3B%0A%7D%0A%0A.toggle-label%20%7B%0A%09display%3A%20inline-flex%3B%0A%09align-items%3A%20center%3B%0A%09gap%3A%200.35rem%3B%0A%09min-height%3A%201.75rem%3B%0A%7D%0A%0A.caret%20%7B%0A%09font-size%3A%200.75rem%3B%0A%09color%3A%20var(--bf-dropdown-muted)%3B%0A%09transition%3A%20transform%20140ms%20ease%3B%0A%7D%0A%0A.root%5Bdata-open%3D'true'%5D%20.caret%20%7B%0A%09transform%3A%20rotate(180deg)%3B%0A%7D%0A%0A.menu%20%7B%0A%09position%3A%20absolute%3B%0A%09min-width%3A%20100%25%3B%0A%09max-width%3A%20320px%3B%0A%09z-index%3A%2060%3B%0A%09border-width%3A%20var(--bf-dropdown-border-width)%3B%0A%09border-style%3A%20var(--bf-dropdown-border-style)%3B%0A%09border-color%3A%20var(--bf-dropdown-border-color)%3B%0A%09border-radius%3A%20calc(var(--bf-dropdown-radius)%20%2B%202px)%3B%0A%09background%3A%20var(--bf-dropdown-bg)%3B%0A%09box-shadow%3A%20var(--bf-dropdown-shadow)%3B%0A%09padding%3A%200.35rem%3B%0A%09overflow%3A%20auto%3B%0A%09max-height%3A%20min(340px%2C%2070vh)%3B%0A%09opacity%3A%200%3B%0A%09transform%3A%20translateY(-4px)%3B%0A%09pointer-events%3A%20none%3B%0A%09transition%3A%20var(--bf-dropdown-transition)%3B%0A%7D%0A%0A.root%5Bdata-open%3D'true'%5D%20.menu%20%7B%0A%09opacity%3A%201%3B%0A%09transform%3A%20translateY(0)%3B%0A%09pointer-events%3A%20auto%3B%0A%7D%0A%0A.root%5Bdata-position%3D'bottom-start'%5D%20.menu%20%7B%0A%09left%3A%200%3B%0A%09top%3A%20calc(100%25%20%2B%200.35rem)%3B%0A%7D%0A%0A.root%5Bdata-position%3D'bottom-end'%5D%20.menu%20%7B%0A%09right%3A%200%3B%0A%09top%3A%20calc(100%25%20%2B%200.35rem)%3B%0A%7D%0A%0A.root%5Bdata-position%3D'top-start'%5D%20.menu%20%7B%0A%09left%3A%200%3B%0A%09bottom%3A%20calc(100%25%20%2B%200.35rem)%3B%0A%7D%0A%0A.root%5Bdata-position%3D'top-end'%5D%20.menu%20%7B%0A%09right%3A%200%3B%0A%09bottom%3A%20calc(100%25%20%2B%200.35rem)%3B%0A%7D%0A%0A.menu%20%3A%3Aslotted(%5Bdata-bf-dropdown-item%5D)%2C%0A.menu%20%3A%3Aslotted(%5Bitem%5D)%2C%0A.menu%20%3A%3Aslotted(a)%2C%0A.menu%20%3A%3Aslotted(button)%20%7B%0A%09display%3A%20flex%3B%0A%09align-items%3A%20center%3B%0A%09width%3A%20100%25%3B%0A%09gap%3A%200.45rem%3B%0A%09border%3A%200%3B%0A%09background%3A%20transparent%3B%0A%09color%3A%20var(--bf-dropdown-color)%3B%0A%09text-decoration%3A%20none%3B%0A%09border-radius%3A%20calc(var(--bf-dropdown-radius)%20-%202px)%3B%0A%09padding%3A%200.5rem%200.6rem%3B%0A%09cursor%3A%20pointer%3B%0A%09text-align%3A%20left%3B%0A%09font%3A%20inherit%3B%0A%7D%0A%0A.menu%20%3A%3Aslotted(*)%20%2B%20%3A%3Aslotted(*)%20%7B%0A%09margin-top%3A%200.15rem%3B%0A%7D%0A%0A.menu%20%3A%3Aslotted(%5Bdata-bf-dropdown-item%5D%3Ahover)%2C%0A.menu%20%3A%3Aslotted(%5Bitem%5D%3Ahover)%2C%0A.menu%20%3A%3Aslotted(a%3Ahover)%2C%0A.menu%20%3A%3Aslotted(button%3Ahover)%20%7B%0A%09background%3A%20color-mix(in%20srgb%2C%20var(--bf-dropdown-accent)%2012%25%2C%20transparent)%3B%0A%7D%0A%0A.menu%20%3A%3Aslotted(%5Bdata-bf-dropdown-item%5D%3Afocus-visible)%2C%0A.menu%20%3A%3Aslotted(%5Bitem%5D%3Afocus-visible)%2C%0A.menu%20%3A%3Aslotted(a%3Afocus-visible)%2C%0A.menu%20%3A%3Aslotted(button%3Afocus-visible)%20%7B%0A%09outline%3A%20none%3B%0A%09box-shadow%3A%20inset%200%200%200%201px%20color-mix(in%20srgb%2C%20var(--bf-dropdown-accent)%2042%25%2C%20transparent)%3B%0A%7D%0A", import.meta.url);
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = cssUrl.href;
     const root = document.createElement("div");
     root.className = "root";
     root.setAttribute("part", "root");
-    root.innerHTML = "<slot></slot>";
+    root.innerHTML = `
+			<div class="toggle" part="toggle" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false">
+				<span class="toggle-label"><slot name="trigger">Open</slot></span>
+				<span class="caret" aria-hidden="true">\u25BE</span>
+			</div>
+			<div class="menu" part="menu" role="menu">
+				<slot name="content"></slot>
+			</div>
+		`;
     this.shadowRoot.replaceChildren(link, root);
+    this._root = root;
+    this._toggle = root.querySelector(".toggle");
+    this._menu = root.querySelector(".menu");
+    this._triggerSlot = root.querySelector('slot[name="trigger"]');
+    this._contentSlot = root.querySelector('slot[name="content"]');
+    this._toggle.addEventListener("click", this._onToggleClick);
+    this._toggle.addEventListener("keydown", this._onKeyDown);
+    this._menu.addEventListener("click", this._onContentClick);
+    this._triggerSlot.addEventListener("slotchange", this._onSlotChange);
+    this._contentSlot.addEventListener("slotchange", this._onSlotChange);
+    document.addEventListener("click", this._onDocumentClick);
+    this._assignSlots();
+    this._decorateItems();
+    this._sync();
+  }
+  disconnectedCallback() {
+    document.removeEventListener("click", this._onDocumentClick);
+    if (this._toggle) {
+      this._toggle.removeEventListener("click", this._onToggleClick);
+      this._toggle.removeEventListener("keydown", this._onKeyDown);
+    }
+    if (this._menu) {
+      this._menu.removeEventListener("click", this._onContentClick);
+    }
+    if (this._triggerSlot) {
+      this._triggerSlot.removeEventListener("slotchange", this._onSlotChange);
+    }
+    if (this._contentSlot) {
+      this._contentSlot.removeEventListener("slotchange", this._onSlotChange);
+    }
+  }
+  attributeChangedCallback() {
+    this._sync();
+  }
+  open() {
+    this.setAttribute("open", "");
+  }
+  close() {
+    this.removeAttribute("open");
+  }
+  toggle() {
+    if (this.hasAttribute("open")) {
+      this.close();
+      return;
+    }
+    this.open();
+  }
+  _onSlotChange() {
+    this._assignSlots();
+    this._decorateItems();
+  }
+  _assignSlots() {
+    const candidates = [...this.children].filter(
+      (element) => element.nodeType === Node.ELEMENT_NODE
+    );
+    if (!candidates.length) {
+      return;
+    }
+    const hasTrigger = candidates.some((el) => el.getAttribute("slot") === "trigger");
+    const hasContent = candidates.some((el) => el.getAttribute("slot") === "content");
+    if (!hasTrigger) {
+      candidates[0].setAttribute("slot", "trigger");
+    }
+    if (!hasContent) {
+      for (let i = 1; i < candidates.length; i += 1) {
+        candidates[i].setAttribute("slot", "content");
+      }
+    }
+  }
+  _actionableItems() {
+    const assigned = this._contentSlot?.assignedElements({ flatten: true }) || [];
+    const items = [];
+    for (const element of assigned) {
+      if (element.matches?.('a,button,[item],[role="menuitem"],[tabindex]')) {
+        items.push(element);
+      }
+      items.push(
+        ...element.querySelectorAll(
+          'a,button,[item],[role="menuitem"],[tabindex]'
+        )
+      );
+    }
+    return items;
+  }
+  _decorateItems() {
+    const items = this._actionableItems();
+    for (const item of items) {
+      item.setAttribute("data-bf-dropdown-item", "");
+      if (item.hasAttribute("item") && !item.hasAttribute("role")) {
+        item.setAttribute("role", "menuitem");
+      }
+      if (!item.hasAttribute("tabindex")) {
+        item.setAttribute("tabindex", "0");
+      }
+      if (item.dataset.bfDropdownStyled !== "true") {
+        item.style.display = "flex";
+        item.style.alignItems = "center";
+        item.style.width = "100%";
+        item.style.gap = "0.45rem";
+        item.style.border = "0";
+        item.style.background = "transparent";
+        item.style.borderRadius = "0.4rem";
+        item.style.padding = "0.5rem 0.6rem";
+        item.style.cursor = "pointer";
+        item.style.textAlign = "left";
+        item.style.font = "inherit";
+        item.style.color = "inherit";
+        item.style.textDecoration = "none";
+        item.dataset.bfDropdownStyled = "true";
+      }
+    }
+  }
+  _focusFirstItem() {
+    const items = this._actionableItems();
+    const first = items.find((item) => !item.hasAttribute("disabled"));
+    first?.focus();
+  }
+  _emitSelect(target) {
+    const value = target.getAttribute("value") || target.textContent?.trim() || "";
+    this.dispatchEvent(
+      new CustomEvent("bf-select", {
+        bubbles: true,
+        composed: true,
+        detail: {
+          id: target.id || "",
+          value
+        }
+      })
+    );
+  }
+  _onContentClick(event) {
+    const target = event.target instanceof Element ? event.target.closest("[data-bf-dropdown-item]") : null;
+    if (!target) {
+      return;
+    }
+    this._emitSelect(target);
+    this.close();
+  }
+  _onToggleClick() {
+    this.toggle();
+    if (this.hasAttribute("open")) {
+      requestAnimationFrame(() => this._focusFirstItem());
+    }
+  }
+  _onDocumentClick(event) {
+    if (!this.hasAttribute("open")) {
+      return;
+    }
+    const path = event.composedPath();
+    if (path.includes(this)) {
+      return;
+    }
+    this.close();
+  }
+  _onKeyDown(event) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      this.toggle();
+      if (this.hasAttribute("open")) {
+        requestAnimationFrame(() => this._focusFirstItem());
+      }
+      return;
+    }
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      this.open();
+      requestAnimationFrame(() => this._focusFirstItem());
+      return;
+    }
+    if (event.key === "Escape") {
+      this.close();
+      this._toggle?.focus();
+    }
+  }
+  _position() {
+    const value = (this.getAttribute("position") || "bottom-start").toLowerCase();
+    if (["bottom-start", "bottom-end", "top-start", "top-end"].includes(value)) {
+      return value;
+    }
+    return "bottom-start";
+  }
+  _sync() {
+    if (!this._root || !this._toggle || !this._menu) {
+      return;
+    }
+    const open = this.hasAttribute("open");
+    this._root.setAttribute("data-open", open ? "true" : "false");
+    this._root.setAttribute("data-position", this._position());
+    this._toggle.setAttribute("aria-expanded", String(open));
+    this._toggle.setAttribute("aria-pressed", String(open));
+    this._menu.hidden = !open;
   }
 };
+__publicField(BfDropdown, "observedAttributes", ["open", "position"]);
 customElements.define("bf-dropdown", BfDropdown);
 
 // src/edge/edge.js
@@ -1552,7 +1758,7 @@ var BfEditor = class extends HTMLElement {
       return;
     }
     this._initialized = true;
-    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-editor-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-editor-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-editor-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-editor-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-editor-border-color%3A%20var(--bf-theme-editor-border-color%2C%20var(--bf-theme-border-1%2C%20%23cbd5e1))%3B%0A%09--bf-editor-bg%3A%20var(--bf-theme-editor-bg%2C%20var(--bf-theme-surface-1%2C%20%23ffffff))%3B%0A%09--bf-editor-color%3A%20var(--bf-theme-editor-color%2C%20var(--bf-theme-text-1%2C%20%230f172a))%3B%0A%09--bf-editor-muted%3A%20var(--bf-theme-text-2%2C%20%2364748b)%3B%0A%09--bf-editor-code-bg%3A%20color-mix(in%20srgb%2C%20var(--bf-editor-bg)%2086%25%2C%20%230f172a%2014%25)%3B%0A%09--bf-editor-code-color%3A%20%23e2e8f0%3B%0A%0A%09display%3A%20block%3B%0A%09font%3A%20var(--bf-editor-font)%3B%0A%09color%3A%20var(--bf-editor-color)%3B%0A%7D%0A%0A.root%20%7B%0A%09background%3A%20var(--bf-editor-bg)%3B%0A%09color%3A%20var(--bf-editor-color)%3B%0A%09border-width%3A%20var(--bf-editor-border-width)%3B%0A%09border-style%3A%20var(--bf-editor-border-style)%3B%0A%09border-color%3A%20var(--bf-editor-border-color)%3B%0A%09border-radius%3A%20var(--bf-editor-radius)%3B%0A%09overflow%3A%20hidden%3B%0A%7D%0A%0A.toolbar%20%7B%0A%09display%3A%20none%3B%0A%09gap%3A%200.35rem%3B%0A%09padding%3A%200.5rem%3B%0A%09border-bottom%3A%201px%20solid%20var(--bf-editor-border-color)%3B%0A%09background%3A%20color-mix(in%20srgb%2C%20var(--bf-editor-bg)%2092%25%2C%20var(--bf-editor-border-color))%3B%0A%7D%0A%0A.toolbar%20button%20%7B%0A%09border%3A%201px%20solid%20var(--bf-editor-border-color)%3B%0A%09background%3A%20var(--bf-editor-bg)%3B%0A%09color%3A%20var(--bf-editor-color)%3B%0A%09border-radius%3A%206px%3B%0A%09padding%3A%200.22rem%200.45rem%3B%0A%09cursor%3A%20pointer%3B%0A%09font%3A%20inherit%3B%0A%09font-size%3A%200.85rem%3B%0A%7D%0A%0A.code-wrap%20%7B%0A%09display%3A%20grid%3B%0A%09grid-template-columns%3A%20auto%201fr%3B%0A%09min-height%3A%20220px%3B%0A%09background%3A%20var(--bf-editor-code-bg)%3B%0A%7D%0A%0A.line-numbers%20%7B%0A%09padding%3A%200.8rem%200.55rem%3B%0A%09margin%3A%200%3B%0A%09white-space%3A%20pre%3B%0A%09line-height%3A%201.45%3B%0A%09font-family%3A%20ui-monospace%2C%20SFMono-Regular%2C%20Menlo%2C%20Monaco%2C%20Consolas%2C%20'Liberation%20Mono'%2C%20'Courier%20New'%2C%20monospace%3B%0A%09font-size%3A%200.85rem%3B%0A%09color%3A%20color-mix(in%20srgb%2C%20var(--bf-editor-code-color)%2055%25%2C%20transparent)%3B%0A%09border-right%3A%201px%20solid%20color-mix(in%20srgb%2C%20var(--bf-editor-border-color)%2080%25%2C%20transparent)%3B%0A%09user-select%3A%20none%3B%0A%7D%0A%0A.code%20%7B%0A%09width%3A%20100%25%3B%0A%09min-height%3A%20220px%3B%0A%09resize%3A%20vertical%3B%0A%09padding%3A%200.8rem%3B%0A%09border%3A%200%3B%0A%09outline%3A%200%3B%0A%09background%3A%20transparent%3B%0A%09color%3A%20var(--bf-editor-code-color)%3B%0A%09font-family%3A%20ui-monospace%2C%20SFMono-Regular%2C%20Menlo%2C%20Monaco%2C%20Consolas%2C%20'Liberation%20Mono'%2C%20'Courier%20New'%2C%20monospace%3B%0A%09font-size%3A%200.9rem%3B%0A%09line-height%3A%201.45%3B%0A%7D%0A%0A.rich%20%7B%0A%09display%3A%20none%3B%0A%09min-height%3A%20220px%3B%0A%09padding%3A%200.8rem%3B%0A%09outline%3A%20none%3B%0A%09line-height%3A%201.5%3B%0A%7D%0A%0A.rich%3Aempty%3A%3Abefore%20%7B%0A%09content%3A%20attr(data-placeholder)%3B%0A%09color%3A%20var(--bf-editor-muted)%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'richtext'%5D%20.toolbar%20%7B%0A%09display%3A%20flex%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'richtext'%5D%20.code-wrap%20%7B%0A%09display%3A%20none%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'richtext'%5D%20.rich%20%7B%0A%09display%3A%20block%3B%0A%7D%0A%0A%3Ahost(%5Bdisabled%5D)%20%7B%0A%09opacity%3A%200.72%3B%0A%7D%0A%0A%3Ahost(%5Bdisabled%5D)%20.toolbar%20button%20%7B%0A%09cursor%3A%20not-allowed%3B%0A%7D%0A", import.meta.url);
+    const cssUrl = new URL("data:text/css;charset=utf-8,%3Ahost%20%7B%0A%09--bf-editor-font%3A%20var(--bf-theme-font-family%2C%20inherit)%3B%0A%09--bf-editor-radius%3A%20var(--bf-theme-radius-md%2C%208px)%3B%0A%09--bf-editor-border-width%3A%20var(--bf-theme-border-width%2C%201px)%3B%0A%09--bf-editor-border-style%3A%20var(--bf-theme-border-style%2C%20solid)%3B%0A%09--bf-editor-border-color%3A%20var(--bf-theme-editor-border-color%2C%20%231f2937)%3B%0A%09--bf-editor-bg%3A%20var(--bf-theme-editor-bg%2C%20%23000000)%3B%0A%09--bf-editor-color%3A%20var(--bf-theme-editor-color%2C%20%23f8fafc)%3B%0A%09--bf-editor-muted%3A%20var(--bf-theme-editor-muted%2C%20%2394a3b8)%3B%0A%09--bf-editor-code-bg%3A%20color-mix(in%20srgb%2C%20var(--bf-editor-bg)%2094%25%2C%20%23111827%206%25)%3B%0A%09--bf-editor-code-color%3A%20%23e2e8f0%3B%0A%0A%09display%3A%20block%3B%0A%09font%3A%20var(--bf-editor-font)%3B%0A%09color%3A%20var(--bf-editor-color)%3B%0A%7D%0A%0A.root%20%7B%0A%09background%3A%20var(--bf-editor-bg)%3B%0A%09color%3A%20var(--bf-editor-color)%3B%0A%09border-width%3A%20var(--bf-editor-border-width)%3B%0A%09border-style%3A%20var(--bf-editor-border-style)%3B%0A%09border-color%3A%20var(--bf-editor-border-color)%3B%0A%09border-radius%3A%20var(--bf-editor-radius)%3B%0A%09overflow%3A%20hidden%3B%0A%7D%0A%0A.toolbar%20%7B%0A%09display%3A%20none%3B%0A%09gap%3A%200.35rem%3B%0A%09padding%3A%200.5rem%3B%0A%09border-bottom%3A%201px%20solid%20var(--bf-editor-border-color)%3B%0A%09background%3A%20color-mix(in%20srgb%2C%20var(--bf-editor-bg)%2092%25%2C%20var(--bf-editor-border-color))%3B%0A%7D%0A%0A.toolbar%20button%20%7B%0A%09border%3A%201px%20solid%20var(--bf-editor-border-color)%3B%0A%09background%3A%20var(--bf-editor-bg)%3B%0A%09color%3A%20var(--bf-editor-color)%3B%0A%09border-radius%3A%206px%3B%0A%09padding%3A%200.22rem%200.45rem%3B%0A%09cursor%3A%20pointer%3B%0A%09font%3A%20inherit%3B%0A%09font-size%3A%200.85rem%3B%0A%7D%0A%0A.code-wrap%20%7B%0A%09display%3A%20grid%3B%0A%09grid-template-columns%3A%20auto%201fr%3B%0A%09min-height%3A%20220px%3B%0A%09background%3A%20var(--bf-editor-code-bg)%3B%0A%7D%0A%0A.line-numbers%20%7B%0A%09padding%3A%200.8rem%200.55rem%3B%0A%09margin%3A%200%3B%0A%09white-space%3A%20pre%3B%0A%09line-height%3A%201.45%3B%0A%09font-family%3A%20ui-monospace%2C%20SFMono-Regular%2C%20Menlo%2C%20Monaco%2C%20Consolas%2C%20'Liberation%20Mono'%2C%20'Courier%20New'%2C%20monospace%3B%0A%09font-size%3A%200.85rem%3B%0A%09color%3A%20color-mix(in%20srgb%2C%20var(--bf-editor-code-color)%2055%25%2C%20transparent)%3B%0A%09border-right%3A%201px%20solid%20color-mix(in%20srgb%2C%20var(--bf-editor-border-color)%2080%25%2C%20transparent)%3B%0A%09user-select%3A%20none%3B%0A%7D%0A%0A.code%20%7B%0A%09width%3A%20100%25%3B%0A%09min-height%3A%20220px%3B%0A%09resize%3A%20vertical%3B%0A%09padding%3A%200.8rem%3B%0A%09border%3A%200%3B%0A%09outline%3A%200%3B%0A%09background%3A%20transparent%3B%0A%09color%3A%20var(--bf-editor-code-color)%3B%0A%09font-family%3A%20ui-monospace%2C%20SFMono-Regular%2C%20Menlo%2C%20Monaco%2C%20Consolas%2C%20'Liberation%20Mono'%2C%20'Courier%20New'%2C%20monospace%3B%0A%09font-size%3A%200.9rem%3B%0A%09line-height%3A%201.45%3B%0A%7D%0A%0A.rich%20%7B%0A%09display%3A%20none%3B%0A%09min-height%3A%20220px%3B%0A%09padding%3A%200.8rem%3B%0A%09outline%3A%20none%3B%0A%09line-height%3A%201.5%3B%0A%7D%0A%0A.rich%3Aempty%3A%3Abefore%20%7B%0A%09content%3A%20attr(data-placeholder)%3B%0A%09color%3A%20var(--bf-editor-muted)%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'richtext'%5D%20.toolbar%20%7B%0A%09display%3A%20flex%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'richtext'%5D%20.code-wrap%20%7B%0A%09display%3A%20none%3B%0A%7D%0A%0A.root%5Bdata-variant%3D'richtext'%5D%20.rich%20%7B%0A%09display%3A%20block%3B%0A%7D%0A%0A%3Ahost(%5Bdisabled%5D)%20%7B%0A%09opacity%3A%200.72%3B%0A%7D%0A%0A%3Ahost(%5Bdisabled%5D)%20.toolbar%20button%20%7B%0A%09cursor%3A%20not-allowed%3B%0A%7D%0A", import.meta.url);
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = cssUrl.href;

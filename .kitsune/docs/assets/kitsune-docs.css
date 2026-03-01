@@ -1,0 +1,198 @@
+:root {
+  --ks-max: 1060px;
+}
+
+.ks-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.ks-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: block;
+}
+
+.ks-page {
+  max-width: var(--ks-max);
+  padding-top: 24px;
+  padding-bottom: 48px;
+}
+
+.ks-hero {
+  margin: 18px 0 18px;
+}
+
+.ks-kicker {
+  margin: 0 0 6px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.ks-meta {
+  margin: 8px 0 0;
+  opacity: 0.8;
+}
+
+.ks-dot {
+  padding: 0 8px;
+}
+
+.ks-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+@media (min-width: 900px) {
+  .ks-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.ks-card {
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 14px;
+  padding: 16px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(6px);
+}
+
+.ks-muted {
+  opacity: 0.75;
+}
+
+.ks-pre {
+  white-space: pre-wrap;
+  background: rgba(10, 14, 22, 0.95);
+  color: rgba(245, 255, 252, 0.92);
+  border-radius: 12px;
+  padding: 12px;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.ks-changes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ks-changes li {
+  padding: 12px 0;
+  border-top: 1px solid rgba(0,0,0,0.08);
+}
+
+.ks-changes li:first-child {
+  border-top: none;
+}
+
+.ks-change-head {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.ks-sha {
+  font-weight: 700;
+}
+
+.ks-change-body {
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.ks-tag-pill {
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.12);
+  font-size: 12px;
+}
+
+.ks-tags {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ks-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.12);
+}
+
+.ks-tag-num {
+  opacity: 0.75;
+  padding-left: 4px;
+}
+
+.ks-downloads {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+}
+
+.ks-downloads li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 6px 0;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.ks-downloads li:first-child {
+  border-top: none;
+}
+
+.ks-link {
+  text-decoration: none;
+  font-weight: 650;
+}
+
+.ks-versions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ks-version-link {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  text-decoration: none;
+}
+
+.ks-version-link:first-child {
+  border-top: none;
+}
+
+.ks-version {
+  font-weight: 700;
+}
+
+.ks-divider {
+  height: 1px;
+  background: rgba(0,0,0,0.10);
+  margin: 18px 0 12px;
+}
+
+.ks-footer {
+  margin-top: 16px;
+}

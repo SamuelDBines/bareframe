@@ -1,0 +1,10 @@
+# Local-only overrides for Kitsune (not intended to be committed)
+#
+# Examples:
+# ai:
+#   model_path: ~/.kitsune/models/default.gguf
+# security:
+#   ignore_paths:
+#     - vendor/**
+#   ignore_rules:
+#     - google_api_key

@@ -1,0 +1,17 @@
+Change log from v0.1.2 to v0.1.3
+
+[25th Feb 2026] Commit: 7ba4d248cc7f548fabeab51735121d9499611fa2
+message: Unify editor component and add PayPal donate button to examples
+
+[26th Feb 2026] Commit: 5a678ca9d72877f8ebfae54b3baa21544b26d0d1
+message: Move examples to public and add versioned GitHub Pages builds
+
+[26th Feb 2026] Commit: e9981f5bbee24d3cba2e1ebcc6d9c232370e7468
+message: Include themes in versioned GitHub Pages snapshots
+
+[26th Feb 2026] Commit: c8bcd3ccfb7f56d74a26feb55847222ef7d3e27f
+message: Prepare v0.1.3: remove default placeholder text in components
+
+v0.1.3 [1st Mar 2026] Commit: dfc0a905fecf2f07f0f60ced340f0fc2d8bd2a2f
+message: chore: update dist, public, scripts, src
+

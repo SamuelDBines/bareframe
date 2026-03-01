@@ -1,0 +1,32 @@
+Change log from e5d49af65d70e3265648149ab024a4cb9a3f5110 to v0.1.1
+
+[25th Feb 2026] Commit: c3c6245a06d91d1dce0a5ff1466919d36d0521ab
+message: Build out bareframe component library, themes, examples, and npm packaging
+
+[25th Feb 2026] Commit: 24291142b96af40582cdac0a7c733798266565bf
+message: Add GitHub Pages workflow for examples deployment
+
+[25th Feb 2026] Commit: 876deb810bbacf540b72c98bdca4b30c32f9b3e7
+message: Add watch script and refresh package docs/manifest
+
+[25th Feb 2026] Commit: 4a1bd270d793a35d6a39736b6e5360abdebe6876
+message: Refactor components, expand utilities, themes, and demos
+
+[25th Feb 2026] Commit: f1ebac4ca9052dfab385b29788acee6aa484f2ea
+message: Fix Pages deploy by copying src/themes/dist into examples
+
+[25th Feb 2026] Commit: a3e6359b8764fd683cb35de4ced0d1668215ac7c
+message: Serve minified bundle on GitHub Pages examples
+
+[25th Feb 2026] Commit: 2401e63c0b5a0fc5aad78fbe4308bcc598e7852d
+message: Unify file upload/dropzone and enforce default translate metadata
+
+[25th Feb 2026] Commit: 52f048bdfd7fb60f73cf2ad8bd6b796a7f70085f
+message: Update npm/docs links and improve table/data-grid utilities demos
+
+[25th Feb 2026] Commit: 31161d80e2ab36ece01999af6127576dbca017c0
+message: chore: prep release
+
+v0.1.1 [25th Feb 2026] Commit: 1ba5012a8f4775e0919f619b076358f1abcd6a72
+message: 0.1.1
+

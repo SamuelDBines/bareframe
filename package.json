@@ -1,32 +1,20 @@
 {
-  "name": "bareframe",
-  "version": "0.1.3",
   "description": "Lightweight, dependency-free Web Components for reusable app UI.",
-  "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "devDependencies": {
+    "esbuild": "^0.27.3"
+  },
   "exports": {
     ".": "./dist/index.js",
-    "./min": "./dist/bareframe.min.js",
     "./bareframe.min.js": "./dist/bareframe.min.js",
     "./components/*.js": "./dist/components/*.js",
-    "./themes/*.css": "./dist/themes/*.css",
-    "./manifest.json": "./dist/manifest.json"
+    "./manifest.json": "./dist/manifest.json",
+    "./min": "./dist/bareframe.min.js",
+    "./themes/*.css": "./dist/themes/*.css"
   },
   "files": [
     "dist",
     "README.md"
   ],
-  "scripts": {
-    "build": "node ./scripts/build.mjs",
-    "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts ./scripts/build.mjs",
-    "serve": "cd public && ln -sfn ../src src && ln -sfn ../themes themes && ln -sfn ../dist dist && python3 -m http.server 8088",
-    "generate:index": "node ./scripts/generate-index.mjs",
-    "prepack": "npm run build",
-    "pack:preview": "npm pack --dry-run",
-    "generate:examples": "node ./scripts/generate-examples.mjs",
-    "generate:versions": "node ./scripts/generate-versions.mjs"
-  },
   "keywords": [
     "web-components",
     "custom-elements",
@@ -35,7 +23,19 @@
     "bareframe"
   ],
   "license": "MIT",
-  "devDependencies": {
-    "esbuild": "^0.27.3"
-  }
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "name": "bareframe",
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "generate:examples": "node ./scripts/generate-examples.mjs",
+    "generate:index": "node ./scripts/generate-index.mjs",
+    "generate:versions": "node ./scripts/generate-versions.mjs",
+    "pack:preview": "npm pack --dry-run",
+    "prepack": "npm run build",
+    "serve": "cd public \u0026\u0026 ln -sfn ../src src \u0026\u0026 ln -sfn ../themes themes \u0026\u0026 ln -sfn ../dist dist \u0026\u0026 python3 -m http.server 8088",
+    "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts ./scripts/build.mjs"
+  },
+  "type": "module",
+  "version": "0.1.4"
 }

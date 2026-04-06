@@ -1,0 +1,12 @@
+{% set title = 'segmented-control' %}
+{% set component = 'segmented-control' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Segmented Control' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'search' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'select' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

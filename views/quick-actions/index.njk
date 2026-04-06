@@ -1,0 +1,12 @@
+{% set title = 'quick-actions' %}
+{% set component = 'quick-actions' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Quick Actions' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'progress' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'radio' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

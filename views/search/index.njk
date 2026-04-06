@@ -1,0 +1,12 @@
+{% set title = 'search' %}
+{% set component = 'search' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Search' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'range' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'segmented-control' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

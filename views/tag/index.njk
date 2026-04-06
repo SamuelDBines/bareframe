@@ -1,0 +1,12 @@
+{% set title = 'tag' %}
+{% set component = 'tag' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Tag' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'table' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'timeline' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

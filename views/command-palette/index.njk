@@ -1,0 +1,12 @@
+{% set title = 'command-palette' %}
+{% set component = 'command-palette' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Command Palette' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'combobox' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'countdown' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

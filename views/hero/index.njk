@@ -1,0 +1,12 @@
+{% set title = 'hero' %}
+{% set component = 'hero' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Hero' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'grid' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'icon' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

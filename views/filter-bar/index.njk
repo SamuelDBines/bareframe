@@ -1,0 +1,12 @@
+{% set title = 'filter-bar' %}
+{% set component = 'filter-bar' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Filter Bar' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'file-upload' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'form-field' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

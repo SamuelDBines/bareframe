@@ -1,0 +1,12 @@
+{% set title = 'tree-view' %}
+{% set component = 'tree-view' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Tree View' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'toolbar' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'video-player' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

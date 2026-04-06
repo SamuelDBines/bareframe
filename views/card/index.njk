@@ -1,0 +1,12 @@
+{% set title = 'card' %}
+{% set component = 'card' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Card' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'canvas' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'carousel' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

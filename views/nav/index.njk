@@ -1,0 +1,12 @@
+{% set title = 'nav' %}
+{% set component = 'nav' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Nav' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'modal' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'number-field' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

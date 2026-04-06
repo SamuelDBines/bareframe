@@ -1,0 +1,12 @@
+{% set title = 'breadcrumb' %}
+{% set component = 'breadcrumb' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Breadcrumb' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'bottom-navigation' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'button' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

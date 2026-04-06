@@ -1,0 +1,16 @@
+{
+  "name": "serve-nohyvc9y",
+  "command": [
+    "serve",
+    "public",
+    "--port",
+    "6050",
+    "--host",
+    "127.0.0.1"
+  ],
+  "created_at": "2026-04-06T12:09:31.791525Z",
+  "started_at": "2026-04-06T12:09:31.805253Z",
+  "ended_at": "0001-01-01T00:00:00Z",
+  "pid": 91891,
+  "status": "running"
+}

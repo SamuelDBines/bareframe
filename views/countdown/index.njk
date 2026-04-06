@@ -1,0 +1,12 @@
+{% set title = 'countdown' %}
+{% set component = 'countdown' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Countdown' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'command-palette' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'data-grid' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

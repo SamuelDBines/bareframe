@@ -1,0 +1,12 @@
+{% set title = 'bottom-navigation' %}
+{% set component = 'bottom-navigation' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Bottom Navigation' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'avatar' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'breadcrumb' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% set title = 'table' %}
+{% set component = 'table' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Table' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'tab' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'tag' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% set title = 'combobox' %}
+{% set component = 'combobox' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Combobox' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'checkbox' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'command-palette' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

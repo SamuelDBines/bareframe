@@ -1,0 +1,12 @@
+{% set title = 'empty-state' %}
+{% set component = 'empty-state' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Empty State' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'editor' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'error-summary' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

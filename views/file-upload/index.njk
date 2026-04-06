@@ -1,0 +1,12 @@
+{% set title = 'file-upload' %}
+{% set component = 'file-upload' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'File Upload' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'fab' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'filter-bar' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

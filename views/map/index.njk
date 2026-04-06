@@ -1,0 +1,12 @@
+{% set title = 'map' %}
+{% set component = 'map' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Map' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'loading-indicator' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'menu' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

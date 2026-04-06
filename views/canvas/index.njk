@@ -1,0 +1,12 @@
+{% set title = 'canvas' %}
+{% set component = 'canvas' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Canvas' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'calendar' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'card' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% set title = 'divider' %}
+{% set component = 'divider' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Divider' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'dialog' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'drawer' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

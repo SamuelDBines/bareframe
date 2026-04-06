@@ -1,0 +1,12 @@
+{% set title = 'list' %}
+{% set component = 'list' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'List' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'link' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'loading-indicator' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

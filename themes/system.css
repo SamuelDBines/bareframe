@@ -29,6 +29,15 @@
 	--bf-theme-button-secondary-bg: #ffffff;
 	--bf-theme-button-secondary-color: #111827;
 	--bf-theme-button-secondary-border-color: #d1d5db;
+	--bf-theme-button-tertiary-bg: #f3f4f6;
+	--bf-theme-button-tertiary-color: #111827;
+	--bf-theme-button-tertiary-border-color: transparent;
+	--bf-theme-button-outlined-bg: transparent;
+	--bf-theme-button-outlined-color: #111827;
+	--bf-theme-button-outlined-border-color: #d1d5db;
+	--bf-theme-button-ghost-bg: transparent;
+	--bf-theme-button-ghost-color: #111827;
+	--bf-theme-button-ghost-border-color: transparent;
 
 	--bf-theme-accordion-bg: var(--bf-theme-surface-1);
 	--bf-theme-accordion-color: var(--bf-theme-text-1);
@@ -396,6 +405,15 @@
 		--bf-theme-button-secondary-bg: #0f172a;
 		--bf-theme-button-secondary-color: #93c5fd;
 		--bf-theme-button-secondary-border-color: #334155;
+		--bf-theme-button-tertiary-bg: #1f2937;
+		--bf-theme-button-tertiary-color: #e2e8f0;
+		--bf-theme-button-tertiary-border-color: transparent;
+		--bf-theme-button-outlined-bg: transparent;
+		--bf-theme-button-outlined-color: #93c5fd;
+		--bf-theme-button-outlined-border-color: #334155;
+		--bf-theme-button-ghost-bg: transparent;
+		--bf-theme-button-ghost-color: #93c5fd;
+		--bf-theme-button-ghost-border-color: transparent;
 
 		--bf-theme-accordion-bg: var(--bf-theme-surface-1);
 		--bf-theme-accordion-color: var(--bf-theme-text-1);

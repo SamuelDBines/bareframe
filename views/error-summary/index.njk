@@ -1,0 +1,12 @@
+{% set title = 'error-summary' %}
+{% set component = 'error-summary' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Error Summary' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'empty-state' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'fab' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

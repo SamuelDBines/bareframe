@@ -8,9 +8,10 @@ const __dirname = path.dirname(__filename);
 const root = path.resolve(__dirname, '..');
 const srcDir = path.join(root, 'src');
 const themesDir = path.join(root, 'themes');
-const distDir = path.join(root, 'dist');
+const distDir = path.join(root, 'public', 'dist');
 const distComponentsDir = path.join(distDir, 'components');
 const distThemesDir = path.join(distDir, 'themes');
+const scriptExts = ['.ts', '.js'];
 
 function parseArgs(argv) {
 	const args = { devOutfile: path.join(distDir, 'index.js') };
@@ -50,15 +51,25 @@ async function getComponentSlugs() {
 		}
 
 		const slug = entry.name;
-		const jsPath = path.join(srcDir, slug, `${slug}.js`);
+		const scriptPath = await resolveScriptPath(path.join(srcDir, slug, slug));
 		const cssPath = path.join(srcDir, slug, `${slug}.css`);
 
-		if ((await exists(jsPath)) && (await exists(cssPath))) {
+		if (scriptPath && (await exists(cssPath))) {
 			slugs.push(slug);
 		}
 	}
 
 	return slugs.sort();
+}
+
+async function resolveScriptPath(basePathWithoutExt) {
+	for (const ext of scriptExts) {
+		const candidate = `${basePathWithoutExt}${ext}`;
+		if (await exists(candidate)) {
+			return candidate;
+		}
+	}
+	return '';
 }
 
 async function cleanAndPrepareDist() {
@@ -69,12 +80,18 @@ async function cleanAndPrepareDist() {
 
 async function copyComponents(slugs) {
 	for (const slug of slugs) {
-		const srcJs = path.join(srcDir, slug, `${slug}.js`);
+		const srcScript = await resolveScriptPath(path.join(srcDir, slug, slug));
 		const srcCss = path.join(srcDir, slug, `${slug}.css`);
 		const outJs = path.join(distComponentsDir, `${slug}.js`);
 		const outCss = path.join(distComponentsDir, `${slug}.css`);
 
-		await fs.copyFile(srcJs, outJs);
+		await build({
+			entryPoints: [srcScript],
+			bundle: true,
+			format: 'esm',
+			target: ['es2020'],
+			outfile: outJs,
+		});
 		await fs.copyFile(srcCss, outCss);
 	}
 }
@@ -124,8 +141,12 @@ async function inlineCssUrlsInBundle(outfile, slugs) {
 
 async function writeDevBundle(slugs, outfile) {
 	await fs.mkdir(path.dirname(outfile), { recursive: true });
+	const entryPoint = await resolveScriptPath(path.join(srcDir, 'index'));
+	if (!entryPoint) {
+		throw new Error('Missing src/index.ts or src/index.js');
+	}
 	await build({
-		entryPoints: [path.join(srcDir, 'index.js')],
+		entryPoints: [entryPoint],
 		bundle: true,
 		format: 'esm',
 		target: ['es2020'],
@@ -137,8 +158,12 @@ async function writeDevBundle(slugs, outfile) {
 
 async function writeMinifiedBundle(slugs) {
 	const outfile = path.join(distDir, 'bareframe.min.js');
+	const entryPoint = await resolveScriptPath(path.join(srcDir, 'index'));
+	if (!entryPoint) {
+		throw new Error('Missing src/index.ts or src/index.js');
+	}
 	await build({
-		entryPoints: [path.join(srcDir, 'index.js')],
+		entryPoints: [entryPoint],
 		bundle: true,
 		format: 'esm',
 		target: ['es2020'],

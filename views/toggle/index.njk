@@ -1,0 +1,12 @@
+{% set title = 'toggle' %}
+{% set component = 'toggle' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Toggle' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'toast' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'toolbar' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

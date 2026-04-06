@@ -1,0 +1,16 @@
+{
+  "name": "serve-n01mzwpy",
+  "command": [
+    "serve",
+    "public",
+    "--port",
+    "6050",
+    "--host",
+    "127.0.0.1"
+  ],
+  "created_at": "2026-04-06T14:53:41.322125Z",
+  "started_at": "2026-04-06T14:53:41.348236Z",
+  "ended_at": "0001-01-01T00:00:00Z",
+  "pid": 46888,
+  "status": "running"
+}

@@ -1,0 +1,12 @@
+{% set title = 'message' %}
+{% set component = 'message' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Message' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'menu' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'metric-card' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

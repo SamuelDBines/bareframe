@@ -1,0 +1,33 @@
+<section class="panel">
+  <h2>{{ heading }}
+    Demo</h2>
+  <p>Tag:
+    <code>bf-{{ component }}</code>
+  </p>
+</section>
+
+<section class="panel">
+  <div class="stack">
+    <p class="hint">This page is ready for a dedicated
+      {{ heading }}
+      demo in the new layout.</p>
+    <p>
+      <a href="/">Back to component index</a>
+    </p>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Related Components</h2>
+  <div class="demo-row">
+    {% if relatedOne %}
+      <a href="/{{ relatedOne }}">{{ relatedOne }}</a>
+    {% endif %}
+    {% if relatedTwo %}
+      <a href="/{{ relatedTwo }}">{{ relatedTwo }}</a>
+    {% endif %}
+    {% if relatedThree %}
+      <a href="/{{ relatedThree }}">{{ relatedThree }}</a>
+    {% endif %}
+  </div>
+</section>

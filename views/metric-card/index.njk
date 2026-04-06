@@ -1,0 +1,12 @@
+{% set title = 'metric-card' %}
+{% set component = 'metric-card' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Metric Card' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'message' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'modal' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% set title = 'edge' %}
+{% set component = 'edge' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Edge' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'dropdown' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'editor' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

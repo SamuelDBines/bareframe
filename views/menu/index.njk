@@ -1,0 +1,12 @@
+{% set title = 'menu' %}
+{% set component = 'menu' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Menu' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'map' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'message' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

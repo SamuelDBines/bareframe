@@ -1,0 +1,12 @@
+{% set title = 'image' %}
+{% set component = 'image' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Image' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'icon' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'input' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

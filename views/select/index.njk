@@ -1,0 +1,12 @@
+{% set title = 'select' %}
+{% set component = 'select' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Select' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'segmented-control' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'skeleton' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

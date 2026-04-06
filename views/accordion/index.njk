@@ -1,0 +1,35 @@
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  <section class="panel">
+    <h2>Accordian Demo</h2>
+    <p>Tag:
+      <code>bf-accordian</code>
+    </p>
+  </section>
+  <section class="panel">
+
+    <div class="stack">
+      <div class="demo-row">
+        <bf-button bf-open="docs-accordion:intro">Open Intro</bf-button>
+        <bf-button variant="secondary" bf-toggle="docs-accordion:api">Toggle API</bf-button >
+      </div>
+      <bf-accordion id="docs-accordion">
+        <section id="intro" title="Introduction">
+          <p>Reusable component composition block.</p>
+        </section>
+        <section id="api" title="API">
+          <p>Open/close sections by id for deterministic tests.</p>
+        </section>
+      </bf-accordion>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Related Components</h2>
+    <div class="demo-row">
+      <a href="/card">card</a>
+      <a href="/edge">edge</a>
+      <a href="/nav">nav</a>
+    </div>
+  </section>
+{% endblock %}

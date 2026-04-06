@@ -150,6 +150,16 @@ function primaryDemo(tag, name, slug, category) {
   </bf-accordion>
 </div>`.trim();
 	}
+	if (slug === 'button') {
+		return `
+<div class="demo-row">
+  <bf-button variant="primary">Primary</bf-button>
+  <bf-button variant="secondary">Secondary</bf-button>
+  <bf-button variant="tertiary">Tertiary</bf-button>
+  <bf-button variant="outlined">Outlined</bf-button>
+  <bf-button variant="ghost">Ghost</bf-button>
+</div>`.trim();
+	}
 	if (slug === 'avatar') {
 		return `
 <div class="stack">
@@ -206,7 +216,7 @@ function primaryDemo(tag, name, slug, category) {
 	}
 	if (slug === 'dropdown') {
 		return `
-<bf-dropdown>
+<bf-dropdown border>
   <bf-button slot="trigger">Actions</bf-button>
   <button slot="content" item value="profile">Edit profile</button>
   <button slot="content" item value="team">Team settings</button>

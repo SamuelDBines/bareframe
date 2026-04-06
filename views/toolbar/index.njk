@@ -1,0 +1,12 @@
+{% set title = 'toolbar' %}
+{% set component = 'toolbar' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Toolbar' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'toggle' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'tree-view' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

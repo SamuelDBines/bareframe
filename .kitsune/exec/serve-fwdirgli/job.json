@@ -1,0 +1,16 @@
+{
+  "name": "serve-fwdirgli",
+  "command": [
+    "serve",
+    "public",
+    "--port",
+    "6050",
+    "--host",
+    "127.0.0.1"
+  ],
+  "created_at": "2026-04-06T11:24:31.603154Z",
+  "started_at": "2026-04-06T11:24:31.620304Z",
+  "ended_at": "0001-01-01T00:00:00Z",
+  "pid": 90867,
+  "status": "running"
+}

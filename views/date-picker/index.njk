@@ -1,0 +1,12 @@
+{% set title = 'date-picker' %}
+{% set component = 'date-picker' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Date Picker' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'data-grid' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'date-range-picker' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

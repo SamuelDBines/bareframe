@@ -1,0 +1,12 @@
+{% set title = 'grid' %}
+{% set component = 'grid' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Grid' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'form-field' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'hero' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

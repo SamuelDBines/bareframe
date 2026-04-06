@@ -43,6 +43,20 @@
 	transition: var(--bf-dropdown-transition);
 }
 
+.root[data-bordered='true'] .toggle {
+	border-width: var(--bf-dropdown-border-width);
+	border-style: var(--bf-dropdown-border-style);
+	border-color: var(--bf-dropdown-border-color);
+	background: var(--bf-dropdown-bg);
+	padding: var(--bf-dropdown-padding-y) var(--bf-dropdown-padding-x);
+}
+
+.root[data-bordered='true'] slot[name='trigger']::slotted(*) {
+	border: none !important;
+	box-shadow: none !important;
+	background: transparent !important;
+}
+
 .toggle:hover {
 	color: color-mix(in srgb, var(--bf-dropdown-accent) 70%, var(--bf-dropdown-color));
 }

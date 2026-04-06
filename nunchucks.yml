@@ -1,0 +1,10 @@
+ignore:
+  # - '**/layouts/**'
+  - '**/partials/**'
+dev:
+  run: nunchucks precompile -views ./views -out ./public --watch
+  output: html
+
+prod:
+  run: nunchucks precompile -views ./views -out ./public
+  output: html

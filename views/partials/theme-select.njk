@@ -1,0 +1,40 @@
+<style>
+  .panel {
+    border: 1px solid var(--bf-theme-border-1, #d1d5db);
+    border-radius: 12px;
+    background: var(--bf-theme-surface-1, #ffffff);
+    padding: 1rem;
+  }
+
+  .theme-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.7rem;
+  }
+</style>
+
+<section class="panel">
+  <div class="theme-controls">
+    <label for="themeSelect">Theme</label>
+    <select id="themeSelect">
+      <option value="system">system</option>
+      <option value="light">light</option>
+      <option value="dark">dark</option>
+      <option value="sprint">sprint</option>
+      <option value="retro">retro</option>
+      <option value="modern">modern</option>
+      <option value="simple">simple</option>
+      <option value="nature">nature</option>
+      <option value="future">future</option>
+      <option value="aurora">aurora</option>
+      <option value="nebula">nebula</option>
+      <option value="desert">desert</option>
+      <option value="matrix">matrix</option>
+      <option value="noir">noir</option>
+      <option value="sunrise">sunrise</option>
+      <option value="oceanic">oceanic</option>
+    </select>
+    <span id="themeStatus"></span>
+  </div>
+</section>

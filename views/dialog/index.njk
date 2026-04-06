@@ -1,0 +1,12 @@
+{% set title = 'dialog' %}
+{% set component = 'dialog' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Dialog' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'date-range-picker' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'divider' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

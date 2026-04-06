@@ -15,9 +15,9 @@
 		var(--bf-theme-transition-color, color 120ms ease),
 		var(--bf-theme-transition-border, border-color 120ms ease);
 
-	display: block;
+	--bf-component-display: var(--bf-component-display, block);
+
+	display: var(--bf-component-display);
 	font: var(--bf-component-font);
 	color: var(--bf-component-color);
 }
-
-/* Copy this file and replace `component` with the real component name. */

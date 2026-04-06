@@ -1,0 +1,12 @@
+{% set title = 'splitter' %}
+{% set component = 'splitter' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Splitter' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'split-button' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'stack' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

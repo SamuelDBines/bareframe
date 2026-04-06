@@ -1,0 +1,12 @@
+{% set title = 'fab' %}
+{% set component = 'fab' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Fab' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'error-summary' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'file-upload' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

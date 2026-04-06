@@ -1,0 +1,12 @@
+{% set title = 'editor' %}
+{% set component = 'editor' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Editor' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'edge' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'empty-state' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

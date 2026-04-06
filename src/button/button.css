@@ -51,6 +51,25 @@
 		--bf-button-secondary-border-color
 	);
 
+	--bf-button-tertiary-bg: var(--bf-theme-button-tertiary-bg, #f3f4f6);
+	--bf-button-tertiary-color: var(--bf-theme-button-tertiary-color, #111827);
+	--bf-button-tertiary-border-color: var(
+		--bf-theme-button-tertiary-border-color,
+		transparent
+	);
+	--bf-button-outlined-bg: var(--bf-theme-button-outlined-bg, transparent);
+	--bf-button-outlined-color: var(--bf-theme-button-outlined-color, #1d4ed8);
+	--bf-button-outlined-border-color: var(
+		--bf-theme-button-outlined-border-color,
+		#1d4ed8
+	);
+	--bf-button-ghost-bg: var(--bf-theme-button-ghost-bg, transparent);
+	--bf-button-ghost-color: var(--bf-theme-button-ghost-color, #1d4ed8);
+	--bf-button-ghost-border-color: var(
+		--bf-theme-button-ghost-border-color,
+		transparent
+	);
+
 	display: inline-block;
 }
 
@@ -135,6 +154,48 @@ button.secondary {
 	);
 }
 
+button.tertiary {
+	--_bf-button-bg: var(--bf-button-tertiary-bg);
+	--_bf-button-color: var(--bf-button-tertiary-color);
+	--_bf-button-border-color: var(--bf-button-tertiary-border-color);
+	--_bf-button-hover-bg: color-mix(in srgb, var(--bf-button-tertiary-bg) 85%, var(--bf-button-tertiary-color));
+	--_bf-button-hover-color: var(--bf-button-tertiary-color);
+	--_bf-button-hover-border-color: var(--bf-button-tertiary-border-color);
+	--_bf-button-active-bg: color-mix(in srgb, var(--bf-button-tertiary-bg) 75%, var(--bf-button-tertiary-color));
+	--_bf-button-active-color: var(--bf-button-tertiary-color);
+	--_bf-button-active-border-color: var(--bf-button-tertiary-border-color);
+}
+
+button.outlined {
+	--_bf-button-bg: var(--bf-button-outlined-bg);
+	--_bf-button-color: var(--bf-button-outlined-color);
+	--_bf-button-border-color: var(--bf-button-outlined-border-color);
+	--_bf-button-hover-bg: color-mix(in srgb, var(--bf-button-outlined-color) 12%, transparent);
+	--_bf-button-hover-color: var(--bf-button-outlined-color);
+	--_bf-button-hover-border-color: var(--bf-button-outlined-border-color);
+	--_bf-button-active-bg: color-mix(in srgb, var(--bf-button-outlined-color) 20%, transparent);
+	--_bf-button-active-color: var(--bf-button-outlined-color);
+	--_bf-button-active-border-color: var(--bf-button-outlined-border-color);
+}
+
+button.ghost {
+	--_bf-button-bg: var(--bf-button-ghost-bg);
+	--_bf-button-color: var(--bf-button-ghost-color);
+	--_bf-button-border-color: var(--bf-button-ghost-border-color);
+	--_bf-button-hover-bg: color-mix(in srgb, var(--bf-button-ghost-color) 12%, transparent);
+	--_bf-button-hover-color: var(--bf-button-ghost-color);
+	--_bf-button-hover-border-color: var(--bf-button-ghost-border-color);
+	--_bf-button-active-bg: color-mix(in srgb, var(--bf-button-ghost-color) 20%, transparent);
+	--_bf-button-active-color: var(--bf-button-ghost-color);
+	--_bf-button-active-border-color: var(--bf-button-ghost-border-color);
+}
+
 button.is-selected {
 	box-shadow: inset 0 0 0 2px var(--bf-theme-focus-ring-color, #93c5fd);
+}
+
+/* When used as bf-dropdown trigger with border, let the dropdown provide the border */
+:host-context(bf-dropdown[border]) button {
+	border: none;
+	background: transparent;
 }

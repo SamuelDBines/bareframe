@@ -1,0 +1,12 @@
+{% set title = 'video-player' %}
+{% set component = 'video-player' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Video Player' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'tree-view' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'virtual-list' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

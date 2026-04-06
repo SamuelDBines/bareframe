@@ -1,0 +1,12 @@
+{% set title = 'avatar' %}
+{% set component = 'avatar' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Avatar' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'autocomplete' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'bottom-navigation' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

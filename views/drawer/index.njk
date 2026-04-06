@@ -1,0 +1,12 @@
+{% set title = 'drawer' %}
+{% set component = 'drawer' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Drawer' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'divider' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'dropdown' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

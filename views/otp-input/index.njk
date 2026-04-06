@@ -1,0 +1,12 @@
+{% set title = 'otp-input' %}
+{% set component = 'otp-input' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Otp Input' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'number-field' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'pagination' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% set title = 'modal' %}
+{% set component = 'modal' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Modal' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'metric-card' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'nav' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

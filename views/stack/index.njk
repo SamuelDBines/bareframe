@@ -1,0 +1,12 @@
+{% set title = 'stack' %}
+{% set component = 'stack' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Stack' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'splitter' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'tab' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

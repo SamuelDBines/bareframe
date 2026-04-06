@@ -1,0 +1,12 @@
+{% set title = 'radio' %}
+{% set component = 'radio' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Radio' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'quick-actions' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'range' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

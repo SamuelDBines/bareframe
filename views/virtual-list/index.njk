@@ -1,0 +1,12 @@
+{% set title = 'virtual-list' %}
+{% set component = 'virtual-list' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Virtual List' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'video-player' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'wizard' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

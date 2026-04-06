@@ -1,0 +1,12 @@
+{% set title = 'number-field' %}
+{% set component = 'number-field' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'Number Field' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+  {% set relatedOne = 'nav' %}
+  {% set relatedTwo = 'accordion' %}
+  {% set relatedThree = 'otp-input' %}
+  {% include 'layouts/component-page.njk' %}
+{% endblock %}

@@ -30,19 +30,19 @@
   "scripts": {
     "build": "node ./scripts/build.mjs",
     "dev": "pnpm",
-    "dev:nunchucks": "nunchucks run dev",
     "dev:kitsune": "kitsune serve public --port 6050 --follow",
+    "dev:nunchucks": "nunchucks run dev",
     "generate:examples": "node ./scripts/generate-examples.mjs",
     "generate:index": "node ./scripts/generate-index.mjs",
     "generate:versions": "node ./scripts/generate-versions.mjs",
     "pack:preview": "npm pack --dry-run",
     "prepack": "npm run build",
-    "serve:complex": "cd public \u0026\u0026 ln -sfn ../themes themes \u0026\u0026 ln -sfn ../dist dist \u0026\u0026 python3 -m http.server 8088",
-    "serve": "cd public && python3 -m http.server 8088",
-    "typecheck": "tsc --noEmit",
     "prepare": "nunchucks precompile -views ./views -out ./public -out-format html --watch",
+    "serve": "cd public \u0026\u0026 python3 -m http.server 8088",
+    "serve:complex": "cd public \u0026\u0026 ln -sfn ../themes themes \u0026\u0026 ln -sfn ../dist dist \u0026\u0026 python3 -m http.server 8088",
+    "typecheck": "tsc --noEmit",
     "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts --watch-path=tsconfig.json ./scripts/build.mjs"
   },
   "type": "module",
-  "version": "0.1.5"
+  "version": "0.1.6"
 }

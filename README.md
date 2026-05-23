@@ -14,6 +14,18 @@ Links:
 - GitHub Pages examples: https://samueldbines.github.io/bareframe/
 - Chart demo: https://samueldbines.github.io/bareframe/chart-test.html
 
+## npm artifact vs Pages directory
+
+Published files ship from **`dist/`** at the repo root (this matches `"exports"` in `package.json`). **`pnpm run build`** compiles into `dist/` and then runs **`scripts/prep-pages.mjs`**, which copies `dist/` and `themes/` into **`public/dist`** and **`public/themes`** and rewrites demo HTML to use `./` / `../` prefixes so asset URLs are never rooted at `https://<user>.github.io/themes/...` when the site lives under **`https://<user>.github.io/<repo>/`** (GitHub project Pages).
+
+Workflow **Deploy Public To Pages** (`.github/workflows/deploy-pages.yml`) uses **pnpm**, runs **`pnpm run build`**, regenerates examples, runs **`prep-pages`** again after generators, builds the Vite showcase into **`public/showcase/`**, and uploads **`public`**.
+
+Sanity-check locally after a build:
+
+```bash
+pnpm run smoke:pages
+```
+
 ## Package Usage
 
 Register everything:
@@ -41,6 +53,32 @@ import 'bareframe/themes/system.css';
 ```
 
 `system` is the default/recommended theme for bareframe.
+
+### Component Studio & CSS variables
+
+The Vite-powered **Component Studio** (from the repo root, `pnpm run studio`) previews static demos inside an iframe while matching the Bareframe themes. It also exposes a tab that resolves every **`--bf-*`** token currently loaded on `:root`.
+
+Build outputs serialize the union of **`--bf-*`** custom properties detected across `themes/*.css` into `bareframe/tokens.json` beside `bareframe/manifest.json`. Consume it however you bundle JSON (`fetch`, Node `readFile`, or `import assertions` depending on tooling).
+
+### App chrome: `bf-header` / `bf-footer` vs `bf-edge`
+
+- **`bf-header`** and **`bf-footer`** wrap semantic landmarks for mastheads and footer bars.
+- **`bf-edge`** exposes boolean **`header`** and **`footer`** attributes to pin rows to viewport edges inside scroll-heavy screens. Those knobs are helpers for layout and are **not** replacements for semantic site chrome.
+
+### Modals vs lightweight dialogs
+
+- **`bf-modal`** is the layered, blocking overlay (backdrop dismiss unless **`persistent`** is set).
+- **`bf-dialog`** is for lighter overlays that avoid full modal layering when you explicitly want that trade-off.
+
+### Feedback & messaging components
+
+Rather than introducing a standalone `bf-alert`, map needs to today's primitives:
+
+| Use case                                               | Reach for…              |
+| ------------------------------------------------------ | ------------------------ |
+| Toasts, snackbars, banners, timed notifications       | **`bf-toast`**          |
+| Inline callouts next to layouts or prose              | **`bf-message`**        |
+| Form rollup with jump-links to offending fields       | **`bf-error-summary`**  |
 
 Optional layout utilities:
 

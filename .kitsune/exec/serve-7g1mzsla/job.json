@@ -1,0 +1,16 @@
+{
+  "name": "serve-7g1mzsla",
+  "command": [
+    "serve",
+    "public",
+    "--port",
+    "6050",
+    "--host",
+    "127.0.0.1"
+  ],
+  "created_at": "2026-04-26T18:35:14.756179Z",
+  "started_at": "2026-04-26T18:35:14.773713Z",
+  "ended_at": "0001-01-01T00:00:00Z",
+  "pid": 44058,
+  "status": "running"
+}

@@ -1,0 +1,30 @@
+:host {
+	--bf-segmented-control-font: var(--bf-theme-font-family, inherit);
+	--bf-segmented-control-radius: var(--bf-theme-radius-md, 8px);
+	--bf-segmented-control-border-width: var(--bf-theme-border-width, 1px);
+	--bf-segmented-control-border-style: var(--bf-theme-border-style, solid);
+	--bf-segmented-control-border-color: var(--bf-theme-segmented-control-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-segmented-control-bg: var(--bf-theme-segmented-control-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-segmented-control-color: var(--bf-theme-segmented-control-color, var(--bf-theme-text-1, #0f172a));
+	--bf-segmented-control-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-segmented-control-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-segmented-control-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-segmented-control-font);
+	color: var(--bf-segmented-control-color);
+}
+
+.root {
+	background: var(--bf-segmented-control-bg);
+	color: var(--bf-segmented-control-color);
+	border-width: var(--bf-segmented-control-border-width);
+	border-style: var(--bf-segmented-control-border-style);
+	border-color: var(--bf-segmented-control-border-color);
+	border-radius: var(--bf-segmented-control-radius);
+	padding: var(--bf-segmented-control-padding-y) var(--bf-segmented-control-padding-x);
+	transition: var(--bf-segmented-control-transition);
+}

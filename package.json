@@ -1,6 +1,8 @@
 {
   "description": "Lightweight, dependency-free Web Components for reusable app UI.",
   "devDependencies": {
+    "@stencil/core": "^4.43.4",
+    "@types/node": "^25.6.0",
     "esbuild": "^0.27.3",
     "typescript": "^5.9.2"
   },
@@ -9,6 +11,7 @@
     "./bareframe.min.js": "./dist/bareframe.min.js",
     "./components/*.js": "./dist/components/*.js",
     "./manifest.json": "./dist/manifest.json",
+    "./tokens.json": "./dist/tokens.json",
     "./min": "./dist/bareframe.min.js",
     "./themes/*.css": "./dist/themes/*.css"
   },
@@ -27,21 +30,28 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "name": "bareframe",
+  "packageManager": "pnpm@10.8.0",
   "scripts": {
-    "build": "node ./scripts/build.mjs",
+    "build": "node ./scripts/build.mjs && node ./scripts/prep-pages.mjs",
+    "build:lib": "node ./scripts/build.mjs",
     "dev": "pnpm",
     "dev:kitsune": "kitsune serve public --port 6050 --follow",
     "dev:nunchucks": "nunchucks run dev",
     "generate:examples": "node ./scripts/generate-examples.mjs",
     "generate:index": "node ./scripts/generate-index.mjs",
     "generate:versions": "node ./scripts/generate-versions.mjs",
+    "prep-pages": "node ./scripts/prep-pages.mjs",
     "pack:preview": "npm pack --dry-run",
-    "prepack": "npm run build",
+    "prepack": "node ./scripts/build.mjs",
     "prepare": "nunchucks precompile -views ./views -out ./public -out-format html --watch",
-    "serve": "cd public \u0026\u0026 python3 -m http.server 8088",
-    "serve:complex": "cd public \u0026\u0026 ln -sfn ../themes themes \u0026\u0026 ln -sfn ../dist dist \u0026\u0026 python3 -m http.server 8088",
+    "serve": "cd public && python3 -m http.server 8088",
+    "serve:complex": "cd public && ln -sfn ../themes themes && ln -sfn ../dist dist && python3 -m http.server 8088",
+    "smoke:pages": "node ./scripts/smoke-pages.mjs",
+    "studio": "pnpm run build && pnpm --prefix showcase dev",
+    "showcase:dev": "pnpm --prefix showcase dev",
+    "showcase:build": "pnpm run build && pnpm --prefix showcase build",
     "typecheck": "tsc --noEmit",
-    "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts --watch-path=tsconfig.json ./scripts/build.mjs"
+    "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts --watch-path=stencil --watch-path=tsconfig.json ./scripts/build.mjs"
   },
   "type": "module",
   "version": "0.1.6"

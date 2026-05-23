@@ -1,0 +1,30 @@
+:host {
+	--bf-message-font: var(--bf-theme-font-family, inherit);
+	--bf-message-radius: var(--bf-theme-radius-md, 8px);
+	--bf-message-border-width: var(--bf-theme-border-width, 1px);
+	--bf-message-border-style: var(--bf-theme-border-style, solid);
+	--bf-message-border-color: var(--bf-theme-message-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-message-bg: var(--bf-theme-message-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-message-color: var(--bf-theme-message-color, var(--bf-theme-text-1, #0f172a));
+	--bf-message-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-message-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-message-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-message-font);
+	color: var(--bf-message-color);
+}
+
+.root {
+	background: var(--bf-message-bg);
+	color: var(--bf-message-color);
+	border-width: var(--bf-message-border-width);
+	border-style: var(--bf-message-border-style);
+	border-color: var(--bf-message-border-color);
+	border-radius: var(--bf-message-radius);
+	padding: var(--bf-message-padding-y) var(--bf-message-padding-x);
+	transition: var(--bf-message-transition);
+}

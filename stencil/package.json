@@ -1,0 +1,13 @@
+{
+  "name": "bareframe-stencil",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Stencil build for bareframe custom elements",
+  "scripts": {
+    "build": "stencil build"
+  },
+  "devDependencies": {
+    "@stencil/core": "^4.43.4"
+  }
+}

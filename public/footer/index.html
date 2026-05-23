@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css" />
+    <title>Bareframe · bf-footer</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: var(--bf-theme-font-family, system-ui, sans-serif);
+        background: var(--bf-theme-surface-2, #f8fafc);
+        color: var(--bf-theme-text-1);
+        padding: 1.25rem;
+        min-height: 100vh;
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        display: grid;
+        gap: 1rem;
+      }
+      .panel {
+        padding: 1rem;
+        border-radius: var(--bf-theme-radius-md, 12px);
+        border: 1px solid var(--bf-theme-border-1, #cbd5e1);
+        background: var(--bf-theme-surface-1, #ffffff);
+      }
+      .theme-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.65rem;
+      }
+      .note {
+        margin: 0 0 0.5rem;
+        font-size: 0.88rem;
+        color: var(--bf-theme-text-2);
+        line-height: 1.5;
+      }
+      .area {
+        min-height: 6rem;
+        padding: 0.75rem;
+        border-radius: var(--bf-theme-radius-md, 10px);
+        border: 1px dashed var(--bf-theme-border-1);
+        margin-bottom: 0.75rem;
+      }
+      code {
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="panel">
+        <div class="theme-controls">
+          <label for="themeSelect">Theme</label>
+          <select id="themeSelect">
+            <option value="system">system</option>
+            <option value="dark">dark</option>
+            <option value="light">light</option>
+            <option value="modern">modern</option>
+            <option value="layout">layout</option>
+            <option value="aurora">aurora</option>
+            <option value="noir">noir</option>
+            <option value="oceanic">oceanic</option>
+            <option value="nature">nature</option>
+            <option value="matrix">matrix</option>
+            <option value="retro">retro</option>
+            <option value="simple">simple</option>
+            <option value="sprint">sprint</option>
+            <option value="sunrise">sunrise</option>
+            <option value="desert">desert</option>
+            <option value="future">future</option>
+            <option value="nebula">nebula</option>
+          </select>
+          <span id="themeStatus"></span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 style="margin: 0 0 0.5rem; font-size: 1.1rem"><code>bf-footer</code></h2>
+        <p class="note">
+          Bottom app-shell landmark. For a <em>fixed edge helper</em> (not semantics), compare
+          <strong><code>bf-edge</code> with <code>footer</code></strong> in the docs.
+        </p>
+        <div class="area">Page body…</div>
+        <bf-footer>
+          <span>© Bareframe</span>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </bf-footer>
+      </section>
+
+      <section class="panel">
+        <h3 style="margin: 0 0 0.35rem; font-size: 1rem">Sticky footer bar</h3>
+        <div class="area" style="min-height: 70vh">Scroll this page.</div>
+        <bf-footer sticky><span>Pinned footer bar · use sparingly</span></bf-footer>
+      </section>
+    </div>
+    <script type="module" src="../dist/index.js"></script>
+    <script type="module">
+      const themeStylesheet = document.getElementById('themeStylesheet');
+      const themeSelect = document.getElementById('themeSelect');
+      const themeStatus = document.getElementById('themeStatus');
+      function applyTheme(t) {
+        themeStylesheet.href = '../themes/' + t + '.css';
+        document.documentElement.setAttribute('data-bf-theme', t);
+        themeStatus.textContent = 'Active: ' + t;
+      }
+      themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+      applyTheme(themeSelect.value);
+    </script>
+  </body>
+</html>

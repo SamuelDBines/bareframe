@@ -1,0 +1,16 @@
+{
+  "name": "serve-zohizwp6",
+  "command": [
+    "serve",
+    "public",
+    "--port",
+    "6050",
+    "--host",
+    "127.0.0.1"
+  ],
+  "created_at": "2026-04-26T18:46:36.667612Z",
+  "started_at": "2026-04-26T18:46:36.681403Z",
+  "ended_at": "0001-01-01T00:00:00Z",
+  "pid": 53075,
+  "status": "running"
+}

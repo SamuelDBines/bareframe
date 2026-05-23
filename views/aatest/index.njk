@@ -1,0 +1,13 @@
+{% set title = 'aatest' %}
+{% set component = 'aatest' %}
+{% set assetPrefix = '..' %}
+{% set homeHref = '..' %}
+{% set heading = 'AAtest' %}
+{% extends 'layouts/base.njk' %}
+{% block main %}
+    <bf-aatest> hello</bf-aatest>
+		{% set relatedOne = 'breadcrumb' %}
+		{% set relatedTwo = 'accordion' %}
+		{% set relatedThree = 'calendar' %}
+		{% include 'layouts/component-page.njk' %}
+{% endblock %}

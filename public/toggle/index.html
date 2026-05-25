@@ -4,14 +4,12 @@
 
 
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css"/>
-    <title>
-      
-    </title>
+    <title>Bareframe · bf-toggle</title>
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -74,7 +72,7 @@
     </style>
   </head>
   <body>
-    <main>
+    <main data-demo-root>
       <div class="layout">
         <header class="header">
 
@@ -140,12 +138,14 @@
 
 <section class="panel">
   <div class="stack">
-    <p class="hint">This page is ready for a dedicated
-      Toggle
-      demo in the new layout.</p>
-    <p>
-      <a href="/">Back to component index</a>
-    </p>
+    <div class="demo-row">
+      <bf-toggle checked>Feature Flag</bf-toggle>
+      <bf-toggle>Read-only Mode</bf-toggle>
+    </div>
+    <div class="demo-row">
+      <bf-toggle switch checked label="Notifications">Notifications</bf-toggle>
+      <bf-toggle switch label="Auto Save">Auto Save</bf-toggle>
+    </div>
   </div>
 </section>
 

@@ -11,7 +11,7 @@ const BfNav$1 = /*@__PURE__*/ proxyCustomElement(class BfNav extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '368270d2f7118590e707cb48ac9327f155c0dcb6' }, h("div", { key: 'cd4b65477ce674a278b963024a76f3f800e7d05d', class: "root", part: "root" }, h("slot", { key: 'e20a3229203c12a67614ac73ae36219be894f3f3' }))));
+        return (h(Host, { key: '718668f06ceb77fc1d2076b4854a7347bc0a5462' }, h("div", { key: '11cad1889896b49764b792d4cf228d6a12ea56df', class: "root", part: "root" }, h("slot", { key: '0351142eb246c1a089d268ee6210692369fcf3fb' }))));
     }
     static get style() { return bfNavCss(); }
 }, [257, "bf-nav"]);

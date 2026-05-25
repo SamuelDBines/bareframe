@@ -11,7 +11,7 @@ const BfErrorSummary$1 = /*@__PURE__*/ proxyCustomElement(class BfErrorSummary e
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'a01a6f1fcd495fdfe20f52c2395b21f3e42fd144' }, h("div", { key: '8c838bfb767b278fdc0f37829621fe81131b29c5', class: "root", part: "root" }, h("slot", { key: '29211bdb96a67412d713be44d9b3be9200adf769' }))));
+        return (h(Host, { key: '43c59f346684e8cf78b00304dd941c4216fd39cc' }, h("div", { key: '02a63eecec18990e472120224294cd6f47c9090b', class: "root", part: "root" }, h("slot", { key: '00e894c950f95563014876fee5223535e622b535' }))));
     }
     static get style() { return bfErrorSummaryCss(); }
 }, [257, "bf-error-summary"]);

@@ -11,7 +11,7 @@ const BfCommandPalette$1 = /*@__PURE__*/ proxyCustomElement(class BfCommandPalet
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'a4cb985c0e0acb70068d02cc434dc7d1a753fdc6' }, h("div", { key: 'dab758cdbec2aad63b0503bdc2d0726de4476ec5', class: "root", part: "root" }, h("slot", { key: '9e75e8abc212de8d581c7ee4c8e8d87732a6add7' }))));
+        return (h(Host, { key: 'a93cb9a9f7207fbde4492a19cbc49b5d836d588b' }, h("div", { key: '5777b7d788968dbf41857fe9e880184e202ceb8f', class: "root", part: "root" }, h("slot", { key: 'eed6a555482cd201ab46ce3613f86c80cbd80c9d' }))));
     }
     static get style() { return bfCommandPaletteCss(); }
 }, [257, "bf-command-palette"]);

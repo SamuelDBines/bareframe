@@ -11,7 +11,7 @@ const BfIcon$1 = /*@__PURE__*/ proxyCustomElement(class BfIcon extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'f754c35086d39d1c75957d5ef448b3d359efc5e5' }, h("div", { key: '74c139c35a6224666676b52dd5a830f9e99a10a5', class: "root", part: "root" }, h("slot", { key: '3a4fd3db6cdc2b01c84aa0763273ef5ebcc43f26' }))));
+        return (h(Host, { key: '8f3b081e76e3403ee2e9e74f4f80ba2c02fd666f' }, h("div", { key: '15c351f6f09e3f9628101b537737167f5c50566e', class: "root", part: "root" }, h("slot", { key: '7016ccc5ac8777dcadc8cdd3eb115d616ca0415f' }))));
     }
     static get style() { return bfIconCss(); }
 }, [257, "bf-icon"]);

@@ -11,7 +11,7 @@ const BfCanvas$1 = /*@__PURE__*/ proxyCustomElement(class BfCanvas extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'f62735290b05e9c7bba7c5d58c567b73b7878c56' }, h("div", { key: 'c6822e0e1113133981794871f97a94da6bd69786', class: "root", part: "root" }, h("slot", { key: '44c55de1de111513a46f2b4a98c8ac6375e54fc7' }))));
+        return (h(Host, { key: '18420b70d53b75f21426f9d72b72e2b507a42b02' }, h("div", { key: 'ce37ff0f29e36bdcaf1b12891c88267f0995c3b2', class: "root", part: "root" }, h("slot", { key: 'b0451fe7efa6dffa5931883ddd5ac03da68bd93a' }))));
     }
     static get style() { return bfCanvasCss(); }
 }, [257, "bf-canvas"]);

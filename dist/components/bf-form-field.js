@@ -11,7 +11,7 @@ const BfFormField$1 = /*@__PURE__*/ proxyCustomElement(class BfFormField extends
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'ba70d54a11a0533436bc1e5132576f2a36e095ab' }, h("div", { key: 'aba6f00a53dbb2f2f737c466ac5752621d2b75f0', class: "root", part: "root" }, h("slot", { key: '66cc627d25c4b8bf310136292fbcfc57d737676c' }))));
+        return (h(Host, { key: '94c9226993a86f197114a0e5435e533f087d14e1' }, h("div", { key: 'a7562339050fbedd5ecf649729ad948954298151', class: "root", part: "root" }, h("slot", { key: '9b799bb1cdd8ba919c85f4fb5345d2535bafb381' }))));
     }
     static get style() { return bfFormFieldCss(); }
 }, [257, "bf-form-field"]);

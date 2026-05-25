@@ -53,7 +53,7 @@ const BfList$1 = /*@__PURE__*/ proxyCustomElement(class BfList extends H {
         this.onSlotChange();
     }
     render() {
-        return (h(Host, { key: 'd22f090361749616d3ea4f06993b22159180a571' }, h("div", { key: '4d137149589f2b9165ba1a78f60eb134d0bc8309', class: "root", part: "root" }, h("slot", { key: '962253909c7cdc6b27d3316aa2daa97493accde1', onSlotchange: this.onSlotChange }))));
+        return (h(Host, { key: '869672c04d54e2ef195e58533981e29eff522b0c' }, h("div", { key: '931ba48a3d385764ca6524d704c9a4ad37979b66', class: "root", part: "root" }, h("slot", { key: '546838241bbd857687802f595136755317291643', onSlotchange: this.onSlotChange }))));
     }
     static get style() { return bfListCss(); }
 }, [257, "bf-list"]);

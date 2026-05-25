@@ -1,5 +1,4 @@
 export { g as getAssetPath, r as render, s as setAssetPath, a as setNonce, b as setPlatformOptions } from './p-DAXdczoz.js';
-export { BfAatest, defineCustomElement as defineCustomElementBfAatest } from './bf-aatest.js';
 export { BfAccordion, defineCustomElement as defineCustomElementBfAccordion } from './bf-accordion.js';
 export { BfActionList, defineCustomElement as defineCustomElementBfActionList } from './bf-action-list.js';
 export { BfAnchor, defineCustomElement as defineCustomElementBfAnchor } from './bf-anchor.js';

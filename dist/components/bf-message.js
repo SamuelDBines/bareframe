@@ -11,7 +11,7 @@ const BfMessage$1 = /*@__PURE__*/ proxyCustomElement(class BfMessage extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '4740ddf4ee4e1ea5a3a93cf1e21e56059e12d0f8' }, h("div", { key: 'd66fdd8812b630e1d2d93c89ae808f6d75d09d78', class: "root", part: "root" }, h("slot", { key: 'a66a76afd51168446a9c7d49ee70013e581efb64' }))));
+        return (h(Host, { key: 'af5e2b48248c253a761c257780143d69823811af' }, h("div", { key: '2e6983e4e49cceb0d15d6f448666b5758ed3913c', class: "root", part: "root" }, h("slot", { key: 'b1ecb51baffe6063eff41b4ef4dd235a36db79c4' }))));
     }
     static get style() { return bfMessageCss(); }
 }, [257, "bf-message"]);

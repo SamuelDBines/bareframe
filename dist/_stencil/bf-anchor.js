@@ -11,7 +11,7 @@ const BfAnchor$1 = /*@__PURE__*/ proxyCustomElement(class BfAnchor extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'c8400b5833c7f5dc467d730d842330c4183c2e5e' }, h("div", { key: '8f236032d3a42c7c0f4ef68e2db5c80d6587f063', class: "root", part: "root" }, h("slot", { key: 'ba9c2d7d76d6c9f0cbff63457cb63964a1716952' }))));
+        return (h(Host, { key: '648ef1357be1312d3a500c528ad7e28b589c8a7f' }, h("div", { key: 'f9073a5aa1be6b790cd17710f2ef387e0fe0f8ed', class: "root", part: "root" }, h("slot", { key: 'faf6498245cb15dce362cad9297bfa9cfc3a66b2' }))));
     }
     static get style() { return bfAnchorCss(); }
 }, [257, "bf-anchor"]);

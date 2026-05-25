@@ -11,7 +11,7 @@ const BfMetricCard$1 = /*@__PURE__*/ proxyCustomElement(class BfMetricCard exten
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '5d538566d2fc3bca7ed9431f899d0b213bab1766' }, h("div", { key: '46586c3e8f62b58bf95bf61d7963296e7282d065', class: "root", part: "root" }, h("slot", { key: '54b0f6c7c948b911efefa18675be931b51f4504d' }))));
+        return (h(Host, { key: 'da0d129b4cfd92a74dff20cdc7995ad27c9e4005' }, h("div", { key: 'b489b71b96c6099ce97c24372416c186b0154ea8', class: "root", part: "root" }, h("slot", { key: '3fbc424ba1a19004ec51a2506723160e07c231f2' }))));
     }
     static get style() { return bfMetricCardCss(); }
 }, [257, "bf-metric-card"]);

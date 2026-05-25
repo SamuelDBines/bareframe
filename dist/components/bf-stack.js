@@ -11,7 +11,7 @@ const BfStack$1 = /*@__PURE__*/ proxyCustomElement(class BfStack extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '2d22c14310575cb42049e1feee1d4232ad2f8247' }, h("div", { key: '73400642d6a3d48c005dde878a3a816d15d5750b', class: "root", part: "root" }, h("slot", { key: '19cd06815d9caf7f96bcc4c85f7737f180b344ab' }))));
+        return (h(Host, { key: '889abbb9ef1ee6a3de3095c6af8b51f4eebe6bbe' }, h("div", { key: 'e3d1ad85871bb34f25542c9bcba6d3d602bf0cd0', class: "root", part: "root" }, h("slot", { key: '446d6330a9e30630c1a31d564f0567706691823f' }))));
     }
     static get style() { return bfStackCss(); }
 }, [257, "bf-stack"]);

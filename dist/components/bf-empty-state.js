@@ -11,7 +11,7 @@ const BfEmptyState$1 = /*@__PURE__*/ proxyCustomElement(class BfEmptyState exten
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'd2271559139b3f3f87c3a6e8db138ddadbbe9d85' }, h("div", { key: 'ab60697479be8a487a4ec320abc7959fdf80fabf', class: "root", part: "root" }, h("slot", { key: 'cb8724e4044444d85abc1ad680285fdde67e0f25' }))));
+        return (h(Host, { key: '520635c974f1ffaf76d51f136f4ac5aaa65e2041' }, h("div", { key: '10f78a7e1b231885420ea4784855d6c0b36d6d67', class: "root", part: "root" }, h("slot", { key: 'def077d7b2994e8b81c7aa8f193629ae38ae11b5' }))));
     }
     static get style() { return bfEmptyStateCss(); }
 }, [257, "bf-empty-state"]);

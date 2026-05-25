@@ -246,7 +246,7 @@ const BfSelect$1 = /*@__PURE__*/ proxyCustomElement(class BfSelect extends H {
         this.pull();
     }
     render() {
-        return (h(Host, { key: 'b17f7004ccecc11752addf8959c65c8dc47488d3' }, h("div", { key: '666c0c098c548032d51918a961fd70b0fddb262c', class: "root", part: "root" }, h("select", { key: '9133532e69a952f81d17f21cf2d2412f60ce9ebf', part: "select" }), h("span", { key: '922a294c7be9431f0635034a7537fbe6f5c85676', class: "chevron", part: "chevron", "aria-hidden": "true" }))));
+        return (h(Host, { key: 'bef0e6c6dce22effd78fff7ee7a83cf538dfd320' }, h("div", { key: '9c6b9989a1715cff7404cec0ec7db8c9d526c175', class: "root", part: "root" }, h("select", { key: '2cf829159f610c873523cf7114e6f69ff9cab5d2', part: "select" }), h("span", { key: '2dcdd5763429ddb3c76d78aee17137ce0a0f54f8', class: "chevron", part: "chevron", "aria-hidden": "true" }))));
     }
     static get style() { return bfSelectCss(); }
 }, [1, "bf-select"]);

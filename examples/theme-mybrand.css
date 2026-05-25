@@ -1,0 +1,27 @@
+/**
+ * Example third-party theme — copy and edit for your brand.
+ * Load after `layout.css` (or @import it) so grid/typography utilities resolve.
+ */
+@import '../themes/layout.css';
+
+/*
+  Pin your brand on :root and/or a data attribute selector to match your app.
+*/
+:root,
+[data-bf-theme='mybrand'] {
+	--bf-theme-font-family:
+		'Inter', 'Segoe UI', system-ui, sans-serif;
+
+	--bf-theme-surface-1: #0b1020;
+	--bf-theme-surface-2: #121a33;
+	--bf-theme-text-1: #f8fafc;
+	--bf-theme-text-2: #94a3b8;
+	--bf-theme-border-1: #334155;
+
+	--bf-theme-button-primary-bg: #38bdf8;
+	--bf-theme-button-primary-color: #0f172a;
+	--bf-theme-button-primary-border-color: #38bdf8;
+	--bf-theme-button-secondary-bg: #1e293b;
+	--bf-theme-button-secondary-color: #e2e8f0;
+	--bf-theme-button-secondary-border-color: #475569;
+}

@@ -75,11 +75,17 @@ export class BfToggle {
 		}
 		const variant = this.variant();
 		root.setAttribute('data-variant', variant);
-		root.setAttribute('aria-pressed', String(this.checked));
-		root.setAttribute('role', 'switch');
-		root.setAttribute('aria-checked', String(this.checked));
 		root.disabled = this.el.hasAttribute('disabled');
 		root.classList.toggle('is-checked', this.checked);
+		if (variant === 'switch') {
+			root.setAttribute('role', 'switch');
+			root.setAttribute('aria-checked', String(this.checked));
+			root.removeAttribute('aria-pressed');
+		} else {
+			root.setAttribute('role', 'button');
+			root.setAttribute('aria-pressed', String(this.checked));
+			root.removeAttribute('aria-checked');
+		}
 		const labelAttr = this.el.getAttribute('label');
 		if (labelAttr) {
 			root.setAttribute('aria-label', labelAttr);

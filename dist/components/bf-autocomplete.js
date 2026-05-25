@@ -266,7 +266,7 @@ const BfAutocomplete$1 = /*@__PURE__*/ proxyCustomElement(class BfAutocomplete e
     }
     render() {
         const placeholder = this.el.getAttribute('placeholder') || 'Search...';
-        return (h(Host, { key: '558168e27e2a70dfbc1293bdac0d40df54e644ef' }, h("div", { key: '8c49ab3a10e89028fbcfdb3a591b707443102e5a', class: "root", part: "root" }, h("input", { key: 'd7a8ab97142343ec768419a28c63d43174b5a885', class: "input", part: "input", type: "text", placeholder: placeholder, autocomplete: "off", spellcheck: false, role: "combobox", "aria-expanded": "false", "aria-controls": this.listId, "aria-autocomplete": "list" }), h("ul", { key: 'dae3c733752b89138286296ce335b43682e64305', class: "list", part: "list", id: this.listId, role: "listbox", hidden: true }))));
+        return (h(Host, { key: '2cb7e33b19deb7d16d5561fbf97571bc76ec1acb' }, h("div", { key: '501f29f46dc305ff509be3102da1499a960d7450', class: "root", part: "root" }, h("input", { key: '3aaf5322c6aa2db7583e17e1972f6587d386d629', class: "input", part: "input", type: "text", placeholder: placeholder, autocomplete: "off", spellcheck: false, role: "combobox", "aria-expanded": "false", "aria-controls": this.listId, "aria-autocomplete": "list" }), h("ul", { key: 'c30c987cecfff8f0e98ed245e9088f33f87c9a98', class: "list", part: "list", id: this.listId, role: "listbox", hidden: true }))));
     }
     static get style() { return bfAutocompleteCss(); }
 }, [1, "bf-autocomplete"]);

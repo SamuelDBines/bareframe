@@ -11,7 +11,7 @@ const BfCalendar$1 = /*@__PURE__*/ proxyCustomElement(class BfCalendar extends H
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '18585135df31bbce04e65fb813476c4611e467e9' }, h("div", { key: 'a181dc975008ac0039ee36d99874f4a114ac1be3', class: "root", part: "root" }, h("slot", { key: 'e00cc75032b7eca61ed2fa3d322c47639da48a32' }))));
+        return (h(Host, { key: 'd7ee33518a9affc0fc455fd7dd07689d003bdca9' }, h("div", { key: '4884885e217c2929b5e5e4e11ef13ac7e12ca900', class: "root", part: "root" }, h("slot", { key: '4deb92a491ed21fa670aaa5c860c917b5aa37d1e' }))));
     }
     static get style() { return bfCalendarCss(); }
 }, [257, "bf-calendar"]);

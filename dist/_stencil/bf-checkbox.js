@@ -107,7 +107,7 @@ const BfCheckbox$1 = /*@__PURE__*/ proxyCustomElement(class BfCheckbox extends H
         }));
     };
     render() {
-        return (h(Host, { key: '5b3a15efe0e9396dbfbc5e2667efca946e29cebc' }, h("label", { key: 'afa1cf334ce0279c98ccbdcfc7640a43e807bde2', class: "root", part: "root" }, h("input", { key: '738df61a17cf0887997f75d585bafb48c5125b3b', type: "checkbox", part: "input", onChange: this.onInputChange }), h("span", { key: '88888cee472d1ee1d990f3fbd6531223d7966f8e', class: "box", part: "box" }), h("span", { key: '7292be60173cb2c2b65a23ba1e509442cdb6abec', class: "text", part: "text" }, h("slot", { key: '47b940a1372e876342c00500902df189e6642755' })))));
+        return (h(Host, { key: '83472f6eb6a6e43b48ce630165b6fc4ca6cc2838' }, h("label", { key: 'ffa4e76920cacc5a3e27b400c77e1b798a76ee5c', class: "root", part: "root" }, h("input", { key: '75d14786af782aaf660fa1c53bdc5a49f9bc19be', type: "checkbox", part: "input", onChange: this.onInputChange }), h("span", { key: '90aba685e1af62e5935e7be9b871ee7cf479941e', class: "box", part: "box" }), h("span", { key: '941b50da7452c346098129ae5a6e9a0d6e6ebbd6', class: "text", part: "text" }, h("slot", { key: 'c3edc735266daa18c2006921a3328b41806e7a3b' })))));
     }
     static get watchers() { return {
         "attrLabel": [{

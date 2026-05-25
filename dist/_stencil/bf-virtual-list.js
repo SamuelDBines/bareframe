@@ -11,7 +11,7 @@ const BfVirtualList$1 = /*@__PURE__*/ proxyCustomElement(class BfVirtualList ext
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '1e22e7e61a688281ddb4e38a157760b88813e0cb' }, h("div", { key: '49e968183b15b2088232b02c1d3fe1645148c226', class: "root", part: "root" }, h("slot", { key: 'b0e8e0c6ec3e6d78ef376bfdcf5aa77860945ea8' }))));
+        return (h(Host, { key: '81419556ddfb42db0612fb581b7aed31b6eb3165' }, h("div", { key: 'f514c2f2a6584f493c6dc4e5d22c35271171e874', class: "root", part: "root" }, h("slot", { key: '8614f59db2b75655302ac83711e05e86f4c7f1d8' }))));
     }
     static get style() { return bfVirtualListCss(); }
 }, [257, "bf-virtual-list"]);

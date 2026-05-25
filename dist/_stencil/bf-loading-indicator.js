@@ -11,7 +11,7 @@ const BfLoadingIndicator$1 = /*@__PURE__*/ proxyCustomElement(class BfLoadingInd
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'a52aa77a78095ca159c54aab320190ce9912d1a4' }, h("div", { key: '3b3ec635b40a84f5520d6b1c04ee83360673b1e9', class: "root", part: "root" }, h("slot", { key: 'b36a15ff8ab24777799d1e74919f846330c757d3' }))));
+        return (h(Host, { key: '2029ac9f40908c83d1e35fe3fb8c118a7dde5de6' }, h("div", { key: 'ffa63c686ed8dc6c6f5194b07b49d6827cfec1d9', class: "root", part: "root" }, h("slot", { key: 'e03b06b3239e3329b2f10c8640c1a0b9bb9f9382' }))));
     }
     static get style() { return bfLoadingIndicatorCss(); }
 }, [257, "bf-loading-indicator"]);

@@ -11,7 +11,7 @@ const BfSplitter$1 = /*@__PURE__*/ proxyCustomElement(class BfSplitter extends H
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '30c35ffee4bc0510ed1e9445fd7b3fef5fd62273' }, h("div", { key: '65e5ae89252e44e77cb614f63f1596e84322d4bf', class: "root", part: "root" }, h("slot", { key: 'cddd9e551eae0e8fa3715fd81f73d7045dd0d96a' }))));
+        return (h(Host, { key: 'aaae2b1394b8eb3905d04df55aeea943c2ae2100' }, h("div", { key: '80b926c54c25b7773e59665f94e33168423312f0', class: "root", part: "root" }, h("slot", { key: '3e4b971caa1d5d88f9a33eda07bc70e846d3403e' }))));
     }
     static get style() { return bfSplitterCss(); }
 }, [257, "bf-splitter"]);

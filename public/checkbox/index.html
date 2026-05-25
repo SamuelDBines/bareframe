@@ -4,14 +4,12 @@
 
 
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css"/>
-    <title>
-      
-    </title>
+    <title>Bareframe · bf-checkbox</title>
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -74,7 +72,7 @@
     </style>
   </head>
   <body>
-    <main>
+    <main data-demo-root>
       <div class="layout">
         <header class="header">
 
@@ -139,13 +137,9 @@
 </section>
 
 <section class="panel">
-  <div class="stack">
-    <p class="hint">This page is ready for a dedicated
-      Checkbox
-      demo in the new layout.</p>
-    <p>
-      <a href="/">Back to component index</a>
-    </p>
+  <div class="demo-row">
+    <bf-checkbox label="Email me">Product updates</bf-checkbox>
+    <bf-checkbox checked label="Terms">I agree to the terms</bf-checkbox>
   </div>
 </section>
 

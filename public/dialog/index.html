@@ -4,14 +4,12 @@
 
 
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css"/>
-    <title>
-      
-    </title>
+    <title>Bareframe · bf-dialog</title>
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -74,7 +72,7 @@
     </style>
   </head>
   <body>
-    <main>
+    <main data-demo-root>
       <div class="layout">
         <header class="header">
 
@@ -140,12 +138,20 @@
 
 <section class="panel">
   <div class="stack">
-    <p class="hint">This page is ready for a dedicated
-      Dialog
-      demo in the new layout.</p>
-    <p>
-      <a href="/">Back to component index</a>
-    </p>
+    <div class="demo-row">
+      <bf-button bf-open="dialog-sheet" variant="secondary">Open Sheet</bf-button>
+      <bf-button bf-open="dialog-panel" variant="secondary">Open Panel</bf-button>
+    </div>
+    <bf-dialog id="dialog-sheet" variant="bottom-sheet" label="Bottom sheet">
+      <p>Bottom sheet variant from the bottom edge.</p>
+      <bf-button bf-close="dialog-sheet">Close</bf-button>
+    </bf-dialog>
+    <bf-dialog id="dialog-panel" variant="panel" position="right" label="Panel">
+      <p>Panel variant anchored right.</p>
+      <bf-button bf-close="dialog-panel">Close</bf-button>
+    </bf-dialog>
+    <bf-dialog variant="popover" position="top-right">Popover-style content</bf-dialog>
+    <bf-dialog variant="tooltip" position="bottom-left">Tooltip-style hint</bf-dialog>
   </div>
 </section>
 

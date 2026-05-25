@@ -26,7 +26,7 @@ const BfLink$1 = /*@__PURE__*/ proxyCustomElement(class BfLink extends H {
         this.applyRoot();
     }
     render() {
-        return (h(Host, { key: '58a70e0e013d74f3bcc2545c597365bb0849fa25' }, h("div", { key: '885cffdc3c7554f79cfb4a6867eac0218a215211', class: "root", part: "root" }, h("slot", { key: '7beca110d851087913fef0dbdc809e9bf5ababec' }))));
+        return (h(Host, { key: '692cabcf2a8996deb4529bbe896e4864bb8e2f87' }, h("div", { key: '107eb4db8a0f8635bcdac7fc6049d7f07f1445ea', class: "root", part: "root" }, h("slot", { key: '9ac27840e7e84e8fb6abf19ca3b35b93fb206d0d' }))));
     }
     static get watchers() { return {
         "variant": [{

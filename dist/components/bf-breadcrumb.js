@@ -150,7 +150,7 @@ const BfBreadcrumb$1 = /*@__PURE__*/ proxyCustomElement(class BfBreadcrumb exten
         this.renderList();
     }
     render() {
-        return (h(Host, { key: 'f0205ff43e36575a09e11b819a5d2bf4cc46419c' }, h("nav", { key: 'eb55a040ae2b06a658c7c4e6d5f5051dfb16548b', class: "root", part: "root", "aria-label": "Breadcrumb" }, h("ol", { key: 'cfa573d015ba684eead63f0688210b4d98e8acd4', class: "list", part: "list" }), h("span", { key: 'ee8a1824538dc841f47af2831228f33268c703d4', hidden: true }, h("slot", { key: '7d5eeeaf0da2aa72283f35774674944122685291', ref: (el) => (this.slotRef = el) })))));
+        return (h(Host, { key: 'd92e0291e805d232420484094409471bc22a6173' }, h("nav", { key: '94382fb88911be5103a8942c628ad8dc29d2eb9b', class: "root", part: "root", "aria-label": "Breadcrumb" }, h("ol", { key: 'de6da523f3934a34c877cbc85cbaa60c7c1c5eec', class: "list", part: "list" }), h("span", { key: '1ef734d2e528fbcb4c9d5abf21551bd15be38254', hidden: true }, h("slot", { key: '2e2f6d58018ec7ec46a994edd8f7f8fd66c1d430', ref: (el) => (this.slotRef = el) })))));
     }
     static get style() { return bfBreadcrumbCss(); }
 }, [257, "bf-breadcrumb"]);

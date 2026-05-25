@@ -71,7 +71,7 @@ const BfModal$1 = /*@__PURE__*/ proxyCustomElement(class BfModal extends H {
         this.syncRoot();
     }
     render() {
-        return (h(Host, { key: 'bfe404e898d592defd94ac8692a47bd64f3a4c91' }, h("div", { key: '9b4d3d45d9110d780d307b6f7fb7ccc7a8c92796', class: "root", part: "root" }, h("div", { key: 'cee8b63906fb8deb9f1ded9824b60011a4b4e820', class: "backdrop", part: "backdrop", onClick: this.onBackdropClick }), h("div", { key: 'efcbc670a1f55d6a1f31b5c4e924336a939d2f8e', class: "panel", part: "panel" }, h("slot", { key: 'c919c5e8b88364b578c3d7a3498718acca504467' })))));
+        return (h(Host, { key: 'd9b645fb4a7859d7eb240422625b378b492a9962' }, h("div", { key: 'f8384a2236212f087c28ea7fa16c5da968293bfb', class: "root", part: "root" }, h("div", { key: 'f195a42ce31ddc03e4dd310ed1f0c80cd7b8ab11', class: "backdrop", part: "backdrop", onClick: this.onBackdropClick }), h("div", { key: '6e78e229f34a4d3eca31ca769113d8de4f9d0c55', class: "panel", part: "panel" }, h("slot", { key: '90b66bc6735358b78ebb18acccd43b2a1c45f4b9' })))));
     }
     static get style() { return bfModalCss(); }
 }, [257, "bf-modal", {

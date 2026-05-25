@@ -12,6 +12,12 @@ Links:
 
 - npm: https://www.npmjs.com/package/bareframe
 - GitHub Pages examples: https://samueldbines.github.io/bareframe/
+- **[Component Studio](https://samueldbines.github.io/bareframe/showcase/)** (after deploy)
+
+**Docs:** [Vision](docs/VISION.md) · [Roadmap](docs/ROADMAP.md) · [Themes](docs/THEMES.md) · [Component contract](docs/COMPONENT-CONTRACT.md) · [Tiering](docs/TIERING.md) · [Testing](docs/TESTING.md)
+
+![Tests](https://github.com/SamuelDBines/bareframe/actions/workflows/test.yml/badge.svg)
+
 - Chart demo: https://samueldbines.github.io/bareframe/chart-test.html
 
 ## npm artifact vs Pages directory

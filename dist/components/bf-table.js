@@ -11,7 +11,7 @@ const BfTable$1 = /*@__PURE__*/ proxyCustomElement(class BfTable extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'e5ebac33d66372068a3890d5a5fb2cda29330bf6' }, h("div", { key: 'df33c7680f642507c8463d2d4fac4897db4cac4b', class: "root", part: "root" }, h("slot", { key: '3a55189358e6371819a8dcdde8fedcec253faed5' }))));
+        return (h(Host, { key: '8a2b9a606b6c4121f8f16cb489ee6498c3ba5162' }, h("div", { key: '0ff2171b232e1f36b46ffc24a335f9d00d783863', class: "root", part: "root" }, h("slot", { key: 'cd5dd8c52d38792f4bde40e736638a8d0c0806a7' }))));
     }
     static get style() { return bfTableCss(); }
 }, [257, "bf-table"]);

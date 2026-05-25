@@ -11,7 +11,7 @@ const BfToolbar$1 = /*@__PURE__*/ proxyCustomElement(class BfToolbar extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '6ced500fd14a5703325e83b6f67963855205212b' }, h("div", { key: 'a4ed455dbfd06fedef63a5b9e220ca6f32c6209c', class: "root", part: "root" }, h("slot", { key: 'a6c8dbd8d47e167c73a6f030e32d0f5538ee46f2' }))));
+        return (h(Host, { key: '4f0aa8f43a8bcaabd72f75ccddacccf6d18af668' }, h("div", { key: '0bdc34ad1f4e4ad460319f644627242c6f09cc80', class: "root", part: "root" }, h("slot", { key: '2d64a775c5fbdcc66282f17794d68df352fb7532' }))));
     }
     static get style() { return bfToolbarCss(); }
 }, [257, "bf-toolbar"]);

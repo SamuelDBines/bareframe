@@ -101,7 +101,7 @@ const BfRadio$1 = /*@__PURE__*/ proxyCustomElement(class BfRadio extends H {
         }));
     };
     render() {
-        return (h(Host, { key: 'ea71570631d8df9fb278c85b9ae4cbf55e9f3984' }, h("label", { key: 'c62418c4f8067a56db8711217505ce9b1dbe7b48', class: "root", part: "root" }, h("input", { key: '953b34af8f8103aefe644981e29b39667e23ca4c', type: "radio", part: "input", onChange: this.onInputChange }), h("span", { key: '7f898e9e213674824f1181b673243cdace03a7a4', class: "dot", part: "dot" }), h("span", { key: '6328247bf9ba9652410d222c36fc7f4d6ace23ac', class: "text", part: "text" }, h("slot", { key: '94c3239cfbf25dcf8bb92bf010923c315f8464be' })))));
+        return (h(Host, { key: '8809c6e319d8138c2646b245196a08a88ee94636' }, h("label", { key: '83c06a9f6fabd8dd565db79468aeafd416b5157a', class: "root", part: "root" }, h("input", { key: '6eb76d6a09bbcc1bde9c73d2959f5b9865e58199', type: "radio", part: "input", onChange: this.onInputChange }), h("span", { key: '57d11ed8838218c86e1dfa13c41ead3f1598c592', class: "dot", part: "dot" }), h("span", { key: '6720311fbb9971a3c2895c289dc69c92be8f8cd9', class: "text", part: "text" }, h("slot", { key: 'ab17618a7cd74d55c84f06ea03d127178db7e87c' })))));
     }
     static get watchers() { return {
         "attrLabel": [{

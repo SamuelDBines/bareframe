@@ -6,8 +6,6 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface BfAatest {
-    }
     interface BfAccordion {
         "closeItem": (itemId: string) => Promise<void>;
         "openItem": (itemId: string) => Promise<void>;
@@ -235,12 +233,6 @@ export interface BfButtonCustomEvent<T> extends CustomEvent<T> {
     target: HTMLBfButtonElement;
 }
 declare global {
-    interface HTMLBfAatestElement extends Components.BfAatest, HTMLStencilElement {
-    }
-    var HTMLBfAatestElement: {
-        prototype: HTMLBfAatestElement;
-        new (): HTMLBfAatestElement;
-    };
     interface HTMLBfAccordionElement extends Components.BfAccordion, HTMLStencilElement {
     }
     var HTMLBfAccordionElement: {
@@ -711,7 +703,6 @@ declare global {
         new (): HTMLBfWizardElement;
     };
     interface HTMLElementTagNameMap {
-        "bf-aatest": HTMLBfAatestElement;
         "bf-accordion": HTMLBfAccordionElement;
         "bf-action-list": HTMLBfActionListElement;
         "bf-anchor": HTMLBfAnchorElement;
@@ -789,8 +780,6 @@ declare global {
     }
 }
 declare namespace LocalJSX {
-    interface BfAatest {
-    }
     interface BfAccordion {
     }
     interface BfActionList {
@@ -1034,7 +1023,6 @@ declare namespace LocalJSX {
     }
 
     interface IntrinsicElements {
-        "bf-aatest": BfAatest;
         "bf-accordion": BfAccordion;
         "bf-action-list": BfActionList;
         "bf-anchor": BfAnchor;
@@ -1115,7 +1103,6 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "bf-aatest": LocalJSX.IntrinsicElements["bf-aatest"] & JSXBase.HTMLAttributes<HTMLBfAatestElement>;
             "bf-accordion": LocalJSX.IntrinsicElements["bf-accordion"] & JSXBase.HTMLAttributes<HTMLBfAccordionElement>;
             "bf-action-list": LocalJSX.IntrinsicElements["bf-action-list"] & JSXBase.HTMLAttributes<HTMLBfActionListElement>;
             "bf-anchor": LocalJSX.IntrinsicElements["bf-anchor"] & JSXBase.HTMLAttributes<HTMLBfAnchorElement>;

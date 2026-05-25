@@ -11,7 +11,7 @@ const BfImage$1 = /*@__PURE__*/ proxyCustomElement(class BfImage extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '51b42da5a9d93c80653a75bbec9064af978e0ccd' }, h("div", { key: '7aa6c152d9c3b5c4d4157465ec51f0daf5ab4d76', class: "root", part: "root" }, h("slot", { key: '0a0cbc20ce48b7d263c63b5ae731c4ed43234f99' }))));
+        return (h(Host, { key: 'd6601cd8dc8034dfa0175a4f7dcb596acd2d2045' }, h("div", { key: '84da6d5ed37b504f45a99b1994a7713f77fddd49', class: "root", part: "root" }, h("slot", { key: '56adb7437b850285f6992d543738690cfbbf495f' }))));
     }
     static get style() { return bfImageCss(); }
 }, [257, "bf-image"]);

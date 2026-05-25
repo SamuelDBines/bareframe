@@ -11,7 +11,7 @@ const BfCard$1 = /*@__PURE__*/ proxyCustomElement(class BfCard extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '6907f116ce55c177fb68a3cfbd4ffd27f2826990' }, h("div", { key: '7693d04e61d530cad577b1b82ff6dc51bcb22e4b', class: "root", part: "root" }, h("slot", { key: 'b31178fbeb9764f3666f804e5ddb59957a9c6b42' }))));
+        return (h(Host, { key: 'fbfa1a2298a699564e9c12ca7e0eccb61660d7d3' }, h("div", { key: '9aa4621920d694118e77f41dfb2fce2fe0a9c688', class: "root", part: "root" }, h("slot", { key: '8831047c5a68a6616044987f035fb372c2bf1643' }))));
     }
     static get style() { return bfCardCss(); }
 }, [257, "bf-card"]);

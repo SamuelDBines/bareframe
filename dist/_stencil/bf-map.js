@@ -11,7 +11,7 @@ const BfMap$1 = /*@__PURE__*/ proxyCustomElement(class BfMap extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '70f0c5a18d1eebe393ca08e2181b825397036807' }, h("div", { key: '3f9adb042684b4cd879cd6135c9362f94ae7a52d', class: "root", part: "root" }, h("slot", { key: 'a715f31a388896512f8a0dbfc02d6ffc634c2849' }))));
+        return (h(Host, { key: 'a4ac138853500556f807e519c71bb0208a03f1e2' }, h("div", { key: '0b94dee96c2b96749714c71d1af0df0acb8a78bf', class: "root", part: "root" }, h("slot", { key: '436c9ee9ff98c56e22cbb851916d2e71c508f32f' }))));
     }
     static get style() { return bfMapCss(); }
 }, [257, "bf-map"]);

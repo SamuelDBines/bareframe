@@ -198,7 +198,7 @@ const BfFileUpload$1 = /*@__PURE__*/ proxyCustomElement(class BfFileUpload exten
         this.observer?.disconnect();
     }
     render() {
-        return (h(Host, { key: '27e2c6339d3ab7b827d3f9c08bfaea420c3cd042' }, h("div", { key: 'e75af05549804d9a1656f7c56fb6852ae2a59def', class: "root", part: "root" }, h("input", { key: 'af1c7bb9efb3e42fadeedf5afb30eecb4dcf0508', class: "native", type: "file" }), h("div", { key: 'c31055b5e6c79fa893e47fb1368299b65f934359', class: "label", part: "label" }), h("div", { key: '38ede9fbd7b00abe42e215ad1ac8684cde4ae5f1', class: "meta", part: "meta" }), h("div", { key: 'a0c968b0c39757e9ac38a624e036e9fe42a3438f', class: "files", part: "files" }), h("slot", { key: '98266e9f48ada8d4294cadf95ac426759299e4a6' }))));
+        return (h(Host, { key: '72ad7b3c11cd9e3752489e74ea7f362b27f37498' }, h("div", { key: 'e4cec1556a0b02281eeb8e60a2b706efd1f3ff98', class: "root", part: "root" }, h("input", { key: '4c9957eebed55a3c3794f8060982ef468729400c', class: "native", type: "file" }), h("div", { key: 'dbe91c9cd8b27ddcd14b30ec3db5e7fb48343304', class: "label", part: "label" }), h("div", { key: 'c976306139e19a0648e520ffbaf3b1dcdafce389', class: "meta", part: "meta" }), h("div", { key: '9bc372321773e220c31136f2d0c8f2c51a086422', class: "files", part: "files" }), h("slot", { key: 'd31b004f932cd19be2975d3bacf672327264294d' }))));
     }
     static get style() { return bfFileUploadCss(); }
 }, [257, "bf-file-upload"]);

@@ -9,16 +9,25 @@ type TokensManifest = {
 	byTheme?: Record<string, string[]>;
 };
 
-/** Curated MVP list — surfaced first in the studio nav. Order is preserved. */
+/**
+ * Tier A essentials — surfaced first in the studio nav (see docs/TIERING.md).
+ * Order is preserved.
+ */
 const ESSENTIAL_SLUGS = [
 	'button',
 	'link',
 	'header',
 	'footer',
 	'modal',
+	'dialog',
 	'toast',
 	'message',
 	'error-summary',
+	'input',
+	'checkbox',
+	'radio',
+	'select',
+	'toggle',
 	'chart',
 ] as const;
 
@@ -378,10 +387,24 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 		}
 	}
 
-	function navigateTo(slug: string) {
+	function syncComponentQuery(slug: string) {
+		try {
+			const u = new URL(window.location.href);
+			u.searchParams.set('component', slug);
+			history.replaceState(null, '', u);
+		} catch {
+			/* file:// or restricted */
+		}
+	}
+
+	function navigateTo(slug: string, opts: { syncUrl?: boolean } = {}) {
+		const { syncUrl = true } = opts;
 		active = slug;
 		bfIframe.src = new URL(`${slug}/index.html`, base).href;
 		applyChip(slug);
+		if (syncUrl) {
+			syncComponentQuery(slug);
+		}
 	}
 
 	bfIframe.addEventListener('load', () => {
@@ -459,6 +482,26 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 	bfSearch.addEventListener('input', () => rerenderNav());
 	bfTokenSearch.addEventListener('input', () => refreshTokenTable());
 	rerenderNav();
+
+	const requested = new URL(window.location.href).searchParams
+		.get('component')
+		?.replace(/^bf-/, '')
+		.trim()
+		.toLowerCase();
+	if (requested && list.includes(requested)) {
+		navigateTo(requested);
+	}
+
+	window.addEventListener('popstate', () => {
+		const slug = new URL(window.location.href).searchParams
+			.get('component')
+			?.replace(/^bf-/, '')
+			.trim()
+			.toLowerCase();
+		if (slug && list.includes(slug)) {
+			navigateTo(slug, { syncUrl: false });
+		}
+	});
 }
 
 function optionFor(text: string): HTMLOptionElement {

@@ -11,7 +11,7 @@ const BfActionList$1 = /*@__PURE__*/ proxyCustomElement(class BfActionList exten
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '2ee10f53b154d0a89d9a3f07ad9bf4116f6d714f' }, h("div", { key: '38c10c079a7f337cd8b008c68ef89e00085ca862', class: "root", part: "root" }, h("slot", { key: '4e3b8ec7875fe366eb496f55d1336768efedcf49' }))));
+        return (h(Host, { key: '0e7f1ff56b94519ce2c25f89d4c02f7ecd966ca4' }, h("div", { key: '2e9883c7cf8c917901f3f1736cb68975897c3a3e', class: "root", part: "root" }, h("slot", { key: '490bc97788a24a072d032664cfe9146fb9b56c24' }))));
     }
     static get style() { return bfActionListCss(); }
 }, [257, "bf-action-list"]);

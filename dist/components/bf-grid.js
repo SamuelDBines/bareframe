@@ -11,7 +11,7 @@ const BfGrid$1 = /*@__PURE__*/ proxyCustomElement(class BfGrid extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '9f1f3e118dabd307aac371ad0b8a624e03f89c38' }, h("div", { key: '53144e3947dd0bfd5026d59d3e6c8e634ece92c8', class: "root", part: "root" }, h("slot", { key: '6c7e353b73d9c3d33122fd8c6d4e73fe9057a4f2' }))));
+        return (h(Host, { key: 'f86efe1d0899b9126b821d0c298fd17fd5c16f27' }, h("div", { key: '1800b5965241398b0464af4d5d3511094ea63765', class: "root", part: "root" }, h("slot", { key: '90b2dc38c686f222e6c0e2da328c4205f44a2064' }))));
     }
     static get style() { return bfGridCss(); }
 }, [257, "bf-grid"]);

@@ -12,7 +12,7 @@ const BfFooter$1 = /*@__PURE__*/ proxyCustomElement(class BfFooter extends H {
     }
     sticky = false;
     render() {
-        return (h(Host, { key: '4436fdc3409fe0f1791a8369ed020b23dcaafd8e' }, h("footer", { key: '2d4a5645ca720f2e2c26e36773250d04fc06c1da', class: "root", part: "root" }, h("slot", { key: 'efc8b11885d5adbe3ae40ed0ad159658889bad7e' }))));
+        return (h(Host, { key: 'cbc5e0c8ad765564c0ed1730c042cec9157f12db' }, h("footer", { key: 'be3e55063fe5a23fcf26018b6c45406e3d2da345', class: "root", part: "root" }, h("slot", { key: '006a2986f5e634a63668048f78b1d9d5c8fd6171' }))));
     }
     static get style() { return bfFooterCss(); }
 }, [769, "bf-footer", {

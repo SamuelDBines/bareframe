@@ -11,7 +11,7 @@ const BfDatePicker$1 = /*@__PURE__*/ proxyCustomElement(class BfDatePicker exten
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '48807910d2751804248cadfe287230b51182087e' }, h("div", { key: '557423189c09acd95c0632ca67bf0920269cf1f6', class: "root", part: "root" }, h("slot", { key: 'a6dc0900fc92a5c8efd3e8da458f1d504385f439' }))));
+        return (h(Host, { key: 'fd6753901a1e3b46a5e6c282616d16b07e85688c' }, h("div", { key: '157f0c1979c4cfa9ca509c5bf20817c266ccab2f', class: "root", part: "root" }, h("slot", { key: '549de96b86ca2e4a5de15c90045bcfc3eb5e4cde' }))));
     }
     static get style() { return bfDatePickerCss(); }
 }, [257, "bf-date-picker"]);

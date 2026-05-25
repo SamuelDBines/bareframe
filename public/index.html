@@ -1,451 +1,182 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link id="themeStylesheet" rel="stylesheet" href="./themes/system.css"/>
-    <title>
-      
-    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bareframe examples</title>
     <style>
-      body {
-        font-family: 'Avenir Next', 'Segoe UI', sans-serif;
-        margin: 2rem;
-        line-height: 1.45;
-        color: var(--bf-theme-text-1, #111827);
-        background: var(--bf-theme-surface-2, #f8fafc);
-      }
-
-      .layout {
-        display: grid;
-        gap: 1rem;
-        max-width: 980px;
-      }
-
-      .layout .header {
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .demo-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.7rem;
-      }
-
-      .stack {
-        display: grid;
-        gap: 0.5rem;
-      }
-      .label {
-        font-weight: 600;
-      }
-      .hint {
-        margin: 0;
-        color: var(--bf-theme-text-2, #4b5563);
-      }
-      .tableish {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.35rem 0.75rem;
-      }
-      .viz {
-        display: flex;
-        align-items: end;
-        gap: 0.5rem;
-        min-height: 120px;
-      }
-      .viz > div {
-        width: 24px;
-        background: var(--bf-theme-button-primary-bg, #2563eb);
-        border-radius: 6px 6px 0 0;
-      }
-      code {
-        background: rgba(148, 163, 184, 0.2);
-        padding: 0.1rem 0.35rem;
-        border-radius: 6px;
+      body { font-family: 'Avenir Next', 'Segoe UI', sans-serif; margin: 2rem; }
+      .layout { display: grid; gap: 1.25rem; max-width: 980px; }
+      section { border: 1px solid #d1d5db; border-radius: 10px; padding: 1rem; background: #ffffff; }
+      h2 { margin-top: 0; font-size: 1.15rem; }
+      ul { columns: 2; margin: 0; padding-left: 1rem; }
+      li { margin: 0.35rem 0; }
+      #donate-button-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 999;
       }
     </style>
   </head>
   <body>
-    <main>
-      <div class="layout">
-        <header class="header">
-
-          <a href="/">
-            <h2>Bareframe</h2>
-          </a>
-
-          <div id="donate-button-container">
-            <div id="donate-button"></div>
-          </div>
-        </header>
-        <header><style>
-  .panel {
-    border: 1px solid var(--bf-theme-border-1, #d1d5db);
-    border-radius: 12px;
-    background: var(--bf-theme-surface-1, #ffffff);
-    padding: 1rem;
-  }
-
-  .theme-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.7rem;
-  }
-</style>
-
-<section class="panel">
-  <div class="theme-controls">
-    <label for="themeSelect">Theme</label>
-    <select id="themeSelect">
-      <option value="system">system</option>
-      <option value="light">light</option>
-      <option value="dark">dark</option>
-      <option value="sprint">sprint</option>
-      <option value="retro">retro</option>
-      <option value="modern">modern</option>
-      <option value="simple">simple</option>
-      <option value="nature">nature</option>
-      <option value="future">future</option>
-      <option value="aurora">aurora</option>
-      <option value="nebula">nebula</option>
-      <option value="desert">desert</option>
-      <option value="matrix">matrix</option>
-      <option value="noir">noir</option>
-      <option value="sunrise">sunrise</option>
-      <option value="oceanic">oceanic</option>
-    </select>
-    <span id="themeStatus"></span>
-  </div>
-</section></header>
-        
-  <div class="layout">
-    <header>
-      <p>Grouped by category to review overlap and reduce unnecessary components.</p>
-      <p>
-        <a href="https://www.npmjs.com/package/bareframe" target="_blank" rel="noreferrer">npm package</a>
-        ·
-        <a href="https://samueldbines.github.io/bareframe/" target="_blank" rel="noreferrer">github pages</a>
-        ·
-        <a href="https://samueldbines.github.io/bareframe/chart.html" target="_blank" rel="noreferrer">chart demo</a>
-        ·
-        <a href="https://samueldbines.github.io/bareframe/versions/" target="_blank" rel="noreferrer">versions</a>
-      </p>
-    </header>
+    <div id="donate-button-container">
+      <div id="donate-button"></div>
+    </div>
+    <div class="layout">
+      <header>
+        <h1>bareframe examples</h1>
+        <p>Grouped by category to review overlap and reduce unnecessary components.</p>
+        <p>
+          <a href="https://www.npmjs.com/package/bareframe" target="_blank" rel="noreferrer">npm package</a>
+          ·
+          <a href="https://samueldbines.github.io/bareframe/" target="_blank" rel="noreferrer">github pages</a>
+          ·
+          <a href="https://samueldbines.github.io/bareframe/chart-test.html" target="_blank" rel="noreferrer">chart demo</a>
+          ·
+          <a href="https://samueldbines.github.io/bareframe/versions/" target="_blank" rel="noreferrer">versions</a>
+        </p>
+      </header>
     <section>
       <h2>Utilities</h2>
       <ul>
-        <li>
-          <a href="./utilities">utilities</a>
-        </li>
+      <li><a href="./utilities-test.html">utilities</a></li>
       </ul>
     </section>
     <section>
       <h2>Base Components</h2>
       <ul>
-        <li>
-          <a href="./accordion">accordion</a>
-        </li>
-        <li>
-          <a href="./button">button</a>
-        </li>
-        <li>
-          <a href="./card">card</a>
-        </li>
-        <li>
-          <a href="./command-palette">command palette</a>
-        </li>
-        <li>
-          <a href="./divider">divider</a>
-        </li>
-        <li>
-          <a href="./dropdown">dropdown</a>
-        </li>
-        <li>
-          <a href="./edge">edge</a>
-        </li>
-        <li>
-          <a href="./empty-state">empty state</a>
-        </li>
-        <li>
-          <a href="./fab">fab</a>
-        </li>
-        <li>
-          <a href="./hero">hero</a>
-        </li>
-        <li>
-          <a href="./loading-indicator">loading indicator</a>
-        </li>
-        <li>
-          <a href="./message">message</a>
-        </li>
-        <li>
-          <a href="./metric-card">metric card</a>
-        </li>
-        <li>
-          <a href="./progress">progress</a>
-        </li>
-        <li>
-          <a href="./segmented-control">segmented control</a>
-        </li>
-        <li>
-          <a href="./skeleton">skeleton</a>
-        </li>
-        <li>
-          <a href="./split-button">split button</a>
-        </li>
-        <li>
-          <a href="./splitter">splitter</a>
-        </li>
-        <li>
-          <a href="./stack">stack</a>
-        </li>
-        <li>
-          <a href="./tag">tag</a>
-        </li>
-        <li>
-          <a href="./wizard">wizard</a>
-        </li>
+      <li><a href="./accordion-test.html">accordion</a></li>
+      <li><a href="./button-test.html">button</a></li>
+      <li><a href="./card-test.html">card</a></li>
+      <li><a href="./command-palette-test.html">command palette</a></li>
+      <li><a href="./divider-test.html">divider</a></li>
+      <li><a href="./dropdown-test.html">dropdown</a></li>
+      <li><a href="./edge-test.html">edge</a></li>
+      <li><a href="./empty-state-test.html">empty state</a></li>
+      <li><a href="./fab-test.html">fab</a></li>
+      <li><a href="./hero-test.html">hero</a></li>
+      <li><a href="./loading-indicator-test.html">loading indicator</a></li>
+      <li><a href="./message-test.html">message</a></li>
+      <li><a href="./metric-card-test.html">metric card</a></li>
+      <li><a href="./progress-test.html">progress</a></li>
+      <li><a href="./segmented-control-test.html">segmented control</a></li>
+      <li><a href="./skeleton-test.html">skeleton</a></li>
+      <li><a href="./split-button-test.html">split button</a></li>
+      <li><a href="./splitter-test.html">splitter</a></li>
+      <li><a href="./stack-test.html">stack</a></li>
+      <li><a href="./tag-test.html">tag</a></li>
+      <li><a href="./wizard-test.html">wizard</a></li>
       </ul>
     </section>
     <section>
       <h2>Editor Components</h2>
       <ul>
-        <li>
-          <a href="./editor">editor</a>
-        </li>
+      <li><a href="./editor-test.html">editor</a></li>
       </ul>
     </section>
     <section>
       <h2>Form Components</h2>
       <ul>
-        <li>
-          <a href="./autocomplete">autocomplete</a>
-        </li>
-        <li>
-          <a href="./checkbox">checkbox</a>
-        </li>
-        <li>
-          <a href="./combobox">combobox</a>
-        </li>
-        <li>
-          <a href="./file-upload">file upload</a>
-        </li>
-        <li>
-          <a href="./form-field">form field</a>
-        </li>
-        <li>
-          <a href="./input">input</a>
-        </li>
-        <li>
-          <a href="./number-field">number field</a>
-        </li>
-        <li>
-          <a href="./otp-input">otp input</a>
-        </li>
-        <li>
-          <a href="./radio">radio</a>
-        </li>
-        <li>
-          <a href="./range">range</a>
-        </li>
-        <li>
-          <a href="./search">search</a>
-        </li>
-        <li>
-          <a href="./select">select</a>
-        </li>
-        <li>
-          <a href="./toggle">toggle</a>
-        </li>
+      <li><a href="./autocomplete-test.html">autocomplete</a></li>
+      <li><a href="./checkbox-test.html">checkbox</a></li>
+      <li><a href="./combobox-test.html">combobox</a></li>
+      <li><a href="./file-upload-test.html">file upload</a></li>
+      <li><a href="./form-field-test.html">form field</a></li>
+      <li><a href="./input-test.html">input</a></li>
+      <li><a href="./number-field-test.html">number field</a></li>
+      <li><a href="./otp-input-test.html">otp input</a></li>
+      <li><a href="./radio-test.html">radio</a></li>
+      <li><a href="./range-test.html">range</a></li>
+      <li><a href="./search-test.html">search</a></li>
+      <li><a href="./select-test.html">select</a></li>
+      <li><a href="./toggle-test.html">toggle</a></li>
       </ul>
     </section>
     <section>
       <h2>Date & Calendar Components</h2>
       <ul>
-        <li>
-          <a href="./calendar">calendar</a>
-        </li>
-        <li>
-          <a href="./countdown">countdown</a>
-        </li>
-        <li>
-          <a href="./date-picker">date picker</a>
-        </li>
-        <li>
-          <a href="./date-range-picker">date range picker</a>
-        </li>
-        <li>
-          <a href="./timeline">timeline</a>
-        </li>
+      <li><a href="./calendar-test.html">calendar</a></li>
+      <li><a href="./countdown-test.html">countdown</a></li>
+      <li><a href="./date-picker-test.html">date picker</a></li>
+      <li><a href="./date-range-picker-test.html">date range picker</a></li>
+      <li><a href="./timeline-test.html">timeline</a></li>
       </ul>
     </section>
     <section>
       <h2>Canvas Components</h2>
       <ul>
-        <li>
-          <a href="./canvas">canvas</a>
-        </li>
+      <li><a href="./canvas-test.html">canvas</a></li>
       </ul>
     </section>
     <section>
       <h2>Charts & Data Viz</h2>
       <ul>
-        <li>
-          <a href="./chart">chart</a>
-        </li>
+      <li><a href="./chart-test.html">chart</a></li>
       </ul>
     </section>
     <section>
       <h2>Modals, Alerts & Feedback</h2>
       <ul>
-        <li>
-          <a href="./bottom-navigation">bottom navigation</a>
-        </li>
-        <li>
-          <a href="./dialog">dialog</a>
-        </li>
-        <li>
-          <a href="./drawer">drawer</a>
-        </li>
-        <li>
-          <a href="./error-summary">error summary</a>
-        </li>
-        <li>
-          <a href="./modal">modal</a>
-        </li>
-        <li>
-          <a href="./toast">toast</a>
-        </li>
+      <li><a href="./bottom-navigation-test.html">bottom navigation</a></li>
+      <li><a href="./dialog-test.html">dialog</a></li>
+      <li><a href="./drawer-test.html">drawer</a></li>
+      <li><a href="./error-summary-test.html">error summary</a></li>
+      <li><a href="./modal-test.html">modal</a></li>
+      <li><a href="./toast-test.html">toast</a></li>
       </ul>
     </section>
     <section>
       <h2>Navigation</h2>
       <ul>
-        <li>
-          <a href="./action-list">action list</a>
-        </li>
-        <li>
-          <a href="./anchor">anchor</a>
-        </li>
-        <li>
-          <a href="./breadcrumb">breadcrumb</a>
-        </li>
-        <li>
-          <a href="./link">link</a>
-        </li>
-        <li>
-          <a href="./menu">menu</a>
-        </li>
-        <li>
-          <a href="./nav">nav</a>
-        </li>
-        <li>
-          <a href="./pagination">pagination</a>
-        </li>
-        <li>
-          <a href="./quick-actions">quick actions</a>
-        </li>
-        <li>
-          <a href="./tab">tab</a>
-        </li>
-        <li>
-          <a href="./toolbar">toolbar</a>
-        </li>
+      <li><a href="./action-list-test.html">action list</a></li>
+      <li><a href="./anchor-test.html">anchor</a></li>
+      <li><a href="./breadcrumb-test.html">breadcrumb</a></li>
+      <li><a href="./link-test.html">link</a></li>
+      <li><a href="./menu-test.html">menu</a></li>
+      <li><a href="./nav-test.html">nav</a></li>
+      <li><a href="./pagination-test.html">pagination</a></li>
+      <li><a href="./quick-actions-test.html">quick actions</a></li>
+      <li><a href="./tab-test.html">tab</a></li>
+      <li><a href="./toolbar-test.html">toolbar</a></li>
       </ul>
     </section>
     <section>
       <h2>Collections & Data Display</h2>
       <ul>
-        <li>
-          <a href="./data-grid">data grid</a>
-        </li>
-        <li>
-          <a href="./filter-bar">filter bar</a>
-        </li>
-        <li>
-          <a href="./grid">grid</a>
-        </li>
-        <li>
-          <a href="./key-value-list">key-value list</a>
-        </li>
-        <li>
-          <a href="./list">list</a>
-        </li>
-        <li>
-          <a href="./table">table</a>
-        </li>
-        <li>
-          <a href="./tree-view">tree view</a>
-        </li>
-        <li>
-          <a href="./virtual-list">virtual list</a>
-        </li>
+      <li><a href="./data-grid-test.html">data grid</a></li>
+      <li><a href="./filter-bar-test.html">filter bar</a></li>
+      <li><a href="./grid-test.html">grid</a></li>
+      <li><a href="./key-value-list-test.html">key-value list</a></li>
+      <li><a href="./list-test.html">list</a></li>
+      <li><a href="./table-test.html">table</a></li>
+      <li><a href="./tree-view-test.html">tree view</a></li>
+      <li><a href="./virtual-list-test.html">virtual list</a></li>
       </ul>
     </section>
     <section>
       <h2>Media & Visual</h2>
       <ul>
-        <li>
-          <a href="./avatar">avatar</a>
-        </li>
-        <li>
-          <a href="./carousel">carousel</a>
-        </li>
-        <li>
-          <a href="./icon">icon</a>
-        </li>
-        <li>
-          <a href="./image">image</a>
-        </li>
-        <li>
-          <a href="./map">map</a>
-        </li>
-        <li>
-          <a href="./video-player">video player</a>
-        </li>
+      <li><a href="./avatar-test.html">avatar</a></li>
+      <li><a href="./carousel-test.html">carousel</a></li>
+      <li><a href="./icon-test.html">icon</a></li>
+      <li><a href="./image-test.html">image</a></li>
+      <li><a href="./map-test.html">map</a></li>
+      <li><a href="./video-player-test.html">video player</a></li>
       </ul>
     </section>
-  </div>
-
-      </div>
-    </main>
-
-    <footer></footer>
-    <script type="module" src="./dist/index.js"></script>
-    <script type="module">
-      const themeSelect = document.getElementById('themeSelect');
-      const themeStatus = document.getElementById('themeStatus');
-      const themeStylesheet = document.getElementById('themeStylesheet');
-
-      function applyTheme(theme) {
-        themeStylesheet.href = './themes/' + theme + '.css';
-        document
-          .documentElement
-          .setAttribute('data-bf-theme', theme);
-        themeStatus.textContent = 'Active: ' + theme;
-      }
-
-      themeSelect.addEventListener('change', () => applyTheme(themeSelect.value),);
-      applyTheme('system');
-    </script>
+    </div>
     <script src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js" charset="UTF-8"></script>
     <script>
-      PayPal
-        .Donation
-        .Button({
-          env: 'production',
-          hosted_button_id: 'LKTM22NDQDVW6',
-          image: {
-            src: 'https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif',
-            alt: 'Donate with PayPal button',
-            title: 'PayPal - The safer, easier way to pay online!'
-          }
-        })
-        .render('#donate-button');
+      PayPal.Donation.Button({
+        env:'production',
+        hosted_button_id:'LKTM22NDQDVW6',
+        image: {
+          src:'https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif',
+          alt:'Donate with PayPal button',
+          title:'PayPal - The safer, easier way to pay online!',
+        }
+      }).render('#donate-button');
     </script>
   </body>
 </html>

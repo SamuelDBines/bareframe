@@ -11,7 +11,7 @@ const BfCombobox$1 = /*@__PURE__*/ proxyCustomElement(class BfCombobox extends H
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'e2a4be965d2d3fc5a3f047c3def2722a0dcf182b' }, h("div", { key: '8277a0fcd39fd12afae0cd84634238adc68821e4', class: "root", part: "root" }, h("slot", { key: '89dab5b219ba22fcd9f6c1046a8829fd1fad0600' }))));
+        return (h(Host, { key: '9bec26ae0a5bb96100a50c4678c2e8daa5e50b26' }, h("div", { key: 'a6cddd8dd910da9812650d35c1f14e725083d7de', class: "root", part: "root" }, h("slot", { key: '770b3b9740f20577c589224794e300427719c0ce' }))));
     }
     static get style() { return bfComboboxCss(); }
 }, [257, "bf-combobox"]);

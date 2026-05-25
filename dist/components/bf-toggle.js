@@ -68,11 +68,18 @@ const BfToggle$1 = /*@__PURE__*/ proxyCustomElement(class BfToggle extends H {
         }
         const variant = this.variant();
         root.setAttribute('data-variant', variant);
-        root.setAttribute('aria-pressed', String(this.checked));
-        root.setAttribute('role', 'switch');
-        root.setAttribute('aria-checked', String(this.checked));
         root.disabled = this.el.hasAttribute('disabled');
         root.classList.toggle('is-checked', this.checked);
+        if (variant === 'switch') {
+            root.setAttribute('role', 'switch');
+            root.setAttribute('aria-checked', String(this.checked));
+            root.removeAttribute('aria-pressed');
+        }
+        else {
+            root.setAttribute('role', 'button');
+            root.setAttribute('aria-pressed', String(this.checked));
+            root.removeAttribute('aria-checked');
+        }
         const labelAttr = this.el.getAttribute('label');
         if (labelAttr) {
             root.setAttribute('aria-label', labelAttr);
@@ -83,7 +90,7 @@ const BfToggle$1 = /*@__PURE__*/ proxyCustomElement(class BfToggle extends H {
         text.hidden = variant === 'switch' && !(this.el.textContent || '').trim();
     }
     render() {
-        return (h(Host, { key: 'b333ee9819595d3fd88be22aab7344d8a2f2b1a5' }, h("button", { key: '5489e3a452ecfe09124611167cec46871688868b', class: "root", part: "root", type: "button", onClick: this.onClick }, h("span", { key: '73615ce76c5c494fe45f6848018c39a5e873440e', class: "track", part: "track" }, h("span", { key: 'e3c9b91251b8dfff5ddfb1349aa2f84183c44be0', class: "thumb", part: "thumb" })), h("span", { key: '2def954163460dd24e769354a4e623012c92f15b', class: "text", part: "text" }, h("slot", { key: '1ad28071dad3fa850db71be970c406b3731bcc7f' })))));
+        return (h(Host, { key: '35486ee03aa0e52a424276b5b8ea57085afbf7d9' }, h("button", { key: '223c6c1049db1112189e30b3ad395ccf31ac08d5', class: "root", part: "root", type: "button", onClick: this.onClick }, h("span", { key: '01b1fdbd08fc514a737b09d98c62849810de78bf', class: "track", part: "track" }, h("span", { key: '34ef0a135be7cd01d0d6be2a4026292755ca8896', class: "thumb", part: "thumb" })), h("span", { key: '19d817c3f5e7442f950b01f6d08c2cde57e8d581', class: "text", part: "text" }, h("slot", { key: 'e7e01ea32bac2da0619599fda22771f439eddf74' })))));
     }
     static get watchers() { return {
         "attrLabel": [{

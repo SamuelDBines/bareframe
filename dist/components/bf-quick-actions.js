@@ -11,7 +11,7 @@ const BfQuickActions$1 = /*@__PURE__*/ proxyCustomElement(class BfQuickActions e
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '0bd58200707bf24913135db9e30e1a721eee65f9' }, h("div", { key: 'd11acd9a845f6b2811ab1cfdbff06bb09d2ac8cb', class: "root", part: "root" }, h("slot", { key: '275f856dbfeef98f2acc8e4aba29fc3de297bbff' }))));
+        return (h(Host, { key: '6e912140f2320c94671dced3189a2708a4e2b823' }, h("div", { key: 'ea35d29bd26f77e2945dd80b3e8036798f6abd26', class: "root", part: "root" }, h("slot", { key: '7acc85c02560a1ae950f1da9396fa4eeb1b0912e' }))));
     }
     static get style() { return bfQuickActionsCss(); }
 }, [257, "bf-quick-actions"]);

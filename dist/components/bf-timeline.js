@@ -11,7 +11,7 @@ const BfTimeline$1 = /*@__PURE__*/ proxyCustomElement(class BfTimeline extends H
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '9ed907402843ec1555bd1b7bc92208990f8d1c12' }, h("div", { key: '5feacfe174691f10395a8ceb7fa4e01a29332b70', class: "root", part: "root" }, h("slot", { key: '26e2ee8b28fd75bfb7201b6f449ec65523d00c8e' }))));
+        return (h(Host, { key: '62d66bcad5ed69a2a80defa4d65981c02d905c30' }, h("div", { key: '31d73117b0d9e78cdac47b0f905b45ee25310ea7', class: "root", part: "root" }, h("slot", { key: 'e6b21d1ec0dac632fd831910a6fa0127876f1108' }))));
     }
     static get style() { return bfTimelineCss(); }
 }, [257, "bf-timeline"]);

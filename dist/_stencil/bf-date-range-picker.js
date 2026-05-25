@@ -11,7 +11,7 @@ const BfDateRangePicker$1 = /*@__PURE__*/ proxyCustomElement(class BfDateRangePi
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '7425574ded91be329a3cfb839303a2e3e9075fe6' }, h("div", { key: 'f71d76c379a103b082c225a3b753168d0128bffe', class: "root", part: "root" }, h("slot", { key: '6de4110c916579fdae01f67a711d276a50738098' }))));
+        return (h(Host, { key: '2170fea4167e6c6b2032c8332ec79f2b8bac8ba1' }, h("div", { key: 'a5bbc4d72ca4082c34dcd57490a09839e6f67dbb', class: "root", part: "root" }, h("slot", { key: '5b3678fcdf1f8d1871cc5ef70996c958360fd7d1' }))));
     }
     static get style() { return bfDateRangePickerCss(); }
 }, [257, "bf-date-range-picker"]);

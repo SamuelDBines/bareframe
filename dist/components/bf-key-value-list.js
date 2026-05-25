@@ -11,7 +11,7 @@ const BfKeyValueList$1 = /*@__PURE__*/ proxyCustomElement(class BfKeyValueList e
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'eacd9ed4cb4747140f2b68ce6f8b707cd6f410f1' }, h("div", { key: '2d1d025e3c002b6e00ec5b74d23fcf8f12719ceb', class: "root", part: "root" }, h("slot", { key: '7d9225ba0db22a0d52334224e02918cf533c46e5' }))));
+        return (h(Host, { key: '71a58ef4946665036d7a045249b89bcbb804e3d9' }, h("div", { key: '805990e06a12e723abe835f1fca8d341fee2fecd', class: "root", part: "root" }, h("slot", { key: '802a75674b2e68d75921babf588b174b551453e7' }))));
     }
     static get style() { return bfKeyValueListCss(); }
 }, [257, "bf-key-value-list"]);

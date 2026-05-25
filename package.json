@@ -1,9 +1,12 @@
 {
   "description": "Lightweight, dependency-free Web Components for reusable app UI.",
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@playwright/test": "^1.60.0",
     "@stencil/core": "^4.43.4",
     "@types/node": "^25.6.0",
     "esbuild": "^0.27.3",
+    "sirv-cli": "^3.0.1",
     "typescript": "^5.9.2"
   },
   "exports": {
@@ -19,6 +22,11 @@
     "dist",
     "README.md"
   ],
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
   "keywords": [
     "web-components",
     "custom-elements",
@@ -46,6 +54,9 @@
     "serve:complex": "cd public && ln -sfn ../themes themes && ln -sfn ../dist dist && python3 -m http.server 8088",
     "smoke:pages": "node ./scripts/smoke-pages.mjs",
     "studio": "pnpm run build && pnpm --prefix showcase dev",
+    "validate:theme": "node ./scripts/validate-theme.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium",
     "showcase:dev": "pnpm --prefix showcase dev",
     "showcase:build": "pnpm run build && pnpm --prefix showcase build",
     "typecheck": "tsc --noEmit",

@@ -74,10 +74,10 @@ const BfButton$1 = /*@__PURE__*/ proxyCustomElement(class BfButton extends H {
     }
     render() {
         const variant = this.variant || 'primary';
-        return (h(Host, { key: '132711f233a12d074dcbebfd28755c754e3593a5' }, h("button", { key: '5739bd4e9aeae79311ad872f81181e7f1d52fb8a', part: "button", type: "button", class: {
+        return (h(Host, { key: 'eac7d2b4344d6ef07eceb259ef2875b91fec9dbe' }, h("button", { key: '290c7c449f3bab9b451dba1be7d2371312cf3c25', part: "button", type: "button", class: {
                 [variant]: true,
                 'is-selected': this.selected,
-            }, disabled: this.disabled, "aria-pressed": String(this.selected), onClick: this.handleClick }, this.label, h("slot", { key: 'fcc3a826359a9b1069a8157465b98dc367bda87b' }))));
+            }, disabled: this.disabled, "aria-pressed": String(this.selected), onClick: this.handleClick }, this.label, h("slot", { key: 'ae4373c9b26e891100d5f713e978bbd7674732a1' }))));
     }
     static get style() { return bfButtonCss(); }
 }, [769, "bf-button", {

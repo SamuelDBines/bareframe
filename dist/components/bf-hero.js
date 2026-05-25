@@ -11,7 +11,7 @@ const BfHero$1 = /*@__PURE__*/ proxyCustomElement(class BfHero extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '8f3b081e76e3403ee2e9e74f4f80ba2c02fd666f' }, h("div", { key: '15c351f6f09e3f9628101b537737167f5c50566e', class: "root", part: "root" }, h("slot", { key: '7016ccc5ac8777dcadc8cdd3eb115d616ca0415f' }))));
+        return (h(Host, { key: 'd89c9e898e1256374e40ea35371edc05d8466076' }, h("div", { key: '939a7380e31b3624a3d1d331184e15d9759fa5e7', class: "root", part: "root" }, h("slot", { key: 'becda2efbe339a51306beb5f3c99b13ef95dc74e' }))));
     }
     static get style() { return bfHeroCss(); }
 }, [257, "bf-hero"]);

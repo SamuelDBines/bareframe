@@ -1,8 +1,7 @@
 {
-  "generatedAt": "2026-05-23T18:10:54.746Z",
-  "componentCount": 75,
+  "generatedAt": "2026-05-25T17:22:20.213Z",
+  "componentCount": 74,
   "components": [
-    "aatest",
     "accordion",
     "action-list",
     "anchor",

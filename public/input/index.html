@@ -4,14 +4,12 @@
 
 
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css"/>
-    <title>
-      
-    </title>
+    <title>Bareframe · bf-input</title>
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -74,7 +72,7 @@
     </style>
   </head>
   <body>
-    <main>
+    <main data-demo-root>
       <div class="layout">
         <header class="header">
 
@@ -140,12 +138,9 @@
 
 <section class="panel">
   <div class="stack">
-    <p class="hint">This page is ready for a dedicated
-      Input
-      demo in the new layout.</p>
-    <p>
-      <a href="/">Back to component index</a>
-    </p>
+    <bf-input type="email" placeholder="name@company.com" label="Email"></bf-input>
+    <bf-input type="password" placeholder="Password" label="Password"></bf-input>
+    <bf-input type="number" min="0" max="100" step="5" value="35" label="Quantity"></bf-input>
   </div>
 </section>
 

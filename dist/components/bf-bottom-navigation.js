@@ -11,7 +11,7 @@ const BfBottomNavigation$1 = /*@__PURE__*/ proxyCustomElement(class BfBottomNavi
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '42502441ffcc6ec7be366ab2a0db371587fc35e4' }, h("div", { key: 'b03e5a4d88ce4e4c6e48d8fdd228c40aa4640a0a', class: "root", part: "root" }, h("slot", { key: 'e28de1bcba3d77750e4d461fc1dcb29d63d7b845' }))));
+        return (h(Host, { key: '2b70cdaa8758a899b0aea73f98c8d7d0e88c2886' }, h("div", { key: 'bdea6e6945427a81621de4529a14b6b48b017f69', class: "root", part: "root" }, h("slot", { key: '77f8a9755d8e441b0312b1afdcd8f07fbda9c151' }))));
     }
     static get style() { return bfBottomNavigationCss(); }
 }, [257, "bf-bottom-navigation"]);

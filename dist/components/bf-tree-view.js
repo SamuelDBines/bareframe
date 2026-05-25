@@ -11,7 +11,7 @@ const BfTreeView$1 = /*@__PURE__*/ proxyCustomElement(class BfTreeView extends H
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'fda0da87d487ddb86fb29e2e0adaa7c2df83e2d6' }, h("div", { key: '9dc6b6e5d9f8422c06165bc6e64ef0bd44ec0ded', class: "root", part: "root" }, h("slot", { key: '69804513da7917ea1e83938b2041df57ecdf110c' }))));
+        return (h(Host, { key: '2fdb582e9d2ac1369a09518a1a304ee604f8b1b1' }, h("div", { key: '60996ffbbdd018df0e7d4f23ec9d1ead18ae79b6', class: "root", part: "root" }, h("slot", { key: 'de73501aafb9749bf73ee7bc2bf566676611e1a8' }))));
     }
     static get style() { return bfTreeViewCss(); }
 }, [257, "bf-tree-view"]);

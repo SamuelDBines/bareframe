@@ -11,7 +11,7 @@ const BfDataGrid$1 = /*@__PURE__*/ proxyCustomElement(class BfDataGrid extends H
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '0ebc3e751b8bc399765a4a7a6cb3e4b938ab840f' }, h("div", { key: '72cc5f04cd0f5e96116349c7ec222014610b5cf8', class: "root", part: "root" }, h("slot", { key: 'ca278d05437032c86ef4668311920440cc3c0f77' }))));
+        return (h(Host, { key: '6cebcda78796fbcf2f64d4f9ed87b5db83840243' }, h("div", { key: '791a5a98a048c7c7d4c93694f57d8ad0ff627552', class: "root", part: "root" }, h("slot", { key: '3bdfd731859810dfc1d9893f505bbc9bc8d828ed' }))));
     }
     static get style() { return bfDataGridCss(); }
 }, [257, "bf-data-grid"]);

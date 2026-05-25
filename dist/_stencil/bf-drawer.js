@@ -87,7 +87,7 @@ const BfDrawer$1 = /*@__PURE__*/ proxyCustomElement(class BfDrawer extends H {
         this.syncRoot();
     }
     render() {
-        return (h(Host, { key: 'a826e6b8d6cb199a263cebc30eecbffa278a8bf9' }, h("div", { key: '044fb3bd50ef9123e9be5821c5be180b110f6d42', class: "root", part: "root" }, h("div", { key: '0b05601a224d69f3c935c577454548f05b08d954', class: "backdrop", part: "backdrop", onClick: this.onBackdropClick }), h("div", { key: '8772aadc936babd426af6fed05d4c523f5e76625', class: "panel", part: "panel" }, h("slot", { key: '9f185d32a1f28819e7a02bd1d4093c6f74a816b8' })))));
+        return (h(Host, { key: '202d2c62867b0aaa357b0aba009b6d6965fb945f' }, h("div", { key: 'e9592fe739e5cf15b1f9b20dafdc695fee4d9924', class: "root", part: "root" }, h("div", { key: '1c0f393cf51b890be0b294ad4376b9850eccdb25', class: "backdrop", part: "backdrop", onClick: this.onBackdropClick }), h("div", { key: '6dfb8750d3f75d4c44369f4f49ee4b17125a222b', class: "panel", part: "panel" }, h("slot", { key: 'f7652c606fbb76b72e91638669b53a539aedf595' })))));
     }
     static get style() { return bfDrawerCss(); }
 }, [257, "bf-drawer", {

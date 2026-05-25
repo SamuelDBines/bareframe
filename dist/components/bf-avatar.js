@@ -43,7 +43,7 @@ const BfAvatar$1 = /*@__PURE__*/ proxyCustomElement(class BfAvatar extends H {
         const size = this.el.getAttribute('size') || 'md';
         const status = this.el.getAttribute('status') || '';
         const showStatus = status && ['online', 'away', 'busy', 'offline'].includes(status);
-        return (h(Host, { key: '86fe594fabd2a216cbfc6962fcc4f3076974db5a' }, h("div", { key: 'cbb6c5d349041b02cb19f1a3b647a0ed86122178', class: `root size-${size}`, part: "root" }, src ? (h("img", { class: { image: true, hidden: this.imgHidden }, part: "image", src: src, alt: alt, onError: this.onImgError })) : (''), h("div", { key: '2d298f1dcc9fc9b2b205c728e3003ba3ee111da6', class: { fallback: true, hidden: Boolean(src) && !this.imgHidden }, part: "fallback", "aria-label": alt }, initials || '?'), showStatus ? h("span", { class: `status ${status}`, part: "status" }) : '')));
+        return (h(Host, { key: 'a96b5fbed21416512eca785443e7429638907a97' }, h("div", { key: '77ab15ea5bedd85b33c2d6c8e0e7f5ab63fc5650', class: `root size-${size}`, part: "root" }, src ? (h("img", { class: { image: true, hidden: this.imgHidden }, part: "image", src: src, alt: alt, onError: this.onImgError })) : (''), h("div", { key: 'bef20453f364398dc68dfc4b8cc02ead05ee1570', class: { fallback: true, hidden: Boolean(src) && !this.imgHidden }, part: "fallback", "aria-label": alt }, initials || '?'), showStatus ? h("span", { class: `status ${status}`, part: "status" }) : '')));
     }
     static get style() { return bfAvatarCss(); }
 }, [513, "bf-avatar", {

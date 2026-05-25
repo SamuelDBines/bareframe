@@ -11,7 +11,7 @@ const BfOtpInput$1 = /*@__PURE__*/ proxyCustomElement(class BfOtpInput extends H
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '14cda2f6b4da7929d1ba3275f426ae674fdd5724' }, h("div", { key: 'd60b1e61d15917ef641e49129565de32d33ee18c', class: "root", part: "root" }, h("slot", { key: 'df6a89aa2623051b653038a2c44f1dbf991ace43' }))));
+        return (h(Host, { key: 'd55855b74c5b1c29a1ab76c5711ba6946a060978' }, h("div", { key: '0e2a27f50e301a3f33f17adbb0c6ae0c58bd118e', class: "root", part: "root" }, h("slot", { key: 'd9ded8b3dc4ccb931bea4770e70c1fe5d6c3cb17' }))));
     }
     static get style() { return bfOtpInputCss(); }
 }, [257, "bf-otp-input"]);

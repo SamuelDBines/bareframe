@@ -4,14 +4,12 @@
 
 
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css"/>
-    <title>
-      
-    </title>
+    <title>Bareframe · bf-select</title>
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -74,7 +72,7 @@
     </style>
   </head>
   <body>
-    <main>
+    <main data-demo-root>
       <div class="layout">
         <header class="header">
 
@@ -140,12 +138,18 @@
 
 <section class="panel">
   <div class="stack">
-    <p class="hint">This page is ready for a dedicated
-      Select
-      demo in the new layout.</p>
-    <p>
-      <a href="/">Back to component index</a>
-    </p>
+    <bf-select label="Plan">
+      <option value="">Choose a plan</option>
+      <option value="starter">Starter</option>
+      <option value="pro" selected>Pro</option>
+      <option value="enterprise">Enterprise</option>
+    </bf-select>
+    <bf-select label="Team Access" multi="2">
+      <option value="analytics" selected>Analytics</option>
+      <option value="billing">Billing</option>
+      <option value="deployments" selected>Deployments</option>
+      <option value="settings">Settings</option>
+    </bf-select>
   </div>
 </section>
 

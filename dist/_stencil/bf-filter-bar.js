@@ -11,7 +11,7 @@ const BfFilterBar$1 = /*@__PURE__*/ proxyCustomElement(class BfFilterBar extends
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '7691c031164ca6e503c36fd733c64cf5013879b9' }, h("div", { key: 'f198feaec9800b933ce7ded726cb43dd5abefdbb', class: "root", part: "root" }, h("slot", { key: '2658bacd2ae5fa9dccc4d749bdaf124f822dbc20' }))));
+        return (h(Host, { key: '1a636c68cf834dc4fe14574d626711ad23e953cf' }, h("div", { key: '6dd651d375039507c55ae1884332c13a6e44e9e6', class: "root", part: "root" }, h("slot", { key: 'af44f3d722c89a69af2c5b69185d5bf275d90888' }))));
     }
     static get style() { return bfFilterBarCss(); }
 }, [257, "bf-filter-bar"]);

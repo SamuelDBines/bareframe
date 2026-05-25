@@ -12,7 +12,7 @@ const BfHeader$1 = /*@__PURE__*/ proxyCustomElement(class BfHeader extends H {
     }
     sticky = false;
     render() {
-        return (h(Host, { key: 'ade101c5af649e0ed8f0f8593dc1064abe67f27d' }, h("header", { key: '25e73f4a9d0cc1dee95a1ac248c0f499be6f79e6', class: "root", part: "root" }, h("slot", { key: 'b5e86ee30e99d7f6f3dc69412e93fc6eee085b8a' }))));
+        return (h(Host, { key: 'f62ffe0bda3c4deef4494160496dc4589169594f' }, h("header", { key: '00ad934beabe2f457164ad074dd45469aee496fd', class: "root", part: "root" }, h("slot", { key: '4055e047985e831f612284403aa591fed399ac17' }))));
     }
     static get style() { return bfHeaderCss(); }
 }, [769, "bf-header", {

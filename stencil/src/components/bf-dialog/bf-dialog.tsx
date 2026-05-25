@@ -13,6 +13,24 @@ export class BfDialog {
 		this.observer = new MutationObserver(() => this.syncRoot());
 		this.observer.observe(this.el, {
 			attributes: true,
+			attributeFilter: [
+				'id',
+				'open',
+				'variant',
+				'position',
+				'label',
+				'persistent',
+				'sheet',
+				'bottom-sheet',
+				'popover',
+				'tooltip',
+				'panel',
+				'left',
+				'right',
+				'top',
+				'bottom',
+				'center',
+			],
 		});
 	}
 

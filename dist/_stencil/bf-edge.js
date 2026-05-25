@@ -40,7 +40,7 @@ const BfEdge$1 = /*@__PURE__*/ proxyCustomElement(class BfEdge extends H {
         }
     }
     render() {
-        return (h(Host, { key: 'cf2d17e9784639190363f1c078e16085425bb07d' }, h("div", { key: '43eb73645930c378d2627283327a92167ea48b76', class: "root", part: "root" }, h("slot", { key: '2b4e25884dbe6fa60716001ae77cdfcea7072818' }))));
+        return (h(Host, { key: '1886f1d5431f8b57acdd6d30cf4d36aeb739170b' }, h("div", { key: 'd639aa0d46f22fc27892e4ed8d5d160db066cf75', class: "root", part: "root" }, h("slot", { key: '7dbdce6a8459acc75fc66a6a433424a1c3643a07' }))));
     }
     static get style() { return bfEdgeCss(); }
 }, [257, "bf-edge"]);

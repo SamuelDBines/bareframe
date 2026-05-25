@@ -82,7 +82,7 @@ const BfTab$1 = /*@__PURE__*/ proxyCustomElement(class BfTab extends H {
         button.classList.toggle('is-selected', this.selected);
     }
     render() {
-        return (h(Host, { key: 'fdf393532e0e9846a3c0395f80c3c84a50270783' }, h("button", { key: '4c0ad86d07987394511bafce7028283aea60799b', class: "root", part: "root", type: "button", onClick: this.onClick }, h("slot", { key: '63a399a86492f1b134ca4d39a1446184e2317b5d' }))));
+        return (h(Host, { key: '6220dd9772b87c2508fe2e55b853bda03c4178d3' }, h("button", { key: '16752462a379276cf7535490078be54e773098cf', class: "root", part: "root", type: "button", onClick: this.onClick }, h("slot", { key: 'dd7b7773dba5bfb22a67ac0f2aa9cbc021cc0de7' }))));
     }
     static get watchers() { return {
         "attrLabel": [{

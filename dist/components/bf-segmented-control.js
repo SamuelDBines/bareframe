@@ -11,7 +11,7 @@ const BfSegmentedControl$1 = /*@__PURE__*/ proxyCustomElement(class BfSegmentedC
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '4c9aff45dd877c130a26d9bcd1d833e75b554b61' }, h("div", { key: '6e547568705137799606cf580f585c04a046bbe2', class: "root", part: "root" }, h("slot", { key: '9f22c961dc6d18f7cefdbb3f44fec25ec202e9d4' }))));
+        return (h(Host, { key: '5141d8c3a87eba98c72b91626c20ae751746a41f' }, h("div", { key: '4e07f241d0f5ba0e7120cddc7b28e3d704c6b3ac', class: "root", part: "root" }, h("slot", { key: 'c528a480c7209b31a19dd13b0381318adc7f0914' }))));
     }
     static get style() { return bfSegmentedControlCss(); }
 }, [257, "bf-segmented-control"]);

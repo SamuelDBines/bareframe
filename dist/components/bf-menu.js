@@ -161,7 +161,7 @@ const BfMenu$1 = /*@__PURE__*/ proxyCustomElement(class BfMenu extends H {
         this.sync();
     }
     render() {
-        return (h(Host, { key: '566459d9a96e926bf61a36546bad7a24604f6ef8' }, h("div", { key: '5605b5063829f5be87f2ccfebbfbc1dfc8685e41', class: "root", part: "root" }, h("slot", { key: '1db6ad6bbf32d4ffdcb964fab2f7a85066d53a82', onSlotchange: this.onSlotChange }))));
+        return (h(Host, { key: 'bdfe19e864270866fafcaca3cdb7b73d6a193aca' }, h("div", { key: '31b06baac142fd50e551c7eb964bd8ebf1903943', class: "root", part: "root" }, h("slot", { key: '80561f05140510e91ef15485445ea159a0d81ceb', onSlotchange: this.onSlotChange }))));
     }
     static get style() { return bfMenuCss(); }
 }, [257, "bf-menu", {

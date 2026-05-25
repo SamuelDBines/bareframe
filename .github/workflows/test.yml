@@ -1,0 +1,65 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: test-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck (root TS)
+        run: pnpm run typecheck
+
+      - name: Build library + sync public/dist and public/themes
+        run: pnpm run build
+
+      - name: Validate example theme (minimal contract)
+        run: pnpm run validate:theme -- examples/theme-mybrand.css
+
+      - name: Validate system theme (minimal contract)
+        run: pnpm run validate:theme -- themes/system.css
+
+      - name: Generate static example pages + versions metadata
+        run: |
+          node ./scripts/generate-examples.mjs
+          node ./scripts/generate-versions.mjs
+
+      - name: Re-sync artifact into public after generators
+        run: pnpm run prep-pages
+
+      - name: Build showcase (Component Studio → public/showcase/)
+        working-directory: showcase
+        run: pnpm install --frozen-lockfile && pnpm exec vite build
+
+      - name: Install Playwright (Chromium)
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: pnpm exec playwright test
+        env:
+          CI: true

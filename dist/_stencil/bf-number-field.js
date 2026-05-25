@@ -11,7 +11,7 @@ const BfNumberField$1 = /*@__PURE__*/ proxyCustomElement(class BfNumberField ext
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '599ead90a16dcb65eea2b80566377c33e4bfa088' }, h("div", { key: 'a295e9b7f20c79b0b2b0a7a8de5544d8b6d3f87c', class: "root", part: "root" }, h("slot", { key: '849f2bc5c6077ba66d8220ac79fc85b3f917f093' }))));
+        return (h(Host, { key: '53fac1a288dd8ab3624f349bd214c0ae81d4645c' }, h("div", { key: '722eee0a1a12a27a337b142872a0f15089c9a738', class: "root", part: "root" }, h("slot", { key: '81fce98f013d1200ef01d8e86cd530e0eb68443b' }))));
     }
     static get style() { return bfNumberFieldCss(); }
 }, [257, "bf-number-field"]);

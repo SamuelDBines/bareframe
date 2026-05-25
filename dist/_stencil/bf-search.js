@@ -11,7 +11,7 @@ const BfSearch$1 = /*@__PURE__*/ proxyCustomElement(class BfSearch extends H {
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '2fe18816c20b6d3e9d682a2a9065e1935c41e1d3' }, h("div", { key: 'dff0301d45ad4537d611ce63c7ea4acd54a7e84e', class: "root", part: "root" }, h("slot", { key: '0db89f19b138219ce48789aba127502bdc39f53f' }))));
+        return (h(Host, { key: '2c1aef489c93eef159530d1866d6ea4d294d94b1' }, h("div", { key: '32833d97ed8cd78c7442f8c7a046fcec2d6adc7b', class: "root", part: "root" }, h("slot", { key: '50ac3769c5ea50fab623c384722d0b6acdfd2198' }))));
     }
     static get style() { return bfSearchCss(); }
 }, [257, "bf-search"]);

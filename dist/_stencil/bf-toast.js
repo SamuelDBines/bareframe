@@ -17,6 +17,26 @@ const BfToast$1 = /*@__PURE__*/ proxyCustomElement(class BfToast extends H {
         this.observer = new MutationObserver(() => this.sync());
         this.observer.observe(this.el, {
             attributes: true,
+            attributeFilter: [
+                'open',
+                'variant',
+                'type',
+                'duration',
+                'alert',
+                'notification',
+                'snackbar',
+                'banner',
+                'success',
+                'warning',
+                'error',
+                'info',
+                'position',
+                'top',
+                'bottom',
+                'left',
+                'right',
+                'center',
+            ],
         });
     }
     disconnectedCallback() {
@@ -233,7 +253,7 @@ const BfToast$1 = /*@__PURE__*/ proxyCustomElement(class BfToast extends H {
         this.sync();
     }
     render() {
-        return (h(Host, { key: '144ee0bd6a794545ee5eaf2eb8a47c52cdad25eb' }, h("div", { key: 'c5ea1c10c22a534076d50cc5751cd85cb9221a91', class: "root", part: "root" }, h("span", { key: '8d0817a1919b1d5675fc2de9333d15acddd4f837', class: "icon", part: "icon", "aria-hidden": "true" }), h("div", { key: 'b6543ae6fdd16333e8d3f9f3b2c165ab1cce7c77', class: "content", part: "content" }, h("slot", { key: '065d21f25a050f83a0eb416f108288b6a53015f5' })), h("button", { key: 'd6c7e3a151723dc920f14c958a176cdb98a69b52', class: "close", part: "close", type: "button", "aria-label": "Close", onClick: this.onCloseClick }, "\u00D7"))));
+        return (h(Host, { key: '670ae2805c85ead17775e28ec2dd61d8c80b1dfc' }, h("div", { key: '8f3e072dc2d80a89f8835325ecf91b2cb9799c6e', class: "root", part: "root" }, h("span", { key: '5c2b94958b2fb883dd9c77372086f6fa5bc7696d', class: "icon", part: "icon", "aria-hidden": "true" }), h("div", { key: '80aeddc96969fcd9850b54b0f6ff9783f90d796f', class: "content", part: "content" }, h("slot", { key: '18c2c14abc07f8b777baecf9e59c0e7ceb1b4702' })), h("button", { key: 'b07817f2f6dd3a3deb94854971e71983bde9710c', class: "close", part: "close", type: "button", "aria-label": "Close", onClick: this.onCloseClick }, "\u00D7"))));
     }
     static get style() { return bfToastCss(); }
 }, [257, "bf-toast", {

@@ -11,7 +11,7 @@ const BfCountdown$1 = /*@__PURE__*/ proxyCustomElement(class BfCountdown extends
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: 'cfaa1b0f9629ab9c0d790c372a6c19e7d8f02dd7' }, h("div", { key: 'cd60cc6f4a131998c33adcac03faed67db62ca3f', class: "root", part: "root" }, h("slot", { key: '601d5344744e72bdb13d5963bbf190e0b6d58886' }))));
+        return (h(Host, { key: '495508523173f3c7c57cd8bfceb43a69cac9968d' }, h("div", { key: 'f39de33e6a1ab50624dafd16a2e356016204209a', class: "root", part: "root" }, h("slot", { key: '432eacfac210996f6798557efffb239debb34422' }))));
     }
     static get style() { return bfCountdownCss(); }
 }, [257, "bf-countdown"]);

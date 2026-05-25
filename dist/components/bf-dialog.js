@@ -16,6 +16,24 @@ const BfDialog$1 = /*@__PURE__*/ proxyCustomElement(class BfDialog extends H {
         this.observer = new MutationObserver(() => this.syncRoot());
         this.observer.observe(this.el, {
             attributes: true,
+            attributeFilter: [
+                'id',
+                'open',
+                'variant',
+                'position',
+                'label',
+                'persistent',
+                'sheet',
+                'bottom-sheet',
+                'popover',
+                'tooltip',
+                'panel',
+                'left',
+                'right',
+                'top',
+                'bottom',
+                'center',
+            ],
         });
     }
     disconnectedCallback() {
@@ -141,7 +159,7 @@ const BfDialog$1 = /*@__PURE__*/ proxyCustomElement(class BfDialog extends H {
         this.syncRoot();
     }
     render() {
-        return (h(Host, { key: 'e5fc44f1b0624864421e27b77750656713c51de5' }, h("div", { key: 'f7e83a1dc53f02e9d8028af5ba039d52403ff3e0', class: "root", part: "root" }, h("div", { key: '9f7440a5555591c80b879fd18125c164422ea0b1', class: "backdrop", part: "backdrop", onClick: this.onBackdropClick }), h("div", { key: 'bf2e4d14f4ef156e1f4e48f09b13a0d306356f6a', class: "panel", part: "panel" }, h("slot", { key: '6ca90122734dc973d8ede0dd090082b809dddb96' })))));
+        return (h(Host, { key: '5daf38258b5f9557678c6f0b71d2d0edb2690747' }, h("div", { key: 'd1231726abb869f0bbeaa56606c37e02ec84cc4e', class: "root", part: "root" }, h("div", { key: 'db7cbb2c1579ec68def2bebc2062b93cca5d33bc', class: "backdrop", part: "backdrop", onClick: this.onBackdropClick }), h("div", { key: 'd8aac0a93c4cc79321ff2de15016f50b9fedd851', class: "panel", part: "panel" }, h("slot", { key: '6748949357855a9e51c958bfad674c9d9056a968' })))));
     }
     static get style() { return bfDialogCss(); }
 }, [257, "bf-dialog", {

@@ -31,7 +31,7 @@ const BfDivider$1 = /*@__PURE__*/ proxyCustomElement(class BfDivider extends H {
     }
     render() {
         const orient = this.vertical ? 'vertical' : 'horizontal';
-        return (h(Host, { key: 'abba6c260fd9fb516da8b09e0f8d50e345949485' }, h("div", { key: '81c386d38ebec9ccadaf5f4facb2e2810413d42c', class: "root", part: "root", "data-orientation": orient }, h("slot", { key: '5b3f5418170d2400dfc8950cbfb1893235dd023c' }))));
+        return (h(Host, { key: 'dac3891855b8e299b137ae4f54f10e50564eb421' }, h("div", { key: '66cf73c5ba8838fc93924d96925e12af09a1fa4d', class: "root", part: "root", "data-orientation": orient }, h("slot", { key: 'ed73eb34ef6deb3b877a837510fcf72cb5201730' }))));
     }
     static get watchers() { return {
         "thickness": [{

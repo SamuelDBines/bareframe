@@ -11,7 +11,7 @@ const BfSplitButton$1 = /*@__PURE__*/ proxyCustomElement(class BfSplitButton ext
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '24d749b06440303f878e09060987505d248bdedc' }, h("div", { key: '4fef1e7a44b674d131e7dbd03fa0df60d44c23b6', class: "root", part: "root" }, h("slot", { key: 'f7773b81c5010ee9040cf2815aaaf1fba7b5edc8' }))));
+        return (h(Host, { key: 'bc381f013bb3bf4acc64c664ef086d3e07786888' }, h("div", { key: 'fb90062a1eb161a5a216633272a95fa72a0d3abb', class: "root", part: "root" }, h("slot", { key: 'a48ba87572b838c6e927a2d78c9071a5ca3c61e3' }))));
     }
     static get style() { return bfSplitButtonCss(); }
 }, [257, "bf-split-button"]);

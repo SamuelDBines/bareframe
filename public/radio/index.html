@@ -4,14 +4,12 @@
 
 
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link id="themeStylesheet" rel="stylesheet" href="../themes/system.css"/>
-    <title>
-      
-    </title>
+    <title>Bareframe · bf-radio</title>
     <style>
       body {
         font-family: 'Avenir Next', 'Segoe UI', sans-serif;
@@ -74,7 +72,7 @@
     </style>
   </head>
   <body>
-    <main>
+    <main data-demo-root>
       <div class="layout">
         <header class="header">
 
@@ -139,13 +137,9 @@
 </section>
 
 <section class="panel">
-  <div class="stack">
-    <p class="hint">This page is ready for a dedicated
-      Radio
-      demo in the new layout.</p>
-    <p>
-      <a href="/">Back to component index</a>
-    </p>
+  <div class="demo-row">
+    <bf-radio group="plan" value="monthly" checked label="Monthly">Monthly</bf-radio>
+    <bf-radio group="plan" value="annual" label="Annual">Annual</bf-radio>
   </div>
 </section>
 

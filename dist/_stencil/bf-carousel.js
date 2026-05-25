@@ -11,7 +11,7 @@ const BfCarousel$1 = /*@__PURE__*/ proxyCustomElement(class BfCarousel extends H
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '5ae1c83b8b44632f6e6f35bda255e5ce50d605a0' }, h("div", { key: 'd5f25ac85a93960d720dbb4a37ece0943c517dcf', class: "root", part: "root" }, h("slot", { key: '193530e691c93e5a007ae73ba19e05ab4614c2cf' }))));
+        return (h(Host, { key: '06355dd22213579ebc05d9dd09f7f71a51fde3a3' }, h("div", { key: '4e29f05c9b20adb355420f18230c8c65ecd46dea', class: "root", part: "root" }, h("slot", { key: 'f3999c08cfc9dc44deb2eedb64cb13d5b73b88ba' }))));
     }
     static get style() { return bfCarouselCss(); }
 }, [257, "bf-carousel"]);

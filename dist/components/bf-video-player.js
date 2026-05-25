@@ -11,7 +11,7 @@ const BfVideoPlayer$1 = /*@__PURE__*/ proxyCustomElement(class BfVideoPlayer ext
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '81419556ddfb42db0612fb581b7aed31b6eb3165' }, h("div", { key: 'f514c2f2a6584f493c6dc4e5d22c35271171e874', class: "root", part: "root" }, h("slot", { key: '8614f59db2b75655302ac83711e05e86f4c7f1d8' }))));
+        return (h(Host, { key: '7053f456879dbd7f0e5931c39cf31cd399aaf671' }, h("div", { key: 'ccba99207fbc11102fa5f0507e8f1aac10a95e11', class: "root", part: "root" }, h("slot", { key: '5a7657728faacd48298914acddb170b5fe62eaf2' }))));
     }
     static get style() { return bfVideoPlayerCss(); }
 }, [257, "bf-video-player"]);

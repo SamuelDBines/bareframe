@@ -3,3 +3,7 @@ npm-debug.log*
 public/src
 public/themes
 public/dist
+/test-results/
+/playwright-report/
+/blob-report/
+

@@ -11,7 +11,7 @@ const BfPagination$1 = /*@__PURE__*/ proxyCustomElement(class BfPagination exten
         this.__attachShadow();
     }
     render() {
-        return (h(Host, { key: '3489297f6809d59b7ae189eef1699291fbe92201' }, h("div", { key: 'adbb1a8191941368543c0c3d89923fb952ea6f38', class: "root", part: "root" }, h("slot", { key: '0297dc5d89414c829d968cfd5d75c0541704e63c' }))));
+        return (h(Host, { key: '5303b71228fa927d229e99d6b095e91ade5cbb02' }, h("div", { key: 'abc878891de8213ad0c9a95cd6075b6d9a09cc34', class: "root", part: "root" }, h("slot", { key: '566b015a7ed9123f5c67f5e659df96f8bb042a76' }))));
     }
     static get style() { return bfPaginationCss(); }
 }, [257, "bf-pagination"]);

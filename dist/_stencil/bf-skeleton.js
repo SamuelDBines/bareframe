@@ -75,7 +75,7 @@ const BfSkeleton$1 = /*@__PURE__*/ proxyCustomElement(class BfSkeleton extends H
         this.apply();
     }
     render() {
-        return (h(Host, { key: 'a7ab9b0d75f7b5c492efef933f36a4f56cc5615e' }, h("div", { key: '337872cda407cdaeed5394bbd32425388b7f0f90', class: "root", part: "root" }, h("div", { key: 'e07a52fd50610e6853ad95764ea2da13eb77e89a', class: "lines", part: "lines" }), h("slot", { key: '7780eaa44f8e7766e14ac8d0889697fff3ad65e4' }))));
+        return (h(Host, { key: 'a643bb7b988d4b3e873019fd1bd158109abeee96' }, h("div", { key: '400d160bc9090457e29e7d0c7dacd69c76c0b137', class: "root", part: "root" }, h("div", { key: 'ea6af369b750d1eff1e372ceaff3838f98480191', class: "lines", part: "lines" }), h("slot", { key: 'aff7afd72560232040c0e47782903605432b79d4' }))));
     }
     static get style() { return bfSkeletonCss(); }
 }, [257, "bf-skeleton"]);

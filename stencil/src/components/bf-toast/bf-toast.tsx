@@ -14,6 +14,26 @@ export class BfToast {
 		this.observer = new MutationObserver(() => this.sync());
 		this.observer.observe(this.el, {
 			attributes: true,
+			attributeFilter: [
+				'open',
+				'variant',
+				'type',
+				'duration',
+				'alert',
+				'notification',
+				'snackbar',
+				'banner',
+				'success',
+				'warning',
+				'error',
+				'info',
+				'position',
+				'top',
+				'bottom',
+				'left',
+				'right',
+				'center',
+			],
 		});
 	}
 

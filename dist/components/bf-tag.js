@@ -47,7 +47,7 @@ const BfTag$1 = /*@__PURE__*/ proxyCustomElement(class BfTag extends H {
         this.applyRoot();
     }
     render() {
-        return (h(Host, { key: 'f6efa304958f4ad2ea66a6e873046cc9162743f6' }, h("div", { key: '86d2fd5bad1b5268b042104274e83df50d815962', class: "root", part: "root", "data-variant": "tag", "data-size": "md" }, h("slot", { key: '9a0ebb636c5799665afb013a5d45ea5cf7865b9c' }))));
+        return (h(Host, { key: 'dc28edc02da6b3b78624dd40d56a2ad439918f19' }, h("div", { key: '8c6fb57ee3b73649838faebcf6ece972bab07009', class: "root", part: "root", "data-variant": "tag", "data-size": "md" }, h("slot", { key: '09e9b3d34278808477949d5dbb5349858978a080' }))));
     }
     static get style() { return bfTagCss(); }
 }, [257, "bf-tag"]);

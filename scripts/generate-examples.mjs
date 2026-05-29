@@ -1,3 +1,4 @@
+import { categoryForSlug } from './component-categories.mjs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,89 +14,6 @@ function slugify(value) {
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-+|-+$/g, '');
-}
-
-function categoryForSlug(slug) {
-	const tokens = slug.split('-');
-	const has = (value) => tokens.includes(value);
-	const hasAny = (...values) => values.some((value) => has(value));
-
-	if (hasAny('code', 'editor', 'textarea')) {
-		return 'editor';
-	}
-	if (hasAny('calendar', 'date', 'countdown', 'timeline')) {
-		return 'date-time';
-	}
-	if (
-		hasAny(
-			'input',
-			'field',
-			'textarea',
-			'search',
-			'select',
-			'combobox',
-			'autocomplete',
-			'color',
-			'number',
-			'otp',
-			'checkbox',
-			'radio',
-			'switch',
-			'slider',
-			'rating',
-			'range',
-			'toggle',
-			'upload',
-			'file',
-			'range',
-		)
-	) {
-		return 'forms';
-	}
-	if (
-		hasAny(
-			'chart',
-			'graph',
-			'heatmap',
-			'sparkline',
-			'gantt',
-			'treemap',
-			'gauge',
-			'donut',
-			'pie',
-		)
-	) {
-		return 'charts';
-	}
-	if (
-		hasAny(
-			'dialog',
-			'modal',
-			'drawer',
-			'sheet',
-			'bottom',
-			'popover',
-			'tooltip',
-			'toast',
-			'expanded',
-			'error',
-		)
-	) {
-		return 'feedback';
-	}
-	if (hasAny('nav', 'menu', 'breadcrumb', 'tab', 'pagination', 'toolbar', 'action', 'quick', 'navigation', 'link', 'anchor')) {
-		return 'navigation';
-	}
-	if (hasAny('table', 'data', 'grid', 'list', 'tree', 'key', 'value', 'filter')) {
-		return 'collections';
-	}
-	if (hasAny('canvas')) {
-		return 'canvas';
-	}
-	if (hasAny('avatar', 'icon', 'image', 'video', 'carousel', 'map')) {
-		return 'media';
-	}
-	return 'base';
 }
 
 function relatedByCategory(category) {

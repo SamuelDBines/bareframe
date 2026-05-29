@@ -14,7 +14,7 @@ Links:
 - GitHub Pages examples: https://samueldbines.github.io/bareframe/
 - **[Component Studio](https://samueldbines.github.io/bareframe/showcase/)** (after deploy)
 
-**Docs:** [Vision](docs/VISION.md) · [Roadmap](docs/ROADMAP.md) · [Themes](docs/THEMES.md) · [Component contract](docs/COMPONENT-CONTRACT.md) · [Tiering](docs/TIERING.md) · [Testing](docs/TESTING.md)
+**Docs:** [Vision](docs/VISION.md) · [Roadmap](docs/ROADMAP.md) · [Themes](docs/THEMES.md) · [Component contract](docs/COMPONENT-CONTRACT.md) · [Tiering](docs/TIERING.md) · [Studio fidelity](docs/STUDIO-FIDELITY.md) · [Testing](docs/TESTING.md)
 
 ![Tests](https://github.com/SamuelDBines/bareframe/actions/workflows/test.yml/badge.svg)
 
@@ -24,12 +24,12 @@ Links:
 
 Published files ship from **`dist/`** at the repo root (this matches `"exports"` in `package.json`). **`pnpm run build`** compiles into `dist/` and then runs **`scripts/prep-pages.mjs`**, which copies `dist/` and `themes/` into **`public/dist`** and **`public/themes`** and rewrites demo HTML to use `./` / `../` prefixes so asset URLs are never rooted at `https://<user>.github.io/themes/...` when the site lives under **`https://<user>.github.io/<repo>/`** (GitHub project Pages).
 
-Workflow **Deploy Public To Pages** (`.github/workflows/deploy-pages.yml`) uses **pnpm**, runs **`pnpm run build`**, regenerates examples, runs **`prep-pages`** again after generators, builds the Vite showcase into **`public/showcase/`**, and uploads **`public`**.
+Workflow **Deploy Public To Pages** (`.github/workflows/deploy-pages.yml`) uses **pnpm**, runs the same steps as **`pnpm run build:pages`** (library build, example generators, showcase Vite build, smoke checks), and uploads **`public`**.
 
-Sanity-check locally after a build:
+Sanity-check locally before pushing Pages-facing changes:
 
 ```bash
-pnpm run smoke:pages
+pnpm run build:pages
 ```
 
 ## Package Usage

@@ -114,7 +114,7 @@ body {
 
 .bf-view-tabs {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 0.35rem;
 	padding: 0.2rem;
 	border-radius: var(--st-radius-md);
@@ -463,6 +463,188 @@ body {
 	border: 0;
 	display: block;
 	background: var(--bf-theme-surface-2, #f8fafc);
+}
+
+.bf-split-stage {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.bf-split-stage--customize {
+	display: grid;
+	grid-template-columns: minmax(0, 1.22fr) minmax(268px, 0.92fr);
+	gap: 1rem;
+	align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+	.bf-split-stage--customize {
+		grid-template-columns: 1fr;
+	}
+}
+
+.bf-customize-pane {
+	border-radius: var(--st-radius-lg);
+	border: 1px solid var(--st-border);
+	background: rgba(0, 0, 0, 0.2);
+	box-shadow: var(--st-shadow);
+	padding: 0.95rem 1rem 1.1rem;
+	max-height: min(78vh, 920px);
+	overflow: auto;
+}
+
+.bf-customize-block + .bf-customize-block {
+	margin-top: 1.1rem;
+	padding-top: 1rem;
+	border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.bf-customize-h {
+	margin: 0 0 0.45rem;
+	font-size: 0.74rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: var(--st-muted);
+}
+
+.bf-customize-p {
+	margin: 0 0 0.52rem;
+	font-size: 0.8rem;
+	color: var(--st-muted);
+	line-height: 1.5;
+}
+
+.bf-customize-recipe:not([hidden]) {
+	margin: 0 0 0.52rem;
+	font-size: 0.8rem;
+	color: var(--st-accent);
+	line-height: 1.45;
+}
+
+.bf-customize-pre {
+	margin: 0;
+	padding: 0.55rem 0.62rem;
+	border-radius: var(--st-radius-md);
+	border: 1px solid rgba(148, 163, 184, 0.14);
+	background: rgba(0, 0, 0, 0.35);
+	font-family:
+		'IBM Plex Mono',
+		ui-monospace,
+		monospace;
+	font-size: 0.74rem;
+	line-height: 1.42;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	color: var(--st-text);
+}
+
+.bf-customize-ul {
+	margin: 0;
+	padding-left: 1.15rem;
+	font-size: 0.8rem;
+	color: var(--st-muted);
+	line-height: 1.45;
+}
+
+.bf-customize-textarea {
+	width: 100%;
+	margin: 0;
+	padding: 0.55rem 0.62rem;
+	border-radius: var(--st-radius-md);
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	background: rgba(0, 0, 0, 0.32);
+	font-family:
+		'IBM Plex Mono',
+		ui-monospace,
+		monospace;
+	font-size: 0.74rem;
+	line-height: 1.42;
+	resize: vertical;
+	min-height: 7.5rem;
+	color: var(--st-text);
+}
+
+.bf-customize-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.45rem;
+	margin-top: 0.52rem;
+}
+
+.bf-customize-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 0.42rem;
+}
+
+.bf-customize-muted {
+	margin: 0;
+	font-size: 0.8rem;
+	opacity: 0.85;
+	font-style: italic;
+	color: var(--st-muted);
+}
+
+.bf-btn-primary {
+	border-color: rgba(124, 179, 255, 0.45);
+	background: var(--st-accent-soft);
+	color: var(--st-accent);
+}
+
+.bf-customize-event-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.42rem;
+}
+
+.bf-customize-event-head .bf-customize-h {
+	margin: 0;
+}
+
+.bf-event-log {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 0.45rem;
+	max-height: 220px;
+	overflow: auto;
+}
+
+.bf-event-item {
+	border-radius: 8px;
+	border: 1px solid rgba(148, 163, 184, 0.12);
+	background: rgba(0, 0, 0, 0.18);
+	padding: 0.42rem 0.48rem;
+	font-size: 0.74rem;
+}
+
+.bf-ev-time {
+	font-family: 'IBM Plex Mono', ui-monospace, monospace;
+	color: var(--st-muted);
+	font-size: 0.72rem;
+}
+
+.bf-ev-kind {
+	font-family: 'IBM Plex Mono', ui-monospace, monospace;
+	color: var(--st-accent);
+}
+
+.bf-ev-detail {
+	margin: 0.32rem 0 0;
+	font-family:
+		'IBM Plex Mono',
+		ui-monospace,
+		monospace;
+	font-size: 0.7rem;
+	white-space: pre-wrap;
+	word-break: break-word;
+	color: var(--st-text);
 }
 
 .bf-studio-error {

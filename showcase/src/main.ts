@@ -1,4 +1,5 @@
 import './showcase.css';
+import customizeRecipes from '../meta/customize.json';
 
 type Manifest = {
 	components?: string[];
@@ -32,6 +33,164 @@ const ESSENTIAL_SLUGS = [
 ] as const;
 
 const FALLBACK_DEMOS = ['button', 'input', 'card'];
+
+type CustomizeRecipe = {
+	eventsDoc: string[];
+	actionIds: string[];
+	cssHint: string;
+};
+
+const CUSTOMIZE_META = customizeRecipes as Record<string, CustomizeRecipe>;
+
+type ShowcaseStudioPayload = {
+	generatedAt: string;
+	categories: Record<string, string>;
+	parts: Record<string, string[]>;
+};
+
+type ShowcaseStudioFetch =
+	| { ok: true; categories: Record<string, string>; parts: Record<string, string[]> }
+	| { ok: false; categories: Record<string, never>; parts: Record<string, never> };
+
+/** Capture listeners for documented composed events (extend as APIs grow). */
+const KNOWN_COMPOSED_BF_EVENTS = [
+	'bf-change',
+	'bf-click',
+	'bf-close',
+	'bf-open',
+	'bf-select',
+	'bf-input',
+	'bf-focus',
+	'bf-blur',
+	'bf-accordion-toggle',
+] as const;
+
+const STYLE_OVERRIDE_ID = 'bfStudioUserOverrides';
+
+const CATEGORY_ORDER = [
+	'forms',
+	'navigation',
+	'feedback',
+	'charts',
+	'collections',
+	'date-time',
+	'editor',
+	'media',
+	'canvas',
+	'base',
+] as const;
+
+const CATEGORY_LABELS: Record<string, string> = {
+	forms: 'Forms',
+	navigation: 'Navigation',
+	feedback: 'Feedback & overlays',
+	charts: 'Charts & data viz',
+	collections: 'Collections & data display',
+	'date-time': 'Date & time',
+	editor: 'Editor',
+	media: 'Media',
+	canvas: 'Canvas',
+	base: 'Base',
+};
+
+const ACTION_LABELS: Record<string, string> = {
+	'click-first-bf-button': 'Dispatch click on first demo bf-button',
+	'focus-first-bf-input': 'Focus first bf-input inside demo root',
+	'click-open-modal-primary': 'Click the demo “Open modal” control (#btnOpen)',
+	'click-first-sheet-trigger': 'Click first bf-button that opens a sheet/panel',
+	'click-first-close': 'Click first toast dismiss (×)',
+	'click-first-bf-checkbox': 'Activate first bf-checkbox',
+	'click-first-bf-radio': 'Activate second bf-radio in group',
+	'click-first-bf-toggle': 'Toggle first bf-toggle control',
+};
+
+const CUSTOMIZE_ACTIONS: Record<string, (doc: Document) => void> = {
+	'click-first-bf-button'(doc) {
+		const el = doc.querySelector('[data-demo-root] bf-button');
+		el?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+	},
+	'focus-first-bf-input'(doc) {
+		const inner = doc
+			.querySelector('[data-demo-root] bf-input')
+			?.shadowRoot?.querySelector('input, textarea');
+		if (inner instanceof HTMLElement) {
+			inner.focus();
+		}
+	},
+	'click-open-modal-primary'(doc) {
+		doc.querySelector<HTMLElement>('[data-demo-root] #btnOpen')?.click();
+	},
+	'click-first-sheet-trigger'(doc) {
+		doc.querySelector<HTMLElement>('[data-demo-root] bf-button[bf-open]')?.click();
+	},
+	'click-first-close'(doc) {
+		const toast = doc.querySelector('[data-demo-root] bf-toast');
+		const btn = toast?.shadowRoot?.querySelector('button.close');
+		(btn as HTMLElement | undefined)?.click();
+	},
+	'click-first-bf-checkbox'(doc) {
+		doc.querySelector<HTMLElement>('[data-demo-root] bf-checkbox')?.click();
+	},
+	'click-first-bf-radio'(doc) {
+		const radios = [...doc.querySelectorAll('[data-demo-root] bf-radio')];
+		(radios[1] ?? radios[0])?.dispatchEvent(
+			new MouseEvent('click', { bubbles: true, composed: true }),
+		);
+	},
+	'click-first-bf-toggle'(doc) {
+		doc.querySelector<HTMLElement>('[data-demo-root] bf-toggle')?.click();
+	},
+};
+
+const OVERRIDE_TEXTAREA_DEFAULT = `:root {
+  --bf-theme-button-primary-bg: #6366f1;
+}
+`;
+
+function stringifyDetail(d: unknown): string {
+	if (d === undefined) return '—';
+	if (typeof d === 'string') return d;
+	try {
+		return JSON.stringify(d);
+	} catch {
+		return String(d);
+	}
+}
+
+const EVENT_LOG_CAP = 56;
+
+/** Capture composed bf-* CustomEvents inside the iframe and inject demo-local CSS snippet. */
+function attachCustomizeIframeBridge(
+	iframe: HTMLIFrameElement,
+	getCssSnippet: () => string,
+	onLine: (type: string, detail: unknown) => void,
+): () => void {
+	const doc = iframe.contentDocument;
+	if (!doc?.documentElement) {
+		onLine('[studio]', 'Cannot access iframe document (cross-origin or not ready)');
+		return () => {};
+	}
+	const handler = (e: Event) => {
+		if (!(e instanceof CustomEvent)) return;
+		onLine(e.type, e.detail);
+	};
+	for (const ev of KNOWN_COMPOSED_BF_EVENTS) {
+		doc.addEventListener(ev, handler, true);
+	}
+	let el = doc.getElementById(STYLE_OVERRIDE_ID) as HTMLStyleElement | null;
+	if (!el) {
+		el = doc.createElement('style');
+		el.id = STYLE_OVERRIDE_ID;
+		doc.head.appendChild(el);
+	}
+	el.textContent = getCssSnippet();
+	return () => {
+		for (const ev of KNOWN_COMPOSED_BF_EVENTS) {
+			doc.removeEventListener(ev, handler, true);
+		}
+		doc.getElementById(STYLE_OVERRIDE_ID)?.remove();
+	};
+}
 
 const THEME_OPTIONS = [
 	'system',
@@ -87,6 +246,18 @@ async function fetchTokensManifest(
 	const tokens = Array.isArray(data.tokens) ? data.tokens : [];
 	const byTheme = data.byTheme && typeof data.byTheme === 'object' ? data.byTheme : {};
 	return { ok: true, tokens, byTheme };
+}
+
+async function fetchShowcaseStudio(base: URL): Promise<ShowcaseStudioFetch> {
+	const url = new URL('dist/showcase-studio.json', base);
+	const res = await fetch(url.href);
+	if (!res.ok) {
+		return { ok: false, categories: {}, parts: {} };
+	}
+	const data = (await res.json()) as ShowcaseStudioPayload;
+	const categories = data.categories && typeof data.categories === 'object' ? data.categories : {};
+	const parts = data.parts && typeof data.parts === 'object' ? data.parts : {};
+	return { ok: true, categories, parts };
 }
 
 function showcasePublicBase(): URL {
@@ -212,7 +383,13 @@ function renderTokensTable(
 	});
 }
 
-function render(app: HTMLElement, components: string[], tokenData: TokensManifestResolved, base: URL) {
+function render(
+	app: HTMLElement,
+	components: string[],
+	tokenData: TokensManifestResolved,
+	base: URL,
+	studioMeta: ShowcaseStudioFetch,
+) {
 	const list = components.length ? components : FALLBACK_DEMOS;
 	const slugCount = components.length;
 
@@ -226,6 +403,7 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
       </div>
       <div class="bf-view-tabs" role="tablist" aria-label="Studio mode">
         <button type="button" class="bf-tab active" role="tab" aria-selected="true" id="bfTabComponents">Components</button>
+        <button type="button" class="bf-tab" role="tab" aria-selected="false" id="bfTabCustomize">Customize</button>
         <button type="button" class="bf-tab" role="tab" aria-selected="false" id="bfTabTokens">CSS variables</button>
       </div>
       <div class="bf-stats">
@@ -274,10 +452,44 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 						}
           <div id="bfTokensMount"></div>
         </div>
-        <div class="bf-preview-frame-wrap" id="bfPreviewWrap">
-          <iframe class="bf-preview-frame" id="bfFrame" title="Component demo preview"></iframe>
+        <div class="bf-split-stage" id="bfSplitStage">
+          <div class="bf-preview-frame-wrap" id="bfPreviewWrap">
+            <iframe class="bf-preview-frame" id="bfFrame" title="Component demo preview"></iframe>
+          </div>
+          <aside class="bf-customize-pane" id="bfCustomizePane" hidden aria-label="Customize and inspect events">
+            <div class="bf-customize-block">
+              <h3 class="bf-customize-h">Shadow and ::part()</h3>
+              <p class="bf-customize-recipe" id="bfCustomizeRecipeHint" hidden></p>
+              <p class="bf-customize-p">Primitives use Shadow DOM. Global <code>--bf-theme-*</code> cascade from <code>:root</code>. For internals use host + <code>::part()</code> with the exported part names listed below.</p>
+              <pre class="bf-customize-pre" id="bfCustomizeParts">—</pre>
+            </div>
+            <div class="bf-customize-block">
+              <h3 class="bf-customize-h">Documented events</h3>
+              <ul class="bf-customize-ul" id="bfCustomizeEventsDoc"></ul>
+            </div>
+            <div class="bf-customize-block">
+              <h3 class="bf-customize-h">CSS overrides</h3>
+              <p class="bf-customize-p">Snippet is injected into the preview as <code>&lt;style id="${STYLE_OVERRIDE_ID}"&gt;</code>.</p>
+              <textarea class="bf-customize-textarea" id="bfCustomizeCss" spellcheck="false" rows="7"></textarea>
+              <div class="bf-customize-row">
+                <button type="button" class="bf-btn bf-btn-primary" id="bfCustomizeApply">Apply overrides</button>
+                <button type="button" class="bf-btn" id="bfCustomizeReset">Reset snippet</button>
+              </div>
+            </div>
+            <div class="bf-customize-block">
+              <h3 class="bf-customize-h">Actions</h3>
+              <p class="bf-customize-p">Sandboxed helpers for demos with metadata (<code>showcase/meta/customize.json</code>).</p>
+              <div class="bf-customize-actions" id="bfCustomizeActions"></div>
+            </div>
+            <div class="bf-customize-block">
+              <div class="bf-customize-event-head">
+                <h3 class="bf-customize-h">Live composed events</h3>
+                <button type="button" class="bf-btn" id="bfCustomizeEventClear">Clear</button>
+              </div>
+              <ul class="bf-event-log" id="bfCustomizeEventLog"></ul>
+            </div>
+          </aside>
         </div>
-      </div>
     </div>
     </div>`;
 
@@ -289,9 +501,20 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 	const bfReload = document.getElementById('bfReload') as HTMLButtonElement;
 	const bfOpenBlank = document.getElementById('bfOpenBlank') as HTMLAnchorElement;
 	const bfTabComponents = document.getElementById('bfTabComponents') as HTMLButtonElement;
+	const bfTabCustomize = document.getElementById('bfTabCustomize') as HTMLButtonElement;
 	const bfTabTokens = document.getElementById('bfTabTokens') as HTMLButtonElement;
+	const bfSplitStage = document.getElementById('bfSplitStage') as HTMLElement | null;
 	const bfTokensPane = document.getElementById('bfTokensPane') as HTMLElement;
 	const bfPreviewWrap = document.getElementById('bfPreviewWrap') as HTMLElement;
+	const bfCustomizePane = document.getElementById('bfCustomizePane') as HTMLElement | null;
+	const bfCustomizeParts = document.getElementById('bfCustomizeParts') as HTMLElement | null;
+	const bfCustomizeEventsDoc = document.getElementById('bfCustomizeEventsDoc') as HTMLElement | null;
+	const bfCustomizeCss = document.getElementById('bfCustomizeCss') as HTMLTextAreaElement | null;
+	const bfCustomizeApply = document.getElementById('bfCustomizeApply') as HTMLButtonElement | null;
+	const bfCustomizeReset = document.getElementById('bfCustomizeReset') as HTMLButtonElement | null;
+	const bfCustomizeActions = document.getElementById('bfCustomizeActions') as HTMLElement | null;
+	const bfCustomizeEventLog = document.getElementById('bfCustomizeEventLog') as HTMLElement | null;
+	const bfCustomizeEventClear = document.getElementById('bfCustomizeEventClear') as HTMLButtonElement | null;
 	const bfToolbar = document.querySelector('.bf-toolbar') as HTMLElement | null;
 	const bfSearchWrap = document.getElementById('bfSearchWrap') as HTMLElement;
 	const bfTokenSearchWrap = document.getElementById('bfTokenSearchWrap') as HTMLElement;
@@ -307,9 +530,20 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 		!bfReload ||
 		!bfOpenBlank ||
 		!bfTabComponents ||
+		!bfTabCustomize ||
 		!bfTabTokens ||
 		!bfTokensPane ||
+		!bfSplitStage ||
 		!bfPreviewWrap ||
+		!bfCustomizePane ||
+		!bfCustomizeParts ||
+		!bfCustomizeEventsDoc ||
+		!bfCustomizeCss ||
+		!bfCustomizeApply ||
+		!bfCustomizeReset ||
+		!bfCustomizeActions ||
+		!bfCustomizeEventLog ||
+		!bfCustomizeEventClear ||
 		!bfSearchWrap ||
 		!bfTokenSearchWrap ||
 		!bfTokenSearch ||
@@ -324,34 +558,90 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 	const tokensMount = bfTokensMount;
 
 	let demoTheme = 'system';
-	let viewMode: 'components' | 'tokens' = 'components';
+	let viewMode: 'components' | 'tokens' | 'customize' = 'components';
+
+	let customizeBridgeTeardown: (() => void) | undefined;
+	type LogRow = { kind: string; detail: unknown; t: number };
+	const customizeLogRows: LogRow[] = [];
+
+	bfCustomizeCss.value = OVERRIDE_TEXTAREA_DEFAULT.trim();
 
 	for (const t of uniqueThemes()) {
 		bfTheme.appendChild(optionFor(t));
 	}
 	bfTheme.value = demoTheme;
 
-	function setViewMode(mode: 'components' | 'tokens') {
+	function redrawCustomizeEventLog() {
+		bfCustomizeEventLog!.replaceChildren();
+		const frag = document.createDocumentFragment();
+		for (const row of customizeLogRows) {
+			const li = document.createElement('li');
+			li.className = 'bf-event-item';
+			const timeEl = document.createElement('span');
+			timeEl.className = 'bf-ev-time';
+			timeEl.textContent = new Date(row.t).toISOString().slice(11, 23);
+			const kindEl = document.createElement('code');
+			kindEl.className = 'bf-ev-kind';
+			kindEl.textContent = row.kind;
+			const detailEl = document.createElement('pre');
+			detailEl.className = 'bf-ev-detail';
+			detailEl.textContent = stringifyDetail(row.detail);
+			li.append(timeEl, document.createTextNode(' '), kindEl, detailEl);
+			frag.appendChild(li);
+		}
+		bfCustomizeEventLog!.appendChild(frag);
+	}
+
+	function pushCustomizeLog(kind: string, detail: unknown) {
+		customizeLogRows.push({ kind, detail, t: Date.now() });
+		if (customizeLogRows.length > EVENT_LOG_CAP) {
+			customizeLogRows.splice(0, customizeLogRows.length - EVENT_LOG_CAP);
+		}
+		redrawCustomizeEventLog();
+	}
+
+	function bindCustomizeIframeIfNeeded() {
+		customizeBridgeTeardown?.();
+		customizeBridgeTeardown = undefined;
+		if (viewMode !== 'customize') return;
+		customizeBridgeTeardown = attachCustomizeIframeBridge(
+			bfIframe,
+			() => bfCustomizeCss!.value,
+			pushCustomizeLog,
+		);
+	}
+
+	function setViewMode(mode: 'components' | 'tokens' | 'customize') {
 		viewMode = mode;
-		const isComponents = mode === 'components';
-		bfTabComponents.classList.toggle('active', isComponents);
-		bfTabComponents.setAttribute('aria-selected', String(isComponents));
-		bfTabTokens.classList.toggle('active', !isComponents);
-		bfTabTokens.setAttribute('aria-selected', String(!isComponents));
+		const rails = mode === 'components' || mode === 'customize';
 
-		bfSearchWrap.hidden = !isComponents;
-		bfTokenSearchWrap.hidden = isComponents;
-		nav.style.display = isComponents ? '' : 'none';
+		bfTabComponents.classList.toggle('active', mode === 'components');
+		bfTabComponents.setAttribute('aria-selected', String(mode === 'components'));
+		bfTabCustomize.classList.toggle('active', mode === 'customize');
+		bfTabCustomize.setAttribute('aria-selected', String(mode === 'customize'));
+		bfTabTokens.classList.toggle('active', mode === 'tokens');
+		bfTabTokens.setAttribute('aria-selected', String(mode === 'tokens'));
 
-		toolbar.style.display = isComponents ? '' : 'none';
-		bfTokensPane.hidden = isComponents;
-		bfPreviewWrap.hidden = !isComponents;
+		bfSearchWrap.hidden = !rails;
+		bfTokenSearchWrap.hidden = mode !== 'tokens';
+		nav.style.display = rails ? '' : 'none';
 
-		if (isComponents) {
-			detachStudioThemeLink();
-		} else {
+		toolbar.style.display = rails ? '' : 'none';
+		bfTokensPane.hidden = mode !== 'tokens';
+		bfSplitStage!.hidden = mode === 'tokens';
+		bfCustomizePane!.hidden = mode !== 'customize';
+		bfSplitStage!.classList.toggle('bf-split-stage--customize', mode === 'customize');
+
+		customizeBridgeTeardown?.();
+		customizeBridgeTeardown = undefined;
+
+		if (mode === 'tokens') {
 			attachStudioThemeLink(demoTheme, base);
 			refreshTokenTable();
+		} else {
+			detachStudioThemeLink();
+			syncDemoDocumentTheme(demoTheme, base, bfIframe.contentWindow);
+			bindCustomizeIframeIfNeeded();
 		}
 	}
 
@@ -360,8 +650,78 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 		renderTokensTable(tokensMount, tokenData.tokens, bfTokenSearch.value);
 	}
 
+	function refreshCustomizeSidebar(slug: string) {
+		const recipe = CUSTOMIZE_META[slug];
+		const hintEl = document.getElementById('bfCustomizeRecipeHint') as HTMLElement | null;
+		if (hintEl) {
+			hintEl.textContent = recipe?.cssHint ?? '';
+			hintEl.hidden = !recipe?.cssHint;
+		}
+		const parts = studioMeta.ok ? (studioMeta.parts[slug] ?? []) : [];
+		const host = slugToTag(slug);
+		bfCustomizeParts!.textContent = parts.length
+			? parts.map((p) => `${host}::part(${p})`).join('\n')
+			: '— (no exported ::part detected in TSX)';
+		bfCustomizeEventsDoc!.replaceChildren();
+		const events = recipe?.eventsDoc ?? [];
+		if (!events.length) {
+			const li = document.createElement('li');
+			li.textContent =
+				'No curated list yet for this slug — inspect the component source or docs/COMPONENT-CONTRACT.md.';
+			bfCustomizeEventsDoc!.appendChild(li);
+		} else {
+			for (const line of events) {
+				const li = document.createElement('li');
+				li.textContent = line;
+				bfCustomizeEventsDoc!.appendChild(li);
+			}
+		}
+		bfCustomizeActions!.replaceChildren();
+		const ids = recipe?.actionIds ?? [];
+		if (!ids.length) {
+			const p = document.createElement('p');
+			p.className = 'bf-customize-muted';
+			p.textContent =
+				'No canned actions for this slug — interact with the preview directly.';
+			bfCustomizeActions!.appendChild(p);
+			return;
+		}
+		for (const id of ids) {
+			const fn = CUSTOMIZE_ACTIONS[id];
+			if (!fn) continue;
+			const btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'bf-btn';
+			btn.textContent = ACTION_LABELS[id] ?? id;
+			btn.addEventListener('click', () => {
+				const doc = bfIframe.contentDocument;
+				if (!doc) {
+					pushCustomizeLog('[studio]', 'No iframe document');
+					return;
+				}
+				try {
+					fn(doc);
+				} catch (e: unknown) {
+					pushCustomizeLog('[action-error]', String(e instanceof Error ? e.message : e));
+				}
+			});
+			bfCustomizeActions!.appendChild(btn);
+		}
+	}
+
 	bfTabComponents.addEventListener('click', () => setViewMode('components'));
+	bfTabCustomize.addEventListener('click', () => setViewMode('customize'));
 	bfTabTokens.addEventListener('click', () => setViewMode('tokens'));
+
+	bfCustomizeApply.addEventListener('click', () => bindCustomizeIframeIfNeeded());
+	bfCustomizeReset.addEventListener('click', () => {
+		bfCustomizeCss.value = OVERRIDE_TEXTAREA_DEFAULT.trim();
+		bindCustomizeIframeIfNeeded();
+	});
+	bfCustomizeEventClear.addEventListener('click', () => {
+		customizeLogRows.splice(0, customizeLogRows.length);
+		redrawCustomizeEventLog();
+	});
 
 	let active = '';
 
@@ -371,6 +731,8 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 		if (viewMode === 'tokens') {
 			attachStudioThemeLink(demoTheme, base);
 			requestAnimationFrame(() => refreshTokenTable());
+		} else {
+			bindCustomizeIframeIfNeeded();
 		}
 	});
 
@@ -402,6 +764,7 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 		active = slug;
 		bfIframe.src = new URL(`${slug}/index.html`, base).href;
 		applyChip(slug);
+		refreshCustomizeSidebar(slug);
 		if (syncUrl) {
 			syncComponentQuery(slug);
 		}
@@ -409,6 +772,7 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 
 	bfIframe.addEventListener('load', () => {
 		syncDemoDocumentTheme(demoTheme, base, bfIframe.contentWindow);
+		bindCustomizeIframeIfNeeded();
 	});
 
 	nav.addEventListener('click', (ev) => {
@@ -426,6 +790,11 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 			return `${worded} · MVP`;
 		}
 		return worded;
+	}
+
+	function categorySortKey(cat: string): number {
+		const i = CATEGORY_ORDER.indexOf(cat as (typeof CATEGORY_ORDER)[number]);
+		return i === -1 ? CATEGORY_ORDER.length : i;
 	}
 
 	const rerenderNav = () => {
@@ -459,9 +828,32 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 			parts.push(`<div class="bf-nav-section-head">Essentials</div>${links(essentialsList)}`);
 		}
 		if (labsList.length) {
-			parts.push(
-				`<div class="bf-nav-section-head">More components (${labsList.length})</div>${links(labsList)}`,
-			);
+			if (!studioMeta.ok) {
+				const sortedLabs = [...labsList].sort();
+				parts.push(
+					`<div class="bf-nav-section-head">More components (${sortedLabs.length})</div>${links(sortedLabs)}`,
+				);
+			} else {
+				const buckets = new Map<string, string[]>();
+				for (const s of labsList) {
+					const cat = studioMeta.categories[s] ?? 'base';
+					const arr = buckets.get(cat);
+					if (arr) arr.push(s);
+					else buckets.set(cat, [s]);
+				}
+				for (const arr of buckets.values()) {
+					arr.sort();
+				}
+				const catsSorted = [...buckets.keys()].sort((a, b) => categorySortKey(a) - categorySortKey(b) || a.localeCompare(b));
+
+				for (const cat of catsSorted) {
+					const slugs = buckets.get(cat)!;
+					const label = CATEGORY_LABELS[cat] ?? titleCase(cat.replace(/-/g, ' '));
+					parts.push(
+						`<div class="bf-nav-section-head">${escapeHtml(`${label} (${slugs.length})`)}</div>${links(slugs)}`,
+					);
+				}
+			}
 		}
 
 		const next =
@@ -472,6 +864,7 @@ function render(app: HTMLElement, components: string[], tokenData: TokensManifes
 
 		active = next;
 		applyChip(next);
+		refreshCustomizeSidebar(active);
 		if (shouldReload) {
 			bfIframe.src = new URL(`${next}/index.html`, base).href;
 		} else {
@@ -541,9 +934,10 @@ function titleCase(raw: string): string {
 
 	const base = showcasePublicBase();
 
-	const [{ ok: manOk, components }, tokenFetch] = await Promise.all([
+	const [{ ok: manOk, components }, tokenFetch, studioMeta] = await Promise.all([
 		fetchManifest(base),
 		fetchTokensManifest(base),
+		fetchShowcaseStudio(base),
 	]);
 
 	if (!manOk) {
@@ -555,7 +949,7 @@ function titleCase(raw: string): string {
 		? { ok: true, tokens: tokenFetch.tokens, byTheme: tokenFetch.byTheme }
 		: { ok: false, tokens: [], byTheme: {} };
 
-	render(app, components, tokenData, base);
+	render(app, components, tokenData, base, studioMeta);
 })().catch((e: unknown) => {
 	console.error('[studio]', e);
 	const msg =

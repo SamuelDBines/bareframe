@@ -6,7 +6,7 @@ The **test** workflow (`.github/workflows/test.yml`) executes:
 
 1. `pnpm install --frozen-lockfile`
 2. `pnpm run typecheck`
-3. Full static site assembly: `pnpm run build` → `generate-examples` + `generate-versions` → `pnpm run prep-pages` → Vite showcase build
+3. Full static site assembly: **`pnpm run build:pages`** (library + generators + showcase + smoke checks)
 4. **`pnpm exec playwright install --with-deps`** (browsers)
 5. **`pnpm exec playwright test`**
 
@@ -15,11 +15,7 @@ The **test** workflow (`.github/workflows/test.yml`) executes:
 After a full build (so `public/` has `dist`, `themes`, `showcase`, and demos):
 
 ```bash
-pnpm run build
-pnpm run generate:examples
-pnpm run generate:versions
-pnpm run prep-pages
-pnpm --prefix showcase exec vite build
+pnpm run build:pages
 pnpm exec playwright install
 pnpm run test:e2e
 ```

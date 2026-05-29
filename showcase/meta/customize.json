@@ -1,0 +1,77 @@
+{
+  "button": {
+    "eventsDoc": ["bf-click (composed, bubbles) — detail.payload when using payload attr"],
+    "actionIds": ["click-first-bf-button"],
+    "cssHint": "Theme: --bf-theme-button-* tokens. Shadow: bf-button::part(button)."
+  },
+  "link": {
+    "eventsDoc": ["bf-click"],
+    "actionIds": ["click-first-bf-button"],
+    "cssHint": "Theme tokens plus ::part(...) if defined on bf-link shadow root."
+  },
+  "input": {
+    "eventsDoc": ["bf-change", "bf-focus", "bf-blur"],
+    "actionIds": ["focus-first-bf-input"],
+    "cssHint": "Prefer theme tokens (--bf-theme-* surfaces on form controls). Inspect bf-input CSS for component-scoped vars."
+  },
+  "header": {
+    "eventsDoc": [],
+    "actionIds": [],
+    "cssHint": "Chrome components use slot content; tune via theme layout tokens."
+  },
+  "footer": {
+    "eventsDoc": [],
+    "actionIds": [],
+    "cssHint": "Uses bf-footer shadow + slots; inherit theme typography and surfaces."
+  },
+  "modal": {
+    "eventsDoc": ["bf-open", "bf-close", "bf-change"],
+    "actionIds": ["click-open-modal-primary"],
+    "cssHint": "Overlay/panel styling often uses bf-modal::part(...) — see Parts list from build."
+  },
+  "dialog": {
+    "eventsDoc": ["bf-open", "bf-close"],
+    "actionIds": ["click-first-sheet-trigger"],
+    "cssHint": "Multiple variants share host; compose ::part(panel) etc. where exposed."
+  },
+  "toast": {
+    "eventsDoc": ["bf-close", "bf-change"],
+    "actionIds": ["click-first-close"],
+    "cssHint": "Position + variant via attributes; toast ::part(close) pattern when exposed."
+  },
+  "message": {
+    "eventsDoc": [],
+    "actionIds": [],
+    "cssHint": "Inline/alerts inherit theme foreground and surfaces."
+  },
+  "error-summary": {
+    "eventsDoc": [],
+    "actionIds": [],
+    "cssHint": "Form rollup pattern; inherits theme semantic colors via tokens."
+  },
+  "checkbox": {
+    "eventsDoc": ["bf-change"],
+    "actionIds": ["click-first-bf-checkbox"],
+    "cssHint": "Checkbox label + native control synced in shadow."
+  },
+  "radio": {
+    "eventsDoc": ["bf-change"],
+    "actionIds": ["click-first-bf-radio"],
+    "cssHint": "Grouped via group attribute."
+  },
+  "select": {
+    "eventsDoc": ["bf-change"],
+    "actionIds": [],
+    "cssHint": "Native-like select facade; prefers theme spacing and borders."
+  },
+  "toggle": {
+    "eventsDoc": ["bf-change"],
+    "actionIds": ["click-first-bf-toggle"],
+    "cssHint": "Switch vs toggle variants use role switch + aria-checked."
+  },
+  "chart": {
+    "eventsDoc": [],
+    "actionIds": [],
+    "cssHint": "Labs placeholder; relies on bf-chart tokens once finalized."
+  }
+}

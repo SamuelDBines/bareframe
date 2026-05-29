@@ -17,13 +17,20 @@ test.describe('smoke — static artifact + showcase', () => {
 		expect(Array.isArray(tokens.tokens)).toBeTruthy();
 	});
 
-	test('showcase loads and same-origin navigations succeed', async ({ page }) => {
+	test('showcase loads and same-origin navigations succeed', async ({ page, request }) => {
 		const base = baseOrigin();
 		const failures: { url: string; status: number }[] = [];
 		attachSameOriginFailures(page, base, failures);
 
 		await gotoDemo(page, '/showcase/index.html');
 		await expect(page.locator('body')).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Component Studio' })).toBeVisible({
+			timeout: 15_000,
+		});
+		await expect(page.getByText('Component Studio needs a build')).toHaveCount(0);
+
+		const studio = await request.get('/dist/showcase-studio.json');
+		expect(studio.ok(), await studio.text()).toBeTruthy();
 
 		const demoSlugs = ['button', 'input', 'card'];
 		for (const slug of demoSlugs) {

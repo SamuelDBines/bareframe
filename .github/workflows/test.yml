@@ -56,6 +56,9 @@ jobs:
         working-directory: showcase
         run: pnpm install --frozen-lockfile && pnpm exec vite build
 
+      - name: Smoke-check Pages artifact
+        run: pnpm run smoke:pages
+
       - name: Install Playwright (Chromium)
         run: pnpm exec playwright install --with-deps chromium
 

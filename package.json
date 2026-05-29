@@ -42,6 +42,7 @@
   "scripts": {
     "build": "node ./scripts/build.mjs && node ./scripts/prep-pages.mjs",
     "build:lib": "node ./scripts/build.mjs",
+    "build:pages": "pnpm run build && pnpm run generate:examples && pnpm run generate:versions && pnpm run prep-pages && pnpm --prefix showcase build && pnpm run smoke:pages",
     "dev": "pnpm",
     "dev:kitsune": "kitsune serve public --port 6050 --follow",
     "generate:examples": "node ./scripts/generate-examples.mjs",
@@ -58,7 +59,7 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
     "showcase:dev": "pnpm --prefix showcase dev",
-    "showcase:build": "pnpm run build && pnpm --prefix showcase build",
+    "showcase:build": "pnpm run build:pages",
     "typecheck": "tsc --noEmit",
     "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts --watch-path=stencil --watch-path=tsconfig.json ./scripts/build.mjs"
   },

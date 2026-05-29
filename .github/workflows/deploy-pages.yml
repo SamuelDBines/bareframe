@@ -53,6 +53,9 @@ jobs:
         working-directory: showcase
         run: pnpm install --frozen-lockfile && pnpm exec vite build
 
+      - name: Smoke-check Pages artifact
+        run: pnpm run smoke:pages
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

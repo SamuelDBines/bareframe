@@ -2,6 +2,8 @@ import { spawnSync } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { categoryForSlug } from './component-categories.mjs';
+import { extractComponentParts } from './extract-studio-style-hints.mjs';
 import { build } from 'esbuild';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -170,6 +172,21 @@ async function writeManifest(slugs) {
 	);
 }
 
+async function writeShowcaseStudioMetadata(slugs) {
+	const categories = Object.fromEntries(slugs.map((s) => [s, categoryForSlug(s)]));
+	const parts = await extractComponentParts(slugs, stencilSrcComponents);
+	const payload = {
+		generatedAt: new Date().toISOString(),
+		categories,
+		parts,
+	};
+	await fs.writeFile(
+		path.join(distDir, 'showcase-studio.json'),
+		`${JSON.stringify(payload, null, 2)}\n`,
+	);
+	console.log('Wrote dist/showcase-studio.json (categories + ::part hints).');
+}
+
 /** Extract `--name` custom properties from flattened CSS text (handles minified blocks). */
 function extractCssCustomPropertyNames(cssText) {
 	const names = new Set();
@@ -281,6 +298,7 @@ async function main() {
 
 	await writeBundles(args.devOutfile, false);
 	await writeManifest(stencilSlugs);
+	await writeShowcaseStudioMetadata(stencilSlugs);
 	await writeBundles(path.join(distDir, 'bareframe.min.js'), true);
 
 	console.log(`Built bareframe (${stencilSlugs.length} Stencil components).`);

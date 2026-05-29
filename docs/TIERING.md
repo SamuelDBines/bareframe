@@ -15,6 +15,8 @@ Tiers prioritize **trust** without blocking all ~75 primitives on Day 1.
 
 These align with MVP/Essentials in the Component Studio (see `ESSENTIAL_SLUGS` plus key form controls).
 
+Manual review of demos and the Studio **Customize** tab is tracked in [STUDIO-FIDELITY.md](./STUDIO-FIDELITY.md).
+
 ## Tier B — Rich interaction
 
 **Expectation:** Documented APIs; expanding Playwright coverage for keyboard navigation and overlays.

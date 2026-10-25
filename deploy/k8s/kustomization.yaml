@@ -5,9 +5,14 @@ resources:
   - namespace.yaml
   - deployment.yaml
   - service.yaml
+  - api-deployment.yaml
+  - api-service.yaml
   - ingress.yaml
   - ingress-aliases.yaml
 images:
   - name: ghcr.io/samueldbines/bareframe/site
     newName: ghcr.io/samueldbines/bareframe/site
+    newTag: latest
+  - name: ghcr.io/samueldbines/bareframe/api
+    newName: ghcr.io/samueldbines/bareframe/api
     newTag: latest

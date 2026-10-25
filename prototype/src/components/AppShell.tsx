@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { ProductSwitcher } from './ProductSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { UserMenu } from './UserMenu';
 
 export function AppShell() {
 	const location = useLocation();
@@ -19,6 +20,7 @@ export function AppShell() {
 				</Link>
 				<ProductSwitcher />
 				<div className="header-spacer" />
+				<UserMenu />
 				<ThemeSwitcher />
 			</header>
 			<main className={`app-main${wide ? ' wide' : ''}`}>

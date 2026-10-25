@@ -27,6 +27,20 @@ jobs:
         with:
           context: .
           push: false
+          load: true
+          tags: bareframe-site:ci
+
+      - name: Verify nginx redirects in container
+        run: |
+          set -euo pipefail
+          docker run -d --name bareframe-nginx -p 18080:8080 bareframe-site:ci
+          sleep 2
+          curl -sf http://127.0.0.1:18080/healthz | grep -q '^ok$'
+          LOC=$(curl -sI -H 'Host: bareframe.org' 'http://127.0.0.1:18080/legacy' | tr -d '\r' | awk 'tolower($1)=="location:" {print $2}')
+          test "$LOC" = '/legacy/'
+          ALIAS_LOC=$(curl -sI -H 'Host: www.bareframe.org' 'http://127.0.0.1:18080/legacy/foo' | tr -d '\r' | awk 'tolower($1)=="location:" {print $2}')
+          test "$ALIAS_LOC" = 'https://bareframe.org/legacy/foo'
+          docker rm -f bareframe-nginx
 
   test:
     runs-on: ubuntu-24.04

@@ -5,6 +5,7 @@ import type { GitHubClient } from './auth/github.js';
 import {
 	clearOAuthStateCookie,
 	clearSessionCookie,
+	cookieSettingsFromPublicUrl,
 	readOAuthStateCookie,
 	readSignedCookie,
 	SESSION_COOKIE,
@@ -16,6 +17,7 @@ import { githubAuthorizeUrl } from './auth/github.js';
 import { isSafeReturnTo, normalizeReturnTo } from './auth/returnTo.js';
 import {
 	createSession,
+	deleteExpiredSessions,
 	deleteSessionByTokenHash,
 	findUserBySessionToken,
 	toPublicUser,
@@ -30,6 +32,7 @@ export type AppDeps = {
 
 export function createApp(deps: AppDeps): Hono {
 	const { config, pool, github } = deps;
+	const cookieSettings = cookieSettingsFromPublicUrl(config.publicUrl);
 	const app = new Hono();
 
 	app.get('/api/healthz', (c) => c.text('ok'));
@@ -37,7 +40,7 @@ export function createApp(deps: AppDeps): Hono {
 	app.get('/api/auth/github', (c) => {
 		const returnTo = normalizeReturnTo(c.req.query('returnTo'));
 		const state = randomToken(16);
-		setOAuthStateCookie(c, { state, returnTo }, config.sessionSecret);
+		setOAuthStateCookie(c, { state, returnTo }, config.sessionSecret, cookieSettings);
 
 		const redirectUri = `${config.publicUrl}/api/auth/github/callback`;
 		const url = githubAuthorizeUrl(config.githubClientId, redirectUri, state);
@@ -48,9 +51,9 @@ export function createApp(deps: AppDeps): Hono {
 		const code = c.req.query('code');
 		const stateParam = c.req.query('state');
 		const stored = readOAuthStateCookie(c, config.sessionSecret);
-		clearOAuthStateCookie(c);
 
 		if (!code || !stateParam || !stored || stored.state !== stateParam) {
+			clearOAuthStateCookie(c, cookieSettings);
 			return c.text('Invalid OAuth state', 400);
 		}
 
@@ -72,7 +75,9 @@ export function createApp(deps: AppDeps): Hono {
 			const sessionToken = randomToken(32);
 			const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 			await createSession(pool, user.id, hashToken(sessionToken), expiresAt);
-			setSessionCookie(c, sessionToken, config.sessionSecret);
+			await deleteExpiredSessions(pool);
+			clearOAuthStateCookie(c, cookieSettings);
+			setSessionCookie(c, sessionToken, config.sessionSecret, cookieSettings, true);
 
 			return c.redirect(`${config.publicUrl}${returnTo}`, 302);
 		} catch (err) {
@@ -96,7 +101,7 @@ export function createApp(deps: AppDeps): Hono {
 		if (token) {
 			await deleteSessionByTokenHash(pool, hashToken(token));
 		}
-		clearSessionCookie(c);
+		clearSessionCookie(c, cookieSettings);
 		return c.json({ ok: true });
 	});
 

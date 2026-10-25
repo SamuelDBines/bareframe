@@ -63,6 +63,10 @@ export async function deleteSessionByTokenHash(
 	await pool.query('DELETE FROM sessions WHERE token_hash = $1', [tokenHash]);
 }
 
+export async function deleteExpiredSessions(pool: pg.Pool): Promise<void> {
+	await pool.query('DELETE FROM sessions WHERE expires_at <= NOW()');
+}
+
 export async function findUserBySessionToken(
 	pool: pg.Pool,
 	tokenHash: string,

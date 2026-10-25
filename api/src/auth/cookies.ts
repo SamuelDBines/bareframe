@@ -7,6 +7,15 @@ export const OAUTH_STATE_COOKIE = 'bareframe_oauth';
 const MAX_AGE_OAUTH = 600; // 10 minutes
 const MAX_AGE_SESSION = 60 * 60 * 24 * 30; // 30 days
 
+export type CookieSettings = {
+	/** True when the public site URL is HTTPS (TLS terminates at ingress). */
+	secure: boolean;
+};
+
+export function cookieSettingsFromPublicUrl(publicUrl: string): CookieSettings {
+	return { secure: publicUrl.startsWith('https://') };
+}
+
 function sign(value: string, secret: string): string {
 	const sig = createHmac('sha256', secret).update(value).digest('base64url');
 	return `${value}.${sig}`;
@@ -35,7 +44,12 @@ function parseCookieHeader(header: string | undefined): Record<string, string> {
 		const [rawKey, ...rest] = part.split('=');
 		const key = rawKey?.trim();
 		if (!key) continue;
-		out[key] = decodeURIComponent(rest.join('=').trim());
+		const rawValue = rest.join('=').trim();
+		try {
+			out[key] = decodeURIComponent(rawValue);
+		} catch {
+			/* ignore malformed cookie values */
+		}
 	}
 	return out;
 }
@@ -44,18 +58,33 @@ export function getCookie(c: Context, name: string): string | undefined {
 	return parseCookieHeader(c.req.header('cookie'))[name];
 }
 
+function setCookieHeader(
+	c: Context,
+	value: string,
+	append: boolean,
+): void {
+	if (append) {
+		c.header('Set-Cookie', value, { append: true });
+	} else {
+		c.header('Set-Cookie', value);
+	}
+}
+
 export function setSignedCookie(
 	c: Context,
 	name: string,
 	payload: string,
 	secret: string,
 	maxAgeSeconds: number,
+	settings: CookieSettings,
+	append = false,
 ): void {
 	const signed = sign(payload, secret);
-	const secure = c.req.url.startsWith('https://') ? '; Secure' : '';
-	c.header(
-		'Set-Cookie',
+	const secure = settings.secure ? '; Secure' : '';
+	setCookieHeader(
+		c,
 		`${name}=${encodeURIComponent(signed)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}${secure}`,
+		append,
 	);
 }
 
@@ -69,20 +98,36 @@ export function readSignedCookie(
 	return unsign(raw, secret);
 }
 
-export function clearCookie(c: Context, name: string): void {
-	const secure = c.req.url.startsWith('https://') ? '; Secure' : '';
-	c.header(
-		'Set-Cookie',
+export function clearCookie(
+	c: Context,
+	name: string,
+	settings: CookieSettings,
+	append = false,
+): void {
+	const secure = settings.secure ? '; Secure' : '';
+	setCookieHeader(
+		c,
 		`${name}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+		append,
 	);
 }
 
-export function setSessionCookie(c: Context, token: string, secret: string): void {
-	setSignedCookie(c, SESSION_COOKIE, token, secret, MAX_AGE_SESSION);
+export function setSessionCookie(
+	c: Context,
+	token: string,
+	secret: string,
+	settings: CookieSettings,
+	append = false,
+): void {
+	setSignedCookie(c, SESSION_COOKIE, token, secret, MAX_AGE_SESSION, settings, append);
 }
 
-export function clearSessionCookie(c: Context): void {
-	clearCookie(c, SESSION_COOKIE);
+export function clearSessionCookie(
+	c: Context,
+	settings: CookieSettings,
+	append = false,
+): void {
+	clearCookie(c, SESSION_COOKIE, settings, append);
 }
 
 export type OAuthStatePayload = {
@@ -94,8 +139,18 @@ export function setOAuthStateCookie(
 	c: Context,
 	payload: OAuthStatePayload,
 	secret: string,
+	settings: CookieSettings,
+	append = false,
 ): void {
-	setSignedCookie(c, OAUTH_STATE_COOKIE, JSON.stringify(payload), secret, MAX_AGE_OAUTH);
+	setSignedCookie(
+		c,
+		OAUTH_STATE_COOKIE,
+		JSON.stringify(payload),
+		secret,
+		MAX_AGE_OAUTH,
+		settings,
+		append,
+	);
 }
 
 export function readOAuthStateCookie(
@@ -115,6 +170,10 @@ export function readOAuthStateCookie(
 	}
 }
 
-export function clearOAuthStateCookie(c: Context): void {
-	clearCookie(c, OAUTH_STATE_COOKIE);
+export function clearOAuthStateCookie(
+	c: Context,
+	settings: CookieSettings,
+	append = false,
+): void {
+	clearCookie(c, OAUTH_STATE_COOKIE, settings, append);
 }

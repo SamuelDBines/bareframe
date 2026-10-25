@@ -7,16 +7,7 @@ import {
 	setupTestDb,
 	testConfig,
 } from '../src/test-utils.js';
-
-function cookieHeaderFromResponse(res: Response): string {
-	const raw =
-		res.headers.getSetCookie?.() ??
-		(res.headers.get('set-cookie') ? [res.headers.get('set-cookie')!] : []);
-	return raw
-		.map((sc) => sc.split(';')[0]?.trim())
-		.filter(Boolean)
-		.join('; ');
-}
+import { cookieHeaderFromResponse } from './helpers.js';
 
 describe('auth flow', () => {
 	const pool = new pg.Pool({ connectionString: testConfig.databaseUrl });

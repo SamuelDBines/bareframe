@@ -6,6 +6,7 @@ export function AppShell() {
 	const location = useLocation();
 	const wide =
 		location.pathname.startsWith('/designer/editor') ||
+		location.pathname.startsWith('/designer/themes') ||
 		location.pathname.startsWith('/designer/theme') ||
 		location.pathname.startsWith('/designer/tokens');
 

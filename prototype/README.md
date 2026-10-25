@@ -36,9 +36,8 @@ Output is written to `../public/prototype/` for GitHub Pages at `https://<user>.
 | Components | `#/components/tokens` | Tokens |
 | Components | `#/components/mcp` | Connect agent (MCP) |
 | Designer | `#/designer` | Project dashboard |
-| Designer | `#/designer/editor` | Screen editor |
-| Designer | `#/designer/theme` | Theme editor |
-| Designer | `#/designer/tokens` | Token editor |
+| Designer | `#/designer/editor` | Infinite canvas (frames, compare, trials) |
+| Designer | `#/designer/themes` | Theme & tokens workspace |
 | Designer | `#/designer/export` | Export / handoff |
 | Designer | `#/designer/settings/agent` | Agent MCP settings |
 

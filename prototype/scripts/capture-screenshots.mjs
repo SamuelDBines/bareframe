@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /**
  * Capture static screenshots of every prototype screen (requires prior `pnpm run build`).
- * Run from repo root: node prototype/scripts/capture-screenshots.mjs
  */
 import { spawn } from 'node:child_process';
 import { promises as fs } from 'node:fs';
@@ -13,7 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const prototypeRoot = path.resolve(__dirname, '..');
 const outDir = path.join(prototypeRoot, 'artifacts', 'screenshots');
 
-const SCREENS = [
+const STATIC_SCREENS = [
 	{ file: '01-site-landing.png', hash: '#/' },
 	{ file: '02-site-pricing.png', hash: '#/pricing' },
 	{ file: '03-site-sign-up.png', hash: '#/sign-up' },
@@ -23,11 +22,10 @@ const SCREENS = [
 	{ file: '07-components-tokens.png', hash: '#/components/tokens' },
 	{ file: '08-components-mcp.png', hash: '#/components/mcp' },
 	{ file: '09-designer-dashboard.png', hash: '#/designer' },
-	{ file: '10-designer-editor.png', hash: '#/designer/editor' },
-	{ file: '11-designer-theme.png', hash: '#/designer/theme' },
-	{ file: '12-designer-tokens.png', hash: '#/designer/tokens' },
-	{ file: '13-designer-export.png', hash: '#/designer/export' },
-	{ file: '14-designer-agent-mcp.png', hash: '#/designer/settings/agent' },
+	{ file: '10-designer-canvas-frames.png', hash: '#/designer/editor' },
+	{ file: '11-designer-themes-workspace.png', hash: '#/designer/themes' },
+	{ file: '12-designer-export.png', hash: '#/designer/export' },
+	{ file: '13-designer-agent-mcp.png', hash: '#/designer/settings/agent' },
 ];
 
 function startPreview() {
@@ -59,14 +57,28 @@ async function main() {
 	const base = 'http://127.0.0.1:4173/';
 
 	const browser = await chromium.launch();
-	const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+	const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 
-	for (const { file, hash } of SCREENS) {
+	for (const { file, hash } of STATIC_SCREENS) {
 		await page.goto(`${base}${hash}`, { waitUntil: 'networkidle' });
-		await page.waitForTimeout(400);
+		await page.waitForTimeout(500);
 		await page.screenshot({ path: path.join(outDir, file), fullPage: true });
 		console.log('wrote', file);
 	}
+
+	await page.goto(`${base}#/designer/editor`, { waitUntil: 'networkidle' });
+	await page.waitForTimeout(600);
+	await page.selectOption('.canvas-subtoolbar label:nth-of-type(3) select', 'matrix');
+	await page.waitForTimeout(800);
+	await page.screenshot({ path: path.join(outDir, '14-designer-compare-matrix.png'), fullPage: true });
+	console.log('wrote 14-designer-compare-matrix.png');
+
+	await page.goto(`${base}#/designer/editor`, { waitUntil: 'networkidle' });
+	await page.waitForTimeout(500);
+	await page.click('.canvas-frame-wrap.selected .frame-toolbar button:has-text("Trial")');
+	await page.waitForTimeout(700);
+	await page.screenshot({ path: path.join(outDir, '15-designer-style-trial.png'), fullPage: true });
+	console.log('wrote 15-designer-style-trial.png');
 
 	await browser.close();
 	preview.kill('SIGTERM');

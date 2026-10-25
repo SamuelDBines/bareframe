@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Select } from '../../components/Select';
 import { THEME_IDS, THEME_LABELS, type ThemeId } from '../../theme/themes';
 import { breakpointForWidth } from '../breakpoints';
 import { getDevicePreset } from '../devicePresets';
@@ -53,38 +54,36 @@ export function InspectorPanel() {
 						<label>Device</label>
 						<input readOnly value={getDevicePreset(frame.devicePresetId)?.label ?? 'Custom'} />
 					</div>
-					<div className="field">
-						<label>Theme</label>
-						<select
-							value={frame.themeId ?? project.defaultThemeId}
-							onChange={(e) =>
-								dispatch({
-									type: 'setFrameTheme',
-									frameId: frame.id,
-									themeId: e.target.value as ThemeId,
-								})
-							}
-						>
-							{THEME_IDS.map((id) => (
-								<option key={id} value={id}>{THEME_LABELS[id]}</option>
-							))}
-						</select>
-					</div>
+					<Select
+						label="Theme"
+						value={frame.themeId ?? project.defaultThemeId}
+						onChange={(e) =>
+							dispatch({
+								type: 'setFrameTheme',
+								frameId: frame.id,
+								themeId: e.target.value as ThemeId,
+							})
+						}
+					>
+						{THEME_IDS.map((id) => (
+							<option key={id} value={id}>{THEME_LABELS[id]}</option>
+						))}
+					</Select>
 					{trial && (
 						<div className="field">
-							<label>Trial token</label>
-							<select
+							<Select
+								label="Trial token"
+								defaultValue=""
 								onChange={(e) => {
 									const [token, value] = e.target.value.split('|');
 									if (token && value)
 										dispatch({ type: 'setTrialToken', token, value });
 								}}
-								defaultValue=""
 							>
 								<option value="">Tweak primary…</option>
 								<option value="--bf-theme-button-primary-bg|#0ea5e9">Primary → sky</option>
 								<option value="--bf-theme-button-primary-bg|#7c3aed">Primary → violet</option>
-							</select>
+							</Select>
 							<button
 								type="button"
 								className="btn btn-secondary"
@@ -112,19 +111,17 @@ export function InspectorPanel() {
 						<label>Definition</label>
 						<input readOnly value={node.instance.definitionId} />
 					</div>
-					<div className="field">
-						<label>Variant</label>
-						<select
-							value={node.instance.variantKey}
-							onChange={(e) =>
-								dispatch({ type: 'updateNodeVariant', nodeId: node.id, variantKey: e.target.value })
-							}
-						>
-							{['primary', 'secondary', 'ghost', 'elevated', 'default'].map((v) => (
-								<option key={v} value={v}>{v}</option>
-							))}
-						</select>
-					</div>
+					<Select
+						label="Variant"
+						value={node.instance.variantKey}
+						onChange={(e) =>
+							dispatch({ type: 'updateNodeVariant', nodeId: node.id, variantKey: e.target.value })
+						}
+					>
+						{['primary', 'secondary', 'ghost', 'elevated', 'default'].map((v) => (
+							<option key={v} value={v}>{v}</option>
+						))}
+					</Select>
 				</Accordion>
 			)}
 
@@ -144,23 +141,21 @@ export function InspectorPanel() {
 
 			{node && (
 				<Accordion title="Layout">
-					<div className="field">
-						<label>Mode</label>
-						<select
-							value={node.layout.mode}
-							onChange={(e) =>
-								dispatch({
-									type: 'updateNodeLayout',
-									nodeId: node.id,
-									layout: { mode: e.target.value as typeof node.layout.mode },
-								})
-							}
-						>
-							{['stack', 'row', 'column', 'grid', 'free'].map((m) => (
-								<option key={m} value={m}>{m}</option>
-							))}
-						</select>
-					</div>
+					<Select
+						label="Mode"
+						value={node.layout.mode}
+						onChange={(e) =>
+							dispatch({
+								type: 'updateNodeLayout',
+								nodeId: node.id,
+								layout: { mode: e.target.value as typeof node.layout.mode },
+							})
+						}
+					>
+						{['stack', 'row', 'column', 'grid', 'free'].map((m) => (
+							<option key={m} value={m}>{m}</option>
+						))}
+					</Select>
 					<div className="field">
 						<label>Gap</label>
 						<input
@@ -175,23 +170,21 @@ export function InspectorPanel() {
 							}
 						/>
 					</div>
-					<div className="field">
-						<label>Width mode</label>
-						<select
-							value={node.layout.widthMode}
-							onChange={(e) =>
-								dispatch({
-									type: 'updateNodeLayout',
-									nodeId: node.id,
-									layout: { widthMode: e.target.value as typeof node.layout.widthMode },
-								})
-							}
-						>
-							{['fill', 'hug', 'fixed', 'percent'].map((m) => (
-								<option key={m} value={m}>{m}</option>
-							))}
-						</select>
-					</div>
+					<Select
+						label="Width mode"
+						value={node.layout.widthMode}
+						onChange={(e) =>
+							dispatch({
+								type: 'updateNodeLayout',
+								nodeId: node.id,
+								layout: { widthMode: e.target.value as typeof node.layout.widthMode },
+							})
+						}
+					>
+						{['fill', 'hug', 'fixed', 'percent'].map((m) => (
+							<option key={m} value={m}>{m}</option>
+						))}
+					</Select>
 				</Accordion>
 			)}
 

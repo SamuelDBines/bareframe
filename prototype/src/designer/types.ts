@@ -1,4 +1,5 @@
 import type { ThemeId } from '../theme/themes';
+import type { MatrixLayout } from './frameLayout';
 
 export type BreakpointId = 'base' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -101,7 +102,14 @@ export type StyleTrial = {
 export type CompareMode =
 	| { kind: 'devices'; pageId: string; tempFrameIds: string[] }
 	| { kind: 'themes'; sourceFrameId: string; themeIds: ThemeId[]; ghostFrameIds: string[] }
-	| { kind: 'matrix'; pageId: string; themeIds: ThemeId[]; devicePresetIds: string[]; ghostFrameIds: string[] }
+	| {
+			kind: 'matrix';
+			pageId: string;
+			themeIds: ThemeId[];
+			devicePresetIds: string[];
+			ghostFrameIds: string[];
+			layout?: MatrixLayout;
+		}
 	| { kind: 'trials'; pageId: string; frameIds: string[] };
 
 export type DesignerProject = {

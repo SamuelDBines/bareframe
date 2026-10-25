@@ -2,13 +2,59 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ThemeId } from '../../theme/themes';
 import { THEME_LABELS } from '../../theme/themes';
 import { breakpointForWidth } from '../breakpoints';
+import { Select } from '../../components/Select';
 import { DEFAULT_DEVICE_PRESETS, getDevicePreset } from '../devicePresets';
+import { FRAME_LABEL_HEIGHT, type MatrixLayout } from '../frameLayout';
 import { useDesigner } from '../store';
 import type { Frame } from '../types';
 import { FramePreview } from './FramePreview';
 
 const ZOOM_MIN = 0.25;
 const ZOOM_MAX = 2.5;
+
+function MatrixHeaders({ layout }: { layout: MatrixLayout }) {
+	const { originX, originY, headerW, headerH, colPresetIds, rowThemeIds, colX, colWidths, rowY, rowHeights } =
+		layout;
+
+	return (
+		<>
+			<div
+				className="matrix-corner-label"
+				style={{ left: originX, top: originY, width: headerW, height: headerH }}
+			>
+				Theme ↓ / Device →
+			</div>
+			{colPresetIds.map((id, i) => (
+				<div
+					key={`col-${id}`}
+					className="matrix-col-header"
+					style={{
+						left: colX[i] ?? originX + headerW,
+						top: originY,
+						width: colWidths[i],
+						height: headerH,
+					}}
+				>
+					{getDevicePreset(id)?.label ?? id}
+				</div>
+			))}
+			{rowThemeIds.map((themeId, ri) => (
+				<div
+					key={`row-${themeId}`}
+					className="matrix-row-header"
+					style={{
+						left: originX,
+						top: rowY[ri],
+						width: headerW,
+						height: rowHeights[ri],
+					}}
+				>
+					{THEME_LABELS[themeId as ThemeId] ?? themeId}
+				</div>
+			))}
+		</>
+	);
+}
 
 export function InfiniteCanvas() {
 	const { state, dispatch, fitAll, fitSelection } = useDesigner();
@@ -69,7 +115,19 @@ export function InfiniteCanvas() {
 		}
 	};
 
-	const frames = project.frames.filter((f) => f.ghost || f.pageId === ui.activePageId);
+	const frames = project.frames.filter((f) => {
+		if (ui.compare?.kind === 'matrix') {
+			return f.ghost && ui.compare.ghostFrameIds.includes(f.id);
+		}
+		if (ui.compare?.kind === 'themes') {
+			const src = ui.compare.sourceFrameId;
+			return (
+				f.id === src ||
+				(f.ghost && ui.compare.ghostFrameIds.includes(f.id))
+			);
+		}
+		return (f.pageId === ui.activePageId && !f.ghost) || (f.ghost && ui.compare?.kind === 'devices');
+	});
 
 	const renderFrame = (frame: Frame) => {
 		if (!page) return null;
@@ -79,6 +137,9 @@ export function InfiniteCanvas() {
 		const bp = breakpointForWidth(frame.width);
 		const selected = ui.selectedFrameId === frame.id;
 
+		const shortDevice = preset?.label.split(' ').slice(0, 2).join(' ') ?? 'Custom';
+		const labelText = `${frame.name} · ${shortDevice} · ${THEME_LABELS[themeId]}`;
+
 		return (
 			<div
 				key={frame.id}
@@ -86,7 +147,7 @@ export function InfiniteCanvas() {
 				style={{
 					position: 'absolute',
 					left: frame.x,
-					top: frame.y,
+					top: frame.y - FRAME_LABEL_HEIGHT,
 					width: frame.width,
 				}}
 				onPointerDown={(e) => {
@@ -121,12 +182,8 @@ export function InfiniteCanvas() {
 					dragRef.current = null;
 				}}
 			>
-				<div
-					className="frame-label"
-					style={{ transform: `scale(${1 / project.canvas.zoom})`, transformOrigin: 'bottom left' }}
-				>
-					{frame.name} · {preset?.label ?? 'Custom'} · {frame.width}×{frame.height} ·{' '}
-					{THEME_LABELS[themeId]}
+				<div className="frame-label" title={labelText}>
+					<span className="frame-label-text">{labelText}</span>
 					{frame.trialId && <span className="trial-chip">Trial</span>}
 					<span className="bp-chip">{bp}</span>
 				</div>
@@ -153,7 +210,7 @@ export function InfiniteCanvas() {
 				</div>
 				{selected && !frame.readOnly && (
 					<div className="frame-toolbar">
-						<select
+						<Select
 							value={frame.devicePresetId}
 							onChange={(e) =>
 								dispatch({ type: 'setFrameDevice', frameId: frame.id, presetId: e.target.value })
@@ -162,7 +219,7 @@ export function InfiniteCanvas() {
 							{DEFAULT_DEVICE_PRESETS.map((p) => (
 								<option key={p.id} value={p.id}>{p.label}</option>
 							))}
-						</select>
+						</Select>
 						<button
 							type="button"
 							className="btn btn-ghost"
@@ -233,6 +290,9 @@ export function InfiniteCanvas() {
 					transformOrigin: '0 0',
 				}}
 			>
+				{ui.compare?.kind === 'matrix' && ui.compare.layout && (
+					<MatrixHeaders layout={ui.compare.layout} />
+				)}
 				{frames.map(renderFrame)}
 			</div>
 			<div className="canvas-zoom-controls">

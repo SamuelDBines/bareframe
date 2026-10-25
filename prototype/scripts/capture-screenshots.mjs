@@ -68,15 +68,24 @@ async function main() {
 
 	await page.goto(`${base}#/designer/editor`, { waitUntil: 'networkidle' });
 	await page.waitForTimeout(600);
-	await page.selectOption('.canvas-subtoolbar label:nth-of-type(3) select', 'matrix');
-	await page.waitForTimeout(800);
+	await page.locator('.canvas-subtoolbar .bf-select-field').filter({ hasText: 'Compare' }).locator('select').selectOption('matrix');
+	await page.waitForTimeout(600);
+	await page.click('button:has-text("Fit all")');
+	await page.waitForTimeout(500);
 	await page.screenshot({ path: path.join(outDir, '14-designer-compare-matrix.png'), fullPage: true });
 	console.log('wrote 14-designer-compare-matrix.png');
 
 	await page.goto(`${base}#/designer/editor`, { waitUntil: 'networkidle' });
 	await page.waitForTimeout(500);
-	await page.click('.canvas-frame-wrap.selected .frame-toolbar button:has-text("Trial")');
-	await page.waitForTimeout(700);
+	const exitBtn = page.locator('button:has-text("Exit")');
+	if (await exitBtn.isVisible().catch(() => false)) await exitBtn.click();
+	await page.locator('.canvas-frame-wrap:not(.ghost)').first().click();
+	await page.waitForTimeout(300);
+	await page.getByRole('button', { name: 'Trial', exact: true }).click({ force: true });
+	await page.waitForTimeout(400);
+	await page.locator('.canvas-frame-wrap:not(.ghost)').first().click();
+	await page.keyboard.press('Shift+2');
+	await page.waitForTimeout(600);
 	await page.screenshot({ path: path.join(outDir, '15-designer-style-trial.png'), fullPage: true });
 	console.log('wrote 15-designer-style-trial.png');
 

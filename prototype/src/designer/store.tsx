@@ -9,6 +9,14 @@ import {
 import type { ThemeId } from '../theme/themes';
 import { breakpointForWidth } from './breakpoints';
 import { deviceDimensions, DUPLICATE_TO_DEVICES_DEFAULT, getDevicePreset } from './devicePresets';
+import {
+	autoPlaceFrame,
+	boundsForFrames,
+	cameraToFitBounds,
+	findPlacementBesideCluster,
+	layoutCompareMatrix,
+	relayoutFrameSet,
+} from './frameLayout';
 import { createInitialProject, PAGE_ID } from './initialProject';
 import type {
 	CompareMode,
@@ -145,13 +153,16 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 			const pageId = action.pageId ?? ui.activePageId;
 			const preset = getDevicePreset(action.presetId ?? 'iphone-15')!;
 			const dim = deviceDimensions(preset);
-			const n = project.frames.length;
+			const place =
+				action.x != null && action.y != null
+					? { x: action.x, y: action.y }
+					: autoPlaceFrame(project.frames, dim.width, dim.height);
 			const frame: Frame = {
 				id: newId('frame'),
 				name: 'New frame',
 				pageId,
-				x: action.x ?? 40 + (n % 3) * (dim.width + 56),
-				y: action.y ?? 40 + Math.floor(n / 3) * (dim.height + 80),
+				x: place.x,
+				y: place.y,
 				width: dim.width,
 				height: dim.height,
 				devicePresetId: preset.id,
@@ -172,10 +183,10 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 			if (!source) return state;
 			const frameSetId = source.frameSetId ?? newId('fs');
 			source.frameSetId = frameSetId;
-			let x = source.x + source.width + 56;
-			const y = source.y;
 			for (const pid of action.presetIds) {
 				if (pid === source.devicePresetId) continue;
+				if (project.frames.some((f) => f.frameSetId === frameSetId && f.devicePresetId === pid))
+					continue;
 				const preset = getDevicePreset(pid);
 				if (!preset) continue;
 				const dim = deviceDimensions(preset);
@@ -183,8 +194,8 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 					id: newId('frame'),
 					name: source.name,
 					pageId: source.pageId,
-					x,
-					y,
+					x: 0,
+					y: 0,
 					width: dim.width,
 					height: dim.height,
 					devicePresetId: pid,
@@ -192,8 +203,8 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 					themeId: source.themeId,
 					frameSetId,
 				});
-				x += dim.width + 56;
 			}
+			relayoutFrameSet(project.frames, frameSetId);
 			return commit(project);
 		}
 		case 'updateNodeLayout': {
@@ -280,11 +291,17 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 				status: 'draft',
 			};
 			project.trials.push(trial);
+			const place = findPlacementBesideCluster(
+				project.frames,
+				frame.width,
+				frame.height,
+				{ x: frame.x, y: frame.y },
+			);
 			const trialFrame: Frame = {
 				...frame,
 				id: newId('frame'),
-				x: frame.x + frame.width + 56,
-				y: frame.y,
+				x: place.x,
+				y: place.y,
 				trialId: trial.id,
 				name: `${frame.name} (trial)`,
 			};
@@ -318,24 +335,30 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 				return { ...state, ui: { ...ui, compare: null } };
 			}
 			const compareReq = action.compare;
+			project.frames = project.frames.filter((f) => !f.ghost);
 			if (compareReq.kind === 'themes') {
 				const src = project.frames.find((f) => f.id === compareReq.sourceFrameId);
 				if (!src) return state;
 				const ghostFrameIds: string[] = [];
-				let x = src.x + src.width + 56;
+				const placed = [...project.frames];
 				for (const themeId of compareReq.themeIds) {
 					const gid = newId('ghost');
 					ghostFrameIds.push(gid);
-					project.frames.push({
+					const pos = findPlacementBesideCluster(placed, src.width, src.height, {
+						x: src.x,
+						y: src.y,
+					});
+					const ghost: Frame = {
 						...src,
 						id: gid,
-						x,
-						y: src.y,
+						x: pos.x,
+						y: pos.y,
 						themeId,
 						ghost: true,
 						readOnly: true,
-					});
-					x += src.width + 56;
+					};
+					project.frames.push(ghost);
+					placed.push(ghost);
 				}
 				return pushHistory(
 					{ ...state, ui: { ...ui, compare: { ...compareReq, ghostFrameIds } } },
@@ -378,37 +401,20 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 			if (compareReq.kind === 'matrix') {
 				const page = project.pages.find((p) => p.id === compareReq.pageId);
 				if (!page) return state;
-				const ghostFrameIds: string[] = [];
-				let y = 40;
-				for (const themeId of compareReq.themeIds.slice(0, 4)) {
-					let x = 40;
-					for (const pid of compareReq.devicePresetIds.slice(0, 4)) {
-						const preset = getDevicePreset(pid)!;
-						const dim = deviceDimensions(preset);
-						const id = newId('ghost');
-						ghostFrameIds.push(id);
-						project.frames.push({
-							id,
-							name: `${page.name}`,
-							pageId: page.id,
-							x,
-							y,
-							width: dim.width,
-							height: dim.height,
-							devicePresetId: pid,
-							heightMode: 'fixed',
-							themeId,
-							ghost: true,
-							readOnly: true,
-						});
-						x += dim.width + 56;
-					}
-					y += 900 + 80;
-				}
+				const layout = layoutCompareMatrix(
+					project.frames,
+					page.id,
+					compareReq.themeIds,
+					compareReq.devicePresetIds,
+					() => newId('ghost'),
+				);
 				return pushHistory(
 					{
 						...state,
-						ui: { ...ui, compare: { ...compareReq, ghostFrameIds } },
+						ui: {
+							...ui,
+							compare: { ...compareReq, ghostFrameIds: layout.cellFrames, layout },
+						},
 					},
 					project,
 				);
@@ -493,24 +499,42 @@ const DesignerContext = createContext<DesignerContextValue | null>(null);
 export function DesignerProvider({ children }: { children: ReactNode }) {
 	const [state, dispatch] = useReducer(reducer, initialState);
 
+	const getCanvasViewport = () => {
+		const el = document.querySelector('.infinite-canvas');
+		return {
+			w: el?.clientWidth ?? Math.max(400, window.innerWidth - 560),
+			h: el?.clientHeight ?? Math.max(300, window.innerHeight - 160),
+		};
+	};
+
 	const fitAll = useCallback(() => {
-		const frames = state.project.frames.filter((f) => !f.ghost);
-		if (!frames.length) return;
-		const minX = Math.min(...frames.map((f) => f.x));
-		const minY = Math.min(...frames.map((f) => f.y));
-		const maxX = Math.max(...frames.map((f) => f.x + f.width));
-		const maxY = Math.max(...frames.map((f) => f.y + f.height));
-		const pad = 70;
-		const worldW = maxX - minX + pad * 2;
-		const worldH = maxY - minY + pad * 2;
-		const viewW = window.innerWidth - 560;
-		const viewH = window.innerHeight - 160;
-		const zoom = Math.min(2.5, Math.max(0.25, Math.min(viewW / worldW, viewH / worldH)));
-		dispatch({
-			type: 'setCamera',
-			patch: { zoom, x: pad - minX * zoom + 20, y: pad - minY * zoom + 20 },
-		});
-	}, [state.project.frames]);
+		const { ui, project } = state;
+		const frames = project.frames.filter(
+			(f) => f.ghost || f.pageId === ui.activePageId,
+		);
+		let bounds = boundsForFrames(frames);
+		if (ui.compare?.kind === 'matrix' && ui.compare.layout) {
+			const l = ui.compare.layout;
+			const headerBounds = {
+				x: l.originX,
+				y: l.originY,
+				w: l.headerW,
+				h: l.headerH,
+			};
+			if (bounds) {
+				bounds = {
+					x: Math.min(bounds.x, headerBounds.x),
+					y: Math.min(bounds.y, headerBounds.y),
+					w: Math.max(bounds.x + bounds.w, headerBounds.x + l.headerW + 800) - Math.min(bounds.x, headerBounds.x),
+					h: Math.max(bounds.y + bounds.h, l.originY + l.headerH + 400) - Math.min(bounds.y, headerBounds.y),
+				};
+			}
+		}
+		if (!bounds) return;
+		const { w: viewW, h: viewH } = getCanvasViewport();
+		const cam = cameraToFitBounds(bounds, viewW, viewH, 40);
+		dispatch({ type: 'setCamera', patch: cam });
+	}, [state]);
 
 	const fitSelection = useCallback(() => {
 		const f = state.project.frames.find((fr) => fr.id === state.ui.selectedFrameId);
@@ -518,15 +542,20 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 			fitAll();
 			return;
 		}
-		const pad = 70;
-		const viewW = window.innerWidth - 560;
-		const viewH = window.innerHeight - 160;
-		const zoom = Math.min(2.5, Math.max(0.25, Math.min(viewW / (f.width + pad * 2), viewH / (f.height + pad * 2))));
-		dispatch({
-			type: 'setCamera',
-			patch: { zoom, x: pad - f.x * zoom + 20, y: pad - f.y * zoom + 20 },
-		});
-	}, [state.project.frames, state.ui.selectedFrameId, fitAll]);
+		const { w: viewW, h: viewH } = getCanvasViewport();
+		const cam = cameraToFitBounds(
+			{
+				x: f.x,
+				y: f.y - 28,
+				w: f.width,
+				h: f.height + 28,
+			},
+			viewW,
+			viewH,
+			48,
+		);
+		dispatch({ type: 'setCamera', patch: cam });
+	}, [state, fitAll]);
 
 	const value = useMemo(
 		() => ({ state, dispatch, fitAll, fitSelection }),

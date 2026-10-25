@@ -70,7 +70,12 @@ function renderNode(
 		.join('');
 
 	if (node.type === 'frame-root' || node.type === 'stack' || node.type === 'row' || node.type === 'column' || node.type === 'section') {
-		return `<div class="bf-node bf-${node.type}" data-node-id="${node.id}"${sel} style="${layoutCss(layout)}min-height:100%;background:var(--bf-theme-surface-2);">${childHtml}</div>`;
+		const extra = node.id === 'node-nav' ? ' bf-nav' : node.type === 'section' ? ' bf-section' : '';
+		const bg =
+			node.type === 'frame-root'
+				? 'min-height:100%;background:var(--bf-theme-surface-2);'
+				: '';
+		return `<div class="bf-node bf-${node.type}${extra}" data-node-id="${node.id}"${sel} style="${layoutCss(layout)}${bg}">${childHtml}</div>`;
 	}
 
 	return `<div class="bf-node" data-node-id="${node.id}"${sel} style="${layoutCss(layout)}">${childHtml}</div>`;
@@ -105,7 +110,14 @@ export function buildFramePreviewDoc(opts: {
 <link rel="stylesheet" href="${base}themes/${themeId}.css" />
 <link rel="stylesheet" href="${base}themes/layout.css" />
 <style>
-  html, body { margin:0; min-height:100%; font-family:var(--bf-theme-font-family); background:var(--bf-theme-surface-2); }
+  html, body { margin:0; min-height:100%; font-family:var(--bf-theme-font-family); font-size:16px; background:var(--bf-theme-surface-2); color:var(--bf-theme-text-1); }
+  h1 { font-size:clamp(1.35rem, 4vw, 2rem); margin:0; line-height:1.15; }
+  h2 { font-size:1.25rem; margin:0; }
+  h3 { font-size:1.05rem; margin:0; }
+  p { margin:0; color:var(--bf-theme-text-2); line-height:1.45; }
+  .bf-row, .bf-stack { width:100%; }
+  .bf-section { background:var(--bf-theme-surface-1); border:1px solid var(--bf-theme-border-1); border-radius:var(--bf-theme-radius-md,8px); }
+  .bf-nav { background:var(--bf-theme-surface-1); border-bottom:1px solid var(--bf-theme-border-1); }
   [data-bf-theme="${themeId}"] { ${varBlock} }
   .bf-btn-primary { background:var(--bf-theme-button-primary-bg); color:var(--bf-theme-button-primary-color); border:1px solid var(--bf-theme-button-primary-border-color); padding:0.5rem 1rem; border-radius:var(--bf-theme-radius-md,8px); font:inherit; cursor:pointer; }
   .bf-btn-secondary { background:var(--bf-theme-button-secondary-bg); color:var(--bf-theme-button-secondary-color); border:1px solid var(--bf-theme-button-secondary-border-color); padding:0.5rem 1rem; border-radius:var(--bf-theme-radius-md,8px); font:inherit; }

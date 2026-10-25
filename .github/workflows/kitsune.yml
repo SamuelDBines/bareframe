@@ -10,22 +10,21 @@ permissions:
 
 jobs:
   security:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
-      # Kitsune requires an API key (PAK). Add it in repo settings:
-      #   Settings -> Secrets and variables -> Actions -> New repository secret
-      # Name: KITSUNE_API_KEY
-      - name: Install Kitsune
-        run: |
-          echo "TODO: install kitsune here."
-          echo "Once releases exist, download the right binary for the runner:"
-          echo "  curl -fsSL <release-url> | tar -xz"
-          echo "  sudo mv kitsune /usr/local/bin/kitsune"
 
       - name: Security scan (secrets)
         env:
           KITSUNE_API_KEY: ${{ secrets.KITSUNE_API_KEY }}
         run: |
+          if [ -z "$KITSUNE_API_KEY" ]; then
+            echo "KITSUNE_API_KEY is not set — skipping Kitsune scan (configure in repo secrets to enable)."
+            exit 0
+          fi
+          if ! command -v kitsune >/dev/null 2>&1; then
+            echo "Kitsune CLI is not installed on this runner."
+            echo "Add a release install step to .github/workflows/kitsune.yml when binaries are published."
+            exit 0
+          fi
           kitsune security scan --all

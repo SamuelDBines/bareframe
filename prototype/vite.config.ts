@@ -27,9 +27,12 @@ function syncThemesPlugin(): Plugin {
 	};
 }
 
+const pagesRoot = process.env.BAREFRAME_PAGES_ROOT === '1';
+
 export default defineConfig({
 	root: here,
-	base: './',
+	// Custom domain serves the app at https://bareframe.org/ (absolute asset URLs).
+	base: pagesRoot ? '/' : './',
 	plugins: [react(), syncThemesPlugin()],
 	build: {
 		outDir: path.join(repoRoot, 'public', 'prototype'),

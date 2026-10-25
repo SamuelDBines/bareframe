@@ -21,7 +21,7 @@ cd prototype
 pnpm run build
 ```
 
-Output is written to `../public/prototype/` for GitHub Pages at `https://<user>.github.io/<repo>/prototype/`.
+Output is written to `../public/prototype/`. The root `pnpm run build:pages` pipeline (or CI) runs `pages:finalize` to promote the prototype to the site root (`https://bareframe.org/`) and move Stencil demos + Component Studio under `/legacy/`.
 
 ## Screens
 

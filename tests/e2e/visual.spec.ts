@@ -8,7 +8,7 @@ test.describe('visual subset (VISUAL=1)', () => {
 	test('button demo — deterministic shell', async ({ page }, testInfo) => {
 		test.skip(!process.env.VISUAL, 'Set VISUAL=1 to enable screenshot comparison');
 
-		await gotoDemo(page, '/button/index.html');
+		await gotoDemo(page, '/legacy/button/index.html');
 		await page.locator('#themeSelect').selectOption('system');
 		const root = page.locator('[data-demo-root]');
 		await expect(root).toBeVisible();

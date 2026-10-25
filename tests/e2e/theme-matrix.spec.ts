@@ -10,7 +10,7 @@ const SURFACE_EXPECT: Record<(typeof MATRIX_THEMES)[number], string> = {
 test.describe('Tier A theme matrix', () => {
 	for (const slug of TIER_A_DEMO_SLUGS) {
 		test(`demo ${slug} resolves tokens across themes`, async ({ page }) => {
-			await gotoDemo(page, `/${slug}/index.html`);
+			await gotoDemo(page, `/legacy/${slug}/index.html`);
 			await expect(page.locator('[data-demo-root]').first()).toBeVisible({ timeout: 20_000 });
 			const primary = themeMatrixLocator(page, slug);
 			await expect(primary).toBeVisible({ timeout: 20_000 });

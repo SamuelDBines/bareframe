@@ -61,7 +61,8 @@
     "showcase:dev": "pnpm --prefix showcase dev",
     "showcase:build": "pnpm run build:pages",
     "prototype:dev": "pnpm --prefix prototype dev",
-    "prototype:build": "pnpm --prefix prototype install && pnpm --prefix prototype run build",
+    "prototype:build": "pnpm --prefix prototype install && BAREFRAME_PAGES_ROOT=1 pnpm --prefix prototype run build",
+    "pages:finalize": "node ./scripts/finalize-pages.mjs",
     "typecheck": "tsc --noEmit",
     "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts --watch-path=stencil --watch-path=tsconfig.json ./scripts/build.mjs"
   },

@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
@@ -55,6 +55,13 @@ jobs:
       - name: Build showcase (Component Studio → public/showcase/)
         working-directory: showcase
         run: pnpm install --frozen-lockfile && pnpm exec vite build
+
+      - name: Build product prototype (→ public/prototype/)
+        working-directory: prototype
+        run: pnpm install --frozen-lockfile && BAREFRAME_PAGES_ROOT=1 pnpm run build
+
+      - name: Finalize Pages layout (prototype @ root, legacy @ /legacy/)
+        run: node ./scripts/finalize-pages.mjs
 
       - name: Smoke-check Pages artifact
         run: pnpm run smoke:pages

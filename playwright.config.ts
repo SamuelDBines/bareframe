@@ -17,7 +17,7 @@ export default defineConfig({
 	webServer: process.env.PW_NO_SERVER
 		? undefined
 		: {
-				command: `pnpm exec sirv public --host 127.0.0.1 --port ${PORT} --cors --quiet`,
+				command: `pnpm exec sirv public --host 127.0.0.1 --port ${PORT} --cors --dev --quiet`,
 				url: baseURL,
 				reuseExistingServer: !process.env.CI,
 				timeout: 120_000,

@@ -24,7 +24,7 @@ Links:
 
 Published files ship from **`dist/`** at the repo root (this matches `"exports"` in `package.json`). **`pnpm run build`** compiles into `dist/` and then runs **`scripts/prep-pages.mjs`**, which copies `dist/` and `themes/` into **`public/dist`** and **`public/themes`** and rewrites demo HTML to use `./` / `../` prefixes so asset URLs are never rooted at `https://<user>.github.io/themes/...` when the site lives under **`https://<user>.github.io/<repo>/`** (GitHub project Pages).
 
-Workflow **Deploy Public To Pages** (`.github/workflows/deploy-pages.yml`) uses **pnpm**, runs the same steps as **`pnpm run build:pages`** (library build, example generators, showcase Vite build, smoke checks), and uploads **`public`**.
+Production hosting is **Kubernetes** on DigitalOcean (`london-cluster`). Workflow **Deploy to Kubernetes** (`.github/workflows/deploy-k8s.yml`) builds the same artifact as **`pnpm run build:pages`** (library build, example generators, showcase Vite build, `finalize-pages`, smoke checks) into a container image. See [`deploy/README.md`](deploy/README.md) for DNS, secrets, and manual deploy.
 
 Sanity-check locally before pushing Pages-facing changes:
 

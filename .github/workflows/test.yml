@@ -20,6 +20,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: actionlint
+        run: |
+          curl -sfL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash
+          ./actionlint -color
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 

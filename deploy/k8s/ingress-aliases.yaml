@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bareframe-aliases
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/permanent-redirect: https://bareframe.org$request_uri
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - www.bareframe.org
+        - bareframe.co.uk
+        - www.bareframe.co.uk
+      secretName: bareframe-aliases-tls
+  rules:
+    - host: www.bareframe.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bareframe-site
+                port:
+                  name: http
+    - host: bareframe.co.uk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bareframe-site
+                port:
+                  name: http
+    - host: www.bareframe.co.uk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bareframe-site
+                port:
+                  name: http

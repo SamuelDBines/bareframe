@@ -7,11 +7,14 @@ function baseOrigin(): string {
 }
 
 test.describe('smoke — static artifact + showcase', () => {
-	test('dist/manifest.json and dist/tokens.json respond', async ({ request }) => {
-		const m = await request.get('/dist/manifest.json');
+	test('prototype root and legacy dist manifest respond', async ({ request, page }) => {
+		await page.goto('/');
+		await expect(page.getByText('Bareframe', { exact: false }).first()).toBeVisible();
+
+		const m = await request.get('/legacy/dist/manifest.json');
 		expect(m.ok(), await m.text()).toBeTruthy();
 
-		const t = await request.get('/dist/tokens.json');
+		const t = await request.get('/legacy/dist/tokens.json');
 		expect(t.ok(), await t.text()).toBeTruthy();
 		const tokens = await t.json();
 		expect(Array.isArray(tokens.tokens)).toBeTruthy();
@@ -22,19 +25,19 @@ test.describe('smoke — static artifact + showcase', () => {
 		const failures: { url: string; status: number }[] = [];
 		attachSameOriginFailures(page, base, failures);
 
-		await gotoDemo(page, '/showcase/index.html');
+		await gotoDemo(page, '/legacy/showcase/index.html');
 		await expect(page.locator('body')).toBeVisible();
 		await expect(page.getByRole('heading', { name: 'Component Studio' })).toBeVisible({
 			timeout: 15_000,
 		});
 		await expect(page.getByText('Component Studio needs a build')).toHaveCount(0);
 
-		const studio = await request.get('/dist/showcase-studio.json');
+		const studio = await request.get('/legacy/dist/showcase-studio.json');
 		expect(studio.ok(), await studio.text()).toBeTruthy();
 
 		const demoSlugs = ['button', 'input', 'card'];
 		for (const slug of demoSlugs) {
-			await gotoDemo(page, `/${slug}/index.html`);
+			await gotoDemo(page, `/legacy/${slug}/index.html`);
 			await page.waitForLoadState('domcontentloaded');
 			await expect(page.locator('body')).toBeVisible();
 		}

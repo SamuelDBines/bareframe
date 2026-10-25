@@ -15,11 +15,13 @@ import { LandingPage } from './pages/site/Landing';
 import { PricingPage } from './pages/site/Pricing';
 import { SignInPage } from './pages/site/SignIn';
 import { SignUpPage } from './pages/site/SignUp';
+import { AuthProvider } from './auth/AuthContext';
 import { ThemeProvider } from './theme/ThemeContext';
 
 export default function App() {
 	return (
 		<ThemeProvider>
+			<AuthProvider>
 			<HashRouter>
 				<Routes>
 					<Route element={<AppShell />}>
@@ -49,6 +51,7 @@ export default function App() {
 					</Route>
 				</Routes>
 			</HashRouter>
+			</AuthProvider>
 		</ThemeProvider>
 	);
 }

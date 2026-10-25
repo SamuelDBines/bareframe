@@ -15,7 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE: ghcr.io/samueldbines/bareframe/site
+  SITE_IMAGE: ghcr.io/samueldbines/bareframe/site
+  API_IMAGE: ghcr.io/samueldbines/bareframe/api
 
 jobs:
   build-and-push:
@@ -38,14 +39,25 @@ jobs:
         id: meta
         run: echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      - name: Build and push
+      - name: Build and push site image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            ${{ env.IMAGE }}:sha-${{ steps.meta.outputs.short_sha }}
-            ${{ env.IMAGE }}:latest
+            ${{ env.SITE_IMAGE }}:sha-${{ steps.meta.outputs.short_sha }}
+            ${{ env.SITE_IMAGE }}:latest
+          labels: |
+            org.opencontainers.image.source=https://github.com/SamuelDBines/bareframe
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: api
+          push: true
+          tags: |
+            ${{ env.API_IMAGE }}:sha-${{ steps.meta.outputs.short_sha }}
+            ${{ env.API_IMAGE }}:latest
           labels: |
             org.opencontainers.image.source=https://github.com/SamuelDBines/bareframe
 
@@ -80,12 +92,13 @@ jobs:
           curl -sfL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.6.0/kustomize_v5.6.0_linux_amd64.tar.gz" | tar xz
           sudo mv kustomize /usr/local/bin/kustomize
 
-      - name: Set deployment image tag
+      - name: Set deployment image tags
         if: env.DO_TOKEN != ''
         working-directory: deploy/k8s
         run: |
           SHORT_SHA="${GITHUB_SHA::7}"
           kustomize edit set image "ghcr.io/samueldbines/bareframe/site=ghcr.io/samueldbines/bareframe/site:sha-${SHORT_SHA}"
+          kustomize edit set image "ghcr.io/samueldbines/bareframe/api=ghcr.io/samueldbines/bareframe/api:sha-${SHORT_SHA}"
 
       - name: Apply manifests and wait for rollout
         if: env.DO_TOKEN != ''
@@ -94,5 +107,9 @@ jobs:
           kubectl apply -k deploy/k8s
           if ! kubectl rollout status deployment/bareframe-site -n bareframe --timeout=180s; then
             kubectl rollout undo deployment/bareframe-site -n bareframe || true
+            exit 1
+          fi
+          if ! kubectl rollout status deployment/bareframe-api -n bareframe --timeout=180s; then
+            kubectl rollout undo deployment/bareframe-api -n bareframe || true
             exit 1
           fi

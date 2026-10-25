@@ -1,0 +1,58 @@
+# Idempotent schema migrations for bareframe-api.
+# NOT included in deploy/k8s/kustomization.yaml — apply manually when deploying
+# the API for the first time or after adding SQL migrations.
+#
+# Pin the image tag to the same sha as bareframe-api before applying:
+#   yq -i '.spec.template.spec.containers[0].image = "ghcr.io/.../api:sha-XXXXXXX"' ...
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bareframe-api-migrate
+  namespace: bareframe
+  labels:
+    app: bareframe-api
+    component: migrate
+spec:
+  ttlSecondsAfterFinished: 86400
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: bareframe-api
+        component: migrate
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: ghcr.io/samueldbines/bareframe/api:latest
+          imagePullPolicy: IfNotPresent
+          command: ['node', 'dist/migrate-cli.js']
+          envFrom:
+            - secretRef:
+                name: bareframe-api-env
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

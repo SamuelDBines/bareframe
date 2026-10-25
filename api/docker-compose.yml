@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bareframe
+      POSTGRES_PASSWORD: bareframe
+      POSTGRES_DB: bareframe
+    ports:
+      - '54329:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bareframe -d bareframe']
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  migrate:
+    build: .
+    command: ['node', 'dist/migrate-cli.js']
+    environment:
+      DATABASE_URL: postgres://bareframe:bareframe@postgres:5432/bareframe?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: .
+    ports:
+      - '8080:8080'
+    environment:
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-dev-client-id}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-dev-client-secret}
+      SESSION_SECRET: ${SESSION_SECRET:-local-dev-session-secret-change-me}
+      DATABASE_URL: postgres://bareframe:bareframe@postgres:5432/bareframe?sslmode=disable
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully

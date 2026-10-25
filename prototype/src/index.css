@@ -205,6 +205,39 @@ pre {
 	border-color: var(--bf-theme-border-1);
 }
 
+.btn-sm {
+	padding: 0.35rem 0.65rem;
+	font-size: 0.8125rem;
+}
+
+.user-menu {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.user-avatar {
+	border-radius: 50%;
+	border: 1px solid var(--bf-theme-border-1);
+	object-fit: cover;
+}
+
+.user-login {
+	font-size: 0.875rem;
+	color: var(--bf-theme-text-2);
+	max-width: 8rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.auth-muted {
+	font-size: 0.875rem;
+	color: var(--bf-theme-text-2);
+	margin: 0;
+}
+
 .card {
 	border-radius: calc(var(--bf-theme-radius-md, 8px) + 4px);
 	border: 1px solid var(--bf-theme-border-1);

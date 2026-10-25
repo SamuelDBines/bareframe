@@ -1,38 +1,39 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { githubSignInUrl, useAuth } from '../../auth/AuthContext';
 
 export function SignUpPage() {
-	const navigate = useNavigate();
+	const { status, user } = useAuth();
+
+	if (user) {
+		return (
+			<div style={{ maxWidth: 440, margin: '0 auto', textAlign: 'center' }}>
+				<p className="lead">You are signed in as <strong>{user.login}</strong>.</p>
+				<Link to="/designer" className="btn btn-primary">Open Designer</Link>
+			</div>
+		);
+	}
 
 	return (
 		<div style={{ maxWidth: 440, margin: '0 auto' }}>
 			<div className="page-hero" style={{ textAlign: 'center' }}>
 				<h1>Create your account</h1>
-				<p>Mock sign-up — continues to Designer dashboard.</p>
+				<p>Get started with GitHub — no separate password.</p>
 			</div>
-			<form
-				className="card form-stack"
-				onSubmit={(e) => {
-					e.preventDefault();
-					navigate('/designer');
-				}}
-			>
-				<div className="field">
-					<label htmlFor="name">Full name</label>
-					<input id="name" name="name" placeholder="Sam Bines" required />
-				</div>
-				<div className="field">
-					<label htmlFor="email">Work email</label>
-					<input id="email" name="email" type="email" placeholder="you@company.com" required />
-				</div>
-				<div className="field">
-					<label htmlFor="password">Password</label>
-					<input id="password" name="password" type="password" required />
-				</div>
-				<button type="submit" className="btn btn-primary">Create account</button>
+			<div className="card form-stack" style={{ alignItems: 'stretch' }}>
+				{status === 'unavailable' ? (
+					<p className="auth-muted" role="status">
+						Sign-in API is not reachable. Run the API locally or use{' '}
+						<a href="https://bareframe.org/sign-in">bareframe.org</a>.
+					</p>
+				) : (
+					<a className="btn btn-primary" href={githubSignInUrl('/#/designer')}>
+						Continue with GitHub
+					</a>
+				)}
 				<p style={{ margin: 0, fontSize: '0.875rem' }}>
 					Already have an account? <Link to="/sign-in">Sign in</Link>
 				</p>
-			</form>
+			</div>
 		</div>
 	);
 }

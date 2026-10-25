@@ -25,3 +25,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
 		nodeEnv: env.NODE_ENV ?? 'development',
 	};
 }
+
+/** Migrations only need a database URL (e.g. Kubernetes Job). */
+export function loadMigrateConfig(env: NodeJS.ProcessEnv = process.env): {
+	databaseUrl: string;
+} {
+	return { databaseUrl: required('DATABASE_URL') };
+}

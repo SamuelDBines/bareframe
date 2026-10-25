@@ -29,30 +29,13 @@ spec:
           env:
             - name: PUBLIC_URL
               value: https://bareframe.org
-            - name: GITHUB_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: bareframe-api
-                  key: GITHUB_CLIENT_ID
-            - name: GITHUB_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: bareframe-api
-                  key: GITHUB_CLIENT_SECRET
-            - name: SESSION_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: bareframe-api
-                  key: SESSION_SECRET
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: bareframe-api
-                  key: DATABASE_URL
+          envFrom:
+            - secretRef:
+                name: bareframe-api-env
           resources:
             requests:
-              cpu: 10m
-              memory: 64Mi
+              cpu: 25m
+              memory: 96Mi
             limits:
               cpu: 200m
               memory: 256Mi

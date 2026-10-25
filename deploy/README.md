@@ -34,16 +34,18 @@ Create a [GitHub OAuth App](https://github.com/settings/developers) (not a GitHu
 
 Copy the **Client ID** and generate a **Client secret** for the Kubernetes secret below.
 
-### Kubernetes secret `bareframe-api`
+### Kubernetes secret `bareframe-api-env`
 
-Do **not** commit credentials. Create the secret in namespace `bareframe`:
+Cluster convention: an `<app>-env` Secret loaded with `envFrom` on the Deployment. Do **not** commit credentials.
+
+Create the secret in namespace `bareframe`:
 
 ```bash
-kubectl create secret generic bareframe-api -n bareframe \
+kubectl create secret generic bareframe-api-env -n bareframe \
   --from-literal=GITHUB_CLIENT_ID='...' \
   --from-literal=GITHUB_CLIENT_SECRET='...' \
   --from-literal=SESSION_SECRET='...' \
-  --from-literal=DATABASE_URL='postgres://USER:PASSWORD@HOST:5432/bareframe?sslmode=require'
+  --from-literal=DATABASE_URL='postgresql://bareframe:<password>@postgres.database.svc.cluster.local:5432/bareframe?sslmode=disable'
 ```
 
 | Key | Description |
@@ -51,11 +53,34 @@ kubectl create secret generic bareframe-api -n bareframe \
 | `GITHUB_CLIENT_ID` | OAuth App client ID |
 | `GITHUB_CLIENT_SECRET` | OAuth App client secret |
 | `SESSION_SECRET` | Random string (32+ chars) for signing session and OAuth state cookies |
-| `DATABASE_URL` | Postgres connection string for the dedicated `bareframe` database |
+| `DATABASE_URL` | Postgres URL for the dedicated `bareframe` role/database |
+
+`PUBLIC_URL` is set on the Deployment manifest (`https://bareframe.org`), not in the secret.
 
 ### Postgres
 
-Use a **dedicated database and user** on the cluster’s shared Postgres instance (not the superuser). The API runs SQL migrations on startup (`users`, `sessions`). Set `sslmode` in `DATABASE_URL` as required by your provider (often `sslmode=require` on managed Postgres).
+Shared in-cluster Postgres (**15**), service `postgres.database.svc.cluster.local:5432`, **SSL off**. Provision a dedicated role and database `bareframe` (not the superuser).
+
+Example `DATABASE_URL` (password from your role setup):
+
+`postgresql://bareframe:<password>@postgres.database.svc.cluster.local:5432/bareframe?sslmode=disable`
+
+The API maps `sslmode=disable` to `ssl: false` for node-pg (libpq-style URLs are not interpreted automatically otherwise).
+
+### Database migrations (Kubernetes Job)
+
+Migrations are **not** run on API pod startup (same pattern as framekit). They are idempotent and applied via a one-off Job manifest kept **outside** the default kustomization: [`deploy/k8s/jobs/api-migrate-job.yaml`](k8s/jobs/api-migrate-job.yaml).
+
+Run after first API deploy and whenever `api/src/db/migrations/` changes:
+
+```bash
+# Pin the Job image to the same tag as bareframe-api (e.g. sha from CI)
+kubectl delete job bareframe-api-migrate -n bareframe --ignore-not-found
+kubectl apply -f deploy/k8s/jobs/api-migrate-job.yaml
+kubectl wait --for=condition=complete job/bareframe-api-migrate -n bareframe --timeout=120s
+```
+
+Local/docker: `docker compose up` runs a `migrate` one-shot service before the API.
 
 ### Local API + Postgres
 

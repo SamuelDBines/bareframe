@@ -1,5 +1,6 @@
-import pg from 'pg';
+import type pg from 'pg';
 import type { Config } from '../config.js';
+import { createPoolFromDatabaseUrl } from './pool.js';
 
 export type UserRow = {
 	id: number;
@@ -13,7 +14,7 @@ export type UserRow = {
 };
 
 export function createPool(config: Config): pg.Pool {
-	return new pg.Pool({ connectionString: config.databaseUrl });
+	return createPoolFromDatabaseUrl(config.databaseUrl);
 }
 
 export async function upsertUser(

@@ -53,40 +53,42 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    env:
+      DO_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
     steps:
       - name: Skip deploy without cluster credentials
-        if: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN == '' }}
+        if: env.DO_TOKEN == ''
         run: echo "DIGITALOCEAN_ACCESS_TOKEN is not configured; skipping Kubernetes deploy."
 
       - name: Checkout
-        if: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN != '' }}
+        if: env.DO_TOKEN != ''
         uses: actions/checkout@v4
 
       - name: Install doctl
-        if: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN != '' }}
+        if: env.DO_TOKEN != ''
         uses: digitalocean/action-doctl@v2
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          token: ${{ env.DO_TOKEN }}
 
       - name: Configure kubectl for london-cluster
-        if: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN != '' }}
+        if: env.DO_TOKEN != ''
         run: doctl kubernetes cluster kubeconfig save london-cluster
 
       - name: Install kustomize
-        if: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN != '' }}
+        if: env.DO_TOKEN != ''
         run: |
           curl -sfL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.6.0/kustomize_v5.6.0_linux_amd64.tar.gz" | tar xz
           sudo mv kustomize /usr/local/bin/kustomize
 
       - name: Set deployment image tag
-        if: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN != '' }}
+        if: env.DO_TOKEN != ''
         working-directory: deploy/k8s
         run: |
           SHORT_SHA="${GITHUB_SHA::7}"
           kustomize edit set image "ghcr.io/samueldbines/bareframe/site=ghcr.io/samueldbines/bareframe/site:sha-${SHORT_SHA}"
 
       - name: Apply manifests and wait for rollout
-        if: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN != '' }}
+        if: env.DO_TOKEN != ''
         run: |
           set -euo pipefail
           kubectl apply -k deploy/k8s

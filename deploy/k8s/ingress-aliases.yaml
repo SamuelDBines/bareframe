@@ -4,7 +4,6 @@ metadata:
   name: bareframe-aliases
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/permanent-redirect: https://bareframe.org$request_uri
 spec:
   ingressClassName: nginx
   tls:

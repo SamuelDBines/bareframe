@@ -90,11 +90,22 @@ async function exists(p) {
 	}
 }
 
+/** Rename when possible; copy+delete on EXDEV (e.g. Docker overlayfs). */
+async function renameOrCopyMove(from, to) {
+	try {
+		await fs.rename(from, to);
+	} catch (err) {
+		if (err?.code !== 'EXDEV') throw err;
+		await fs.cp(from, to, { recursive: true, force: true });
+		await fs.rm(from, { recursive: true, force: true });
+	}
+}
+
 async function moveIntoLegacy(name) {
 	const from = path.join(publicDir, name);
 	const to = path.join(legacyDir, name);
 	if (await exists(to)) await fs.rm(to, { recursive: true, force: true });
-	await fs.rename(from, to);
+	await renameOrCopyMove(from, to);
 }
 
 async function main() {

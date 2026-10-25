@@ -19,6 +19,7 @@ const checks = [
 	'public/dist/showcase-studio.json',
 	'public/themes/system.css',
 	'public/showcase/index.html',
+	'public/prototype/index.html',
 ];
 
 async function main() {

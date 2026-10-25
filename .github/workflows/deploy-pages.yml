@@ -53,6 +53,10 @@ jobs:
         working-directory: showcase
         run: pnpm install --frozen-lockfile && pnpm exec vite build
 
+      - name: Build product prototype (→ public/prototype/)
+        working-directory: prototype
+        run: pnpm install --frozen-lockfile && pnpm run build
+
       - name: Smoke-check Pages artifact
         run: pnpm run smoke:pages
 

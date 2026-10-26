@@ -1,16 +1,42 @@
 import { Link } from 'react-router-dom';
+import { Alert } from '../../components/bareframe/Alert';
+import { Button } from '../../components/bareframe/Button';
 import { COMPONENT_LIBRARY } from '../../data/components';
+import { THEME_LABELS, type ThemeId } from '../../theme/themes';
+
+const THEME_COMPARE: ThemeId[] = ['light', 'dark', 'aurora', 'noir'];
 
 export function ComponentsGallery() {
+	const stable = COMPONENT_LIBRARY.filter((c) => c.status === 'stable');
+
 	return (
 		<>
 			<div className="page-hero">
 				<h1>Component gallery</h1>
 				<p className="lead">
-					Preview @bareframe/react primitives with live theme switching and copy-ready snippets.
+					Preview @bareframe/react primitives with live playgrounds, theme switching, and copy-ready snippets.
 				</p>
 			</div>
-			<div className="grid-2">
+
+			<section className="gallery-theme-matrix card">
+				<h2>Across themes</h2>
+				<p style={{ margin: 0, color: 'var(--bf-theme-text-2)', fontSize: '0.9rem' }}>
+					Primary button and alert surfaces on a few theme presets — open any component for the full playground.
+				</p>
+				<div className="gallery-theme-row">
+					{THEME_COMPARE.map((themeId) => (
+						<div key={themeId} className="gallery-theme-cell" data-bf-theme={themeId}>
+							<span className="gallery-theme-cell__label">{THEME_LABELS[themeId]}</span>
+							<Button size="sm" variant="primary">Action</Button>
+							<Alert variant="info" title="Note" dismissible={false}>
+								Token-driven UI
+							</Alert>
+						</div>
+					))}
+				</div>
+			</section>
+
+			<div className="grid-2" style={{ marginTop: '1.5rem' }}>
 				{COMPONENT_LIBRARY.map((c) => (
 					<Link
 						key={c.slug}
@@ -29,6 +55,10 @@ export function ComponentsGallery() {
 					</Link>
 				))}
 			</div>
+
+			<p className="footer-note">
+				{stable.length} stable components · {COMPONENT_LIBRARY.length} documented total
+			</p>
 		</>
 	);
 }

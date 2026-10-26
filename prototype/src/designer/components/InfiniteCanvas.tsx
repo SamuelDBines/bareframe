@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ThemeId } from '../../theme/themes';
 import { THEME_LABELS } from '../../theme/themes';
-import { panCamera, setCameraZoomAtScreenPoint, zoomCameraAroundPoint, type Camera } from '../camera';
+import { setCameraZoomAtScreenPoint, zoomCameraAroundPoint, type Camera } from '../camera';
 import { getDevicePreset } from '../devicePresets';
 import type { MatrixLayout } from '../frameLayout';
 import { useDesigner } from '../store';
+import { useDesignerCanvasInput } from '../useDesignerCanvasInput';
 import { CanvasFrame } from './CanvasFrame';
 
 function MatrixHeaders({ layout }: { layout: MatrixLayout }) {
@@ -117,50 +118,29 @@ export function InfiniteCanvas() {
 		[commitCamera],
 	);
 
-	useEffect(() => {
-		const onKey = (e: KeyboardEvent) => {
-			if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-			if (e.code === 'Space') {
-				e.preventDefault();
-				setSpaceDown(e.type === 'keydown');
-			}
-			if (e.key === 'Escape') dispatch({ type: 'exitCompare' });
-			if (e.shiftKey && e.key === '1') fitAll();
-			if (e.shiftKey && e.key === '2') fitSelection();
-			if (e.shiftKey && e.key === '0') commitCamera({ ...liveCameraRef.current, zoom: 1 });
-		};
-		window.addEventListener('keydown', onKey);
-		window.addEventListener('keyup', onKey);
-		return () => {
-			window.removeEventListener('keydown', onKey);
-			window.removeEventListener('keyup', onKey);
-		};
-	}, [dispatch, fitAll, fitSelection, commitCamera]);
+	const clearPan = useCallback(() => {
+		panRef.current = null;
+		pinchRef.current = null;
+		pointersRef.current.clear();
+	}, []);
 
-	useEffect(() => {
-		const onWheel = (e: WheelEvent) => {
-			const rect = containerRef.current?.getBoundingClientRect();
-			if (!rect) return;
-			if (
-				e.clientX < rect.left ||
-				e.clientX > rect.right ||
-				e.clientY < rect.top ||
-				e.clientY > rect.bottom
-			) {
-				return;
-			}
-			if (e.ctrlKey || e.metaKey) {
-				e.preventDefault();
-				zoomAround(e.clientX, e.clientY, e.deltaY > 0 ? -0.08 : 0.08);
-			} else {
-				e.preventDefault();
-				const next = panCamera(liveCameraRef.current, -e.deltaX, -e.deltaY);
-				commitCamera(next);
-			}
-		};
-		window.addEventListener('wheel', onWheel, { passive: false });
-		return () => window.removeEventListener('wheel', onWheel);
-	}, [zoomAround, commitCamera]);
+	const zoomTo100 = useCallback(() => {
+		commitCamera({ ...liveCameraRef.current, zoom: 1 });
+	}, [commitCamera]);
+
+	useDesignerCanvasInput({
+		containerRef,
+		workspaceSelector: '.designer-workspace-v2',
+		liveCameraRef,
+		commitCamera,
+		zoomAround,
+		onSpaceChange: setSpaceDown,
+		onClearPan: clearPan,
+		fitAll,
+		fitSelection,
+		zoomTo100,
+		dispatch,
+	});
 
 	const frames = project.frames.filter((f) => {
 		if (ui.compare?.kind === 'matrix') {
@@ -266,6 +246,9 @@ export function InfiniteCanvas() {
 			panRef.current = null;
 			commitCamera(liveCameraRef.current);
 		}
+		if (e.nativeEvent.getModifierState) {
+			if (!e.nativeEvent.getModifierState(' ')) setSpaceDown(false);
+		}
 	};
 
 	const zoomCenter = () => {
@@ -277,7 +260,7 @@ export function InfiniteCanvas() {
 	return (
 		<div
 			ref={containerRef}
-			className="infinite-canvas"
+			className={`infinite-canvas${spaceDown ? ' infinite-canvas--space-pan' : ''}`}
 			onPointerDown={onPointerDown}
 			onPointerMove={onPointerMove}
 			onPointerUp={onPointerUp}

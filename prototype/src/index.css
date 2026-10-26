@@ -12,6 +12,20 @@ body,
 	min-height: 100%;
 }
 
+body.designer-editor-active {
+	overflow: hidden;
+	max-width: 100%;
+}
+
+body.designer-editor-active #root {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	height: 100dvh;
+	max-height: 100dvh;
+	overflow: hidden;
+}
+
 body {
 	margin: 0;
 	font-family: var(--bf-theme-font-family, 'Inter', system-ui, sans-serif);
@@ -160,6 +174,19 @@ pre {
 .app-main.wide {
 	max-width: none;
 	padding: 0;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.app-main.wide .designer-route-shell {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
 }
 
 .btn {
@@ -588,6 +615,8 @@ table.props-table tr:last-child td {
 
 .designer-route-shell {
 	width: 100%;
+	max-width: 100%;
+	min-width: 0;
 }
 
 .designer-subnav {
@@ -609,8 +638,10 @@ table.props-table tr:last-child td {
 	grid-template-columns: 260px minmax(0, 1fr) 300px;
 	width: 100%;
 	max-width: 100%;
-	height: calc(100vh - 52px);
-	min-height: 520px;
+	min-width: 0;
+	flex: 1;
+	min-height: 0;
+	height: auto;
 	overflow: hidden;
 	border-top: 1px solid var(--bf-theme-border-1);
 	background: var(--bf-theme-surface-2);
@@ -619,9 +650,11 @@ table.props-table tr:last-child td {
 .designer-sidebar,
 .designer-inspector {
 	overflow-y: auto;
+	overflow-x: hidden;
 	padding: 0.75rem;
 	background: var(--bf-theme-surface-1);
 	border-right: 1px solid var(--bf-theme-border-1);
+	min-width: 0;
 }
 
 .designer-inspector {
@@ -772,12 +805,14 @@ table.props-table tr:last-child td {
 	cursor: grab;
 	touch-action: none;
 	user-select: none;
+	contain: paint;
 	background:
 		radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--bf-theme-border-1) 40%, transparent) 1px, transparent 0)
 		0 0 / 16px 16px;
 }
 
-.infinite-canvas:active {
+.infinite-canvas:active,
+.infinite-canvas.infinite-canvas--space-pan {
 	cursor: grabbing;
 }
 
@@ -785,6 +820,9 @@ table.props-table tr:last-child td {
 	position: absolute;
 	left: 0;
 	top: 0;
+	width: 0;
+	height: 0;
+	overflow: visible;
 	will-change: transform;
 }
 
@@ -1059,7 +1097,7 @@ table.props-table tr:last-child td {
 	border-radius: 8px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
 	.designer-route-shell {
 		overflow-x: hidden;
 	}

@@ -2,6 +2,7 @@ import type { ThemeId } from '../theme/themes';
 import { resolveLayout, resolveVariant, isVisible } from './resolveNode';
 import { breakpointForWidth } from './breakpoints';
 import type { DesignNode, Page, StyleTrial } from './types';
+import { framePreviewHostScript } from './framePreviewHostScript';
 
 const base = import.meta.env.BASE_URL;
 
@@ -110,7 +111,7 @@ export function buildFramePreviewDoc(opts: {
 <link rel="stylesheet" href="${base}themes/${themeId}.css" />
 <link rel="stylesheet" href="${base}themes/layout.css" />
 <style>
-  html, body { margin:0; min-height:100%; font-family:var(--bf-theme-font-family); font-size:16px; background:var(--bf-theme-surface-2); color:var(--bf-theme-text-1); }
+  html, body { margin:0; min-height:100%; font-family:var(--bf-theme-font-family); font-size:16px; background:var(--bf-theme-surface-2); color:var(--bf-theme-text-1); touch-action:none; overscroll-behavior:none; }
   h1 { font-size:clamp(1.35rem, 4vw, 2rem); margin:0; line-height:1.15; }
   h2 { font-size:1.25rem; margin:0; }
   h3 { font-size:1.05rem; margin:0; }
@@ -129,6 +130,6 @@ export function buildFramePreviewDoc(opts: {
   [data-selected="true"] { outline:2px solid var(--bf-theme-button-primary-bg); outline-offset:2px; }
 </style>
 </head>
-<body>${inner}</body>
+<body>${inner}${framePreviewHostScript()}</body>
 </html>`;
 }

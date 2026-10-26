@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import type { ThemeId } from '../../theme/themes';
 import { buildFramePreviewDoc } from '../framePreviewDoc';
 import type { Frame, Page, StyleTrial } from '../types';
@@ -13,7 +13,7 @@ type Props = {
 	onSelectNode: (nodeId: string) => void;
 };
 
-export function FramePreview({
+export const FramePreview = memo(function FramePreview({
 	frame,
 	page,
 	themeId,
@@ -74,4 +74,4 @@ export function FramePreview({
 			}}
 		/>
 	);
-}
+});

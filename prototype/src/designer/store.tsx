@@ -51,6 +51,7 @@ type Action =
 	| { type: 'selectNode'; nodeId: string | null }
 	| { type: 'setEditScope'; scope: 'base' | 'breakpoint' }
 	| { type: 'setCamera'; patch: Partial<DesignerProject['canvas']> }
+	| { type: 'setMobilePanel'; panel: DesignerState['ui']['mobilePanel'] }
 	| { type: 'moveFrame'; frameId: string; x: number; y: number }
 	| { type: 'setFrameDevice'; frameId: string; presetId: string; landscape?: boolean }
 	| { type: 'setFrameTheme'; frameId: string; themeId: ThemeId | null }
@@ -92,10 +93,20 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 		case 'setEditScope':
 			return { ...state, ui: { ...state.ui, editScope: action.scope } };
 		case 'setCamera': {
-			const project = cloneProject(state.project);
-			project.canvas = { ...project.canvas, ...action.patch };
-			return { ...state, project };
+			return {
+				...state,
+				ui: {
+					...state.ui,
+					camera: { ...state.ui.camera, ...action.patch },
+				},
+				project: {
+					...state.project,
+					canvas: { ...state.project.canvas, ...action.patch },
+				},
+			};
 		}
+		case 'setMobilePanel':
+			return { ...state, ui: { ...state.ui, mobilePanel: action.panel } };
 		case 'assistantOpen':
 			return { ...state, ui: { ...state.ui, assistantOpen: action.open } };
 		default:
@@ -472,8 +483,10 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 	}
 }
 
+const initialProject = createInitialProject();
+
 const initialState: DesignerState = {
-	project: createInitialProject(),
+	project: initialProject,
 	ui: {
 		activePageId: PAGE_ID,
 		selectedFrameId: 'frame-iphone',
@@ -482,8 +495,10 @@ const initialState: DesignerState = {
 		compare: null,
 		assistantOpen: false,
 		panning: false,
+		camera: { ...initialProject.canvas },
+		mobilePanel: 'none',
 	},
-	history: [createInitialProject()],
+	history: [initialProject],
 	historyIndex: 0,
 };
 

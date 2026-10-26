@@ -151,7 +151,7 @@ jobs:
 
       - name: Build product prototype (→ public/prototype/)
         working-directory: prototype
-        run: pnpm install --frozen-lockfile && BAREFRAME_PAGES_ROOT=1 pnpm run build
+        run: pnpm install --frozen-lockfile && pnpm test && BAREFRAME_PAGES_ROOT=1 pnpm run build
 
       - name: Finalize Pages layout (prototype @ root, legacy @ /legacy/)
         run: node ./scripts/finalize-pages.mjs

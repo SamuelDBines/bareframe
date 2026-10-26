@@ -133,6 +133,9 @@ export type DesignerUiState = {
 	compare: CompareMode | null;
 	assistantOpen: boolean;
 	panning: boolean;
+	/** Viewport camera; kept out of undo/history and not deep-cloned on pan/zoom. */
+	camera: { x: number; y: number; zoom: number };
+	mobilePanel: 'none' | 'left' | 'right';
 };
 
 export type DesignerState = {

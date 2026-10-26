@@ -16,6 +16,34 @@ export function CanvasToolbar() {
 
 	return (
 		<div className="canvas-subtoolbar">
+			<div className="canvas-subtoolbar-mobile-toggles">
+				<button
+					type="button"
+					className="btn btn-ghost designer-panel-toggle"
+					aria-expanded={ui.mobilePanel === 'left'}
+					onClick={() =>
+						dispatch({
+							type: 'setMobilePanel',
+							panel: ui.mobilePanel === 'left' ? 'none' : 'left',
+						})
+					}
+				>
+					Pages
+				</button>
+				<button
+					type="button"
+					className="btn btn-ghost designer-panel-toggle"
+					aria-expanded={ui.mobilePanel === 'right'}
+					onClick={() =>
+						dispatch({
+							type: 'setMobilePanel',
+							panel: ui.mobilePanel === 'right' ? 'none' : 'right',
+						})
+					}
+				>
+					Inspect
+				</button>
+			</div>
 			<Select
 				label="Device"
 				value={frame?.devicePresetId ?? 'iphone-15'}

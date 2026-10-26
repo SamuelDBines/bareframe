@@ -4,10 +4,12 @@ import { InfiniteCanvas } from './components/InfiniteCanvas';
 import { InspectorPanel } from './components/InspectorPanel';
 import { LibrarySidebar } from './components/LibrarySidebar';
 import { DesignerProvider, useDesigner } from './store';
+import { useDesignerEditorChrome } from './useDesignerEditorChrome';
 
 function WorkspaceInner() {
 	const { state, dispatch } = useDesigner();
 	const { mobilePanel } = state.ui;
+	useDesignerEditorChrome();
 
 	return (
 		<div

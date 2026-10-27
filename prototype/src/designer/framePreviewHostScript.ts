@@ -26,6 +26,7 @@ export function framePreviewHostScript(): string {
       deltaMode: e.deltaMode,
       ctrlKey: e.ctrlKey,
       metaKey: e.metaKey,
+      shiftKey: e.shiftKey,
       clientX: e.clientX,
       clientY: e.clientY,
     });

@@ -805,7 +805,6 @@ table.props-table tr:last-child td {
 	cursor: grab;
 	touch-action: none;
 	user-select: none;
-	contain: paint;
 	background:
 		radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--bf-theme-border-1) 40%, transparent) 1px, transparent 0)
 		0 0 / 16px 16px;

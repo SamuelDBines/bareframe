@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ThemeId } from '../../theme/themes';
 import { THEME_LABELS } from '../../theme/themes';
+import { cameraForPan, type PanAnchor } from '../canvasPanSession';
 import { setCameraZoomAtScreenPoint, zoomCameraAroundPoint, type Camera } from '../camera';
 import { getDevicePreset } from '../devicePresets';
 import type { MatrixLayout } from '../frameLayout';
@@ -73,7 +74,8 @@ export function InfiniteCanvas() {
 	const liveCameraRef = useRef<Camera>(camera);
 	const [spaceDown, setSpaceDown] = useState(false);
 	const [zoomLabel, setZoomLabel] = useState(() => Math.round(camera.zoom * 100));
-	const panRef = useRef<{ startX: number; startY: number; camX: number; camY: number } | null>(null);
+	const panRef = useRef<PanAnchor | null>(null);
+	const windowPanCleanupRef = useRef<(() => void) | null>(null);
 	const pinchRef = useRef<{
 		startDist: number;
 		startZoom: number;
@@ -86,10 +88,18 @@ export function InfiniteCanvas() {
 	const page = project.pages.find((p) => p.id === ui.activePageId);
 
 	useEffect(() => {
+		if (panRef.current || pinchRef.current) return;
 		liveCameraRef.current = camera;
 		applyWorldTransform(worldRef.current, camera);
 		setZoomLabel(Math.round(camera.zoom * 100));
 	}, [camera]);
+
+	useEffect(
+		() => () => {
+			windowPanCleanupRef.current?.();
+		},
+		[],
+	);
 
 	const commitCamera = useCallback(
 		(next: Camera) => {
@@ -118,11 +128,54 @@ export function InfiniteCanvas() {
 		[commitCamera],
 	);
 
+	const endWindowPan = useCallback(() => {
+		windowPanCleanupRef.current?.();
+		windowPanCleanupRef.current = null;
+	}, []);
+
 	const clearPan = useCallback(() => {
+		endWindowPan();
 		panRef.current = null;
 		pinchRef.current = null;
 		pointersRef.current.clear();
+	}, [endWindowPan]);
+
+	const applyPanMove = useCallback((clientX: number, clientY: number) => {
+		const p = panRef.current;
+		if (!p) return;
+		const next = cameraForPan(p, clientX, clientY, liveCameraRef.current);
+		liveCameraRef.current = next;
+		applyWorldTransform(worldRef.current, next);
 	}, []);
+
+	const startWindowPan = useCallback(
+		(clientX: number, clientY: number) => {
+			endWindowPan();
+			panRef.current = {
+				startX: clientX,
+				startY: clientY,
+				camX: liveCameraRef.current.x,
+				camY: liveCameraRef.current.y,
+			};
+			const onMove = (ev: PointerEvent) => applyPanMove(ev.clientX, ev.clientY);
+			const onUp = () => {
+				endWindowPan();
+				if (panRef.current) {
+					commitCamera(liveCameraRef.current);
+					panRef.current = null;
+				}
+			};
+			window.addEventListener('pointermove', onMove);
+			window.addEventListener('pointerup', onUp);
+			window.addEventListener('pointercancel', onUp);
+			windowPanCleanupRef.current = () => {
+				window.removeEventListener('pointermove', onMove);
+				window.removeEventListener('pointerup', onUp);
+				window.removeEventListener('pointercancel', onUp);
+			};
+		},
+		[applyPanMove, commitCamera, endWindowPan],
+	);
 
 	const zoomTo100 = useCallback(() => {
 		commitCamera({ ...liveCameraRef.current, zoom: 1 });
@@ -181,13 +234,8 @@ export function InfiniteCanvas() {
 		}
 
 		if (shouldPan(e)) {
-			panRef.current = {
-				startX: e.clientX,
-				startY: e.clientY,
-				camX: liveCameraRef.current.x,
-				camY: liveCameraRef.current.y,
-			};
-			(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+			e.preventDefault();
+			startWindowPan(e.clientX, e.clientY);
 		} else if (e.target === e.currentTarget) {
 			dispatch({ type: 'selectFrame', frameId: null });
 		}
@@ -225,25 +273,13 @@ export function InfiniteCanvas() {
 			return;
 		}
 
-		const p = panRef.current;
-		if (!p) return;
-		const next = {
-			...liveCameraRef.current,
-			x: p.camX + (e.clientX - p.startX),
-			y: p.camY + (e.clientY - p.startY),
-		};
-		liveCameraRef.current = next;
-		applyWorldTransform(worldRef.current, next);
+		applyPanMove(e.clientX, e.clientY);
 	};
 
 	const onPointerUp = (e: React.PointerEvent) => {
 		pointersRef.current.delete(e.pointerId);
 		if (pinchRef.current && pointersRef.current.size < 2) {
 			pinchRef.current = null;
-			commitCamera(liveCameraRef.current);
-		}
-		if (panRef.current) {
-			panRef.current = null;
 			commitCamera(liveCameraRef.current);
 		}
 		if (e.nativeEvent.getModifierState) {
@@ -266,7 +302,13 @@ export function InfiniteCanvas() {
 			onPointerUp={onPointerUp}
 			onPointerCancel={onPointerUp}
 		>
-			<div ref={worldRef} className="canvas-world">
+			<div
+				ref={worldRef}
+				className="canvas-world"
+				data-camera-x={liveCameraRef.current.x}
+				data-camera-y={liveCameraRef.current.y}
+				data-camera-zoom={liveCameraRef.current.zoom}
+			>
 				{ui.compare?.kind === 'matrix' && ui.compare.layout && (
 					<MatrixHeaders layout={ui.compare.layout} />
 				)}

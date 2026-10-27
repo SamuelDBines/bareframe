@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, type RefObject } from 'react';
 import { applyCanvasGestureScale, applyCanvasWheel } from './canvasInputHandlers';
+import { cameraForPan } from './canvasPanSession';
 import type { Camera } from './camera';
 import { FRAME_PREVIEW_MESSAGE_SOURCE } from './framePreviewHostScript';
 
@@ -302,11 +303,7 @@ export function useDesignerCanvasInput({
 				const pan = iframePanRef.current;
 				if (!pan) return;
 				if (data.phase === 'move') {
-					commitCamera({
-						...liveCameraRef.current,
-						x: pan.camX + (pt.x - pan.startX),
-						y: pan.camY + (pt.y - pan.startY),
-					});
+					commitCamera(cameraForPan(pan, pt.x, pt.y, liveCameraRef.current));
 					return;
 				}
 				if (data.phase === 'end') {

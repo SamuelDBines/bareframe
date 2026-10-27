@@ -79,6 +79,57 @@ test.describe('designer canvas', () => {
 		await expect(page.locator('.infinite-canvas')).not.toHaveClass(/infinite-canvas--space-pan/);
 	});
 
+	test('middle-drag across frame iframes keeps moving camera left (no pan wall)', async ({ page }) => {
+		await page.setViewportSize({ width: 1280, height: 800 });
+		const readCamX = () =>
+			page.evaluate(() => {
+				const m = document.querySelector('.canvas-world')?.style.transform?.match(/translate\(([-0-9.]+)px/);
+				return m ? parseFloat(m[1]) : 0;
+			});
+		const iframe = page.locator('.frame-preview-iframe').first();
+		const iframeBox = await iframe.boundingBox();
+		expect(iframeBox).toBeTruthy();
+		const startX = await readCamX();
+		await page.mouse.move(iframeBox!.x + 80, iframeBox!.y + 120);
+		await page.mouse.down({ button: 'middle' });
+		const samples: number[] = [];
+		for (let i = 0; i < 28; i++) {
+			await page.mouse.move(iframeBox!.x + 80 - i * 32, iframeBox!.y + 120);
+			samples.push(await readCamX());
+		}
+		await page.mouse.up({ button: 'middle' });
+		const endX = await readCamX();
+		expect(endX).toBeLessThan(startX - 400);
+		const tail = samples.slice(-10);
+		expect(Math.max(...tail) - Math.min(...tail)).toBeGreaterThan(80);
+	});
+
+	test('wheel inside rightmost frame keeps decreasing camera x', async ({ page }) => {
+		await page.setViewportSize({ width: 1280, height: 800 });
+		const readCamX = () =>
+			page.evaluate(() => {
+				const m = document.querySelector('.canvas-world')?.style.transform?.match(/translate\(([-0-9.]+)px/);
+				return m ? parseFloat(m[1]) : 0;
+			});
+		const startX = await readCamX();
+		await page.frameLocator('.frame-preview-iframe').first().locator('body').evaluate((body) => {
+			for (let i = 0; i < 20; i++) {
+				body.dispatchEvent(
+					new WheelEvent('wheel', {
+						bubbles: true,
+						cancelable: true,
+						deltaX: 120,
+						deltaY: 0,
+						clientX: 120,
+						clientY: 200,
+					}),
+				);
+			}
+		});
+		const endX = await readCamX();
+		expect(endX).toBeLessThan(startX - 300);
+	});
+
 	test('no horizontal document scroll after canvas wheel gestures', async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 });
 		const canvas = page.locator('.infinite-canvas');

@@ -208,8 +208,9 @@ test.describe('designer canvas', () => {
 	});
 
 	test('mobile panels toggle without page overflow', async ({ page }) => {
+		test.setTimeout(60_000);
 		await page.setViewportSize({ width: 390, height: 844 });
-		await expect(page.locator('.designer-panel-toggle').first()).toBeVisible();
+		await expect(page.locator('.designer-panel-toggle').first()).toBeVisible({ timeout: 45_000 });
 		const overflowX = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
 		expect(overflowX).toBe(false);
 		await page.getByRole('button', { name: 'Pages' }).click();

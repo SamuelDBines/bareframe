@@ -26,7 +26,7 @@ The package is **self-contained**: themes ship inside the npm tarball. You do no
 import '@bareframe/react/styles.css';
 ```
 
-This file includes component rules and Repkit legacy variable aliases (`--rk-theme-*` → `--bf-theme-*`).
+This file includes component rules, **button variant styles** (`.bf-btn--*`), and Repkit legacy variable aliases (`--rk-theme-*` → `--bf-theme-*`). The bareframe.org docs app imports component rules only from source and keeps site chrome in `prototype/src/index.css`.
 
 ### 2. Theme tokens (required)
 

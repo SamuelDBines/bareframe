@@ -1,0 +1,653 @@
+{
+  "alert": [
+    {
+      "name": "variant",
+      "type": "\"info\" | \"success\" | \"warning\" | \"error\"",
+      "default": "info",
+      "description": ""
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "dismissible",
+      "type": "boolean",
+      "default": "false",
+      "description": ""
+    },
+    {
+      "name": "defaultVisible",
+      "type": "boolean",
+      "default": "true",
+      "description": ""
+    },
+    {
+      "name": "visible",
+      "type": "boolean",
+      "description": ""
+    },
+    {
+      "name": "onDismiss",
+      "type": "() => void",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "style",
+      "type": "CSSProperties",
+      "description": ""
+    },
+    {
+      "name": "action",
+      "type": "ReactNode",
+      "description": ""
+    }
+  ],
+  "badge": [
+    {
+      "name": "variant",
+      "type": "\"default\" | \"success\" | \"warning\" | \"outline\" | \"error\"",
+      "default": "default",
+      "description": ""
+    },
+    {
+      "name": "size",
+      "type": "\"sm\" | \"md\"",
+      "default": "md",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "button": [
+    {
+      "name": "variant",
+      "type": "\"primary\" | \"secondary\" | \"ghost\" | \"destructive\"",
+      "default": "primary",
+      "description": ""
+    },
+    {
+      "name": "size",
+      "type": "\"sm\" | \"md\" | \"lg\"",
+      "default": "md",
+      "description": ""
+    },
+    {
+      "name": "loading",
+      "type": "boolean",
+      "default": "false",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "calendar": [],
+  "card": [
+    {
+      "name": "variant",
+      "type": "\"elevated\" | \"outlined\" | \"ghost\"",
+      "default": "outlined",
+      "description": ""
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "footer",
+      "type": "ReactNode",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "checkbox": [
+    {
+      "name": "label",
+      "type": "string",
+      "default": "Volume",
+      "description": ""
+    },
+    {
+      "name": "checked",
+      "type": "boolean",
+      "description": ""
+    },
+    {
+      "name": "defaultChecked",
+      "type": "boolean",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "switch": [
+    {
+      "name": "label",
+      "type": "string",
+      "default": "Volume",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "field": [
+    {
+      "name": "label",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "hint",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "errorMessage",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "inputClassName",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "input": [
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "inputClassName",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "error",
+      "type": "boolean",
+      "description": ""
+    }
+  ],
+  "textarea": [],
+  "select": [
+    {
+      "name": "options",
+      "type": "SelectOption[]",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "triggerClassName",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "slider": [
+    {
+      "name": "label",
+      "type": "string",
+      "default": "Volume",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "radio-group": [
+    {
+      "name": "name",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "onChange",
+      "type": "(value: string) => void",
+      "description": ""
+    },
+    {
+      "name": "options",
+      "type": "{ value: string; label: string; }[]",
+      "default": "[\n\t\t\t{ value: 'email', label: 'Email' },\n\t\t\t{ value: 'sms', label: 'SMS' },\n\t\t\t{ value: 'push', label: 'Push' },\n\t\t]",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "multiselect": [
+    {
+      "name": "options",
+      "type": "SelectOption[]",
+      "description": ""
+    },
+    {
+      "name": "value",
+      "type": "string[]",
+      "default": "[]",
+      "description": ""
+    },
+    {
+      "name": "onChange",
+      "type": "(value: string[]) => void",
+      "description": ""
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "default": "Select…",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "combobox": [
+    {
+      "name": "options",
+      "type": "SelectOption[]",
+      "description": ""
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "default": "Select…",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "onChange",
+      "type": "(value: string) => void",
+      "description": ""
+    }
+  ],
+  "modal": [
+    {
+      "name": "title",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "footer",
+      "type": "ReactNode",
+      "description": ""
+    },
+    {
+      "name": "dialogClassName",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "drawer": [
+    {
+      "name": "title",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "side",
+      "type": "\"left\" | \"right\"",
+      "default": "right",
+      "description": ""
+    }
+  ],
+  "tooltip": [
+    {
+      "name": "content",
+      "type": "ReactNode",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "popover": [
+    {
+      "name": "trigger",
+      "type": "ReactNode",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "dropdown-menu": [
+    {
+      "name": "label",
+      "type": "string",
+      "default": "Actions",
+      "description": ""
+    },
+    {
+      "name": "items",
+      "type": "{ id: string; label: string; disabled?: boolean; }[]",
+      "default": "[\n\t\t{ id: 'edit', label: 'Edit' },\n\t\t{ id: 'duplicate', label: 'Duplicate' },\n\t\t{ id: 'archive', label: 'Archive' },\n\t]",
+      "description": ""
+    },
+    {
+      "name": "onAction",
+      "type": "(id: string) => void",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "tabs": [
+    {
+      "name": "variant",
+      "type": "\"line\" | \"pills\"",
+      "default": "line",
+      "description": ""
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "default": "overview",
+      "description": ""
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "onChange",
+      "type": "(value: string) => void",
+      "description": ""
+    },
+    {
+      "name": "items",
+      "type": "{ id: string; label: string; content?: ReactNode; }[]",
+      "default": "[\n\t\t\t{ id: 'overview', label: 'Overview', content: 'Overview panel content.' },\n\t\t\t{ id: 'analytics', label: 'Analytics', content: 'Analytics panel content.' },\n\t\t\t{ id: 'settings', label: 'Settings', content: 'Settings panel content.' },\n\t\t]",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "breadcrumbs": [
+    {
+      "name": "items",
+      "type": "{ href?: string; label: string; }[]",
+      "default": "[\n\t\t\t{ id: 'overview', label: 'Overview', content: 'Overview panel content.' },\n\t\t\t{ id: 'analytics', label: 'Analytics', content: 'Analytics panel content.' },\n\t\t\t{ id: 'settings', label: 'Settings', content: 'Settings panel content.' },\n\t\t]",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "pagination": [
+    {
+      "name": "page",
+      "type": "number",
+      "default": "1",
+      "description": ""
+    },
+    {
+      "name": "total",
+      "type": "number",
+      "default": "5",
+      "description": ""
+    },
+    {
+      "name": "onPageChange",
+      "type": "(page: number) => void",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "accordion": [
+    {
+      "name": "items",
+      "type": "{ id: string; title: string; content: ReactNode; }[]",
+      "default": "[\n\t\t\t{ id: 'overview', label: 'Overview', content: 'Overview panel content.' },\n\t\t\t{ id: 'analytics', label: 'Analytics', content: 'Analytics panel content.' },\n\t\t\t{ id: 'settings', label: 'Settings', content: 'Settings panel content.' },\n\t\t]",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "toast": [
+    {
+      "name": "variant",
+      "type": "\"default\" | \"success\" | \"error\"",
+      "default": "default",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "progress": [
+    {
+      "name": "value",
+      "type": "number",
+      "default": "0",
+      "description": ""
+    },
+    {
+      "name": "max",
+      "type": "number",
+      "default": "100",
+      "description": ""
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "default": "Loading",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "spinner": [
+    {
+      "name": "size",
+      "type": "\"sm\" | \"md\" | \"lg\"",
+      "default": "md",
+      "description": ""
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "default": "Loading",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "skeleton": [
+    {
+      "name": "lines",
+      "type": "number",
+      "default": "3",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "avatar": [
+    {
+      "name": "name",
+      "type": "string",
+      "default": "Sam",
+      "description": ""
+    },
+    {
+      "name": "size",
+      "type": "\"sm\" | \"md\" | \"lg\"",
+      "default": "md",
+      "description": ""
+    },
+    {
+      "name": "src",
+      "type": "string",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "table": [
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "empty-state": [
+    {
+      "name": "title",
+      "type": "string",
+      "default": "No projects yet",
+      "description": ""
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "default": "Create your first project to see it here.",
+      "description": ""
+    },
+    {
+      "name": "actionLabel",
+      "type": "string",
+      "default": "Create project",
+      "description": ""
+    },
+    {
+      "name": "onAction",
+      "type": "() => void",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "stat-card": [
+    {
+      "name": "label",
+      "type": "string",
+      "default": "Active users",
+      "description": ""
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "default": "12.4k",
+      "description": ""
+    },
+    {
+      "name": "delta",
+      "type": "string",
+      "default": "+8.2%",
+      "description": ""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "description": ""
+    }
+  ],
+  "datepicker": [
+    {
+      "name": "label",
+      "type": "string",
+      "default": "Date",
+      "description": ""
+    }
+  ]
+}

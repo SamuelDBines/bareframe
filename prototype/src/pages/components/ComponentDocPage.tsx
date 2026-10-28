@@ -1,14 +1,30 @@
-import { useMemo, useState } from 'react';
-import { loadDocExamples } from '../../components/library/loadDocExamples';
+import { useEffect, useState } from 'react';
+import { loadDocExamples, type LoadedDocExample } from '../../components/library/loadDocExamples';
 import type { ComponentRegistryEntry } from '../../components/library/types';
 import { THEME_LABELS, type ThemeId } from '../../theme/themes';
 import { ComponentPlayground } from './ComponentPlayground';
 
 export function ComponentDocPage({ entry }: { entry: ComponentRegistryEntry }) {
-	const docExamples = useMemo(
-		() => (entry.docExamples?.length ? loadDocExamples(entry.slug, entry.docExamples) : []),
-		[entry],
-	);
+	const [docExamples, setDocExamples] = useState<LoadedDocExample[]>([]);
+	const [examplesLoading, setExamplesLoading] = useState(Boolean(entry.docExamples?.length));
+
+	useEffect(() => {
+		if (!entry.docExamples?.length) {
+			setExamplesLoading(false);
+			return;
+		}
+		let cancelled = false;
+		loadDocExamples(entry.slug, entry.docExamples)
+			.then((loaded) => {
+				if (!cancelled) setDocExamples(loaded);
+			})
+			.finally(() => {
+				if (!cancelled) setExamplesLoading(false);
+			});
+		return () => {
+			cancelled = true;
+		};
+	}, [entry.slug, entry.docExamples]);
 
 	return (
 		<>
@@ -23,7 +39,12 @@ export function ComponentDocPage({ entry }: { entry: ComponentRegistryEntry }) {
 				<ComponentPlayground entry={entry} />
 			</section>
 
-			{docExamples.length > 0 ? (
+			{examplesLoading ? (
+				<section className="doc-section">
+					<h2>Examples</h2>
+					<p>Loading examples…</p>
+				</section>
+			) : docExamples.length > 0 ? (
 				<section className="doc-section">
 					<h2>Examples</h2>
 					<div className="doc-examples">

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
-import { describe, expect, it } from 'vitest';
 import { Field, Input } from './Input';
 
 describe('Input', () => {
@@ -14,6 +14,13 @@ describe('Input', () => {
 		render(<Field label="Email" errorMessage="Required" defaultValue="" />);
 		expect(screen.getByText('Email')).toBeInTheDocument();
 		expect(screen.getByText('Required')).toBeInTheDocument();
+	});
+
+	it('Field accepts typing uncontrolled', async () => {
+		const user = userEvent.setup();
+		render(<Field label="Name" defaultValue="" />);
+		await user.type(screen.getByRole('textbox'), 'Ada');
+		expect(screen.getByRole('textbox')).toHaveValue('Ada');
 	});
 
 	it('has no axe violations', async () => {

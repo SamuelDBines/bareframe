@@ -1,6 +1,17 @@
 import { forwardRef, useState } from 'react';
+import {
+	Button,
+	Disclosure,
+	DisclosureGroup,
+	DisclosurePanel,
+	Heading,
+	Tab,
+	TabList,
+	TabPanel,
+	Tabs as RACTabs,
+} from 'react-aria-components';
 import { cn } from './utils/cn';
-import { Button } from './Button/Button';
+import { Button as BfButton } from './Button/Button';
 
 export const Tabs = forwardRef<
 	HTMLDivElement,
@@ -28,32 +39,32 @@ export const Tabs = forwardRef<
 	ref,
 ) {
 	const [internal, setInternal] = useState(defaultValue);
-	const active = value ?? internal;
-	const setActive = (id: string) => {
-		if (value === undefined) setInternal(id);
-		onChange?.(id);
-	};
-	const panel = items.find((i) => i.id === active);
+	const selectedKey = value ?? internal;
 	return (
-		<div ref={ref} className={cn('bf-tabs', `bf-tabs--${variant}`, className)}>
-			<div role="tablist" aria-label="Tabs" className="bf-tabs__list">
+		<RACTabs
+			ref={ref}
+			selectedKey={selectedKey}
+			defaultSelectedKey={defaultValue}
+			onSelectionChange={(key) => {
+				const id = String(key);
+				if (value === undefined) setInternal(id);
+				onChange?.(id);
+			}}
+			className={cn('bf-tabs', `bf-tabs--${variant}`, className)}
+		>
+			<TabList aria-label="Tabs" className="bf-tabs__list">
 				{items.map((item) => (
-					<button
-						key={item.id}
-						type="button"
-						role="tab"
-						aria-selected={active === item.id}
-						className={cn('bf-tabs__tab', active === item.id && 'is-active')}
-						onClick={() => setActive(item.id)}
-					>
+					<Tab key={item.id} id={item.id} className="bf-tabs__tab">
 						{item.label}
-					</button>
+					</Tab>
 				))}
-			</div>
-			<div role="tabpanel" className="bf-tabs__panel">
-				{panel?.content ?? `Content for ${active}`}
-			</div>
-		</div>
+			</TabList>
+			{items.map((item) => (
+				<TabPanel key={item.id} id={item.id} className="bf-tabs__panel">
+					{item.content ?? `Content for ${item.id}`}
+				</TabPanel>
+			))}
+		</RACTabs>
 	);
 });
 
@@ -85,11 +96,11 @@ export const Pagination = forwardRef<
 >(function Pagination({ page = 1, total = 5, onPageChange, className }, ref) {
 	return (
 		<nav ref={ref} className={cn('bf-pagination', className)} aria-label="Pagination">
-			<Button variant="secondary" size="sm" isDisabled={page <= 1} onPress={() => onPageChange?.(page - 1)}>
+			<BfButton variant="secondary" size="sm" isDisabled={page <= 1} onPress={() => onPageChange?.(page - 1)}>
 				Previous
-			</Button>
+			</BfButton>
 			{Array.from({ length: total }, (_, i) => i + 1).map((n) => (
-				<Button
+				<BfButton
 					key={n}
 					variant={n === page ? 'primary' : 'secondary'}
 					size="sm"
@@ -97,46 +108,67 @@ export const Pagination = forwardRef<
 					onPress={() => onPageChange?.(n)}
 				>
 					{n}
-				</Button>
+				</BfButton>
 			))}
-			<Button variant="secondary" size="sm" isDisabled={page >= total} onPress={() => onPageChange?.(page + 1)}>
+			<BfButton variant="secondary" size="sm" isDisabled={page >= total} onPress={() => onPageChange?.(page + 1)}>
 				Next
-			</Button>
+			</BfButton>
 		</nav>
 	);
 });
 
 export const Accordion = forwardRef<
 	HTMLDivElement,
-	{ items?: { id: string; title: string; content: React.ReactNode }[]; className?: string }
->(function Accordion({ items, className }, ref) {
+	{
+		items?: { id: string; title: string; content: React.ReactNode }[];
+		className?: string;
+		defaultExpandedKeys?: Iterable<string>;
+		expandedKeys?: Iterable<string>;
+		onExpandedChange?: (keys: Set<string | number>) => void;
+	}
+>(function Accordion(
+	{
+		items,
+		className,
+		defaultExpandedKeys,
+		expandedKeys: expandedKeysProp,
+		onExpandedChange,
+	},
+	ref,
+) {
 	const data = items ?? [
 		{ id: '1', title: 'What are design tokens?', content: 'Named variables for color, spacing, and typography.' },
 		{ id: '2', title: 'How do themes work?', content: 'Themes override CSS custom properties on `[data-bf-theme]`.' },
 	];
-	const [open, setOpen] = useState(data[0]?.id ?? '');
+	const [internalKeys, setInternalKeys] = useState<Set<string>>(
+		() => new Set(defaultExpandedKeys ?? (data[0]?.id ? [data[0].id] : [])),
+	);
+	const expandedKeys = expandedKeysProp ? new Set(expandedKeysProp) : internalKeys;
+	const setExpandedKeys = (keys: Set<string | number>) => {
+		const normalized = new Set(Array.from(keys, String));
+		if (expandedKeysProp === undefined) setInternalKeys(normalized);
+		onExpandedChange?.(normalized);
+	};
 	return (
-		<div ref={ref} className={cn('bf-accordion', className)}>
-			{data.map((item) => {
-				const expanded = open === item.id;
-				return (
-					<div key={item.id} className="bf-accordion__item">
-						<button
-							type="button"
-							className="bf-accordion__trigger"
-							aria-expanded={expanded}
-							onClick={() => setOpen(expanded ? '' : item.id)}
-						>
+		<DisclosureGroup
+			ref={ref}
+			className={cn('bf-accordion', className)}
+			expandedKeys={expandedKeys}
+			onExpandedChange={setExpandedKeys}
+			allowsMultipleExpanded={false}
+		>
+			{data.map((item) => (
+				<Disclosure key={item.id} id={item.id} className="bf-accordion__item">
+					<Heading>
+						<Button slot="trigger" className="bf-accordion__trigger">
 							{item.title}
-						</button>
-						{expanded ? (
-							<div className="bf-accordion__panel" role="region">
-								{item.content}
-							</div>
-						) : null}
-					</div>
-				);
-			})}
-		</div>
+						</Button>
+					</Heading>
+					<DisclosurePanel className="bf-accordion__panel" role="region">
+						{item.content}
+					</DisclosurePanel>
+				</Disclosure>
+			))}
+		</DisclosureGroup>
 	);
 });

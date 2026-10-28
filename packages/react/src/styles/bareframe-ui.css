@@ -522,38 +522,22 @@
 	width: 100%;
 	max-width: 16rem;
 }
-.bf-combobox-wrap--contained > :not(.bf-combobox) {
-	pointer-events: auto;
-}
 
-.bf-combobox-wrap--contained .bf-combobox__popover {
-	width: 100%;
-	max-height: 11rem;
-	overflow-y: auto;
-	position: relative !important;
-	inset: auto !important;
-	top: auto !important;
-	left: auto !important;
-	right: auto !important;
-	transform: none !important;
-	margin-top: 0.25rem;
-	z-index: 1000;
-}
-.bf-combobox-wrap--contained .bf-combobox__list {
-	position: relative;
-	top: auto;
-	left: auto;
-	right: auto;
-}
 .bf-combobox__popover {
 	z-index: 30;
+	width: var(--trigger-width, max-content);
+	max-width: 16rem;
 }
-.bf-combobox-wrap:has(.bf-combobox[data-open='true']) {
-	pointer-events: none;
+.bf-combobox__popover--docs-floating {
+	z-index: 10001;
 }
-.bf-combobox-wrap:has(.bf-combobox[data-open='true']) .bf-combobox,
-.bf-combobox-wrap:has(.bf-combobox[data-open='true']) .bf-combobox * {
-	pointer-events: auto;
+.bf-combobox__popover--docs-floating .bf-combobox__list {
+	position: static;
+	inset: auto;
+	border: none;
+	padding: 0;
+	background: transparent;
+	box-shadow: none;
 }
 .bf-combobox__list {
 	position: absolute;

@@ -3,7 +3,7 @@ import { THEME_IDS, THEME_LABELS, type ThemeId } from '../../theme/themes';
 import { generateComponentSnippet } from '../../components/library/codegen';
 import type { ComponentRegistryEntry, PreviewInteractionState } from '../../components/library/types';
 import { PreviewCodeTabs } from './docs/PreviewCodeTabs';
-import { PlaygroundPortalProvider, PlaygroundOverlayLayer } from './docs/PlaygroundPortal';
+import { PlaygroundPortalProvider, PlaygroundOverlayLayer, PlaygroundFloatingPortalLayer } from './docs/PlaygroundPortal';
 
 type ViewportId = 'mobile' | 'tablet' | 'desktop';
 
@@ -58,6 +58,7 @@ export function ComponentPlayground({ entry }: Props) {
 	}, []);
 
 	const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+	const [floatingPortalRoot, setFloatingPortalRoot] = useState<HTMLElement | null>(null);
 
 	const previewProps = useMemo(() => {
 		let next: Record<string, unknown> = liveProps;
@@ -152,8 +153,15 @@ export function ComponentPlayground({ entry }: Props) {
 			};
 		}
 
+		if (entry.slug === 'combobox') {
+			next = {
+				...next,
+				portalContainer: floatingPortalRoot,
+			};
+		}
+
 		return next;
-	}, [entry.defaultProps, entry.slug, liveProps, setProp]);
+	}, [entry.defaultProps, entry.slug, floatingPortalRoot, liveProps, setProp]);
 
 	const applyVariant = useCallback(
 		(variant: string) => {
@@ -212,15 +220,16 @@ export function ComponentPlayground({ entry }: Props) {
 					</div>
 				</div>
 			</div>
-			<div
-				className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
-				data-testid="playground-preview"
-			>
-			<PlaygroundPortalProvider portalRoot={portalRoot}>
+			<PlaygroundPortalProvider portalRoot={portalRoot} floatingPortalRoot={floatingPortalRoot}>
 				<PlaygroundOverlayLayer onPortalRootChange={setPortalRoot} />
-				<div className="playground-preview-content">{entry.render(previewProps)}</div>
+				<div
+					className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
+					data-testid="playground-preview"
+				>
+					<div className="playground-preview-content">{entry.render(previewProps)}</div>
+				</div>
+				<PlaygroundFloatingPortalLayer onPortalRootChange={setFloatingPortalRoot} />
 			</PlaygroundPortalProvider>
-			</div>
 		</div>
 	);
 

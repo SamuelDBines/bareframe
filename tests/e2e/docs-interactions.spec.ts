@@ -5,6 +5,7 @@ import {
 	openComponent,
 	panel,
 	preview,
+	previewOverlays,
 	setPreviewColorMode,
 } from './docs-helpers';
 
@@ -76,12 +77,28 @@ test.describe('Overlay interactions', () => {
 
 	test('Combobox: type and pick option', async ({ page }, testInfo) => {
 		await openComponent(page, 'combobox');
-		const input = preview(page).getByRole('combobox');
+		const input = preview(page).getByRole('combobox', { name: 'Framework' });
+		await input.scrollIntoViewIfNeeded();
 		await input.fill('Vue');
-		const option = preview(page).getByRole('option', { name: 'Vue' });
+		const overlay = previewOverlays(page);
+		const option = overlay.getByRole('option', { name: 'Vue' });
 		await expect(option).toBeVisible();
 		if (isMobileProject(testInfo.project.name)) {
-			await option.tap();
+			const pick = overlay.getByRole('option', { name: 'Vue' });
+			if (testInfo.project.name === 'webkit-mobile') {
+				await expect(async () => {
+					const vue = overlay.getByRole('option', { name: 'Vue' });
+					await expect(vue).toBeVisible();
+					await vue.scrollIntoViewIfNeeded();
+					await vue.tap({ timeout: 5000 });
+					await expect(input).toHaveValue('Vue');
+				}).toPass({ timeout: 45_000 });
+			} else {
+				await expect
+					.poll(async () => (await pick.boundingBox())?.width ?? 0, { timeout: 15_000 })
+					.toBeGreaterThan(50);
+				await pick.tap();
+			}
 		} else {
 			await option.click();
 		}

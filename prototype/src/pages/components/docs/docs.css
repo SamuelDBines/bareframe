@@ -428,6 +428,7 @@
 	background: var(--docs-surface);
 	overflow: visible;
 	box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+	position: relative;
 }
 
 .playground-frame__toolbar {
@@ -549,31 +550,26 @@
 .playground-overlay-root .bf-datepicker__popover,
 .playground-overlay-root .bf-popover,
 .playground-overlay-root .bf-dropdown__popover,
-.playground-overlay-root .bf-select-popover,
-.playground-overlay-root .bf-combobox__popover {
+.playground-overlay-root .bf-select-popover {
 	z-index: 30;
 }
 
-.docs-tabs__panel:has(.bf-combobox[data-open='true']) {
+.playground-floating-portal {
+	position: fixed;
+	inset: 0;
+	z-index: 10000;
+	overflow: visible;
 	pointer-events: none;
 }
 
-.docs-tabs__panel:has(.bf-combobox[data-open='true']) .bf-combobox__popover,
-.docs-tabs__panel:has(.bf-combobox[data-open='true']) .bf-combobox__popover * {
+.playground-floating-portal > * {
 	pointer-events: auto;
 }
 
-.playground-frame:has(.bf-combobox-wrap--contained .bf-combobox[data-open='true']) {
-	pointer-events: none;
-}
-
-.playground-frame:has(.bf-combobox-wrap--contained .bf-combobox[data-open='true']) .bf-combobox__popover,
-.playground-frame:has(.bf-combobox-wrap--contained .bf-combobox[data-open='true']) .bf-combobox__popover * {
-	pointer-events: auto;
-}
-
-.playground-frame:has(.bf-combobox[data-open='true']) .playground-frame__toolbar {
-	pointer-events: none;
+.playground-floating-portal .bf-combobox__popover {
+	max-height: min(11rem, 40vh);
+	overflow-y: auto;
+	animation: none;
 }
 
 .playground-frame .bf-combobox__popover,

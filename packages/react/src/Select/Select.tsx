@@ -82,8 +82,9 @@ export type ComboboxProps = {
 	value?: string;
 	defaultValue?: string;
 	onChange?: (value: string) => void;
-	/** Docs preview: scope the listbox portal to this field for reliable touch targeting. */
+	/** Docs preview: portal the listbox into `portalContainer` (playground floating layer). */
 	contained?: boolean;
+	portalContainer?: Element | null;
 };
 
 export function Combobox({
@@ -96,14 +97,12 @@ export function Combobox({
 	defaultValue,
 	onChange,
 	contained = false,
+	portalContainer = null,
 }: ComboboxProps) {
 	const a11yLabel = label ?? ariaLabel ?? 'Search options';
-	const [wrapEl, setWrapEl] = useState<HTMLDivElement | null>(null);
+	const portaled = contained && portalContainer;
 	return (
-		<div
-			ref={setWrapEl}
-			className={cn('bf-combobox-wrap', contained && 'bf-combobox-wrap--contained')}
-		>
+		<div className={cn('bf-combobox-wrap', contained && 'bf-combobox-wrap--contained')}>
 			<ComboBox<SelectOption>
 				className={cn('bf-combobox', className)}
 				selectedKey={value}
@@ -120,9 +119,11 @@ export function Combobox({
 					</RACButton>
 				</div>
 				<Popover
-					className="bf-combobox__popover"
+					className={cn('bf-combobox__popover', portaled && 'bf-combobox__popover--docs-floating')}
 					isNonModal
-					UNSTABLE_portalContainer={contained ? (wrapEl ?? undefined) : undefined}
+					placement={portaled ? 'top' : 'bottom'}
+					shouldFlip
+					UNSTABLE_portalContainer={portaled ? (portalContainer ?? undefined) : undefined}
 				>
 					<ListBox className="bf-combobox__list" items={options}>
 						{(item: SelectOption) => (

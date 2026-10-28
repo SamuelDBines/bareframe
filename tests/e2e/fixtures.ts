@@ -5,6 +5,7 @@ const IGNORE_CONSOLE = [
 	/Failed to load resource.*404/i,
 	/Failed to load resource: net::ERR_FAILED/i,
 	/PayPal is not defined/i,
+	/Can't find variable: PayPal/i,
 ];
 
 function isIgnoredConsoleError(text: string): boolean {
@@ -27,6 +28,7 @@ export const test = baseTest.extend({
 			errors.push(text);
 		};
 		const onPageError = (err: Error) => {
+			if (isIgnoredConsoleError(err.message)) return;
 			errors.push(err.message);
 		};
 

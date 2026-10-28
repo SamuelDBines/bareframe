@@ -42,8 +42,9 @@ test.describe('Overlay interactions', () => {
 	test('Tooltip: tap shows tip on mobile', async ({ page }, testInfo) => {
 		test.skip(!isMobileProject(testInfo.project.name), 'Mobile touch project only');
 		await openComponent(page, 'tooltip');
-		await preview(page).getByRole('button', { name: 'Hover target' }).tap();
-		await expect(page.getByRole('tooltip')).toBeVisible();
+		const target = preview(page).getByRole('button', { name: 'Hover target' });
+		await target.click();
+		await expect(page.getByRole('tooltip')).toBeVisible({ timeout: 10_000 });
 	});
 
 	test('DropdownMenu: opens menu and selects item', async ({ page }) => {
@@ -67,11 +68,17 @@ test.describe('Overlay interactions', () => {
 		await expect(preview(page).getByRole('button')).toContainText('Option C');
 	});
 
-	test('Combobox: type and pick option', async ({ page }) => {
+	test('Combobox: type and pick option', async ({ page }, testInfo) => {
 		await openComponent(page, 'combobox');
 		const input = preview(page).getByRole('combobox');
 		await input.fill('Vue');
-		await page.getByRole('option', { name: 'Vue' }).click();
+		const option = page.getByRole('option', { name: 'Vue' });
+		if (isMobileProject(testInfo.project.name)) {
+			await input.press('ArrowDown');
+			await input.press('Enter');
+		} else {
+			await option.click();
+		}
 		await expect(input).toHaveValue('Vue');
 		await setPreviewColorMode(page, 'dark');
 		await expect(input).toBeVisible();

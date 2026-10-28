@@ -45,7 +45,7 @@ export function ModalDocPreview(props: Record<string, unknown>) {
 			</Button>
 			<Modal
 				{...rest}
-				className="bf-modal-overlay--contained"
+				contained
 				portalContainer={portalContainer}
 				isOpen={isOpen}
 				onOpenChange={handleOpenChange}
@@ -86,7 +86,7 @@ export function DrawerDocPreview(props: Record<string, unknown>) {
 			</Button>
 			<Drawer
 				{...rest}
-				className="bf-drawer-overlay--contained"
+				contained
 				portalContainer={portalContainer}
 				isOpen={isOpen}
 				onOpenChange={handleOpenChange}
@@ -109,6 +109,7 @@ export function PopoverDocPreview(props: Record<string, unknown>) {
 			trigger="Open popover"
 			isOpen={isOpen}
 			onOpenChange={onOpenChange}
+			contained
 			portalContainer={portalContainer}
 			className="bf-popover-anchor--contained"
 		>

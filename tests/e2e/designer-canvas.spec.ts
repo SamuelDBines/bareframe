@@ -44,7 +44,11 @@ test.describe('designer canvas', () => {
 		expect(metrics.overflow).toBe(false);
 	});
 
-	test('wheel pan over a frame does not reload preview iframes', async ({ page }) => {
+	test('wheel pan over a frame does not reload preview iframes', async ({ page }, testInfo) => {
+		test.skip(
+			testInfo.project.name === 'webkit-mobile',
+			'Playwright mobile WebKit does not support mouse.wheel',
+		);
 		const iframe = page.locator('.frame-preview-iframe').first();
 		const box = await iframe.boundingBox();
 		expect(box).toBeTruthy();
@@ -189,7 +193,11 @@ test.describe('designer canvas', () => {
 		expect(['clip', 'hidden']).toContain(metrics.bodyOverflowX);
 	});
 
-	test('no horizontal document scroll after canvas wheel gestures', async ({ page }) => {
+	test('no horizontal document scroll after canvas wheel gestures', async ({ page }, testInfo) => {
+		test.skip(
+			testInfo.project.name === 'webkit-mobile',
+			'Playwright mobile WebKit does not support mouse.wheel',
+		);
 		await page.setViewportSize({ width: 1280, height: 800 });
 		const canvas = page.locator('.infinite-canvas');
 		const box = await canvas.boundingBox();

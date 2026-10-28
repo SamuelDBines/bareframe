@@ -27,6 +27,10 @@ export default defineConfig({
 			name: 'chromium-mobile',
 			use: { ...devices['Pixel 7'] },
 		},
+		{
+			name: 'webkit-mobile',
+			use: { ...devices['iPhone 14'] },
+		},
 	],
 	webServer: process.env.PW_NO_SERVER
 		? undefined

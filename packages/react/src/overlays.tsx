@@ -45,6 +45,7 @@ export function PopoverPanel({
 	isOpen,
 	defaultOpen,
 	onOpenChange,
+	contained = false,
 	portalContainer,
 }: {
 	trigger: ReactNode;
@@ -53,6 +54,8 @@ export function PopoverPanel({
 	isOpen?: boolean;
 	defaultOpen?: boolean;
 	onOpenChange?: (open: boolean) => void;
+	/** Non-modal popover for docs preview; keeps the rest of the page interactive. */
+	contained?: boolean;
 	portalContainer?: Element | null;
 }) {
 	return (
@@ -60,7 +63,7 @@ export function PopoverPanel({
 			<DialogTrigger isOpen={isOpen} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
 				<RACButton className="btn btn-secondary">{trigger}</RACButton>
 				<RACPopover
-					className={cn('bf-popover', portalContainer && 'bf-popover--contained')}
+					className={cn('bf-popover', (contained || portalContainer) && 'bf-popover--contained')}
 					UNSTABLE_portalContainer={portalContainer ?? undefined}
 				>
 					<div className="bf-popover__content">{children}</div>

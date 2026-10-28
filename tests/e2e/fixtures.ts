@@ -6,6 +6,7 @@ const IGNORE_CONSOLE = [
 	/Failed to load resource: net::ERR_FAILED/i,
 	/PayPal is not defined/i,
 	/Can't find variable: PayPal/i,
+	/ResizeObserver loop completed with undelivered notifications/i,
 ];
 
 function isIgnoredConsoleError(text: string): boolean {

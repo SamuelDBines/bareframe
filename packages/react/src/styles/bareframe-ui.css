@@ -512,7 +512,33 @@
 	background: var(--bf-theme-surface-2);
 }
 
+.bf-combobox-wrap {
+	width: fit-content;
+	max-width: 16rem;
+}
 .bf-combobox { width: 100%; max-width: 16rem; }
+.bf-combobox-wrap--contained {
+	position: relative;
+	width: 100%;
+	max-width: 16rem;
+}
+
+.bf-combobox__popover {
+	z-index: 30;
+	width: var(--trigger-width, max-content);
+	max-width: 16rem;
+}
+.bf-combobox__popover--docs-floating {
+	z-index: 10001;
+}
+.bf-combobox__popover--docs-floating .bf-combobox__list {
+	position: static;
+	inset: auto;
+	border: none;
+	padding: 0;
+	background: transparent;
+	box-shadow: none;
+}
 .bf-combobox__list {
 	position: absolute;
 	top: 100%;
@@ -660,6 +686,24 @@
 	align-items: center;
 	justify-content: center;
 	padding: 1rem;
+}
+
+.bf-modal-overlay--contained,
+.bf-drawer-overlay--contained {
+	position: absolute !important;
+	inset: 0;
+	z-index: 20;
+	padding: 0.75rem;
+	pointer-events: none;
+}
+
+.bf-modal-overlay--contained .bf-modal-scene,
+.bf-drawer-overlay--contained .bf-drawer-scene {
+	pointer-events: auto;
+}
+
+.bf-drawer-overlay--contained {
+	padding: 0;
 }
 
 .bf-drawer-overlay {

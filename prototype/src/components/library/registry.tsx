@@ -374,6 +374,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		render: (p) =>
 			render(Bf.Combobox, {
 				label: 'Framework',
+				contained: true,
 				options: [
 					{ value: 'react', label: 'React' },
 					{ value: 'vue', label: 'Vue' },

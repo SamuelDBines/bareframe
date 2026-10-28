@@ -7,6 +7,7 @@ import { defineConfig } from 'vite';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '..');
+const reactPkg = path.join(repoRoot, 'packages/react');
 const themesSource = path.join(repoRoot, 'themes');
 const prototypePublicThemes = path.join(here, 'public', 'themes');
 
@@ -34,6 +35,11 @@ export default defineConfig({
 	// Custom domain serves the app at https://bareframe.org/ (absolute asset URLs).
 	base: pagesRoot ? '/' : './',
 	plugins: [react(), syncThemesPlugin()],
+	resolve: {
+		alias: {
+			'@bareframe/react': path.join(reactPkg, 'src/index.ts'),
+		},
+	},
 	build: {
 		outDir: path.join(repoRoot, 'public', 'prototype'),
 		emptyOutDir: true,

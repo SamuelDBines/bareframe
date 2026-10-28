@@ -15,6 +15,18 @@ type Props = {
 	entry: ComponentRegistryEntry;
 };
 
+function previewWrapperClass(state: PreviewInteractionState): string {
+	return [
+		'bf-docs-preview',
+		state === 'hover' && 'bf-preview-hover',
+		state === 'focus' && 'bf-preview-focus',
+		state === 'disabled' && 'bf-preview-disabled',
+		state === 'loading' && 'bf-preview-loading',
+	]
+		.filter(Boolean)
+		.join(' ');
+}
+
 function mergeProps(
 	entry: ComponentRegistryEntry,
 	overrides: Record<string, unknown>,
@@ -117,8 +129,8 @@ export function ComponentPlayground({ entry }: Props) {
 					data-bf-theme={effectiveTheme}
 					style={{ maxWidth: VIEWPORT_WIDTH[viewport], margin: viewport === 'desktop' ? undefined : '0 auto' }}
 				>
-					<div className="playground__canvas" data-testid="playground-preview">
-						{entry.render(liveProps, interaction)}
+					<div className={`playground__canvas ${previewWrapperClass(interaction)}`} data-testid="playground-preview">
+						{entry.render(liveProps)}
 					</div>
 				</div>
 
@@ -236,48 +248,6 @@ export function ComponentPlayground({ entry }: Props) {
 					</button>
 				</div>
 				<pre className="code-block" data-testid="playground-snippet">{snippet}</pre>
-			</section>
-
-			{entry.examples.length > 0 ? (
-				<section className="playground__examples">
-					<h2>Examples</h2>
-					<div className="grid-2">
-						{entry.examples.map((ex) => (
-							<div key={ex.title} className="card">
-								<h3>{ex.title}</h3>
-								{ex.description ? <p>{ex.description}</p> : null}
-								<div className="playground__example-preview" data-bf-theme={effectiveTheme}>
-									{entry.render(mergeProps(entry, ex.props), 'default')}
-								</div>
-								<button
-									type="button"
-									className="btn btn-ghost btn-sm"
-									onClick={() => setProps({ ...entry.defaultProps, ...ex.props })}
-								>
-									Load in playground
-								</button>
-							</div>
-						))}
-					</div>
-				</section>
-			) : null}
-
-			<section className="playground__a11y">
-				<h2>Accessibility</h2>
-				<p>{entry.a11y.summary}</p>
-				{entry.a11y.roles?.length ? (
-					<p><strong>Roles:</strong> {entry.a11y.roles.join(', ')}</p>
-				) : null}
-				{entry.a11y.keyboard?.length ? (
-					<>
-						<h3>Keyboard</h3>
-						<ul>
-							{entry.a11y.keyboard.map((k) => (
-								<li key={k}>{k}</li>
-							))}
-						</ul>
-					</>
-				) : null}
 			</section>
 		</div>
 	);

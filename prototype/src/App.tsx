@@ -3,6 +3,7 @@ import { AppShell } from './components/AppShell';
 import { ComponentDetailPage } from './pages/components/ComponentDetail';
 import { ComponentsGallery } from './pages/components/ComponentsGallery';
 import { ComponentsLayout } from './pages/components/ComponentsLayout';
+import { GettingStartedPage } from './pages/components/GettingStartedPage';
 import { McpPage } from './pages/components/McpPage';
 import { TokensPage } from './pages/components/TokensPage';
 import { AgentSettingsPage } from './pages/designer/AgentSettings';
@@ -34,6 +35,7 @@ export default function App() {
 							<Route index element={<ComponentsGallery />} />
 							<Route path="tokens" element={<TokensPage />} />
 							<Route path="mcp" element={<McpPage />} />
+							<Route path="start" element={<GettingStartedPage />} />
 							<Route path=":slug" element={<ComponentDetailPage />} />
 						</Route>
 

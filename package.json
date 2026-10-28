@@ -41,6 +41,7 @@
   "packageManager": "pnpm@10.8.0",
   "scripts": {
     "build": "node ./scripts/build.mjs && node ./scripts/prep-pages.mjs",
+    "build:react": "pnpm --filter @bareframe/react build",
     "build:lib": "node ./scripts/build.mjs",
     "build:pages": "pnpm run build && pnpm run generate:examples && pnpm run generate:versions && pnpm run prep-pages && pnpm --prefix showcase build && pnpm run smoke:pages",
     "dev": "pnpm",
@@ -61,7 +62,8 @@
     "showcase:dev": "pnpm --prefix showcase dev",
     "showcase:build": "pnpm run build:pages",
     "prototype:dev": "pnpm --prefix prototype dev",
-    "prototype:build": "pnpm --prefix prototype install && BAREFRAME_PAGES_ROOT=1 pnpm --prefix prototype run build",
+    "prototype:build": "pnpm run build:react && pnpm --prefix prototype install && pnpm test:react && BAREFRAME_PAGES_ROOT=1 pnpm --prefix prototype run build",
+    "test:react": "pnpm --filter @bareframe/react test:coverage",
     "pages:finalize": "node ./scripts/finalize-pages.mjs",
     "typecheck": "tsc --noEmit",
     "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts --watch-path=stencil --watch-path=tsconfig.json ./scripts/build.mjs"

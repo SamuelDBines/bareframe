@@ -41,19 +41,32 @@ export type A11yDoc = {
 	roles?: string[];
 };
 
+export type DocExample = {
+	title: string;
+	description?: string;
+	file: string;
+};
+
+export type DosDont = { do: string; dont: string };
+
 export type ComponentRegistryEntry = {
 	slug: string;
 	name: string;
+	overview?: string;
 	description: string;
+	whenToUse?: string;
 	category: string;
 	status: ComponentStatus;
 	variants: string[];
 	props: PropDoc[];
 	defaultProps: Record<string, unknown>;
 	controls: PropControl[];
-	render: (props: Record<string, unknown>, previewState: PreviewInteractionState) => ReactNode;
+	render: (props: Record<string, unknown>) => ReactNode;
 	examples: ComponentExample[];
+	docExamples?: DocExample[];
 	a11y: A11yDoc;
+	dosDonts?: DosDont[];
+	themeTokens?: string[];
 	importName?: string;
 };
 

@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { getRegistryEntry } from '../../components/library/registry';
-import { ComponentPlayground } from './ComponentPlayground';
+import { ComponentDocPage, VariantThemeMatrix } from './ComponentDocPage';
 
 export function ComponentDetailPage() {
 	const { slug = '' } = useParams();
@@ -28,11 +28,12 @@ export function ComponentDetailPage() {
 				</span>
 			</div>
 
-			<ComponentPlayground entry={entry} />
+			<ComponentDocPage entry={entry} />
+			<VariantThemeMatrix entry={entry} />
 
-			<section style={{ marginTop: '2rem' }}>
+			<section className="doc-section">
 				<h2>Props</h2>
-				<div className="table-wrap" style={{ marginTop: '0.75rem' }}>
+				<div className="table-wrap">
 					<table className="props-table">
 						<thead>
 							<tr>
@@ -54,6 +55,22 @@ export function ComponentDetailPage() {
 						</tbody>
 					</table>
 				</div>
+			</section>
+
+			<section className="doc-section">
+				<h2>Accessibility</h2>
+				<p>{entry.a11y.summary}</p>
+				{entry.a11y.roles?.length ? <p><strong>Roles:</strong> {entry.a11y.roles.join(', ')}</p> : null}
+				{entry.a11y.keyboard?.length ? (
+					<>
+						<h3>Keyboard</h3>
+						<ul>
+							{entry.a11y.keyboard.map((k) => (
+								<li key={k}>{k}</li>
+							))}
+						</ul>
+					</>
+				) : null}
 			</section>
 		</>
 	);

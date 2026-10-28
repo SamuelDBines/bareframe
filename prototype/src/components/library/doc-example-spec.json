@@ -1,0 +1,738 @@
+{
+  "badge": {
+    "importName": "Badge",
+    "samples": [
+      {
+        "file": "status",
+        "title": "Status label",
+        "description": "Show deployment state beside a title.",
+        "body": "export default function Example() {\n  return <Badge variant=\"success\">Live</Badge>;\n}"
+      },
+      {
+        "file": "count",
+        "title": "Count",
+        "description": "Compact numeric badge.",
+        "body": "export default function Example() {\n  return <Badge size=\"sm\">12</Badge>;\n}"
+      },
+      {
+        "file": "outline",
+        "title": "Outline",
+        "description": "Subtle badge on dense UI.",
+        "body": "export default function Example() {\n  return <Badge variant=\"outline\">Beta</Badge>;\n}"
+      }
+    ]
+  },
+  "button": {
+    "importName": "Button",
+    "samples": [
+      {
+        "file": "primary-action",
+        "title": "Primary action",
+        "description": "Main call to action on a form.",
+        "body": "export default function Example() {\n  return <Button variant=\"primary\">Save changes</Button>;\n}"
+      },
+      {
+        "file": "destructive",
+        "title": "Destructive",
+        "description": "Irreversible actions.",
+        "body": "export default function Example() {\n  return <Button variant=\"destructive\">Delete project</Button>;\n}"
+      },
+      {
+        "file": "loading",
+        "title": "Loading",
+        "description": "Prevent double submit while saving.",
+        "body": "export default function Example() {\n  return <Button loading>Saving…</Button>;\n}"
+      }
+    ]
+  },
+  "card": {
+    "importName": "Card",
+    "samples": [
+      {
+        "file": "summary",
+        "title": "Summary card",
+        "description": "Grouped metrics with footer.",
+        "body": "import { Card } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <Card title=\"Revenue\" footer=\"Updated 5m ago\">\n      $12,480 this week\n    </Card>\n  );\n}"
+      },
+      {
+        "file": "elevated",
+        "title": "Elevated",
+        "description": "Use elevation sparingly for focus.",
+        "body": "import { Card } from '@bareframe/react';\n\nexport default function Example() {\n  return <Card variant=\"elevated\" title=\"Highlight\">Featured content</Card>;\n}"
+      },
+      {
+        "file": "ghost",
+        "title": "Ghost",
+        "description": "Low chrome grouping.",
+        "body": "import { Card } from '@bareframe/react';\n\nexport default function Example() {\n  return <Card variant=\"ghost\">Supporting details</Card>;\n}"
+      }
+    ]
+  },
+  "checkbox": {
+    "importName": "Checkbox",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Checkbox with theme tokens.",
+        "body": "import { Checkbox } from '@bareframe/react';\n\nexport default function Example() {\n  return <Checkbox />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Checkbox } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Checkbox />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Checkbox } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Checkbox />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "switch": {
+    "importName": "Switch",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Switch with theme tokens.",
+        "body": "import { Switch } from '@bareframe/react';\n\nexport default function Example() {\n  return <Switch />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Switch } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Switch />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Switch } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Switch />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "field": {
+    "importName": "Field",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Labeled input",
+        "description": "Visible label with hint text.",
+        "body": "import { Field } from '@bareframe/react';\n\nexport default function Example() {\n  return <Field label=\"Project name\" hint=\"Shown on invoices.\" />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "Validation error",
+        "description": "Surface an error message from the server.",
+        "body": "import { Field } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <Field label=\"Email\" errorMessage=\"That address is already registered.\" />\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Dark theme",
+        "description": "Field inherits scoped theme tokens.",
+        "body": "import { Field } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Field label=\"API key\" />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "input": {
+    "importName": "Input",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Input with theme tokens.",
+        "body": "import { Input } from '@bareframe/react';\n\nexport default function Example() {\n  return <Input />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Input } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Input />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Input } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Input />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "textarea": {
+    "importName": "Textarea",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Textarea with theme tokens.",
+        "body": "import { Textarea } from '@bareframe/react';\n\nexport default function Example() {\n  return <Textarea />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Textarea } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Textarea />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Textarea } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Textarea />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "select": {
+    "importName": "Select",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Pick one option",
+        "description": "Keyboard navigable listbox.",
+        "body": "import { Select } from '@bareframe/react';\n\nconst options = [\n  { value: 'a', label: 'Design' },\n  { value: 'b', label: 'Engineering' },\n];\n\nexport default function Example() {\n  return <Select aria-label=\"Team\" options={options} defaultSelectedKey=\"a\" />;\n}"
+      },
+      {
+        "file": "controlled",
+        "title": "Controlled value",
+        "description": "Sync selection with app state.",
+        "body": "import { useState } from 'react';\nimport { Select } from '@bareframe/react';\n\nconst options = [{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }];\n\nexport default function Example() {\n  const [theme, setTheme] = useState('light');\n  return (\n    <Select\n      aria-label=\"Theme\"\n      options={options}\n      selectedKey={theme}\n      onSelectionChange={(k) => setTheme(String(k))}\n    />\n  );\n}"
+      },
+      {
+        "file": "disabled-option",
+        "title": "Disabled option",
+        "description": "Mark unavailable entries.",
+        "body": "import { Select } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <Select\n      aria-label=\"Plan\"\n      options={[\n        { value: 'free', label: 'Free' },\n        { value: 'pro', label: 'Pro', disabled: true },\n      ]}\n    />\n  );\n}"
+      }
+    ]
+  },
+  "slider": {
+    "importName": "Slider",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Slider with theme tokens.",
+        "body": "import { Slider } from '@bareframe/react';\n\nexport default function Example() {\n  return <Slider />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Slider } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Slider />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Slider } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Slider />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "radio-group": {
+    "importName": "RadioGroup",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default RadioGroup with theme tokens.",
+        "body": "import { RadioGroup } from '@bareframe/react';\n\nexport default function Example() {\n  return <RadioGroup />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { RadioGroup } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <RadioGroup />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { RadioGroup } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <RadioGroup />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "multiselect": {
+    "importName": "MultiSelect",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Tag picker",
+        "description": "Add values with a labeled control.",
+        "body": "import { MultiSelect } from '@bareframe/react';\n\nconst options = [\n  { value: 'react', label: 'React' },\n  { value: 'vue', label: 'Vue' },\n];\n\nexport default function Example() {\n  return <MultiSelect label=\"Skills\" options={options} defaultValue={['react']} />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "Controlled",
+        "description": "Sync chip list with form state.",
+        "body": "import { useState } from 'react';\nimport { MultiSelect } from '@bareframe/react';\n\nconst options = [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }];\n\nexport default function Example() {\n  const [tags, setTags] = useState<string[]>(['a']);\n  return <MultiSelect label=\"Tags\" options={options} value={tags} onChange={setTags} />;\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Compact row",
+        "description": "MultiSelect in a narrow column.",
+        "body": "import { MultiSelect } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '16rem' }}>\n      <MultiSelect aria-label=\"Labels\" options={[{ value: 'bug', label: 'Bug' }]} />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "combobox": {
+    "importName": "Combobox",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Searchable list",
+        "description": "Filter options with a visible label.",
+        "body": "import { Combobox } from '@bareframe/react';\n\nconst options = [\n  { value: 'figma', label: 'Figma' },\n  { value: 'sketch', label: 'Sketch' },\n];\n\nexport default function Example() {\n  return <Combobox label=\"Design tool\" options={options} defaultValue=\"figma\" />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "Controlled",
+        "description": "Keep selection in React state.",
+        "body": "import { useState } from 'react';\nimport { Combobox } from '@bareframe/react';\n\nconst options = [{ value: 'us', label: 'United States' }, { value: 'ca', label: 'Canada' }];\n\nexport default function Example() {\n  const [country, setCountry] = useState('us');\n  return (\n    <Combobox\n      label=\"Country\"\n      options={options}\n      value={country}\n      onChange={setCountry}\n    />\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Aria label only",
+        "description": "Use aria-label when a visible label is not possible.",
+        "body": "import { Combobox } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <Combobox\n      aria-label=\"Search repositories\"\n      options={[{ value: 'bareframe', label: 'bareframe' }]}\n    />\n  );\n}"
+      }
+    ]
+  },
+  "modal": {
+    "importName": "Modal",
+    "samples": [
+      {
+        "file": "confirm",
+        "title": "Confirm dialog",
+        "description": "Critical confirmation with actions.",
+        "body": "import { Button, Modal } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <Modal\n      isOpen\n      title=\"Delete file?\"\n      footer={\n        <>\n          <Button variant=\"ghost\">Cancel</Button>\n          <Button variant=\"destructive\">Delete</Button>\n        </>\n      }\n    >\n      This cannot be undone.\n    </Modal>\n  );\n}"
+      },
+      {
+        "file": "controlled",
+        "title": "Controlled open",
+        "description": "Drive visibility from React state.",
+        "body": "import { useState } from 'react';\nimport { Button, Modal } from '@bareframe/react';\n\nexport default function Example() {\n  const [open, setOpen] = useState(true);\n  return (\n    <>\n      <Button onPress={() => setOpen(true)}>Open</Button>\n      <Modal isOpen={open} onOpenChange={setOpen} title=\"Settings\">\n        Modal content\n      </Modal>\n    </>\n  );\n}"
+      },
+      {
+        "file": "form",
+        "title": "Form in modal",
+        "description": "Short forms fit well in modals.",
+        "body": "import { Field, Modal } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <Modal isOpen title=\"Invite teammate\">\n      <Field label=\"Email\" />\n    </Modal>\n  );\n}"
+      }
+    ]
+  },
+  "drawer": {
+    "importName": "Drawer",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Drawer with theme tokens.",
+        "body": "import { Drawer } from '@bareframe/react';\n\nexport default function Example() {\n  return <Drawer />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Drawer } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Drawer />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Drawer } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Drawer />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "tooltip": {
+    "importName": "Tooltip",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Icon hint",
+        "description": "Clarify an icon-only control.",
+        "body": "import { Tooltip } from '@bareframe/react';\n\nexport default function Example() {\n  return <Tooltip content=\"Copy link to clipboard\">Share</Tooltip>;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "Field help",
+        "description": "Short guidance beside a label.",
+        "body": "import { Tooltip } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <Tooltip content=\"Must match your billing country.\">\n      Country\n    </Tooltip>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Dark surface",
+        "description": "Tooltip on a dark panel.",
+        "body": "import { Tooltip } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Tooltip content=\"Experimental feature\">Labs</Tooltip>\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "popover": {
+    "importName": "Popover",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Extra actions",
+        "description": "Popover anchored to a trigger.",
+        "body": "import { Popover } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <Popover trigger=\"Filters\">\n      <p>Refine results by status and owner.</p>\n    </Popover>\n  );\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "Inline help",
+        "description": "Keep dense forms uncluttered.",
+        "body": "import { Popover } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <Popover trigger=\"What is this?\">\n      <p>We use this to calculate prorated billing.</p>\n    </Popover>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "On dark UI",
+        "description": "Popover inherits theme tokens.",
+        "body": "import { Popover } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"noir\">\n      <Popover trigger=\"Details\">More information here.</Popover>\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "dropdown-menu": {
+    "importName": "DropdownMenu",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default DropdownMenu with theme tokens.",
+        "body": "import { DropdownMenu } from '@bareframe/react';\n\nexport default function Example() {\n  return <DropdownMenu />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { DropdownMenu } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <DropdownMenu />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { DropdownMenu } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <DropdownMenu />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "tabs": {
+    "importName": "Tabs",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Tabs with theme tokens.",
+        "body": "import { Tabs } from '@bareframe/react';\n\nexport default function Example() {\n  return <Tabs />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Tabs } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Tabs />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Tabs } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Tabs />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "breadcrumbs": {
+    "importName": "Breadcrumbs",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Breadcrumbs with theme tokens.",
+        "body": "import { Breadcrumbs } from '@bareframe/react';\n\nexport default function Example() {\n  return <Breadcrumbs />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Breadcrumbs } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Breadcrumbs />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Breadcrumbs } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Breadcrumbs />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "pagination": {
+    "importName": "Pagination",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Pagination with theme tokens.",
+        "body": "import { Pagination } from '@bareframe/react';\n\nexport default function Example() {\n  return <Pagination />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Pagination } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Pagination />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Pagination } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Pagination />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "accordion": {
+    "importName": "Accordion",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Accordion with theme tokens.",
+        "body": "import { Accordion } from '@bareframe/react';\n\nexport default function Example() {\n  return <Accordion />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Accordion } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Accordion />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Accordion } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Accordion />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "toast": {
+    "importName": "Toast",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Toast with theme tokens.",
+        "body": "import { Toast } from '@bareframe/react';\n\nexport default function Example() {\n  return <Toast />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Toast } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Toast />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Toast } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Toast />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "progress": {
+    "importName": "Progress",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Progress with theme tokens.",
+        "body": "import { Progress } from '@bareframe/react';\n\nexport default function Example() {\n  return <Progress />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Progress } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Progress />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Progress } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Progress />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "spinner": {
+    "importName": "Spinner",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Spinner with theme tokens.",
+        "body": "import { Spinner } from '@bareframe/react';\n\nexport default function Example() {\n  return <Spinner />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Spinner } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Spinner />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Spinner } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Spinner />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "skeleton": {
+    "importName": "Skeleton",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Skeleton with theme tokens.",
+        "body": "import { Skeleton } from '@bareframe/react';\n\nexport default function Example() {\n  return <Skeleton />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Skeleton } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Skeleton />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Skeleton } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Skeleton />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "avatar": {
+    "importName": "Avatar",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Avatar with theme tokens.",
+        "body": "import { Avatar } from '@bareframe/react';\n\nexport default function Example() {\n  return <Avatar />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Avatar } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Avatar />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Avatar } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Avatar />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "table": {
+    "importName": "Table",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Table with theme tokens.",
+        "body": "import { Table } from '@bareframe/react';\n\nexport default function Example() {\n  return <Table />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Table } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Table />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Table } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Table />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "empty-state": {
+    "importName": "EmptyState",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default EmptyState with theme tokens.",
+        "body": "import { EmptyState } from '@bareframe/react';\n\nexport default function Example() {\n  return <EmptyState />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { EmptyState } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <EmptyState />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { EmptyState } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <EmptyState />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "stat-card": {
+    "importName": "StatCard",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default StatCard with theme tokens.",
+        "body": "import { StatCard } from '@bareframe/react';\n\nexport default function Example() {\n  return <StatCard />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { StatCard } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <StatCard />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { StatCard } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <StatCard />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "calendar": {
+    "importName": "Calendar",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default Calendar with theme tokens.",
+        "body": "import { Calendar } from '@bareframe/react';\n\nexport default function Example() {\n  return <Calendar />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { Calendar } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <Calendar />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { Calendar } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <Calendar />\n    </div>\n  );\n}"
+      }
+    ]
+  },
+  "datepicker": {
+    "importName": "DatePicker",
+    "samples": [
+      {
+        "file": "basic",
+        "title": "Basic usage",
+        "description": "Default DatePicker with theme tokens.",
+        "body": "import { DatePicker } from '@bareframe/react';\n\nexport default function Example() {\n  return <DatePicker />;\n}"
+      },
+      {
+        "file": "in-form",
+        "title": "In context",
+        "description": "Typical placement in an app surface.",
+        "body": "import { DatePicker } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div style={{ maxWidth: '20rem' }}>\n      <DatePicker />\n    </div>\n  );\n}"
+      },
+      {
+        "file": "themed",
+        "title": "Themed surface",
+        "description": "Scoped inside a theme wrapper.",
+        "body": "import { DatePicker } from '@bareframe/react';\n\nexport default function Example() {\n  return (\n    <div data-bf-theme=\"dark\">\n      <DatePicker />\n    </div>\n  );\n}"
+      }
+    ]
+  }
+}

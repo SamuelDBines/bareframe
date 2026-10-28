@@ -21,4 +21,10 @@ describe('generateComponentSnippet', () => {
 		expect(getRegistryEntry('switch')).toBeDefined();
 		expect(getRegistryEntry('stat-card')).toBeDefined();
 	});
+
+	it('merges generated props for badge', () => {
+		const entry = getRegistryEntry('badge');
+		expect(entry?.props.some((p) => p.name === 'variant')).toBe(true);
+		expect(entry?.docExamples?.length).toBeGreaterThanOrEqual(3);
+	});
 });

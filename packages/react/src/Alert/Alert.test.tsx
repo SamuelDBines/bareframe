@@ -34,6 +34,19 @@ describe('Alert', () => {
 		expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 	});
 
+	it('supports controlled visibility', async () => {
+		const user = userEvent.setup();
+		const onDismiss = vi.fn();
+		render(
+			<Alert visible dismissible title="Note" onDismiss={onDismiss}>
+				Bye
+			</Alert>,
+		);
+		await user.click(screen.getByRole('button', { name: 'Dismiss alert' }));
+		expect(onDismiss).toHaveBeenCalled();
+		expect(screen.getByRole('alert')).toBeInTheDocument();
+	});
+
 	it('has no axe violations', async () => {
 		const { container } = render(<Alert title="Info">Message</Alert>);
 		expect(await axe(container)).toHaveNoViolations();

@@ -1,11 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
-import { Button } from '../Button/Button';
+import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
-import { describe, expect, it } from 'vitest';
 import { Button } from '../Button/Button';
-import { Modal } from './Modal';
+import { Drawer, Modal } from './Modal';
 
 describe('Modal', () => {
 	it('renders when open', () => {
@@ -16,6 +14,15 @@ describe('Modal', () => {
 		);
 		expect(screen.getByRole('dialog')).toBeInTheDocument();
 		expect(screen.getByText('Confirm')).toBeInTheDocument();
+	});
+
+	it('does not render when closed', () => {
+		render(
+			<Modal isOpen={false} title="Hidden">
+				Nope
+			</Modal>,
+		);
+		expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 	});
 
 	it('traps focus on primary action', async () => {
@@ -43,6 +50,26 @@ describe('Modal', () => {
 			<Modal isOpen title="Title">
 				Content
 			</Modal>,
+		);
+		expect(await axe(container)).toHaveNoViolations();
+	});
+});
+
+describe('Drawer', () => {
+	it('renders when open', () => {
+		render(
+			<Drawer isOpen title="Panel">
+				Drawer body
+			</Drawer>,
+		);
+		expect(screen.getByRole('dialog')).toHaveTextContent('Drawer body');
+	});
+
+	it('has no axe violations', async () => {
+		const { container } = render(
+			<Drawer isOpen title="Panel">
+				Body
+			</Drawer>,
 		);
 		expect(await axe(container)).toHaveNoViolations();
 	});

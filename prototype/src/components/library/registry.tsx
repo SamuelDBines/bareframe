@@ -1,5 +1,7 @@
 import type { ComponentType, ReactNode } from 'react';
 import * as Bf from '@bareframe/react';
+import { DOC_META } from './doc-meta';
+import GENERATED_PROPS from './generated-props.json';
 import type { ComponentRegistryEntry } from './types';
 
 function render(Component: ComponentType<any>, props: Record<string, unknown>): ReactNode {
@@ -736,7 +738,19 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 ];
 
 export function getRegistryEntry(slug: string): ComponentRegistryEntry | undefined {
-	return COMPONENT_REGISTRY.find((c) => c.slug === slug);
+	const base = COMPONENT_REGISTRY.find((c) => c.slug === slug);
+	if (!base) return undefined;
+	const meta = DOC_META[slug];
+	const generated = GENERATED_PROPS[slug as keyof typeof GENERATED_PROPS];
+	return {
+		...base,
+		overview: base.overview ?? meta?.overview,
+		whenToUse: base.whenToUse ?? meta?.whenToUse,
+		docExamples: base.docExamples ?? meta?.docExamples,
+		dosDonts: base.dosDonts ?? meta?.dosDonts,
+		themeTokens: base.themeTokens ?? meta?.themeTokens,
+		props: generated?.length ? generated : base.props,
+	};
 }
 
 export function listComponentsForMcp() {

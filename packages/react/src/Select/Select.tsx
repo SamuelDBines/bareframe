@@ -1,6 +1,9 @@
-import { forwardRef, type ReactNode } from 'react';
+import { forwardRef, useState, type ReactNode } from 'react';
 import {
 	Button as RACButton,
+	ComboBox,
+	Input as RACInput,
+	Label,
 	ListBox,
 	ListBoxItem,
 	Popover,
@@ -70,6 +73,8 @@ NativeSelect.displayName = 'NativeSelect';
 export type ComboboxProps = {
 	options: SelectOption[];
 	placeholder?: string;
+	label?: string;
+	'aria-label'?: string;
 	className?: string;
 	value?: string;
 	defaultValue?: string;
@@ -79,57 +84,84 @@ export type ComboboxProps = {
 export function Combobox({
 	options,
 	placeholder = 'Search…',
+	label,
+	'aria-label': ariaLabel,
 	className,
 	value,
 	defaultValue,
 	onChange,
 }: ComboboxProps) {
+	const a11yLabel = label ?? ariaLabel ?? 'Search options';
 	return (
-		<RACSelect
+		<ComboBox<SelectOption>
 			className={cn('bf-combobox', className)}
 			selectedKey={value}
 			defaultSelectedKey={defaultValue}
 			onSelectionChange={(key) => onChange?.(String(key))}
+			aria-label={label ? undefined : a11yLabel}
+			items={options}
 		>
-			<RACButton className="bf-input bf-combobox__trigger">
-				<SelectValue>{({ selectedText }) => selectedText || placeholder}</SelectValue>
-			</RACButton>
+			{label ? <Label className="bf-field__label">{label}</Label> : null}
+			<div className="bf-combobox__input-row">
+				<RACInput className="bf-input bf-combobox__input" placeholder={placeholder} />
+				<RACButton className="bf-combobox__trigger" aria-label={`${a11yLabel} options`}>
+					▾
+				</RACButton>
+			</div>
 			<Popover className="bf-combobox__popover">
 				<ListBox className="bf-combobox__list" items={options}>
-					{(item) => (
-						<ListBoxItem id={item.value} textValue={item.label}>
+					{(item: SelectOption) => (
+						<ListBoxItem id={item.value} textValue={item.label} className="bf-select-option">
 							{item.label}
 						</ListBoxItem>
 					)}
 				</ListBox>
 			</Popover>
-		</RACSelect>
+		</ComboBox>
 	);
 }
 
 export type MultiSelectProps = {
 	options: SelectOption[];
 	value?: string[];
+	defaultValue?: string[];
 	onChange?: (value: string[]) => void;
 	placeholder?: string;
+	label?: string;
+	'aria-label'?: string;
 	className?: string;
 };
 
 export function MultiSelect({
 	options,
-	value = [],
+	value: valueProp,
+	defaultValue,
 	onChange,
 	placeholder = 'Add…',
+	label,
+	'aria-label': ariaLabel,
 	className,
 }: MultiSelectProps) {
+	const [internal, setInternal] = useState<string[]>(defaultValue ?? []);
+	const value = valueProp ?? internal;
+	const setValue = (next: string[]) => {
+		if (valueProp === undefined) setInternal(next);
+		onChange?.(next);
+	};
+	const addLabel = label ?? ariaLabel ?? 'Add item';
 	return (
 		<div className={cn('bf-multiselect', className)}>
-			<div className="bf-multiselect__chips">
+			{label ? (
+				<span id="bf-multiselect-label" className="bf-field__label">
+					{label}
+				</span>
+			) : null}
+			<div className="bf-multiselect__chips" aria-labelledby={label ? 'bf-multiselect-label' : undefined}>
 				{value.map((v) => {
-					const label = options.find((o) => o.value === v)?.label ?? v;
+					const chipLabel = options.find((o) => o.value === v)?.label ?? v;
 					return (
 						<span key={v} className="bf-badge bf-badge--outline">
-							{label}
+							{chipLabel}
 						</span>
 					);
 				})}
@@ -137,8 +169,10 @@ export function MultiSelect({
 			<Select
 				options={options.filter((o) => !value.includes(o.value))}
 				placeholder={placeholder}
+				aria-label={label ? undefined : addLabel}
+				aria-labelledby={label ? 'bf-multiselect-label' : undefined}
 				onSelectionChange={(key) => {
-					if (key) onChange?.([...value, String(key)]);
+					if (key) setValue([...value, String(key)]);
 				}}
 			/>
 		</div>

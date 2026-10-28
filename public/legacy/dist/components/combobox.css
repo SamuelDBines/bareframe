@@ -1,0 +1,30 @@
+:host {
+	--bf-combobox-font: var(--bf-theme-font-family, inherit);
+	--bf-combobox-radius: var(--bf-theme-radius-md, 8px);
+	--bf-combobox-border-width: var(--bf-theme-border-width, 1px);
+	--bf-combobox-border-style: var(--bf-theme-border-style, solid);
+	--bf-combobox-border-color: var(--bf-theme-combobox-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-combobox-bg: var(--bf-theme-combobox-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-combobox-color: var(--bf-theme-combobox-color, var(--bf-theme-text-1, #0f172a));
+	--bf-combobox-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-combobox-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-combobox-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-combobox-font);
+	color: var(--bf-combobox-color);
+}
+
+.root {
+	background: var(--bf-combobox-bg);
+	color: var(--bf-combobox-color);
+	border-width: var(--bf-combobox-border-width);
+	border-style: var(--bf-combobox-border-style);
+	border-color: var(--bf-combobox-border-color);
+	border-radius: var(--bf-combobox-radius);
+	padding: var(--bf-combobox-padding-y) var(--bf-combobox-padding-x);
+	transition: var(--bf-combobox-transition);
+}

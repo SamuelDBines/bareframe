@@ -3,7 +3,7 @@ import { THEME_IDS, THEME_LABELS, type ThemeId } from '../../theme/themes';
 import { generateComponentSnippet } from '../../components/library/codegen';
 import type { ComponentRegistryEntry, PreviewInteractionState } from '../../components/library/types';
 import { PreviewCodeTabs } from './docs/PreviewCodeTabs';
-import { PlaygroundPortalRoot } from './docs/PlaygroundPortal';
+import { PlaygroundPortalProvider, PlaygroundOverlayLayer } from './docs/PlaygroundPortal';
 
 type ViewportId = 'mobile' | 'tablet' | 'desktop';
 
@@ -216,9 +216,10 @@ export function ComponentPlayground({ entry }: Props) {
 				className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
 				data-testid="playground-preview"
 			>
-			<PlaygroundPortalRoot portalRoot={portalRoot} onPortalRootChange={setPortalRoot}>
-				{entry.render(previewProps)}
-			</PlaygroundPortalRoot>
+			<PlaygroundPortalProvider portalRoot={portalRoot}>
+				<PlaygroundOverlayLayer onPortalRootChange={setPortalRoot} />
+				<div className="playground-preview-content">{entry.render(previewProps)}</div>
+			</PlaygroundPortalProvider>
 			</div>
 		</div>
 	);

@@ -1,5 +1,4 @@
-import { createContext, useContext, useEffect, type ReactNode } from 'react';
-import { UNSAFE_PortalProvider } from 'react-aria';
+import { createContext, useContext, type ReactNode } from 'react';
 
 const PlaygroundPortalContext = createContext<HTMLElement | null>(null);
 
@@ -13,47 +12,32 @@ type Props = {
 	onPortalRootChange: (el: HTMLElement | null) => void;
 };
 
-/** RAC ModalOverlay inerts outside content; keep playground controls interactive for contained previews. */
-function usePlaygroundPanelUnlock(portalRoot: HTMLElement | null) {
-	useEffect(() => {
-		const panel = document.querySelector('.playground-panel');
-		if (!panel || !portalRoot) {
-			return;
-		}
-
-		const unlockPanel = () => {
-			const containedOpen = portalRoot.querySelector(
-				'.bf-modal-overlay--contained, .bf-drawer-overlay--contained',
-			);
-			if (containedOpen) {
-				panel.removeAttribute('inert');
-				panel.removeAttribute('aria-hidden');
-			}
-		};
-
-		unlockPanel();
-		const observer = new MutationObserver(unlockPanel);
-		observer.observe(panel, { attributes: true, attributeFilter: ['inert', 'aria-hidden'] });
-		observer.observe(portalRoot, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
-		return () => observer.disconnect();
-	}, [portalRoot]);
+/** Supplies the playground overlay portal target to doc previews (modal, drawer, popover). */
+export function PlaygroundPortalProvider({ children, portalRoot }: Omit<Props, 'onPortalRootChange'>) {
+	return <PlaygroundPortalContext.Provider value={portalRoot}>{children}</PlaygroundPortalContext.Provider>;
 }
 
-/** Mounts playground overlays inside the preview frame (not document body). */
-export function PlaygroundPortalRoot({ children, portalRoot, onPortalRootChange }: Props) {
-	usePlaygroundPanelUnlock(portalRoot);
-
+/** Empty layer portaled modals/drawers render into; sits above preview content. */
+export function PlaygroundOverlayLayer({
+	onPortalRootChange,
+}: {
+	onPortalRootChange: (el: HTMLElement | null) => void;
+}) {
 	return (
-		<PlaygroundPortalContext.Provider value={portalRoot}>
-			<div
-				ref={onPortalRootChange}
-				className="playground-overlay-root"
-				data-testid="playground-overlay-root"
-			>
-				{portalRoot ? (
-					<UNSAFE_PortalProvider getContainer={() => portalRoot}>{children}</UNSAFE_PortalProvider>
-				) : null}
-			</div>
-		</PlaygroundPortalContext.Provider>
+		<div
+			ref={onPortalRootChange}
+			className="playground-overlay-root"
+			data-testid="playground-overlay-root"
+		/>
+	);
+}
+
+/** @deprecated Use PlaygroundPortalProvider + PlaygroundOverlayLayer */
+export function PlaygroundPortalRoot({ children, portalRoot, onPortalRootChange }: Props) {
+	return (
+		<PlaygroundPortalProvider portalRoot={portalRoot}>
+			<PlaygroundOverlayLayer onPortalRootChange={onPortalRootChange} />
+			<div className="playground-preview-content">{children}</div>
+		</PlaygroundPortalProvider>
 	);
 }

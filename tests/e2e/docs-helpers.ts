@@ -30,7 +30,7 @@ export async function expectExamplesSection(page: Page) {
 }
 
 export function isMobileProject(projectName: string) {
-	return projectName === 'chromium-mobile';
+	return projectName === 'chromium-mobile' || projectName === 'webkit-mobile';
 }
 
 export function isDesktopProject(projectName: string) {

@@ -1,0 +1,30 @@
+:host {
+	--bf-number-field-font: var(--bf-theme-font-family, inherit);
+	--bf-number-field-radius: var(--bf-theme-radius-md, 8px);
+	--bf-number-field-border-width: var(--bf-theme-border-width, 1px);
+	--bf-number-field-border-style: var(--bf-theme-border-style, solid);
+	--bf-number-field-border-color: var(--bf-theme-number-field-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-number-field-bg: var(--bf-theme-number-field-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-number-field-color: var(--bf-theme-number-field-color, var(--bf-theme-text-1, #0f172a));
+	--bf-number-field-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-number-field-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-number-field-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-number-field-font);
+	color: var(--bf-number-field-color);
+}
+
+.root {
+	background: var(--bf-number-field-bg);
+	color: var(--bf-number-field-color);
+	border-width: var(--bf-number-field-border-width);
+	border-style: var(--bf-number-field-border-style);
+	border-color: var(--bf-number-field-border-color);
+	border-radius: var(--bf-number-field-radius);
+	padding: var(--bf-number-field-padding-y) var(--bf-number-field-padding-x);
+	transition: var(--bf-number-field-transition);
+}

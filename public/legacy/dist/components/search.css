@@ -1,0 +1,30 @@
+:host {
+	--bf-search-font: var(--bf-theme-font-family, inherit);
+	--bf-search-radius: var(--bf-theme-radius-md, 8px);
+	--bf-search-border-width: var(--bf-theme-border-width, 1px);
+	--bf-search-border-style: var(--bf-theme-border-style, solid);
+	--bf-search-border-color: var(--bf-theme-search-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-search-bg: var(--bf-theme-search-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-search-color: var(--bf-theme-search-color, var(--bf-theme-text-1, #0f172a));
+	--bf-search-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-search-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-search-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-search-font);
+	color: var(--bf-search-color);
+}
+
+.root {
+	background: var(--bf-search-bg);
+	color: var(--bf-search-color);
+	border-width: var(--bf-search-border-width);
+	border-style: var(--bf-search-border-style);
+	border-color: var(--bf-search-border-color);
+	border-radius: var(--bf-search-radius);
+	padding: var(--bf-search-padding-y) var(--bf-search-padding-x);
+	transition: var(--bf-search-transition);
+}

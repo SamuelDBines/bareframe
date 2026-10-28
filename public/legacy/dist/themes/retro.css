@@ -1,0 +1,47 @@
+@import './layout.css';
+
+:root,
+[data-bf-theme='retro'] {
+	color-scheme: light;
+
+	--bf-theme-font-family: 'Courier New', 'Lucida Console', monospace;
+	--bf-theme-border-width: 2px;
+	--bf-theme-border-style: solid;
+	--bf-theme-radius-md: 2px;
+	--bf-theme-space-2: 0.5rem;
+	--bf-theme-space-3: 0.85rem;
+	--bf-theme-cursor-button: pointer;
+	--bf-theme-opacity-hover: 0.94;
+	--bf-theme-active-translate-y: 0;
+	--bf-theme-focus-ring-width: 2px;
+	--bf-theme-focus-ring-style: dashed;
+	--bf-theme-focus-ring-color: #22c55e;
+	--bf-theme-focus-ring-offset: 2px;
+	--bf-theme-surface-1: #fffbe6;
+	--bf-theme-surface-2: #fef3c7;
+	--bf-theme-text-1: #1f2937;
+	--bf-theme-text-2: #92400e;
+	--bf-theme-border-1: #d97706;
+
+	--bf-theme-button-primary-bg: #f97316;
+	--bf-theme-button-primary-color: #111827;
+	--bf-theme-button-primary-border-color: #9a3412;
+	--bf-theme-button-secondary-bg: #fffbe6;
+	--bf-theme-button-secondary-color: #7c2d12;
+	--bf-theme-button-secondary-border-color: #d97706;
+
+	--bf-theme-accordion-trigger-bg: #fde68a;
+	--bf-theme-accordion-trigger-hover-bg: #fcd34d;
+	--bf-theme-accordion-trigger-open-bg: #fdba74;
+	--bf-theme-accordion-chevron-color: #78350f;
+	--bf-theme-typography-color: var(--bf-theme-text-1);
+	--bf-theme-typography-line-height: 1.4;
+	--bf-theme-typography-display-size: 2.2rem;
+	--bf-theme-typography-h1-size: 1.75rem;
+	--bf-theme-typography-h2-size: 1.35rem;
+	--bf-theme-typography-h3-size: 1.1rem;
+	--bf-theme-typography-body-size: 1rem;
+	--bf-theme-typography-caption-size: 0.875rem;
+	--bf-theme-typography-label-size: 0.875rem;
+	--bf-theme-typography-code-size: 0.9rem;
+}

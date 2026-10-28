@@ -82,6 +82,8 @@ export type ComboboxProps = {
 	value?: string;
 	defaultValue?: string;
 	onChange?: (value: string) => void;
+	/** Docs preview: scope the listbox portal to this field for reliable touch targeting. */
+	contained?: boolean;
 };
 
 export function Combobox({
@@ -93,34 +95,45 @@ export function Combobox({
 	value,
 	defaultValue,
 	onChange,
+	contained = false,
 }: ComboboxProps) {
 	const a11yLabel = label ?? ariaLabel ?? 'Search options';
+	const [wrapEl, setWrapEl] = useState<HTMLDivElement | null>(null);
 	return (
-		<ComboBox<SelectOption>
-			className={cn('bf-combobox', className)}
-			selectedKey={value}
-			defaultSelectedKey={defaultValue}
-			onSelectionChange={(key) => onChange?.(String(key))}
-			aria-label={label ? undefined : a11yLabel}
-			items={options}
+		<div
+			ref={setWrapEl}
+			className={cn('bf-combobox-wrap', contained && 'bf-combobox-wrap--contained')}
 		>
-			{label ? <Label className="bf-field__label">{label}</Label> : null}
-			<div className="bf-combobox__input-row">
-				<RACInput className="bf-input bf-combobox__input" placeholder={placeholder} />
-				<RACButton className="bf-combobox__trigger" aria-label={`${a11yLabel} options`}>
-					▾
-				</RACButton>
-			</div>
-			<Popover className="bf-combobox__popover">
-				<ListBox className="bf-combobox__list" items={options}>
-					{(item: SelectOption) => (
-						<ListBoxItem id={item.value} textValue={item.label} className="bf-select-option">
-							{item.label}
-						</ListBoxItem>
-					)}
-				</ListBox>
-			</Popover>
-		</ComboBox>
+			<ComboBox<SelectOption>
+				className={cn('bf-combobox', className)}
+				selectedKey={value}
+				defaultSelectedKey={defaultValue}
+				onSelectionChange={(key) => onChange?.(String(key))}
+				aria-label={label ? undefined : a11yLabel}
+				items={options}
+			>
+				{label ? <Label className="bf-field__label">{label}</Label> : null}
+				<div className="bf-combobox__input-row">
+					<RACInput className="bf-input bf-combobox__input" placeholder={placeholder} />
+					<RACButton className="bf-combobox__trigger" aria-label={`${a11yLabel} options`}>
+						▾
+					</RACButton>
+				</div>
+				<Popover
+					className="bf-combobox__popover"
+					isNonModal
+					UNSTABLE_portalContainer={contained ? (wrapEl ?? undefined) : undefined}
+				>
+					<ListBox className="bf-combobox__list" items={options}>
+						{(item: SelectOption) => (
+							<ListBoxItem id={item.value} textValue={item.label} className="bf-select-option">
+								{item.label}
+							</ListBoxItem>
+						)}
+					</ListBox>
+				</Popover>
+			</ComboBox>
+		</div>
 	);
 }
 

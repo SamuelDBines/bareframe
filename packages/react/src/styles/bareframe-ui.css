@@ -512,16 +512,48 @@
 	background: var(--bf-theme-surface-2);
 }
 
+.bf-combobox-wrap {
+	width: fit-content;
+	max-width: 16rem;
+}
 .bf-combobox { width: 100%; max-width: 16rem; }
+.bf-combobox-wrap--contained {
+	position: relative;
+	width: 100%;
+	max-width: 16rem;
+}
+.bf-combobox-wrap--contained > :not(.bf-combobox) {
+	pointer-events: auto;
+}
+
+.bf-combobox-wrap--contained .bf-combobox__popover {
+	width: 100%;
+	max-height: 11rem;
+	overflow-y: auto;
+	position: relative !important;
+	inset: auto !important;
+	top: auto !important;
+	left: auto !important;
+	right: auto !important;
+	transform: none !important;
+	margin-top: 0.25rem;
+	z-index: 1000;
+}
+.bf-combobox-wrap--contained .bf-combobox__list {
+	position: relative;
+	top: auto;
+	left: auto;
+	right: auto;
+}
 .bf-combobox__popover {
-	z-index: 5;
+	z-index: 30;
 }
-/* Focused combobox input overlaps the list in hit-test order on narrow viewports; let taps reach options. */
-.bf-combobox__input[aria-expanded='true'] {
+.bf-combobox-wrap:has(.bf-combobox[data-open='true']) {
 	pointer-events: none;
 }
-.bf-combobox[data-open='true'] .bf-field__label {
-	pointer-events: none;
+.bf-combobox-wrap:has(.bf-combobox[data-open='true']) .bf-combobox,
+.bf-combobox-wrap:has(.bf-combobox[data-open='true']) .bf-combobox * {
+	pointer-events: auto;
 }
 .bf-combobox__list {
 	position: absolute;

@@ -1,0 +1,30 @@
+:host {
+	--bf-metric-card-font: var(--bf-theme-font-family, inherit);
+	--bf-metric-card-radius: var(--bf-theme-radius-md, 8px);
+	--bf-metric-card-border-width: var(--bf-theme-border-width, 1px);
+	--bf-metric-card-border-style: var(--bf-theme-border-style, solid);
+	--bf-metric-card-border-color: var(--bf-theme-metric-card-border-color, var(--bf-theme-border-1, #cbd5e1));
+	--bf-metric-card-bg: var(--bf-theme-metric-card-bg, var(--bf-theme-surface-1, #ffffff));
+	--bf-metric-card-color: var(--bf-theme-metric-card-color, var(--bf-theme-text-1, #0f172a));
+	--bf-metric-card-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-metric-card-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-metric-card-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-metric-card-font);
+	color: var(--bf-metric-card-color);
+}
+
+.root {
+	background: var(--bf-metric-card-bg);
+	color: var(--bf-metric-card-color);
+	border-width: var(--bf-metric-card-border-width);
+	border-style: var(--bf-metric-card-border-style);
+	border-color: var(--bf-metric-card-border-color);
+	border-radius: var(--bf-metric-card-radius);
+	padding: var(--bf-metric-card-padding-y) var(--bf-metric-card-padding-x);
+	transition: var(--bf-metric-card-transition);
+}

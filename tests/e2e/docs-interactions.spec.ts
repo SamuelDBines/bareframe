@@ -64,7 +64,7 @@ test.describe('Overlay interactions', () => {
 		await trigger.click();
 		await expect(page.getByRole('listbox')).toBeVisible();
 		if (isMobileProject(testInfo.project.name)) {
-			await preview(page).getByRole('option', { name: 'Option B' }).tap();
+			await page.getByRole('option', { name: 'Option B' }).tap();
 		} else {
 			await page.keyboard.press('ArrowDown');
 			await page.keyboard.press('Enter');
@@ -78,12 +78,11 @@ test.describe('Overlay interactions', () => {
 		await openComponent(page, 'combobox');
 		const input = preview(page).getByRole('combobox');
 		await input.fill('Vue');
+		const option = preview(page).getByRole('option', { name: 'Vue' });
+		await expect(option).toBeVisible();
 		if (isMobileProject(testInfo.project.name)) {
-			await input.press('ArrowDown');
-			await input.press('Enter');
+			await option.tap();
 		} else {
-			const option = preview(page).getByRole('option', { name: 'Vue' });
-			await expect(option).toBeVisible();
 			await option.click();
 		}
 		await expect(input).toHaveValue('Vue');
@@ -96,7 +95,7 @@ test.describe('Overlay interactions', () => {
 		const trigger = preview(page).getByRole('button');
 		if (isMobileProject(testInfo.project.name)) {
 			await trigger.tap();
-			await preview(page).getByRole('option', { name: 'Design' }).tap();
+			await page.getByRole('option', { name: 'Design' }).tap();
 		} else {
 			await trigger.click();
 			await page.getByRole('option', { name: 'Design' }).click();

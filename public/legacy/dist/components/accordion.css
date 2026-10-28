@@ -1,0 +1,107 @@
+:host {
+	--bf-accordion-font: var(--bf-theme-font-family, inherit);
+	--bf-accordion-gap: var(--bf-theme-space-2, 0.5rem);
+	--bf-accordion-radius: var(--bf-theme-radius-md, 8px);
+	--bf-accordion-border-width: var(--bf-theme-border-width, 1px);
+	--bf-accordion-border-style: var(--bf-theme-border-style, solid);
+	--bf-accordion-border-color: var(--bf-theme-accordion-border-color, #cbd5e1);
+	--bf-accordion-bg: var(--bf-theme-accordion-bg, #ffffff);
+	--bf-accordion-color: var(--bf-theme-accordion-color, #0f172a);
+	--bf-accordion-trigger-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-accordion-trigger-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-accordion-panel-padding-y: var(--bf-theme-space-2, 0.6rem);
+	--bf-accordion-panel-padding-x: var(--bf-theme-space-3, 0.9rem);
+	--bf-accordion-trigger-bg: var(--bf-theme-accordion-trigger-bg, #f8fafc);
+	--bf-accordion-trigger-hover-bg: var(
+		--bf-theme-accordion-trigger-hover-bg,
+		#f1f5f9
+	);
+	--bf-accordion-trigger-open-bg: var(
+		--bf-theme-accordion-trigger-open-bg,
+		#eff6ff
+	);
+	--bf-accordion-trigger-color: var(--bf-theme-accordion-trigger-color, #0f172a);
+	--bf-accordion-panel-bg: var(--bf-theme-accordion-panel-bg, #ffffff);
+	--bf-accordion-focus-ring-width: var(--bf-theme-focus-ring-width, 2px);
+	--bf-accordion-focus-ring-style: var(--bf-theme-focus-ring-style, solid);
+	--bf-accordion-focus-ring-color: var(--bf-theme-focus-ring-color, #93c5fd);
+	--bf-accordion-focus-ring-offset: var(--bf-theme-focus-ring-offset, 2px);
+	--bf-accordion-chevron-color: var(--bf-theme-accordion-chevron-color, #475569);
+	--bf-accordion-transition:
+		var(--bf-theme-transition-bg, background-color 120ms ease),
+		var(--bf-theme-transition-color, color 120ms ease),
+		var(--bf-theme-transition-border, border-color 120ms ease);
+
+	display: block;
+	font: var(--bf-accordion-font);
+	color: var(--bf-accordion-color);
+}
+
+.accordion {
+	display: grid;
+	gap: var(--bf-accordion-gap);
+}
+
+.accordion-item {
+	border-width: var(--bf-accordion-border-width);
+	border-style: var(--bf-accordion-border-style);
+	border-color: var(--bf-accordion-border-color);
+	border-radius: var(--bf-accordion-radius);
+	background: var(--bf-accordion-bg);
+	overflow: clip;
+}
+
+.accordion-trigger {
+	list-style: none;
+	cursor: pointer;
+	padding: var(--bf-accordion-trigger-padding-y)
+		var(--bf-accordion-trigger-padding-x);
+	background: var(--bf-accordion-trigger-bg);
+	color: var(--bf-accordion-trigger-color);
+	transition: var(--bf-accordion-transition);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.accordion-trigger::-webkit-details-marker {
+	display: none;
+}
+
+.accordion-trigger::after {
+	content: '+';
+	color: var(--bf-accordion-chevron-color);
+	font-weight: 700;
+	line-height: 1;
+}
+
+.accordion-item[open] > .accordion-trigger::after {
+	content: '-';
+}
+
+.accordion-trigger:hover {
+	background: var(--bf-accordion-trigger-hover-bg);
+}
+
+.accordion-trigger:focus-visible {
+	outline-width: var(--bf-accordion-focus-ring-width);
+	outline-style: var(--bf-accordion-focus-ring-style);
+	outline-color: var(--bf-accordion-focus-ring-color);
+	outline-offset: calc(var(--bf-accordion-focus-ring-offset) * -1);
+}
+
+.accordion-item[open] > .accordion-trigger {
+	background: var(--bf-accordion-trigger-open-bg);
+}
+
+.accordion-panel {
+	padding: var(--bf-accordion-panel-padding-y) var(--bf-accordion-panel-padding-x);
+	background: var(--bf-accordion-panel-bg);
+	border-top-width: var(--bf-accordion-border-width);
+	border-top-style: var(--bf-accordion-border-style);
+	border-top-color: var(--bf-accordion-border-color);
+}
+
+.accordion-panel ::slotted(*) {
+	margin: 0;
+}

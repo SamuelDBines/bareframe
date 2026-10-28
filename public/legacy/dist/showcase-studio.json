@@ -1,0 +1,365 @@
+{
+  "generatedAt": "2026-10-28T14:17:17.570Z",
+  "categories": {
+    "accordion": "base",
+    "action-list": "navigation",
+    "anchor": "navigation",
+    "autocomplete": "forms",
+    "avatar": "media",
+    "bottom-navigation": "feedback",
+    "breadcrumb": "navigation",
+    "button": "base",
+    "calendar": "date-time",
+    "canvas": "canvas",
+    "card": "base",
+    "carousel": "media",
+    "chart": "charts",
+    "checkbox": "forms",
+    "combobox": "forms",
+    "command-palette": "base",
+    "countdown": "date-time",
+    "data-grid": "collections",
+    "date-picker": "date-time",
+    "date-range-picker": "date-time",
+    "dialog": "feedback",
+    "divider": "base",
+    "drawer": "feedback",
+    "dropdown": "base",
+    "edge": "base",
+    "editor": "editor",
+    "empty-state": "base",
+    "error-summary": "feedback",
+    "fab": "base",
+    "file-upload": "forms",
+    "filter-bar": "collections",
+    "footer": "base",
+    "form-field": "forms",
+    "grid": "collections",
+    "header": "base",
+    "hero": "base",
+    "icon": "media",
+    "image": "media",
+    "input": "forms",
+    "key-value-list": "collections",
+    "link": "navigation",
+    "list": "collections",
+    "loading-indicator": "base",
+    "map": "media",
+    "menu": "navigation",
+    "message": "base",
+    "metric-card": "base",
+    "modal": "feedback",
+    "nav": "navigation",
+    "number-field": "forms",
+    "otp-input": "forms",
+    "pagination": "navigation",
+    "progress": "base",
+    "quick-actions": "navigation",
+    "radio": "forms",
+    "range": "forms",
+    "search": "forms",
+    "segmented-control": "base",
+    "select": "forms",
+    "skeleton": "base",
+    "split-button": "base",
+    "splitter": "base",
+    "stack": "base",
+    "tab": "navigation",
+    "table": "collections",
+    "tag": "base",
+    "timeline": "date-time",
+    "toast": "feedback",
+    "toggle": "forms",
+    "toolbar": "navigation",
+    "tree-view": "collections",
+    "video-player": "media",
+    "virtual-list": "collections",
+    "wizard": "base"
+  },
+  "parts": {
+    "accordion": [
+      "accordion"
+    ],
+    "action-list": [
+      "root"
+    ],
+    "anchor": [
+      "root"
+    ],
+    "autocomplete": [
+      "input",
+      "list",
+      "root"
+    ],
+    "avatar": [
+      "fallback",
+      "image",
+      "root",
+      "status"
+    ],
+    "bottom-navigation": [
+      "root"
+    ],
+    "breadcrumb": [
+      "list",
+      "root"
+    ],
+    "button": [
+      "button"
+    ],
+    "calendar": [
+      "root"
+    ],
+    "canvas": [
+      "root"
+    ],
+    "card": [
+      "root"
+    ],
+    "carousel": [
+      "root"
+    ],
+    "chart": [
+      "meta",
+      "root",
+      "viz"
+    ],
+    "checkbox": [
+      "box",
+      "input",
+      "root",
+      "text"
+    ],
+    "combobox": [
+      "root"
+    ],
+    "command-palette": [
+      "root"
+    ],
+    "countdown": [
+      "root"
+    ],
+    "data-grid": [
+      "root"
+    ],
+    "date-picker": [
+      "root"
+    ],
+    "date-range-picker": [
+      "root"
+    ],
+    "dialog": [
+      "backdrop",
+      "panel",
+      "root"
+    ],
+    "divider": [
+      "root"
+    ],
+    "drawer": [
+      "backdrop",
+      "panel",
+      "root"
+    ],
+    "dropdown": [
+      "menu",
+      "root",
+      "toggle"
+    ],
+    "edge": [
+      "root"
+    ],
+    "editor": [
+      "code",
+      "code-wrap",
+      "line-numbers",
+      "rich",
+      "root",
+      "toolbar"
+    ],
+    "empty-state": [
+      "root"
+    ],
+    "error-summary": [
+      "root"
+    ],
+    "fab": [
+      "root"
+    ],
+    "file-upload": [
+      "files",
+      "label",
+      "meta",
+      "root"
+    ],
+    "filter-bar": [
+      "root"
+    ],
+    "footer": [
+      "root"
+    ],
+    "form-field": [
+      "root"
+    ],
+    "grid": [
+      "root"
+    ],
+    "header": [
+      "root"
+    ],
+    "hero": [
+      "root"
+    ],
+    "icon": [
+      "root"
+    ],
+    "image": [
+      "root"
+    ],
+    "input": [
+      "format",
+      "input",
+      "picker",
+      "root",
+      "swatch"
+    ],
+    "key-value-list": [
+      "root"
+    ],
+    "link": [
+      "root"
+    ],
+    "list": [
+      "root"
+    ],
+    "loading-indicator": [
+      "root"
+    ],
+    "map": [
+      "root"
+    ],
+    "menu": [
+      "root"
+    ],
+    "message": [
+      "root"
+    ],
+    "metric-card": [
+      "root"
+    ],
+    "modal": [
+      "backdrop",
+      "panel",
+      "root"
+    ],
+    "nav": [
+      "root"
+    ],
+    "number-field": [
+      "root"
+    ],
+    "otp-input": [
+      "root"
+    ],
+    "pagination": [
+      "root"
+    ],
+    "progress": [
+      "circular",
+      "fill",
+      "linear",
+      "meta",
+      "root",
+      "track"
+    ],
+    "quick-actions": [
+      "root"
+    ],
+    "radio": [
+      "dot",
+      "input",
+      "root",
+      "text"
+    ],
+    "range": [
+      "dual",
+      "fill",
+      "high",
+      "input",
+      "low",
+      "meta",
+      "rating",
+      "root",
+      "single",
+      "track"
+    ],
+    "search": [
+      "root"
+    ],
+    "segmented-control": [
+      "root"
+    ],
+    "select": [
+      "chevron",
+      "root",
+      "select"
+    ],
+    "skeleton": [
+      "lines",
+      "root"
+    ],
+    "split-button": [
+      "root"
+    ],
+    "splitter": [
+      "root"
+    ],
+    "stack": [
+      "root"
+    ],
+    "tab": [
+      "root"
+    ],
+    "table": [
+      "root"
+    ],
+    "tag": [
+      "root"
+    ],
+    "timeline": [
+      "root"
+    ],
+    "toast": [
+      "close",
+      "content",
+      "icon",
+      "root"
+    ],
+    "toggle": [
+      "root",
+      "text",
+      "thumb",
+      "track"
+    ],
+    "toolbar": [
+      "root"
+    ],
+    "tree-view": [
+      "root"
+    ],
+    "video-player": [
+      "root"
+    ],
+    "virtual-list": [
+      "root"
+    ],
+    "wizard": [
+      "actions",
+      "content",
+      "next",
+      "prev",
+      "root",
+      "steps"
+    ]
+  }
+}

@@ -8,6 +8,7 @@ import {
 	type ModalOverlayProps,
 } from 'react-aria-components';
 import { cn } from '../utils/cn';
+import { ContainedOverlay } from './ContainedOverlay';
 
 export type ModalProps = Omit<ModalOverlayProps, 'children'> & {
 	title?: string;
@@ -27,6 +28,51 @@ export type ModalProps = Omit<ModalOverlayProps, 'children'> & {
 	portalContainer?: Element | null;
 };
 
+function ModalDialogContent({
+	title,
+	titleId,
+	showCloseButton,
+	children,
+	footer,
+	dialogClassName,
+}: {
+	title?: string;
+	titleId?: string;
+	showCloseButton: boolean;
+	children?: ReactNode;
+	footer?: ReactNode;
+	dialogClassName?: string;
+}) {
+	return (
+		<div className={cn('bf-modal-scene', dialogClassName)}>
+			<Dialog className="bf-modal" aria-labelledby={titleId}>
+				{title ? (
+					<header className="bf-modal__header">
+						<div className="bf-modal__header-row">
+							<Heading slot="title" id={titleId} className="bf-modal__title">
+								{title}
+							</Heading>
+							{showCloseButton ? (
+								<RACButton slot="close" className="bf-modal__close" aria-label="Close dialog">
+									×
+								</RACButton>
+							) : null}
+						</div>
+					</header>
+				) : showCloseButton ? (
+					<div className="bf-modal__header bf-modal__header--close-only">
+						<RACButton slot="close" className="bf-modal__close" aria-label="Close dialog">
+							×
+						</RACButton>
+					</div>
+				) : null}
+				<div className="bf-modal__body">{children}</div>
+				{footer ? <footer className="bf-modal__footer">{footer}</footer> : null}
+			</Dialog>
+		</div>
+	);
+}
+
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
 	{
 		title,
@@ -40,21 +86,48 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
 		isDismissable = true,
 		contained = false,
 		portalContainer,
+		onOpenChange,
 		...props
 	},
 	ref,
 ) {
 	const resolvedOpen = isOpen ?? open ?? false;
 	const titleId = title ? 'bf-modal-title' : undefined;
-	const scopedContained = contained;
+
+	const dialog = (
+		<ModalDialogContent
+			title={title}
+			titleId={titleId}
+			showCloseButton={showCloseButton}
+			dialogClassName={dialogClassName}
+			footer={footer}
+		>
+			{children}
+		</ModalDialogContent>
+	);
+
+	if (contained) {
+		return (
+			<ContainedOverlay
+				isOpen={resolvedOpen}
+				onOpenChange={onOpenChange}
+				isDismissable={isDismissable}
+				portalContainer={portalContainer}
+				overlayClassName={cn('bf-modal-overlay', 'bf-modal-overlay--contained', className)}
+				overlayRef={ref}
+			>
+				{dialog}
+			</ContainedOverlay>
+		);
+	}
 
 	return (
 		<ModalOverlay
 			{...props}
 			isOpen={resolvedOpen}
 			isDismissable={isDismissable}
-			UNSTABLE_portalContainer={portalContainer ?? undefined}
-			className={cn('bf-modal-overlay', scopedContained && 'bf-modal-overlay--contained', className)}
+			onOpenChange={onOpenChange}
+			className={cn('bf-modal-overlay', className)}
 			ref={ref}
 		>
 			<RACModal className={cn('bf-modal-scene', dialogClassName)}>
@@ -110,20 +183,48 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(
 		isDismissable = true,
 		contained = false,
 		portalContainer,
+		onOpenChange,
 		...props
 	},
 	ref,
 ) {
 	const resolvedOpen = isOpen ?? open ?? false;
-	const scopedContained = contained;
+
+	const drawerDialog = (
+		<div className={cn('bf-drawer-scene', `bf-drawer-scene--${side}`)}>
+			<Dialog className="bf-drawer" aria-label={title}>
+				{title ? (
+					<header className="bf-drawer__header">
+						<Heading slot="title">{title}</Heading>
+					</header>
+				) : null}
+				<div className="bf-drawer__body">{children}</div>
+			</Dialog>
+		</div>
+	);
+
+	if (contained) {
+		return (
+			<ContainedOverlay
+				isOpen={resolvedOpen}
+				onOpenChange={onOpenChange}
+				isDismissable={isDismissable}
+				portalContainer={portalContainer}
+				overlayClassName={cn('bf-drawer-overlay', 'bf-drawer-overlay--contained', className)}
+				overlayRef={ref}
+			>
+				{drawerDialog}
+			</ContainedOverlay>
+		);
+	}
 
 	return (
 		<ModalOverlay
 			{...props}
 			isOpen={resolvedOpen}
 			isDismissable={isDismissable}
-			UNSTABLE_portalContainer={portalContainer ?? undefined}
-			className={cn('bf-drawer-overlay', scopedContained && 'bf-drawer-overlay--contained', className)}
+			onOpenChange={onOpenChange}
+			className={cn('bf-drawer-overlay', className)}
 			ref={ref}
 		>
 			<RACModal className={cn('bf-drawer-scene', `bf-drawer-scene--${side}`)}>

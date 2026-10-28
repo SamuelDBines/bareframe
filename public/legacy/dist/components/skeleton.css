@@ -1,0 +1,117 @@
+:host {
+	--bf-skeleton-radius: var(--bf-theme-radius-md, 8px);
+	--bf-skeleton-width: 100%;
+	--bf-skeleton-height: 0.9rem;
+	--bf-skeleton-base: color-mix(in srgb, var(--bf-theme-border-1, #cbd5e1) 55%, var(--bf-theme-surface-1, #ffffff));
+	--bf-skeleton-highlight: color-mix(in srgb, var(--bf-theme-surface-1, #ffffff) 86%, transparent);
+	--bf-skeleton-speed: 1.15s;
+
+	display: block;
+}
+
+.root {
+	position: relative;
+	overflow: hidden;
+	width: var(--bf-skeleton-width);
+	height: var(--bf-skeleton-height);
+	background: var(--bf-skeleton-base);
+	border-radius: var(--bf-skeleton-radius);
+	color: transparent;
+	user-select: none;
+}
+
+.root[data-animate='on']::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		100deg,
+		transparent 0%,
+		var(--bf-skeleton-highlight) 45%,
+		transparent 80%
+	);
+	transform: translateX(-100%);
+	animation: bf-skeleton-shimmer var(--bf-skeleton-speed) ease-in-out infinite;
+}
+
+.root[data-variant='title'] {
+	--bf-skeleton-height: 1.05rem;
+	--bf-skeleton-width: 58%;
+}
+
+.root[data-variant='avatar'] {
+	--bf-skeleton-width: 2.5rem;
+	--bf-skeleton-height: 2.5rem;
+	--bf-skeleton-radius: 999px;
+}
+
+.root[data-variant='button'] {
+	--bf-skeleton-width: 8rem;
+	--bf-skeleton-height: 2.1rem;
+	--bf-skeleton-radius: 10px;
+}
+
+.root[data-variant='image'] {
+	--bf-skeleton-height: auto;
+	--bf-skeleton-width: 100%;
+	aspect-ratio: 16 / 9;
+	border-radius: 12px;
+}
+
+.root[data-variant='paragraph'] {
+	--bf-skeleton-height: auto;
+	background: transparent;
+	display: grid;
+	gap: 0.45rem;
+}
+
+.root[data-variant='paragraph']::after {
+	display: none;
+}
+
+.lines {
+	display: none;
+}
+
+.root[data-variant='paragraph'] .lines {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.line {
+	position: relative;
+	display: block;
+	height: 0.78rem;
+	border-radius: 999px;
+	background: var(--bf-skeleton-base);
+	overflow: hidden;
+}
+
+.root[data-variant='paragraph'][data-animate='on'] .line::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		100deg,
+		transparent 0%,
+		var(--bf-skeleton-highlight) 45%,
+		transparent 80%
+	);
+	transform: translateX(-100%);
+	animation: bf-skeleton-shimmer var(--bf-skeleton-speed) ease-in-out infinite;
+}
+
+slot {
+	display: none;
+}
+
+@keyframes bf-skeleton-shimmer {
+	100% { transform: translateX(120%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.root::after,
+	.line::after {
+		animation: none !important;
+	}
+}

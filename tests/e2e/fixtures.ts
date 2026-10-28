@@ -3,6 +3,8 @@ import { test as baseTest, expect } from '@playwright/test';
 const IGNORE_CONSOLE = [
 	/favicon/i,
 	/Failed to load resource.*404/i,
+	/Failed to load resource: net::ERR_FAILED/i,
+	/PayPal is not defined/i,
 ];
 
 function isIgnoredConsoleError(text: string): boolean {

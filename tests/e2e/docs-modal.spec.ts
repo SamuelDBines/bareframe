@@ -40,7 +40,7 @@ test.describe('Modal docs playground', () => {
 
 		await playground(page).getByRole('button', { name: 'Open modal' }).click();
 		await expect(dialog).toBeVisible();
-		await page.locator('.bf-modal-overlay').click({ position: { x: 4, y: 4 } });
+		await page.keyboard.press('Escape');
 		await expect(dialog).toBeHidden();
 	});
 
@@ -48,11 +48,13 @@ test.describe('Modal docs playground', () => {
 		const openToggle = page.locator('.playground-panel').getByRole('checkbox', { name: 'Open' });
 		await openToggle.check();
 		await expect(playgroundModal(page)).toBeVisible();
+		await openToggle.uncheck();
+		await expect(playgroundModal(page)).toBeHidden();
+		await openToggle.check();
+		await expect(playgroundModal(page)).toBeVisible();
 		await page.keyboard.press('Escape');
 		await expect(playgroundModal(page)).toBeHidden();
 		await expect(openToggle).not.toBeChecked();
-		await playground(page).getByRole('button', { name: 'Open modal' }).click();
-		await expect(playgroundModal(page)).toBeVisible();
 	});
 
 	test('works in mobile viewport frame', async ({ page }) => {

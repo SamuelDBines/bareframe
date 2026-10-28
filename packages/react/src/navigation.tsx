@@ -93,7 +93,8 @@ export const Breadcrumbs = forwardRef<
 export const Pagination = forwardRef<
 	HTMLElement,
 	{ page?: number; total?: number; onPageChange?: (page: number) => void; className?: string }
->(function Pagination({ page = 1, total = 5, onPageChange, className }, ref) {
+>(function Pagination({ page: pageProp = 1, total = 5, onPageChange, className }, ref) {
+	const page = pageProp;
 	return (
 		<nav ref={ref} className={cn('bf-pagination', className)} aria-label="Pagination">
 			<BfButton variant="secondary" size="sm" isDisabled={page <= 1} onPress={() => onPageChange?.(page - 1)}>

@@ -1,6 +1,7 @@
 import { forwardRef, type ReactNode } from 'react';
 import {
 	Button as RACButton,
+	DialogTrigger,
 	Menu,
 	MenuItem,
 	MenuTrigger,
@@ -28,19 +29,30 @@ export function PopoverPanel({
 	trigger,
 	children,
 	className,
+	isOpen,
+	defaultOpen,
+	onOpenChange,
+	portalContainer,
 }: {
 	trigger: ReactNode;
 	children: ReactNode;
 	className?: string;
+	isOpen?: boolean;
+	defaultOpen?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	portalContainer?: Element | null;
 }) {
 	return (
 		<div className={cn('bf-popover-anchor', className)}>
-			<MenuTrigger>
+			<DialogTrigger isOpen={isOpen} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
 				<RACButton className="btn btn-secondary">{trigger}</RACButton>
-				<RACPopover className="bf-popover">
-					<div role="dialog">{children}</div>
+				<RACPopover
+					className={cn('bf-popover', portalContainer && 'bf-popover--contained')}
+					UNSTABLE_portalContainer={portalContainer ?? undefined}
+				>
+					<div className="bf-popover__content">{children}</div>
 				</RACPopover>
-			</MenuTrigger>
+			</DialogTrigger>
 		</div>
 	);
 }

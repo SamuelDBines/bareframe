@@ -76,14 +76,20 @@ test.describe('Overlay interactions', () => {
 	});
 
 	test('Combobox: type and pick option', async ({ page }, testInfo) => {
+		if (isMobileProject(testInfo.project.name)) {
+			test.setTimeout(90_000);
+		}
 		await openComponent(page, 'combobox');
 		const input = preview(page).getByRole('combobox', { name: 'Framework' });
 		await input.scrollIntoViewIfNeeded();
-		await input.fill('Vue');
 		const overlay = previewOverlays(page);
 
 		if (isMobileProject(testInfo.project.name)) {
+			await input.tap();
+			await input.pressSequentially('Vue', { delay: 40 });
 			await expect(async () => {
+				const listbox = page.getByRole('listbox');
+				await expect(listbox).toBeVisible();
 				const vue = overlay.getByRole('option', { name: 'Vue' });
 				await expect(vue).toBeVisible();
 				if (testInfo.project.name === 'webkit-mobile') {
@@ -91,10 +97,11 @@ test.describe('Overlay interactions', () => {
 				} else {
 					expect((await vue.boundingBox())?.width ?? 0).toBeGreaterThan(50);
 				}
-				await vue.tap({ timeout: 5000 });
+				await vue.tap({ timeout: 10_000 });
 				await expect(input).toHaveValue('Vue');
 			}).toPass({ timeout: 45_000 });
 		} else {
+			await input.fill('Vue');
 			const option = overlay.getByRole('option', { name: 'Vue' });
 			await expect(option).toBeVisible();
 			await option.click();

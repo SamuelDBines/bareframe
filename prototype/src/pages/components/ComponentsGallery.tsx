@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { COMPONENT_REGISTRY } from '../../components/library/registry';
 import { useDocPageToc } from './docs/DocsShell';
+import { GalleryPreviewScaler } from './docs/GalleryPreviewScaler';
 
 const DEMO_OPTIONS = [{ value: 'a', label: 'Option A' }];
 
@@ -13,6 +14,25 @@ function galleryPreviewProps(entry: (typeof COMPONENT_REGISTRY)[number]) {
 	}
 	if (entry.slug === 'calendar' || entry.slug === 'datepicker') {
 		props.label = props.label ?? entry.name;
+	}
+	if (entry.slug === 'toast') {
+		const msg = props.message ?? 'Saved successfully.';
+		props.children = props.children ?? msg;
+		delete props.message;
+	}
+	if (entry.slug === 'pagination') {
+		props.total = 3;
+		props.page = 2;
+	}
+	if (entry.slug === 'tabs') {
+		props.items = [
+			{ id: 'overview', label: 'Overview', content: 'Summary content.' },
+			{ id: 'settings', label: 'Settings', content: 'Preferences.' },
+		];
+	}
+	if (entry.slug === 'progress') {
+		props.label = 'Upload';
+		props.value = 45;
 	}
 	return props;
 }
@@ -85,9 +105,7 @@ export function ComponentsGallery() {
 			<div className="docs-gallery-grid">
 				{filtered.map((entry) => (
 					<Link key={entry.slug} to={`/components/${entry.slug}`} className="docs-gallery-card">
-						<div className="docs-gallery-card__preview" data-bf-theme="light">
-							<div className="bf-docs-preview">{entry.render(galleryPreviewProps(entry))}</div>
-						</div>
+						<GalleryPreviewScaler>{entry.render(galleryPreviewProps(entry))}</GalleryPreviewScaler>
 						<div className="docs-gallery-card__body">
 							<div className="docs-gallery-card__row">
 								<h3>{entry.name}</h3>

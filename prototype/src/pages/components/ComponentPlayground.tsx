@@ -73,24 +73,21 @@ export function ComponentPlayground({ entry }: Props) {
 			data-bf-theme={effectiveTheme}
 			style={{ maxWidth: VIEWPORT_WIDTH[viewport], margin: viewport === 'desktop' ? undefined : '0 auto' }}
 		>
-			<div className="playground-frame__toolbar">
-				<div className="playground__toolbar-group">
-					<label className="playground__toolbar-label">
-						Theme
-						<select
-							className="theme-select"
-							value={previewTheme}
-							onChange={(e) => setPreviewTheme(e.target.value as ThemeId)}
-							aria-label="Preview theme"
-						>
-							{THEME_IDS.filter((id) => id !== 'system').map((id) => (
-								<option key={id} value={id}>
-									{THEME_LABELS[id]}
-								</option>
-							))}
-						</select>
-					</label>
-					<div className="playground__segmented" role="group" aria-label="Color mode">
+			<div className="playground-frame__toolbar playground-frame__toolbar--compact">
+				<select
+					className="playground-toolbar__theme-select"
+					value={previewTheme}
+					onChange={(e) => setPreviewTheme(e.target.value as ThemeId)}
+					aria-label="Preview theme"
+				>
+					{THEME_IDS.filter((id) => id !== 'system').map((id) => (
+						<option key={id} value={id}>
+							{THEME_LABELS[id]}
+						</option>
+					))}
+				</select>
+				<div className="playground-toolbar__segments">
+					<div className="playground__segmented playground__segmented--compact" role="group" aria-label="Color mode">
 						{(['theme', 'light', 'dark'] as const).map((mode) => (
 							<button
 								key={mode}
@@ -98,13 +95,11 @@ export function ComponentPlayground({ entry }: Props) {
 								className={colorMode === mode ? 'is-active' : undefined}
 								onClick={() => setColorMode(mode)}
 							>
-								{mode === 'theme' ? 'As theme' : mode === 'light' ? 'Light' : 'Dark'}
+								{mode === 'theme' ? 'Auto' : mode === 'light' ? 'Light' : 'Dark'}
 							</button>
 						))}
 					</div>
-				</div>
-				<div className="playground__toolbar-group">
-					<div className="playground__segmented" role="group" aria-label="Viewport width">
+					<div className="playground__segmented playground__segmented--compact" role="group" aria-label="Viewport width">
 						{(Object.keys(VIEWPORT_WIDTH) as ViewportId[]).map((vp) => (
 							<button
 								key={vp}
@@ -112,7 +107,7 @@ export function ComponentPlayground({ entry }: Props) {
 								className={viewport === vp ? 'is-active' : undefined}
 								onClick={() => setViewport(vp)}
 							>
-								{vp}
+								{vp.charAt(0).toUpperCase() + vp.slice(1)}
 							</button>
 						))}
 					</div>

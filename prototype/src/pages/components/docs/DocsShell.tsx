@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Button } from '@bareframe/react';
 import { CommandPalette, DocsSidebar } from './DocsSidebar';
@@ -28,7 +28,7 @@ export function DocsShell() {
 		return () => window.removeEventListener('keydown', onKey);
 	}, []);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		const handler = (e: Event) => {
 			const detail = (e as CustomEvent<TocItem[]>).detail;
 			setTocItems(detail ?? []);
@@ -71,9 +71,14 @@ export function publishDocToc(items: TocItem[]) {
 
 export function useDocPageToc(items: TocItem[]) {
 	const key = items.map((i) => i.id).join('|');
-	useEffect(() => {
+	useLayoutEffect(() => {
 		publishDocToc(items);
 		return () => publishDocToc([]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by section ids
+	}, [key]);
+	// Republish after DocsShell attaches its listener (child layout effects run before parent effects).
+	useEffect(() => {
+		publishDocToc(items);
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by section ids
 	}, [key]);
 }

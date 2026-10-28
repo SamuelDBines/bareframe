@@ -6,7 +6,9 @@ WORKDIR /app
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable && corepack prepare pnpm@10.8.0 --activate
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/react/package.json packages/react/tsconfig.json packages/react/tsup.config.ts ./packages/react/
+COPY packages/react/scripts ./packages/react/scripts
 COPY scripts ./scripts
 COPY src ./src
 COPY stencil ./stencil
@@ -20,8 +22,11 @@ COPY prototype/package.json prototype/pnpm-lock.yaml ./prototype/
 
 RUN pnpm install --frozen-lockfile
 
+COPY packages/react/src ./packages/react/src
 COPY showcase ./showcase
 COPY prototype ./prototype
+
+RUN pnpm run build:react
 
 RUN pnpm run build \
     && node ./scripts/generate-examples.mjs \

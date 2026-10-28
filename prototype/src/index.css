@@ -1383,6 +1383,52 @@ table.props-table tr:last-child td {
 	color: var(--bf-theme-text-2);
 }
 
+.doc-section {
+	margin-top: 2rem;
+}
+
+.doc-section h2 {
+	margin-bottom: 0.75rem;
+}
+
+.doc-examples {
+	display: grid;
+	gap: 1rem;
+}
+
+.doc-example-card .playground__code-header {
+	margin-top: 0.75rem;
+}
+
+.doc-dosdonts {
+	list-style: none;
+	padding: 0;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.doc-do,
+.doc-dont {
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	margin-right: 0.35rem;
+}
+
+.doc-do {
+	color: #15803d;
+}
+
+.doc-dont {
+	color: #b91c1c;
+}
+
+.doc-example-source-label {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--bf-theme-text-2);
+}
+
 @media (max-width: 900px) {
 	.playground {
 		grid-template-columns: 1fr;

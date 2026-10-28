@@ -587,6 +587,49 @@
 }
 .bf-calendar__day.is-muted { visibility: hidden; }
 
-.bf-datepicker__popover {
+.bf-alert__action {
 	margin-top: 0.5rem;
 }
+
+.bf-modal-overlay,
+.bf-drawer-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+	background: color-mix(in srgb, var(--bf-theme-text-1) 40%, transparent);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+}
+
+.bf-select-popover,
+.bf-combobox__popover,
+.bf-dropdown__popover {
+	border: 1px solid var(--bf-theme-border-1);
+	border-radius: 8px;
+	background: var(--bf-theme-surface-1);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+	padding: 0.35rem;
+}
+
+.bf-select-list,
+.bf-select-option {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.bf-select-option {
+	padding: 0.45rem 0.55rem;
+	border-radius: 4px;
+	cursor: default;
+}
+
+.bf-dropdown__item {
+	width: 100%;
+	text-align: left;
+	padding: 0.45rem 0.55rem;
+	border-radius: 4px;
+}
+

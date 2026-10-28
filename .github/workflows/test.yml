@@ -125,6 +125,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Test @bareframe/react (unit + coverage)
+        run: pnpm run test:react
+
+      - name: Build @bareframe/react package
+        run: pnpm run build:react
+
       - name: Typecheck (root TS)
         run: pnpm run typecheck
 

@@ -1,0 +1,56 @@
+{
+  "name": "@bareframe/react",
+  "version": "0.1.0",
+  "description": "Accessible React components for Bareframe design systems",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup && node ./scripts/copy-css.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "react": "^18.3.0 || ^19.0.0",
+    "react-dom": "^18.3.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@internationalized/date": "^3.8.2",
+    "@react-aria/i18n": "^3.12.10",
+    "react-aria-components": "^1.11.0"
+  },
+  "devDependencies": {
+    "@axe-core/react": "^4.10.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "axe-core": "^4.11.0",
+    "jsdom": "^26.1.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4",
+    "vitest-axe": "^0.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

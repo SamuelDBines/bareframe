@@ -1,13 +1,9 @@
-import type { ReactNode } from 'react';
-import * as Bf from '../bareframe';
-import type { ComponentRegistryEntry, PreviewInteractionState } from './types';
+import type { ComponentType, ReactNode } from 'react';
+import * as Bf from '@bareframe/react';
+import type { ComponentRegistryEntry } from './types';
 
-function render<T extends Record<string, unknown>>(
-	Component: (props: T & { previewState?: PreviewInteractionState }) => ReactNode,
-	props: Record<string, unknown>,
-	state: PreviewInteractionState,
-): ReactNode {
-	return <Component {...(props as T)} previewState={state} />;
+function render(Component: ComponentType<any>, props: Record<string, unknown>): ReactNode {
+	return <Component {...props} />;
 }
 
 const commonInteraction: import('./types').PropControl = {
@@ -21,15 +17,19 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 	{
 		slug: 'alert',
 		name: 'Alert',
+		overview:
+			'Alerts communicate important feedback inline — success, warnings, errors, or neutral info — without blocking the whole page.',
 		description: 'Inline feedback for success, warning, and error states.',
+		whenToUse: 'Use for page-level or section-level status after an action. Prefer Toast for transient global notices.',
 		category: 'Feedback',
 		status: 'stable',
 		variants: ['info', 'success', 'warning', 'error'],
 		props: [
-			{ name: 'variant', type: 'string', default: 'info', description: 'Visual tone' },
+			{ name: 'variant', type: "'info' | 'success' | 'warning' | 'error'", default: 'info', description: 'Visual tone' },
 			{ name: 'title', type: 'string', description: 'Optional heading' },
 			{ name: 'children', type: 'ReactNode', description: 'Alert body' },
 			{ name: 'dismissible', type: 'boolean', default: 'false', description: 'Show dismiss control' },
+			{ name: 'action', type: 'ReactNode', description: 'Optional inline action' },
 		],
 		defaultProps: {
 			variant: 'info',
@@ -44,11 +44,22 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'dismissible', label: 'Dismissible', kind: 'boolean' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Alert, p, s),
+		render: (p) => render(Bf.Alert, p),
 		examples: [
 			{ title: 'Success', props: { variant: 'success', title: 'Saved', children: 'Your profile was updated.' } },
 			{ title: 'Error', props: { variant: 'error', title: 'Failed', children: 'Could not reach the server.' } },
 		],
+		docExamples: [
+			{ title: 'With action', file: 'with-action', description: 'Pair an alert with a secondary action.' },
+			{ title: 'Dismissible', file: 'dismissible', description: 'Let people close non-critical messages.' },
+			{ title: 'Form error', file: 'form-error', description: 'Summarize validation failures above a form.' },
+			{ title: 'Stacked alerts', file: 'stack', description: 'Multiple alerts in a vertical stack.' },
+		],
+		dosDonts: [
+			{ do: 'Keep messages short and actionable.', dont: 'Stack many alerts on one screen.' },
+			{ do: 'Use error variant for blocking issues.', dont: 'Use alerts for marketing banners.' },
+		],
+		themeTokens: ['--bf-theme-alert-bg', '--bf-theme-alert-border-color', '--bf-theme-surface-1'],
 		a11y: {
 			summary: 'Uses role="alert" for important messages. Dismiss button has an accessible name.',
 			keyboard: ['Tab moves focus to the dismiss button when visible.'],
@@ -74,7 +85,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'children', label: 'Label', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Badge, p, s),
+		render: (p) => render(Bf.Badge, p),
 		examples: [{ title: 'Outline', props: { variant: 'outline', children: 'Beta' } }],
 		a11y: { summary: 'Decorative when adjacent to descriptive text; use visible labels for status alone.' },
 	},
@@ -101,7 +112,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'loading', label: 'Loading', kind: 'boolean' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Button, p, s),
+		render: (p) => render(Bf.Button, p),
 		examples: [
 			{ title: 'Destructive', props: { variant: 'destructive', children: 'Delete' } },
 			{ title: 'Loading', props: { loading: true, children: 'Saving…' } },
@@ -137,7 +148,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'children', label: 'Body', kind: 'textarea' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Card, p, s),
+		render: (p) => render(Bf.Card, p),
 		examples: [{ title: 'Elevated', props: { variant: 'elevated', footer: '' } }],
 		a11y: { summary: 'Use semantic headings inside cards for screen reader structure.' },
 	},
@@ -158,7 +169,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'checked', label: 'Checked', kind: 'boolean' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Checkbox, p, s),
+		render: (p) => render(Bf.Checkbox, p),
 		examples: [{ title: 'Unchecked', props: { checked: false } }],
 		a11y: { summary: 'Label wraps control; Space toggles when focused.', keyboard: ['Space toggles'] },
 	},
@@ -179,7 +190,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'checked', label: 'On', kind: 'boolean' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Switch, p, s),
+		render: (p) => render(Bf.Switch, p),
 		examples: [],
 		a11y: { summary: 'Uses role="switch" via input type checkbox pattern.', keyboard: ['Space toggles'] },
 	},
@@ -202,7 +213,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'error', label: 'Error', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Field, p, s),
+		render: (p) => render(Bf.Field, p),
 		examples: [{ title: 'With error', props: { error: 'Enter a valid email address.', hint: '' } }],
 		a11y: { summary: 'Associates label with input; errors use role="alert".' },
 	},
@@ -225,7 +236,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'error', label: 'Error state', kind: 'boolean' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Input, p, s),
+		render: (p) => render(Bf.Input, p),
 		examples: [],
 		a11y: { summary: 'Use with Field for labels; focus ring from theme tokens.' },
 	},
@@ -246,7 +257,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'rows', label: 'Rows', kind: 'number', min: 2, max: 8 },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Textarea, p, s),
+		render: (p) => render(Bf.Textarea, p),
 		examples: [],
 		a11y: { summary: 'Pair with Field for accessible labeling.' },
 	},
@@ -265,7 +276,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'value', label: 'Value', kind: 'select', options: ['a', 'b', 'c'] },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Select, p, s),
+		render: (p) => render(Bf.Select, p),
 		examples: [],
 		a11y: {
 			summary: 'Native select element with theme-styled appearance.',
@@ -289,7 +300,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'value', label: 'Value', kind: 'number', min: 0, max: 100 },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Slider, p, s),
+		render: (p) => render(Bf.Slider, p),
 		examples: [],
 		a11y: {
 			summary: 'Range input with visible label and value.',
@@ -310,7 +321,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'value', label: 'Selected', kind: 'select', options: ['email', 'sms', 'push'] },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.RadioGroup, p, s),
+		render: (p) => render(Bf.RadioGroup, p),
 		examples: [],
 		a11y: { summary: 'Wrapped in role="radiogroup".', keyboard: ['Arrow keys move selection'] },
 	},
@@ -324,7 +335,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p, s) => render(Bf.MultiSelect, p, s),
+		render: (p) => render(Bf.MultiSelect, p),
 		examples: [],
 		a11y: { summary: 'Chips represent selected values; trigger opens listbox.' },
 	},
@@ -338,7 +349,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p, s) => render(Bf.Combobox, p, s),
+		render: (p) => render(Bf.Combobox, p),
 		examples: [],
 		a11y: { summary: 'Combines text input with listbox popup.', keyboard: ['Arrow keys navigate options'] },
 	},
@@ -361,7 +372,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'children', label: 'Body', kind: 'textarea' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Modal, p, s),
+		render: (p) => render(Bf.Modal, p),
 		examples: [],
 		a11y: {
 			summary: 'role="dialog" with aria-modal; focus should be trapped in production builds.',
@@ -387,7 +398,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'title', label: 'Title', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Drawer, p, s),
+		render: (p) => render(Bf.Drawer, p),
 		examples: [{ title: 'Left', props: { side: 'left' } }],
 		a11y: {
 			summary: 'Dialog panel sliding from screen edge.',
@@ -407,7 +418,9 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'content', label: 'Content', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Tooltip, p, s),
+		render: (p) => (
+			<Bf.Tooltip content={String(p.content ?? 'Helpful hint')}>Hover target</Bf.Tooltip>
+		),
 		examples: [],
 		a11y: { summary: 'role="tooltip" associated with trigger; not for essential info alone.' },
 	},
@@ -424,7 +437,12 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'open', label: 'Open', kind: 'boolean' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Popover, p, s),
+		render: () => (
+			<Bf.PopoverPanel trigger="Open popover">
+				<strong>Popover</strong>
+				<p>Floating content anchored to the trigger.</p>
+			</Bf.PopoverPanel>
+		),
 		examples: [{ title: 'Open', props: { open: true } }],
 		a11y: {
 			summary: 'Non-modal floating surface for supplementary content.',
@@ -442,7 +460,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p, s) => render(Bf.DropdownMenu, p, s),
+		render: (p) => render(Bf.DropdownMenu, p),
 		examples: [],
 		a11y: { summary: 'role="menu" with menuitem children.', keyboard: ['Arrow keys navigate items', 'Escape closes'] },
 	},
@@ -463,7 +481,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'defaultValue', label: 'Default tab', kind: 'select', options: ['overview', 'analytics', 'settings'] },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Tabs, p, s),
+		render: (p) => render(Bf.Tabs, p),
 		examples: [{ title: 'Pills', props: { variant: 'pills' } }],
 		a11y: {
 			summary: 'tablist / tab / tabpanel roles.',
@@ -480,7 +498,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p, s) => render(Bf.Breadcrumbs, p, s),
+		render: (p) => render(Bf.Breadcrumbs, p),
 		examples: [],
 		a11y: { summary: 'nav with aria-label; current page uses aria-current.' },
 	},
@@ -501,7 +519,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'total', label: 'Total pages', kind: 'number', min: 1, max: 10 },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Pagination, p, s),
+		render: (p) => render(Bf.Pagination, p),
 		examples: [],
 		a11y: { summary: 'Current page exposed with aria-current="page".' },
 	},
@@ -515,7 +533,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p, s) => render(Bf.Accordion, p, s),
+		render: (p) => render(Bf.Accordion, p),
 		examples: [],
 		a11y: {
 			summary: 'Expandable regions with aria-expanded on triggers.',
@@ -539,7 +557,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'message', label: 'Message', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Toast, p, s),
+		render: (p) => render(Bf.Toast, p),
 		examples: [],
 		a11y: { summary: 'role="status" for non-critical updates.' },
 	},
@@ -560,7 +578,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'value', label: 'Value', kind: 'number', min: 0, max: 100 },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Progress, p, s),
+		render: (p) => render(Bf.Progress, p),
 		examples: [],
 		a11y: { summary: 'role="progressbar" with value min/max.' },
 	},
@@ -581,7 +599,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'label', label: 'Label', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Spinner, p, s),
+		render: (p) => render(Bf.Spinner, p),
 		examples: [],
 		a11y: { summary: 'role="status" with aria-label.' },
 	},
@@ -598,7 +616,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'lines', label: 'Lines', kind: 'number', min: 1, max: 6 },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Skeleton, p, s),
+		render: (p) => render(Bf.Skeleton, p),
 		examples: [],
 		a11y: { summary: 'Marked aria-hidden; provide live region for loaded content.' },
 	},
@@ -619,7 +637,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'size', label: 'Size', kind: 'select', options: ['sm', 'md', 'lg'] },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.Avatar, p, s),
+		render: (p) => render(Bf.Avatar, p),
 		examples: [],
 		a11y: { summary: 'Initials avatars use aria-label with the person name.' },
 	},
@@ -633,7 +651,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p, s) => render(Bf.Table, p, s),
+		render: (p) => render(Bf.Table, p),
 		examples: [],
 		a11y: { summary: 'Use th scope for column headers.' },
 	},
@@ -655,7 +673,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'description', label: 'Description', kind: 'textarea' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.EmptyState, p, s),
+		render: (p) => render(Bf.EmptyState, p),
 		examples: [],
 		a11y: { summary: 'Provide a primary action button for next steps.' },
 	},
@@ -679,7 +697,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'delta', label: 'Delta', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p, s) => render(Bf.StatCard, p, s),
+		render: (p) => render(Bf.StatCard, p),
 		examples: [],
 		a11y: { summary: 'Structure with headings and supporting text.' },
 	},
@@ -695,7 +713,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p, s) => render(Bf.CalendarPlaceholder, p, s),
+		render: (p) => render(Bf.Calendar, p),
 		examples: [],
 		a11y: { summary: 'Grid navigation with arrow keys once React Aria is wired.' },
 	},
@@ -711,7 +729,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p, s) => render(Bf.DatePickerPlaceholder, p, s),
+		render: (p) => render(Bf.DatePicker, p),
 		examples: [],
 		a11y: { summary: 'Combines text field with dialog calendar popup.' },
 	},

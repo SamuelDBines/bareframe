@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Alert } from '../../components/bareframe/Alert';
-import { Button } from '../../components/bareframe/Button';
+import { Alert, Button } from '@bareframe/react';
 import { COMPONENT_LIBRARY } from '../../data/components';
 import { THEME_LABELS, type ThemeId } from '../../theme/themes';
 

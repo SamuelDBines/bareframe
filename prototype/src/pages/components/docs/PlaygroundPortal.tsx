@@ -13,28 +13,35 @@ type Props = {
 	onPortalRootChange: (el: HTMLElement | null) => void;
 };
 
-function useKeepPlaygroundPanelUnlocked(portalRoot: HTMLElement | null) {
+/** RAC ModalOverlay inerts outside content; keep playground controls interactive for contained previews. */
+function usePlaygroundPanelUnlock(portalRoot: HTMLElement | null) {
 	useEffect(() => {
-		const unlock = () => {
-			const panel = document.querySelector('.playground-panel');
-			if (!panel) return;
-			const trapped =
-				portalRoot?.querySelector('.bf-modal-overlay, .bf-drawer-overlay, .bf-popover, [role="dialog"]') !=
-				null;
-			if (trapped) {
-			 panel.removeAttribute('inert');
-			 panel.removeAttribute('aria-hidden');
+		const panel = document.querySelector('.playground-panel');
+		if (!panel || !portalRoot) {
+			return;
+		}
+
+		const unlockPanel = () => {
+			const containedOpen = portalRoot.querySelector(
+				'.bf-modal-overlay--contained, .bf-drawer-overlay--contained',
+			);
+			if (containedOpen) {
+				panel.removeAttribute('inert');
+				panel.removeAttribute('aria-hidden');
 			}
 		};
-		unlock();
-		const id = window.setInterval(unlock, 50);
-		return () => window.clearInterval(id);
+
+		unlockPanel();
+		const observer = new MutationObserver(unlockPanel);
+		observer.observe(panel, { attributes: true, attributeFilter: ['inert', 'aria-hidden'] });
+		observer.observe(portalRoot, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+		return () => observer.disconnect();
 	}, [portalRoot]);
 }
 
 /** Mounts playground overlays inside the preview frame (not document body). */
 export function PlaygroundPortalRoot({ children, portalRoot, onPortalRootChange }: Props) {
-	useKeepPlaygroundPanelUnlocked(portalRoot);
+	usePlaygroundPanelUnlock(portalRoot);
 
 	return (
 		<PlaygroundPortalContext.Provider value={portalRoot}>

@@ -513,6 +513,16 @@
 }
 
 .bf-combobox { width: 100%; max-width: 16rem; }
+.bf-combobox__popover {
+	z-index: 5;
+}
+/* Focused combobox input overlaps the list in hit-test order on narrow viewports; let taps reach options. */
+.bf-combobox__input[aria-expanded='true'] {
+	pointer-events: none;
+}
+.bf-combobox[data-open='true'] .bf-field__label {
+	pointer-events: none;
+}
 .bf-combobox__list {
 	position: absolute;
 	top: 100%;
@@ -660,6 +670,24 @@
 	align-items: center;
 	justify-content: center;
 	padding: 1rem;
+}
+
+.bf-modal-overlay--contained,
+.bf-drawer-overlay--contained {
+	position: absolute !important;
+	inset: 0;
+	z-index: 20;
+	padding: 0.75rem;
+	pointer-events: none;
+}
+
+.bf-modal-overlay--contained .bf-modal-scene,
+.bf-drawer-overlay--contained .bf-drawer-scene {
+	pointer-events: auto;
+}
+
+.bf-drawer-overlay--contained {
+	padding: 0;
 }
 
 .bf-drawer-overlay {

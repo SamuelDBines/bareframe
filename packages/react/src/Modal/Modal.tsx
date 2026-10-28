@@ -18,7 +18,12 @@ export type ModalProps = Omit<ModalOverlayProps, 'children'> & {
 	showCloseButton?: boolean;
 	/** Alias for `isOpen` used by docs/codegen. */
 	open?: boolean;
-	/** Portal target for docs/playground contained overlays. */
+	/**
+	 * Non-modal overlay scoped to `portalContainer` (docs preview). Omit for full-page modals
+	 * with focus trap and an inert page background.
+	 */
+	contained?: boolean;
+	/** Portal target; required when `contained` is true. */
 	portalContainer?: Element | null;
 };
 
@@ -33,6 +38,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
 		open,
 		isOpen,
 		isDismissable = true,
+		contained = false,
 		portalContainer,
 		...props
 	},
@@ -40,7 +46,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
 ) {
 	const resolvedOpen = isOpen ?? open ?? false;
 	const titleId = title ? 'bf-modal-title' : undefined;
-	const contained = Boolean(portalContainer);
+	const scopedContained = contained;
 
 	return (
 		<ModalOverlay
@@ -48,8 +54,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
 			isOpen={resolvedOpen}
 			isDismissable={isDismissable}
 			UNSTABLE_portalContainer={portalContainer ?? undefined}
-			{...(contained ? ({ isNonModal: true } as Partial<ModalOverlayProps>) : {})}
-			className={cn('bf-modal-overlay', contained && 'bf-modal-overlay--contained', className)}
+			className={cn('bf-modal-overlay', scopedContained && 'bf-modal-overlay--contained', className)}
 			ref={ref}
 		>
 			<RACModal className={cn('bf-modal-scene', dialogClassName)}>
@@ -90,15 +95,27 @@ export type DrawerProps = Omit<ModalOverlayProps, 'children'> & {
 	side?: 'left' | 'right';
 	className?: string;
 	open?: boolean;
+	contained?: boolean;
 	portalContainer?: Element | null;
 };
 
 export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(
-	{ title, children, side = 'right', className, open, isOpen, isDismissable = true, portalContainer, ...props },
+	{
+		title,
+		children,
+		side = 'right',
+		className,
+		open,
+		isOpen,
+		isDismissable = true,
+		contained = false,
+		portalContainer,
+		...props
+	},
 	ref,
 ) {
 	const resolvedOpen = isOpen ?? open ?? false;
-	const contained = Boolean(portalContainer);
+	const scopedContained = contained;
 
 	return (
 		<ModalOverlay
@@ -106,8 +123,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(
 			isOpen={resolvedOpen}
 			isDismissable={isDismissable}
 			UNSTABLE_portalContainer={portalContainer ?? undefined}
-			{...(contained ? ({ isNonModal: true } as Partial<ModalOverlayProps>) : {})}
-			className={cn('bf-drawer-overlay', contained && 'bf-drawer-overlay--contained', className)}
+			className={cn('bf-drawer-overlay', scopedContained && 'bf-drawer-overlay--contained', className)}
 			ref={ref}
 		>
 			<RACModal className={cn('bf-drawer-scene', `bf-drawer-scene--${side}`)}>

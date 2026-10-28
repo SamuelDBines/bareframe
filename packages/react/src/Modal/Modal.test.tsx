@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -73,6 +73,37 @@ describe('Modal', () => {
 			</Modal>,
 		);
 		expect(await axe(container)).toHaveNoViolations();
+	});
+
+	it('marks page content inert when open as a full modal', async () => {
+		const outside = document.createElement('button');
+		outside.type = 'button';
+		outside.textContent = 'Outside';
+		document.body.appendChild(outside);
+
+		render(
+			<Modal isOpen title="Confirm">
+				Body
+			</Modal>,
+		);
+
+		await waitFor(() => {
+			expect(outside).toHaveAttribute('aria-hidden', 'true');
+		});
+		outside.remove();
+	});
+
+	it('contained mode renders a scoped overlay class for docs previews', async () => {
+		render(
+			<Modal isOpen contained title="Preview">
+				Scoped
+			</Modal>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByRole('dialog')).toBeInTheDocument();
+		});
+		expect(document.querySelector('.bf-modal-overlay--contained')).toBeTruthy();
 	});
 });
 

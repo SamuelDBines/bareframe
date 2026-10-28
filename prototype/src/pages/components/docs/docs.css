@@ -426,7 +426,7 @@
 	border: 1px solid var(--docs-border);
 	border-radius: 12px;
 	background: var(--docs-surface);
-	overflow: visible;
+	overflow: clip;
 	box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
 }
 
@@ -494,6 +494,8 @@
 	isolation: isolate;
 }
 
+.playground-overlay-root .bf-doc-modal-preview,
+.playground-overlay-root .bf-doc-drawer-preview,
 .playground-overlay-root .bf-popover-anchor,
 .playground-overlay-root .bf-doc-modal-preview,
 .playground-overlay-root .bf-doc-drawer-preview {
@@ -533,6 +535,12 @@
 	z-index: 30;
 }
 
+.playground-frame .bf-combobox__popover,
+.playground-frame .bf-select-popover {
+	max-height: 11rem;
+	overflow-y: auto;
+}
+
 .bf-doc-toast-preview {
 	display: flex;
 	flex-direction: column;
@@ -554,7 +562,6 @@
 	background: var(--docs-surface);
 	padding: 1rem;
 	position: relative;
-	z-index: 10000;
 }
 
 .playground-panel__title {

@@ -58,11 +58,17 @@ test.describe('Overlay interactions', () => {
 		await expect(page.getByRole('menu')).toBeVisible();
 	});
 
-	test('Select: listbox opens and Value control updates selection', async ({ page }) => {
+	test('Select: listbox opens and Value control updates selection', async ({ page }, testInfo) => {
 		await openComponent(page, 'select');
-		await preview(page).getByRole('button').click();
+		const trigger = preview(page).getByRole('button');
+		await trigger.click();
 		await expect(page.getByRole('listbox')).toBeVisible();
-		await page.getByRole('option', { name: 'Option B' }).click();
+		if (isMobileProject(testInfo.project.name)) {
+			await preview(page).getByRole('option', { name: 'Option B' }).tap();
+		} else {
+			await page.keyboard.press('ArrowDown');
+			await page.keyboard.press('Enter');
+		}
 		await expect(preview(page).getByRole('button')).toContainText('Option B');
 		await panel(page).getByLabel('Value').selectOption('c');
 		await expect(preview(page).getByRole('button')).toContainText('Option C');
@@ -72,10 +78,12 @@ test.describe('Overlay interactions', () => {
 		await openComponent(page, 'combobox');
 		const input = preview(page).getByRole('combobox');
 		await input.fill('Vue');
-		const option = page.getByRole('option', { name: 'Vue' });
 		if (isMobileProject(testInfo.project.name)) {
-			await option.click({ force: true });
+			await input.press('ArrowDown');
+			await input.press('Enter');
 		} else {
+			const option = preview(page).getByRole('option', { name: 'Vue' });
+			await expect(option).toBeVisible();
 			await option.click();
 		}
 		await expect(input).toHaveValue('Vue');
@@ -83,10 +91,16 @@ test.describe('Overlay interactions', () => {
 		await expect(input).toBeVisible();
 	});
 
-	test('MultiSelect: adds a chip via listbox', async ({ page }) => {
+	test('MultiSelect: adds a chip via listbox', async ({ page }, testInfo) => {
 		await openComponent(page, 'multiselect');
-		await preview(page).getByRole('button').click();
-		await page.getByRole('option', { name: 'Design' }).click();
+		const trigger = preview(page).getByRole('button');
+		if (isMobileProject(testInfo.project.name)) {
+			await trigger.tap();
+			await preview(page).getByRole('option', { name: 'Design' }).tap();
+		} else {
+			await trigger.click();
+			await page.getByRole('option', { name: 'Design' }).click();
+		}
 		await expect(preview(page).getByText('Design')).toBeVisible();
 	});
 });

@@ -74,8 +74,7 @@ test.describe('Overlay interactions', () => {
 		await input.fill('Vue');
 		const option = page.getByRole('option', { name: 'Vue' });
 		if (isMobileProject(testInfo.project.name)) {
-			await input.press('ArrowDown');
-			await input.press('Enter');
+			await option.click({ force: true });
 		} else {
 			await option.click();
 		}

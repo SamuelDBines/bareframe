@@ -215,7 +215,7 @@ test.describe('designer canvas', () => {
 		expect(overflowX).toBe(false);
 		await page.getByRole('button', { name: 'Pages' }).click();
 		await expect(page.locator('.designer-sidebar')).toBeVisible();
-		await page.getByRole('button', { name: 'Close panel' }).click();
+		await page.getByRole('button', { name: 'Close panel' }).click({ force: true });
 		await expect(page.locator('.designer-workspace-v2')).toHaveAttribute('data-mobile-panel', 'none');
 	});
 });

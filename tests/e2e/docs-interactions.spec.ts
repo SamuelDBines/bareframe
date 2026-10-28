@@ -43,7 +43,7 @@ test.describe('Overlay interactions', () => {
 		test.skip(!isMobileProject(testInfo.project.name), 'Mobile touch project only');
 		await openComponent(page, 'tooltip');
 		const target = preview(page).getByRole('button', { name: 'Hover target' });
-		await target.click();
+		await target.tap();
 		await expect(page.getByRole('tooltip')).toBeVisible({ timeout: 10_000 });
 	});
 

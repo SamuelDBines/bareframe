@@ -13,12 +13,25 @@ import { cn } from './utils/cn';
 
 export const Tooltip = forwardRef<
 	HTMLDivElement,
-	{ content: ReactNode; children: ReactNode; className?: string }
->(function Tooltip({ content, children, className }, ref) {
+	{
+		content: ReactNode;
+		children: ReactNode;
+		className?: string;
+		isOpen?: boolean;
+		onOpenChange?: (open: boolean) => void;
+	}
+>(function Tooltip({ content, children, className, isOpen, onOpenChange }, ref) {
 	return (
 		<div ref={ref} className={cn('bf-tooltip-anchor', className)}>
-			<TooltipTrigger>
-				<RACButton className="btn btn-secondary">{children}</RACButton>
+			<TooltipTrigger
+				isOpen={isOpen}
+				onOpenChange={onOpenChange}
+				delay={0}
+				closeDelay={0}
+			>
+				<RACButton className="btn btn-secondary" onPress={() => onOpenChange?.(true)}>
+					{children}
+				</RACButton>
 				<RACTooltip className="bf-tooltip">{content}</RACTooltip>
 			</TooltipTrigger>
 		</div>

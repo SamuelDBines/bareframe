@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Button, Drawer, Modal, PopoverPanel } from '@bareframe/react';
+import { Button, Drawer, Modal, PopoverPanel, Tooltip } from '@bareframe/react';
 
 import { usePlaygroundPortal } from './PlaygroundPortal';
 
@@ -115,6 +115,31 @@ export function PopoverDocPreview(props: Record<string, unknown>) {
 			<strong>Popover</strong>
 			<p>Floating content anchored to the trigger.</p>
 		</PopoverPanel>
+	);
+}
+
+export function TooltipDocPreview(props: Record<string, unknown>) {
+	const { content, open, onOpenChange } = props;
+	const text = String(content ?? 'Helpful hint');
+	const panelOpen = open === true;
+	const [triggerOpen, setTriggerOpen] = useState(false);
+	const isOpen = panelOpen || triggerOpen;
+
+	const handleOpenChange = (next: boolean) => {
+		setTriggerOpen(next);
+		if (typeof onOpenChange === 'function') {
+			onOpenChange(next);
+		}
+	};
+
+	return (
+		<Tooltip
+			content={text}
+			isOpen={isOpen}
+			onOpenChange={handleOpenChange}
+		>
+			Hover target
+		</Tooltip>
 	);
 }
 

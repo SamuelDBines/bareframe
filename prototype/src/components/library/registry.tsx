@@ -3,7 +3,7 @@ import * as Bf from '@bareframe/react';
 import { DOC_META } from './doc-meta';
 import GENERATED_PROPS from './generated-props.json';
 import type { ComponentRegistryEntry } from './types';
-import { DrawerDocPreview, ModalDocPreview, PopoverDocPreview, ToastDocPreview } from '../../pages/components/docs/DocComponentPreview';
+import { DrawerDocPreview, ModalDocPreview, PopoverDocPreview, ToastDocPreview, TooltipDocPreview } from '../../pages/components/docs/DocComponentPreview';
 
 function render(Component: ComponentType<any>, props: Record<string, unknown>): ReactNode {
 	return <Component {...props} />;
@@ -443,15 +443,17 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		category: 'Overlays',
 		status: 'stable',
 		variants: ['default'],
-		props: [{ name: 'content', type: 'string', description: 'Tooltip text' }],
-		defaultProps: { content: 'Exports the current frame to TSX.' },
+		props: [
+			{ name: 'content', type: 'string', description: 'Tooltip text' },
+			{ name: 'open', type: 'boolean', description: 'Visible (playground / touch)' },
+		],
+		defaultProps: { content: 'Exports the current frame to TSX.', open: false },
 		controls: [
 			{ prop: 'content', label: 'Content', kind: 'text' },
+			{ prop: 'open', label: 'Open', kind: 'boolean' },
 			commonInteraction,
 		],
-		render: (p) => (
-			<Bf.Tooltip content={String(p.content ?? 'Helpful hint')}>Hover target</Bf.Tooltip>
-		),
+		render: (p) => <TooltipDocPreview {...p} />,
 		examples: [],
 		a11y: { summary: 'role="tooltip" associated with trigger; not for essential info alone.' },
 	},

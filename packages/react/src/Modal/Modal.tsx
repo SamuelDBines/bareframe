@@ -1,5 +1,6 @@
 import { forwardRef, type ReactNode } from 'react';
 import {
+	Button as RACButton,
 	Dialog,
 	Heading,
 	Modal as RACModal,
@@ -8,28 +9,64 @@ import {
 } from 'react-aria-components';
 import { cn } from '../utils/cn';
 
-export type ModalProps = ModalOverlayProps & {
+export type ModalProps = Omit<ModalOverlayProps, 'children'> & {
 	title?: string;
 	children?: ReactNode;
 	footer?: ReactNode;
 	className?: string;
 	dialogClassName?: string;
+	showCloseButton?: boolean;
+	/** Alias for `isOpen` used by docs/codegen. */
+	open?: boolean;
 };
 
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
-	{ title, children, footer, className, dialogClassName, ...props },
+	{
+		title,
+		children,
+		footer,
+		className,
+		dialogClassName,
+		showCloseButton = false,
+		open,
+		isOpen,
+		isDismissable = true,
+		...props
+	},
 	ref,
 ) {
+	const resolvedOpen = isOpen ?? open ?? false;
+	const titleId = title ? 'bf-modal-title' : undefined;
+
 	return (
-		<ModalOverlay {...props} className={cn('bf-modal-overlay', className)} ref={ref}>
+		<ModalOverlay
+			{...props}
+			isOpen={resolvedOpen}
+			isDismissable={isDismissable}
+			className={cn('bf-modal-overlay', className)}
+			ref={ref}
+		>
 			<RACModal className={cn('bf-modal-scene', dialogClassName)}>
-				<Dialog className="bf-modal" aria-labelledby={title ? 'bf-modal-title' : undefined}>
+				<Dialog className="bf-modal" aria-labelledby={titleId}>
 					{title ? (
 						<header className="bf-modal__header">
-							<Heading slot="title" id="bf-modal-title" className="bf-modal__title">
-								{title}
-							</Heading>
+							<div className="bf-modal__header-row">
+								<Heading slot="title" id={titleId} className="bf-modal__title">
+									{title}
+								</Heading>
+								{showCloseButton ? (
+									<RACButton slot="close" className="bf-modal__close" aria-label="Close dialog">
+										×
+									</RACButton>
+								) : null}
+							</div>
 						</header>
+					) : showCloseButton ? (
+						<div className="bf-modal__header bf-modal__header--close-only">
+							<RACButton slot="close" className="bf-modal__close" aria-label="Close dialog">
+								×
+							</RACButton>
+						</div>
 					) : null}
 					<div className="bf-modal__body">{children}</div>
 					{footer ? <footer className="bf-modal__footer">{footer}</footer> : null}
@@ -41,19 +78,28 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
 
 Modal.displayName = 'Modal';
 
-export type DrawerProps = ModalOverlayProps & {
+export type DrawerProps = Omit<ModalOverlayProps, 'children'> & {
 	title?: string;
 	children?: ReactNode;
 	side?: 'left' | 'right';
 	className?: string;
+	open?: boolean;
 };
 
 export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(
-	{ title, children, side = 'right', className, ...props },
+	{ title, children, side = 'right', className, open, isOpen, isDismissable = true, ...props },
 	ref,
 ) {
+	const resolvedOpen = isOpen ?? open ?? false;
+
 	return (
-		<ModalOverlay {...props} className={cn('bf-drawer-overlay', className)} ref={ref}>
+		<ModalOverlay
+			{...props}
+			isOpen={resolvedOpen}
+			isDismissable={isDismissable}
+			className={cn('bf-drawer-overlay', className)}
+			ref={ref}
+		>
 			<RACModal className={cn('bf-drawer-scene', `bf-drawer-scene--${side}`)}>
 				<Dialog className="bf-drawer" aria-label={title}>
 					{title ? (

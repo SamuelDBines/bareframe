@@ -12,8 +12,22 @@ export default defineConfig({
 	use: {
 		baseURL,
 		trace: 'on-first-retry',
+		video: 'on-first-retry',
 	},
-	projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+	projects: [
+		{
+			name: 'chromium-desktop',
+			use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+		},
+		{
+			name: 'webkit-desktop',
+			use: { ...devices['Desktop Safari'], viewport: { width: 1440, height: 900 } },
+		},
+		{
+			name: 'chromium-mobile',
+			use: { ...devices['Pixel 7'] },
+		},
+	],
 	webServer: process.env.PW_NO_SERVER
 		? undefined
 		: {

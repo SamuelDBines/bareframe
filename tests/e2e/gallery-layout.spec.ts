@@ -13,7 +13,8 @@ const INDEX_WIDTHS = [
 ] as const;
 
 for (const { label, width } of INDEX_WIDTHS) {
-	test(`gallery pagination and breadcrumbs at ${label} (${width}px)`, async ({ page }) => {
+	test(`gallery pagination and breadcrumbs at ${label} (${width}px)`, async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'chromium-desktop', 'Layout checks run on desktop Chromium only');
 		await page.setViewportSize({ width, height: 900 });
 		await openIndex(page);
 

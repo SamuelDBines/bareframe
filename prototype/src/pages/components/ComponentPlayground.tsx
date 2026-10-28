@@ -56,6 +56,20 @@ export function ComponentPlayground({ entry }: Props) {
 		setProps((prev) => ({ ...prev, [key]: value }));
 	}, []);
 
+	const previewProps = useMemo(() => {
+		if (!Object.prototype.hasOwnProperty.call(entry.defaultProps, 'open')) {
+			return liveProps;
+		}
+		const userOnOpenChange = liveProps.onOpenChange as ((open: boolean) => void) | undefined;
+		return {
+			...liveProps,
+			onOpenChange: (open: boolean) => {
+				setProp('open', open);
+				userOnOpenChange?.(open);
+			},
+		};
+	}, [entry.defaultProps, liveProps, setProp]);
+
 	const applyVariant = useCallback(
 		(variant: string) => {
 			if ('variant' in entry.defaultProps || entry.controls.some((c) => c.prop === 'variant')) {
@@ -117,7 +131,7 @@ export function ComponentPlayground({ entry }: Props) {
 				className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
 				data-testid="playground-preview"
 			>
-				{entry.render(liveProps)}
+				{entry.render(previewProps)}
 			</div>
 		</div>
 	);

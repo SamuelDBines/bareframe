@@ -422,7 +422,7 @@
 	border: 1px solid var(--docs-border);
 	border-radius: 12px;
 	background: var(--docs-surface);
-	overflow: hidden;
+	overflow: visible;
 	box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
 }
 
@@ -477,6 +477,7 @@
 	align-items: center;
 	justify-content: center;
 	transition: max-width 0.2s ease;
+	overflow: visible;
 }
 
 .playground-panel {
@@ -484,6 +485,8 @@
 	border-radius: 12px;
 	background: var(--docs-surface);
 	padding: 1rem;
+	position: relative;
+	z-index: 1100;
 }
 
 .playground-panel__title {

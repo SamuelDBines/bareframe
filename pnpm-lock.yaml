@@ -96,6 +96,9 @@ importers:
       '@bareframe/react':
         specifier: workspace:*
         version: link:../packages/react
+      '@react-aria/i18n':
+        specifier: ^3.12.10
+        version: 3.13.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       prismjs:
         specifier: ^1.30.0
         version: 1.30.0

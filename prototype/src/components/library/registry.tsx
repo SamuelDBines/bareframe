@@ -3,6 +3,7 @@ import * as Bf from '@bareframe/react';
 import { DOC_META } from './doc-meta';
 import GENERATED_PROPS from './generated-props.json';
 import type { ComponentRegistryEntry } from './types';
+import { DrawerDocPreview, ModalDocPreview } from '../../pages/components/docs/DocComponentPreview';
 
 function render(Component: ComponentType<any>, props: Record<string, unknown>): ReactNode {
 	return <Component {...props} />;
@@ -367,14 +368,14 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ name: 'title', type: 'string', description: 'Dialog title' },
 			{ name: 'children', type: 'ReactNode', description: 'Body content' },
 		],
-		defaultProps: { open: true, title: 'Delete project?', children: 'This action cannot be undone.' },
+		defaultProps: { open: false, title: 'Delete project?', children: 'This action cannot be undone.' },
 		controls: [
 			{ prop: 'open', label: 'Open', kind: 'boolean' },
 			{ prop: 'title', label: 'Title', kind: 'text' },
 			{ prop: 'children', label: 'Body', kind: 'textarea' },
 			commonInteraction,
 		],
-		render: (p) => render(Bf.Modal, p),
+		render: (p) => <ModalDocPreview {...p} />,
 		examples: [],
 		a11y: {
 			summary: 'role="dialog" with aria-modal; focus should be trapped in production builds.',
@@ -393,14 +394,14 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ name: 'side', type: "'left' | 'right'", default: 'right', description: 'Edge anchor' },
 			{ name: 'title', type: 'string', description: 'Panel title' },
 		],
-		defaultProps: { open: true, side: 'right', title: 'Filters' },
+		defaultProps: { open: false, side: 'right', title: 'Filters', children: 'Filter by status, owner, or date.' },
 		controls: [
 			{ prop: 'open', label: 'Open', kind: 'boolean' },
 			{ prop: 'side', label: 'Side', kind: 'select', options: ['left', 'right'] },
 			{ prop: 'title', label: 'Title', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p) => render(Bf.Drawer, p),
+		render: (p) => <DrawerDocPreview {...p} />,
 		examples: [{ title: 'Left', props: { side: 'left' } }],
 		a11y: {
 			summary: 'Dialog panel sliding from screen edge.',
@@ -720,7 +721,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [
 			{ name: 'value', type: 'Date', description: 'Selected date' },
 		],
-		defaultProps: {},
+		defaultProps: { 'aria-label': 'Choose date' },
 		controls: [commonInteraction],
 		render: (p) => render(Bf.Calendar, p),
 		examples: [],
@@ -736,8 +737,11 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [
 			{ name: 'label', type: 'string', description: 'Field label' },
 		],
-		defaultProps: {},
-		controls: [commonInteraction],
+		defaultProps: { label: 'Start date' },
+		controls: [
+			{ prop: 'label', label: 'Label', kind: 'text' },
+			commonInteraction,
+		],
 		render: (p) => render(Bf.DatePicker, p),
 		examples: [],
 		a11y: { summary: 'Combines text field with dialog calendar popup.' },

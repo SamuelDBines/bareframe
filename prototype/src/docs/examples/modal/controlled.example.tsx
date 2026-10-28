@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Modal } from '@bareframe/react';
 
 export default function Example() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   return (
     <>
       <Button onPress={() => setOpen(true)}>Open</Button>

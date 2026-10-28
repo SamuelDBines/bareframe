@@ -81,27 +81,25 @@ test.describe('Overlay interactions', () => {
 		await input.scrollIntoViewIfNeeded();
 		await input.fill('Vue');
 		const overlay = previewOverlays(page);
-		const option = overlay.getByRole('option', { name: 'Vue' });
-		await expect(option).toBeVisible();
+
 		if (isMobileProject(testInfo.project.name)) {
-			if (testInfo.project.name === 'webkit-mobile') {
-				await expect(async () => {
-					const vue = overlay.getByRole('option', { name: 'Vue' });
-					await expect(vue).toBeVisible();
+			await expect(async () => {
+				const vue = overlay.getByRole('option', { name: 'Vue' });
+				await expect(vue).toBeVisible();
+				if (testInfo.project.name === 'webkit-mobile') {
 					await vue.scrollIntoViewIfNeeded();
-					await vue.tap({ timeout: 3000 });
-					await expect(input).toHaveValue('Vue');
-				}).toPass({ timeout: 45_000 });
-			} else {
-				await expect
-					.poll(async () => (await option.boundingBox())?.width ?? 0, { timeout: 15_000 })
-					.toBeGreaterThan(50);
-				await option.tap();
-			}
+				} else {
+					expect((await vue.boundingBox())?.width ?? 0).toBeGreaterThan(50);
+				}
+				await vue.tap({ timeout: 5000 });
+				await expect(input).toHaveValue('Vue');
+			}).toPass({ timeout: 45_000 });
 		} else {
+			const option = overlay.getByRole('option', { name: 'Vue' });
+			await expect(option).toBeVisible();
 			await option.click();
+			await expect(input).toHaveValue('Vue');
 		}
-		await expect(input).toHaveValue('Vue');
 		await setPreviewColorMode(page, 'dark');
 		await expect(input).toBeVisible();
 	});

@@ -193,7 +193,11 @@ test.describe('designer canvas', () => {
 		expect(['clip', 'hidden']).toContain(metrics.bodyOverflowX);
 	});
 
-	test('no horizontal document scroll after canvas wheel gestures', async ({ page }) => {
+	test('no horizontal document scroll after canvas wheel gestures', async ({ page }, testInfo) => {
+		test.skip(
+			testInfo.project.name === 'webkit-mobile',
+			'Playwright mobile WebKit does not support mouse.wheel',
+		);
 		await page.setViewportSize({ width: 1280, height: 800 });
 		const canvas = page.locator('.infinite-canvas');
 		const box = await canvas.boundingBox();

@@ -3,6 +3,7 @@ import * as Bf from '@bareframe/react';
 import { DOC_META } from './doc-meta';
 import GENERATED_PROPS from './generated-props.json';
 import type { ComponentRegistryEntry } from './types';
+import { DrawerDocPreview, ModalDocPreview, PopoverDocPreview, ToastDocPreview, TooltipDocPreview } from '../../pages/components/docs/DocComponentPreview';
 
 function render(Component: ComponentType<any>, props: Record<string, unknown>): ReactNode {
 	return <Component {...props} />;
@@ -215,7 +216,10 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'error', label: 'Error', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p) => render(Bf.Field, p),
+		render: (p) => {
+			const { error, ...rest } = p;
+			return render(Bf.Field, { ...rest, errorMessage: error });
+		},
 		examples: [{ title: 'With error', props: { error: 'Enter a valid email address.', hint: '' } }],
 		a11y: { summary: 'Associates label with input; errors use role="alert".' },
 	},
@@ -273,7 +277,14 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [
 			{ name: 'value', type: 'string', description: 'Selected value' },
 		],
-		defaultProps: { value: 'a' },
+		defaultProps: {
+			value: 'a',
+			options: [
+				{ value: 'a', label: 'Option A' },
+				{ value: 'b', label: 'Option B' },
+				{ value: 'c', label: 'Option C' },
+			],
+		},
 		controls: [
 			{ prop: 'value', label: 'Value', kind: 'select', options: ['a', 'b', 'c'] },
 			commonInteraction,
@@ -281,8 +292,8 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		render: (p) => render(Bf.Select, p),
 		examples: [],
 		a11y: {
-			summary: 'Native select element with theme-styled appearance.',
-			keyboard: ['Arrow keys change option when focused', 'Enter opens native list'],
+			summary: 'Listbox popup with keyboard navigation.',
+			keyboard: ['Arrow keys navigate options', 'Enter selects', 'Escape closes'],
 		},
 	},
 	{
@@ -337,7 +348,16 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p) => render(Bf.MultiSelect, p),
+		render: (p) =>
+			render(Bf.MultiSelect, {
+				label: 'Tags',
+				options: [
+					{ value: 'design', label: 'Design' },
+					{ value: 'eng', label: 'Engineering' },
+					{ value: 'docs', label: 'Docs' },
+				],
+				...p,
+			}),
 		examples: [],
 		a11y: { summary: 'Chips represent selected values; trigger opens listbox.' },
 	},
@@ -351,7 +371,16 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [],
 		defaultProps: {},
 		controls: [commonInteraction],
-		render: (p) => render(Bf.Combobox, p),
+		render: (p) =>
+			render(Bf.Combobox, {
+				label: 'Framework',
+				options: [
+					{ value: 'react', label: 'React' },
+					{ value: 'vue', label: 'Vue' },
+					{ value: 'svelte', label: 'Svelte' },
+				],
+				...p,
+			}),
 		examples: [],
 		a11y: { summary: 'Combines text input with listbox popup.', keyboard: ['Arrow keys navigate options'] },
 	},
@@ -367,14 +396,14 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ name: 'title', type: 'string', description: 'Dialog title' },
 			{ name: 'children', type: 'ReactNode', description: 'Body content' },
 		],
-		defaultProps: { open: true, title: 'Delete project?', children: 'This action cannot be undone.' },
+		defaultProps: { open: false, title: 'Delete project?', children: 'This action cannot be undone.' },
 		controls: [
 			{ prop: 'open', label: 'Open', kind: 'boolean' },
 			{ prop: 'title', label: 'Title', kind: 'text' },
 			{ prop: 'children', label: 'Body', kind: 'textarea' },
 			commonInteraction,
 		],
-		render: (p) => render(Bf.Modal, p),
+		render: (p) => <ModalDocPreview {...p} />,
 		examples: [],
 		a11y: {
 			summary: 'role="dialog" with aria-modal; focus should be trapped in production builds.',
@@ -393,14 +422,14 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ name: 'side', type: "'left' | 'right'", default: 'right', description: 'Edge anchor' },
 			{ name: 'title', type: 'string', description: 'Panel title' },
 		],
-		defaultProps: { open: true, side: 'right', title: 'Filters' },
+		defaultProps: { open: false, side: 'right', title: 'Filters', children: 'Filter by status, owner, or date.' },
 		controls: [
 			{ prop: 'open', label: 'Open', kind: 'boolean' },
 			{ prop: 'side', label: 'Side', kind: 'select', options: ['left', 'right'] },
 			{ prop: 'title', label: 'Title', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p) => render(Bf.Drawer, p),
+		render: (p) => <DrawerDocPreview {...p} />,
 		examples: [{ title: 'Left', props: { side: 'left' } }],
 		a11y: {
 			summary: 'Dialog panel sliding from screen edge.',
@@ -414,15 +443,17 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		category: 'Overlays',
 		status: 'stable',
 		variants: ['default'],
-		props: [{ name: 'content', type: 'string', description: 'Tooltip text' }],
-		defaultProps: { content: 'Exports the current frame to TSX.' },
+		props: [
+			{ name: 'content', type: 'string', description: 'Tooltip text' },
+			{ name: 'open', type: 'boolean', description: 'Visible (playground / touch)' },
+		],
+		defaultProps: { content: 'Exports the current frame to TSX.', open: false },
 		controls: [
 			{ prop: 'content', label: 'Content', kind: 'text' },
+			{ prop: 'open', label: 'Open', kind: 'boolean' },
 			commonInteraction,
 		],
-		render: (p) => (
-			<Bf.Tooltip content={String(p.content ?? 'Helpful hint')}>Hover target</Bf.Tooltip>
-		),
+		render: (p) => <TooltipDocPreview {...p} />,
 		examples: [],
 		a11y: { summary: 'role="tooltip" associated with trigger; not for essential info alone.' },
 	},
@@ -439,13 +470,8 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'open', label: 'Open', kind: 'boolean' },
 			commonInteraction,
 		],
-		render: () => (
-			<Bf.PopoverPanel trigger="Open popover">
-				<strong>Popover</strong>
-				<p>Floating content anchored to the trigger.</p>
-			</Bf.PopoverPanel>
-		),
-		examples: [{ title: 'Open', props: { open: true } }],
+		render: (p) => <PopoverDocPreview {...p} />,
+		examples: [{ title: 'With link', props: {} }],
 		a11y: {
 			summary: 'Non-modal floating surface for supplementary content.',
 			keyboard: ['Escape closes popover'],
@@ -562,9 +588,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		render: (p) => {
 			const { message, children, ...rest } = p;
 			return (
-				<Bf.Toast {...rest}>
-					{(children as React.ReactNode) ?? (message as React.ReactNode) ?? 'Notification'}
-				</Bf.Toast>
+				<ToastDocPreview {...rest} message={String(message ?? 'Theme published successfully.')} />
 			);
 		},
 		examples: [],
@@ -720,7 +744,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [
 			{ name: 'value', type: 'Date', description: 'Selected date' },
 		],
-		defaultProps: {},
+		defaultProps: { 'aria-label': 'Choose date' },
 		controls: [commonInteraction],
 		render: (p) => render(Bf.Calendar, p),
 		examples: [],
@@ -736,8 +760,11 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		props: [
 			{ name: 'label', type: 'string', description: 'Field label' },
 		],
-		defaultProps: {},
-		controls: [commonInteraction],
+		defaultProps: { label: 'Start date' },
+		controls: [
+			{ prop: 'label', label: 'Label', kind: 'text' },
+			commonInteraction,
+		],
 		render: (p) => render(Bf.DatePicker, p),
 		examples: [],
 		a11y: { summary: 'Combines text field with dialog calendar popup.' },

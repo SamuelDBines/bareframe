@@ -405,7 +405,7 @@
 }
 
 /* Playground hero */
-.playground-hero {
+.playground-shell {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
 	gap: 1rem;
@@ -413,16 +413,20 @@
 }
 
 @media (max-width: 900px) {
-	.playground-hero {
+	.playground-shell {
 		grid-template-columns: 1fr;
 	}
+}
+
+.playground-hero {
+	display: block;
 }
 
 .playground-frame {
 	border: 1px solid var(--docs-border);
 	border-radius: 12px;
 	background: var(--docs-surface);
-	overflow: hidden;
+	overflow: visible;
 	box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
 }
 
@@ -477,6 +481,71 @@
 	align-items: center;
 	justify-content: center;
 	transition: max-width 0.2s ease;
+	overflow: visible;
+}
+
+.playground-overlay-root {
+	position: relative;
+	width: 100%;
+	min-height: 8rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	isolation: isolate;
+}
+
+.playground-overlay-root .bf-popover-anchor,
+.playground-overlay-root .bf-doc-modal-preview,
+.playground-overlay-root .bf-doc-drawer-preview {
+	position: relative;
+	z-index: 1;
+}
+
+.bf-modal-overlay--contained {
+	position: absolute !important;
+	inset: 0;
+	z-index: 20;
+	padding: 0.75rem;
+	pointer-events: none;
+}
+
+.bf-modal-overlay--contained .bf-modal-scene {
+	pointer-events: auto;
+}
+
+.bf-drawer-overlay--contained {
+	position: absolute !important;
+	inset: 0;
+	z-index: 20;
+	padding: 0;
+	pointer-events: none;
+}
+
+.bf-drawer-overlay--contained .bf-drawer-scene {
+	pointer-events: auto;
+}
+
+.playground-overlay-root .bf-datepicker__popover,
+.playground-overlay-root .bf-popover,
+.playground-overlay-root .bf-dropdown__popover,
+.playground-overlay-root .bf-select-popover,
+.playground-overlay-root .bf-combobox__popover {
+	z-index: 30;
+}
+
+.bf-doc-toast-preview {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.75rem;
+	width: 100%;
+}
+
+.bf-doc-toast-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	width: min(100%, 18rem);
 }
 
 .playground-panel {
@@ -484,6 +553,8 @@
 	border-radius: 12px;
 	background: var(--docs-surface);
 	padding: 1rem;
+	position: relative;
+	z-index: 10000;
 }
 
 .playground-panel__title {

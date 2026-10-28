@@ -16,6 +16,15 @@ describe('Modal', () => {
 		expect(screen.getByText('Confirm')).toBeInTheDocument();
 	});
 
+	it('accepts open alias', () => {
+		render(
+			<Modal open title="Alias">
+				Body
+			</Modal>,
+		);
+		expect(screen.getByRole('dialog')).toBeInTheDocument();
+	});
+
 	it('does not render when closed', () => {
 		render(
 			<Modal isOpen={false} title="Hidden">
@@ -43,6 +52,18 @@ describe('Modal', () => {
 		);
 		await user.tab();
 		expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus();
+	});
+
+	it('closes via close button and escape', async () => {
+		const user = userEvent.setup();
+		const onOpenChange = vi.fn();
+		render(
+			<Modal isOpen showCloseButton title="Title" onOpenChange={onOpenChange}>
+				Content
+			</Modal>,
+		);
+		await user.click(screen.getByRole('button', { name: 'Close dialog' }));
+		expect(onOpenChange).toHaveBeenCalledWith(false);
 	});
 
 	it('has no axe violations when open', async () => {

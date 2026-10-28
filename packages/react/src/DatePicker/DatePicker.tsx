@@ -33,18 +33,24 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(function D
 		<RACDatePicker {...props} className={cn('bf-datepicker', className)} ref={ref}>
 			<Label className="bf-field__label">{label}</Label>
 			<Group className="bf-datepicker__group">
-				<DateInput className="bf-input">
+				<DateInput className="bf-input bf-datepicker__input">
 					{(segment) => <DateSegment segment={segment} />}
 				</DateInput>
-				<RACButton className="btn btn-secondary btn-sm">📅</RACButton>
+				<RACButton className="btn btn-secondary btn-sm bf-datepicker__trigger" aria-label="Open calendar">
+					📅
+				</RACButton>
 			</Group>
-			<Popover className="bf-datepicker__popover">
-				<Dialog>
+			<Popover className="bf-datepicker__popover" placement="bottom start" offset={8}>
+				<Dialog className="bf-datepicker__dialog">
 					<Calendar>
 						<header className="bf-calendar__header">
-							<RACButton slot="previous">‹</RACButton>
+							<RACButton slot="previous" aria-label="Previous month">
+								‹
+							</RACButton>
 							<Heading />
-							<RACButton slot="next">›</RACButton>
+							<RACButton slot="next" aria-label="Next month">
+								›
+							</RACButton>
 						</header>
 						<CalendarGrid className="bf-calendar__grid">
 							<CalendarGridHeader>

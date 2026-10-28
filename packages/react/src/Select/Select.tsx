@@ -20,14 +20,17 @@ export type SelectProps = Omit<RACSelectProps<SelectOption>, 'children' | 'class
 	placeholder?: string;
 	className?: string;
 	triggerClassName?: string;
+	/** Docs/codegen alias for `selectedKey`. */
+	value?: string;
 };
 
 export const Select = forwardRef<HTMLButtonElement, SelectProps>(function Select(
-	{ options, placeholder = 'Select…', className, triggerClassName, ...props },
+	{ options, placeholder = 'Select…', className, triggerClassName, value, selectedKey, ...props },
 	ref,
 ) {
+	const resolvedKey = selectedKey ?? (value as string | undefined);
 	return (
-		<RACSelect {...props} className={cn('bf-select-field', className)}>
+		<RACSelect {...props} selectedKey={resolvedKey} className={cn('bf-select-field', className)}>
 			<RACButton ref={ref} className={cn('bf-select-native', triggerClassName)}>
 				<SelectValue>{({ selectedText }) => selectedText || placeholder}</SelectValue>
 				<span aria-hidden> ▾</span>

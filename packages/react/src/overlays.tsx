@@ -1,6 +1,7 @@
 import { forwardRef, type ReactNode } from 'react';
 import {
 	Button as RACButton,
+	DialogTrigger,
 	Menu,
 	MenuItem,
 	MenuTrigger,
@@ -12,12 +13,25 @@ import { cn } from './utils/cn';
 
 export const Tooltip = forwardRef<
 	HTMLDivElement,
-	{ content: ReactNode; children: ReactNode; className?: string }
->(function Tooltip({ content, children, className }, ref) {
+	{
+		content: ReactNode;
+		children: ReactNode;
+		className?: string;
+		isOpen?: boolean;
+		onOpenChange?: (open: boolean) => void;
+	}
+>(function Tooltip({ content, children, className, isOpen, onOpenChange }, ref) {
 	return (
 		<div ref={ref} className={cn('bf-tooltip-anchor', className)}>
-			<TooltipTrigger>
-				<RACButton className="btn btn-secondary">{children}</RACButton>
+			<TooltipTrigger
+				isOpen={isOpen}
+				onOpenChange={onOpenChange}
+				delay={0}
+				closeDelay={0}
+			>
+				<RACButton className="btn btn-secondary" onPress={() => onOpenChange?.(true)}>
+					{children}
+				</RACButton>
 				<RACTooltip className="bf-tooltip">{content}</RACTooltip>
 			</TooltipTrigger>
 		</div>
@@ -28,19 +42,30 @@ export function PopoverPanel({
 	trigger,
 	children,
 	className,
+	isOpen,
+	defaultOpen,
+	onOpenChange,
+	portalContainer,
 }: {
 	trigger: ReactNode;
 	children: ReactNode;
 	className?: string;
+	isOpen?: boolean;
+	defaultOpen?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	portalContainer?: Element | null;
 }) {
 	return (
 		<div className={cn('bf-popover-anchor', className)}>
-			<MenuTrigger>
+			<DialogTrigger isOpen={isOpen} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
 				<RACButton className="btn btn-secondary">{trigger}</RACButton>
-				<RACPopover className="bf-popover">
-					<div role="dialog">{children}</div>
+				<RACPopover
+					className={cn('bf-popover', portalContainer && 'bf-popover--contained')}
+					UNSTABLE_portalContainer={portalContainer ?? undefined}
+				>
+					<div className="bf-popover__content">{children}</div>
 				</RACPopover>
-			</MenuTrigger>
+			</DialogTrigger>
 		</div>
 	);
 }

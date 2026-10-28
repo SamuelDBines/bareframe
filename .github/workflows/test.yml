@@ -165,8 +165,8 @@ jobs:
       - name: Smoke-check Pages artifact
         run: pnpm run smoke:pages
 
-      - name: Install Playwright (Chromium)
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright (Chromium + WebKit)
+        run: pnpm exec playwright install --with-deps chromium webkit
 
       - name: Run Playwright tests
         run: pnpm exec playwright test

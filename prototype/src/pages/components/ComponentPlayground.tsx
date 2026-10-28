@@ -1,8 +1,9 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 import { THEME_IDS, THEME_LABELS, type ThemeId } from '../../theme/themes';
 import { generateComponentSnippet } from '../../components/library/codegen';
 import type { ComponentRegistryEntry, PreviewInteractionState } from '../../components/library/types';
 import { PreviewCodeTabs } from './docs/PreviewCodeTabs';
+import { PlaygroundPortalRoot } from './docs/PlaygroundPortal';
 
 type ViewportId = 'mobile' | 'tablet' | 'desktop';
 
@@ -55,6 +56,104 @@ export function ComponentPlayground({ entry }: Props) {
 	const setProp = useCallback((key: string, value: unknown) => {
 		setProps((prev) => ({ ...prev, [key]: value }));
 	}, []);
+
+	const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+
+	const previewProps = useMemo(() => {
+		let next: Record<string, unknown> = liveProps;
+
+		if (Object.prototype.hasOwnProperty.call(entry.defaultProps, 'open')) {
+			const userOnOpenChange = liveProps.onOpenChange as ((open: boolean) => void) | undefined;
+			next = {
+				...next,
+				onOpenChange: (open: boolean) => {
+					setProp('open', open);
+					userOnOpenChange?.(open);
+				},
+			};
+		}
+
+		if (Object.prototype.hasOwnProperty.call(entry.defaultProps, 'page')) {
+			const userOnPageChange = liveProps.onPageChange as ((page: number) => void) | undefined;
+			next = {
+				...next,
+				onPageChange: (page: number) => {
+					setProp('page', page);
+					userOnPageChange?.(page);
+				},
+			};
+		}
+
+		if (entry.slug === 'select') {
+			const userOnSelectionChange = liveProps.onSelectionChange as ((key: unknown) => void) | undefined;
+			next = {
+				...next,
+				onSelectionChange: (key: unknown) => {
+					setProp('value', String(key));
+					userOnSelectionChange?.(key);
+				},
+			};
+		}
+
+		if (entry.slug === 'slider') {
+			const userOnChange = liveProps.onChange as ((e: ChangeEvent<HTMLInputElement>) => void) | undefined;
+			next = {
+				...next,
+				onChange: (e: ChangeEvent<HTMLInputElement>) => {
+					setProp('value', Number(e.target.value));
+					userOnChange?.(e);
+				},
+			};
+		}
+
+		if (entry.slug === 'tabs') {
+			const userOnChange = liveProps.onChange as ((value: string) => void) | undefined;
+			const tabValue = liveProps.defaultValue ?? liveProps.value;
+			next = {
+				...next,
+				value: tabValue,
+				onChange: (value: string) => {
+					setProp('defaultValue', value);
+					userOnChange?.(value);
+				},
+			};
+		}
+
+		if (entry.slug === 'switch') {
+			const userOnChange = liveProps.onChange as ((e: ChangeEvent<HTMLInputElement>) => void) | undefined;
+			next = {
+				...next,
+				onChange: (e: ChangeEvent<HTMLInputElement>) => {
+					setProp('checked', e.target.checked);
+					userOnChange?.(e);
+				},
+			};
+		}
+
+		if (entry.slug === 'checkbox') {
+			const userOnChange = liveProps.onChange as ((e: ChangeEvent<HTMLInputElement>) => void) | undefined;
+			next = {
+				...next,
+				onChange: (e: ChangeEvent<HTMLInputElement>) => {
+					setProp('checked', e.target.checked);
+					userOnChange?.(e);
+				},
+			};
+		}
+
+		if (entry.slug === 'radio-group') {
+			const userOnChange = liveProps.onChange as ((value: string) => void) | undefined;
+			next = {
+				...next,
+				onChange: (value: string) => {
+					setProp('value', value);
+					userOnChange?.(value);
+				},
+			};
+		}
+
+		return next;
+	}, [entry.defaultProps, entry.slug, liveProps, setProp]);
 
 	const applyVariant = useCallback(
 		(variant: string) => {
@@ -117,33 +216,37 @@ export function ComponentPlayground({ entry }: Props) {
 				className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
 				data-testid="playground-preview"
 			>
-				{entry.render(liveProps)}
+			<PlaygroundPortalRoot portalRoot={portalRoot} onPortalRootChange={setPortalRoot}>
+				{entry.render(previewProps)}
+			</PlaygroundPortalRoot>
 			</div>
 		</div>
 	);
 
 	return (
-		<div className="playground-hero">
-			<div>
-				<PreviewCodeTabs preview={previewNode} code={snippet} />
-				{entry.variants.length > 0 ? (
-					<div className="playground__variants" style={{ marginTop: '0.75rem' }}>
-						<span className="playground__variants-label">Variants</span>
-						<div className="playground__variant-pills">
-							{entry.variants.map((v) => (
-								<button
-									key={v}
-									type="button"
-									className={`badge-pill playground__variant-pill${activeVariant === v ? ' is-active' : ''}`}
-									onClick={() => applyVariant(v)}
-									aria-pressed={activeVariant === v}
-								>
-									{v}
-								</button>
-							))}
+		<div className="playground-shell">
+			<div className="playground-hero">
+				<div>
+					<PreviewCodeTabs preview={previewNode} code={snippet} />
+					{entry.variants.length > 0 ? (
+						<div className="playground__variants" style={{ marginTop: '0.75rem' }}>
+							<span className="playground__variants-label">Variants</span>
+							<div className="playground__variant-pills">
+								{entry.variants.map((v) => (
+									<button
+										key={v}
+										type="button"
+										className={`badge-pill playground__variant-pill${activeVariant === v ? ' is-active' : ''}`}
+										onClick={() => applyVariant(v)}
+										aria-pressed={activeVariant === v}
+									>
+										{v}
+									</button>
+								))}
+							</div>
 						</div>
-					</div>
-				) : null}
+					) : null}
+				</div>
 			</div>
 
 			<aside className="playground-panel" aria-label="Playground controls">

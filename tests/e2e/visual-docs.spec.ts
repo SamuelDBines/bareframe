@@ -30,6 +30,9 @@ async function expectDesktopChrome(page: import('@playwright/test').Page) {
 }
 
 test.describe('docs visual snapshots', () => {
+	test.beforeEach(({}, testInfo) => {
+		test.skip(testInfo.project.name !== 'chromium-desktop', 'Visual baselines are desktop Chromium only');
+	});
 	for (const [label, size] of Object.entries(VIEWPORTS)) {
 		test(`alert playground ${label} light`, async ({ page }) => {
 			await page.setViewportSize(size);

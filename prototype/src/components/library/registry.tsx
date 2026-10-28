@@ -559,7 +559,14 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 			{ prop: 'message', label: 'Message', kind: 'text' },
 			commonInteraction,
 		],
-		render: (p) => render(Bf.Toast, p),
+		render: (p) => {
+			const { message, children, ...rest } = p;
+			return (
+				<Bf.Toast {...rest}>
+					{(children as React.ReactNode) ?? (message as React.ReactNode) ?? 'Notification'}
+				</Bf.Toast>
+			);
+		},
 		examples: [],
 		a11y: { summary: 'role="status" for non-critical updates.' },
 	},

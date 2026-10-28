@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { THEME_IDS, THEME_LABELS, type ThemeId } from '../../theme/themes';
 import { generateComponentSnippet } from '../../components/library/codegen';
 import type { ComponentRegistryEntry, PreviewInteractionState } from '../../components/library/types';
+import { PreviewCodeTabs } from './docs/PreviewCodeTabs';
 
 type ViewportId = 'mobile' | 'tablet' | 'desktop';
 
@@ -43,7 +44,6 @@ export function ComponentPlayground({ entry }: Props) {
 	const [previewTheme, setPreviewTheme] = useState<ThemeId>('light');
 	const [colorMode, setColorMode] = useState<'theme' | 'light' | 'dark'>('theme');
 	const [viewport, setViewport] = useState<ViewportId>('desktop');
-	const [copied, setCopied] = useState(false);
 
 	const interaction = (props.__interaction as PreviewInteractionState) ?? 'default';
 	const effectiveTheme: ThemeId =
@@ -65,95 +65,89 @@ export function ComponentPlayground({ entry }: Props) {
 		[entry, setProp],
 	);
 
-	const copySnippet = async () => {
-		try {
-			await navigator.clipboard.writeText(snippet);
-			setCopied(true);
-			window.setTimeout(() => setCopied(false), 2000);
-		} catch {
-			setCopied(false);
-		}
-	};
-
 	const activeVariant = typeof liveProps.variant === 'string' ? liveProps.variant : entry.variants[0];
 
-	return (
-		<div className="playground">
-			<section className="playground__preview-section">
-				<div className="playground__toolbar">
-					<div className="playground__toolbar-group">
-						<label className="playground__toolbar-label">
-							Theme
-							<select
-								className="theme-select"
-								value={previewTheme}
-								onChange={(e) => setPreviewTheme(e.target.value as ThemeId)}
-								aria-label="Preview theme"
-							>
-								{THEME_IDS.filter((id) => id !== 'system').map((id) => (
-									<option key={id} value={id}>{THEME_LABELS[id]}</option>
-								))}
-							</select>
-						</label>
-						<div className="playground__segmented" role="group" aria-label="Color mode">
-							{(['theme', 'light', 'dark'] as const).map((mode) => (
-								<button
-									key={mode}
-									type="button"
-									className={colorMode === mode ? 'is-active' : undefined}
-									onClick={() => setColorMode(mode)}
-								>
-									{mode === 'theme' ? 'As theme' : mode === 'light' ? 'Light' : 'Dark'}
-								</button>
-							))}
-						</div>
-					</div>
-					<div className="playground__toolbar-group">
-						<div className="playground__segmented" role="group" aria-label="Viewport width">
-							{(Object.keys(VIEWPORT_WIDTH) as ViewportId[]).map((vp) => (
-								<button
-									key={vp}
-									type="button"
-									className={viewport === vp ? 'is-active' : undefined}
-									onClick={() => setViewport(vp)}
-								>
-									{vp}
-								</button>
-							))}
-						</div>
-					</div>
-				</div>
-
-				<div
-					className="playground__stage card"
-					data-bf-theme={effectiveTheme}
-					style={{ maxWidth: VIEWPORT_WIDTH[viewport], margin: viewport === 'desktop' ? undefined : '0 auto' }}
+	const previewNode = (
+		<div
+			className="playground-frame"
+			data-bf-theme={effectiveTheme}
+			style={{ maxWidth: VIEWPORT_WIDTH[viewport], margin: viewport === 'desktop' ? undefined : '0 auto' }}
+		>
+			<div className="playground-frame__toolbar playground-frame__toolbar--compact">
+				<select
+					className="playground-toolbar__theme-select"
+					value={previewTheme}
+					onChange={(e) => setPreviewTheme(e.target.value as ThemeId)}
+					aria-label="Preview theme"
 				>
-					<div className={`playground__canvas ${previewWrapperClass(interaction)}`} data-testid="playground-preview">
-						{entry.render(liveProps)}
-					</div>
-				</div>
-
-				<div className="playground__variants">
-					<span className="playground__variants-label">Variants</span>
-					<div className="playground__variant-pills">
-						{entry.variants.map((v) => (
+					{THEME_IDS.filter((id) => id !== 'system').map((id) => (
+						<option key={id} value={id}>
+							{THEME_LABELS[id]}
+						</option>
+					))}
+				</select>
+				<div className="playground-toolbar__segments">
+					<div className="playground__segmented playground__segmented--compact" role="group" aria-label="Color mode">
+						{(['theme', 'light', 'dark'] as const).map((mode) => (
 							<button
-								key={v}
+								key={mode}
 								type="button"
-								className={`badge-pill playground__variant-pill${activeVariant === v ? ' is-active' : ''}`}
-								onClick={() => applyVariant(v)}
-								aria-pressed={activeVariant === v}
+								className={colorMode === mode ? 'is-active' : undefined}
+								onClick={() => setColorMode(mode)}
 							>
-								{v}
+								{mode === 'theme' ? 'Auto' : mode === 'light' ? 'Light' : 'Dark'}
+							</button>
+						))}
+					</div>
+					<div className="playground__segmented playground__segmented--compact" role="group" aria-label="Viewport width">
+						{(Object.keys(VIEWPORT_WIDTH) as ViewportId[]).map((vp) => (
+							<button
+								key={vp}
+								type="button"
+								className={viewport === vp ? 'is-active' : undefined}
+								onClick={() => setViewport(vp)}
+							>
+								{vp.charAt(0).toUpperCase() + vp.slice(1)}
 							</button>
 						))}
 					</div>
 				</div>
-			</section>
+			</div>
+			<div
+				className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
+				data-testid="playground-preview"
+			>
+				{entry.render(liveProps)}
+			</div>
+		</div>
+	);
 
-			<aside className="playground__controls card">
-				<h3>Controls</h3>
+	return (
+		<div className="playground-hero">
+			<div>
+				<PreviewCodeTabs preview={previewNode} code={snippet} />
+				{entry.variants.length > 0 ? (
+					<div className="playground__variants" style={{ marginTop: '0.75rem' }}>
+						<span className="playground__variants-label">Variants</span>
+						<div className="playground__variant-pills">
+							{entry.variants.map((v) => (
+								<button
+									key={v}
+									type="button"
+									className={`badge-pill playground__variant-pill${activeVariant === v ? ' is-active' : ''}`}
+									onClick={() => applyVariant(v)}
+									aria-pressed={activeVariant === v}
+								>
+									{v}
+								</button>
+							))}
+						</div>
+					</div>
+				) : null}
+			</div>
+
+			<aside className="playground-panel" aria-label="Playground controls">
+				<p className="playground-panel__title">Controls</p>
 				<div className="playground__control-stack">
 					{entry.controls.map((control) => {
 						const value = props[control.prop] ?? entry.defaultProps[control.prop];
@@ -166,7 +160,9 @@ export function ComponentPlayground({ entry }: Props) {
 										onChange={(e) => setProp('__interaction', e.target.value)}
 									>
 										{(control.options ?? []).map((o) => (
-											<option key={o} value={o}>{o}</option>
+											<option key={o} value={o}>
+												{o}
+											</option>
 										))}
 									</select>
 								</label>
@@ -193,7 +189,9 @@ export function ComponentPlayground({ entry }: Props) {
 										onChange={(e) => setProp(control.prop, e.target.value)}
 									>
 										{(control.options ?? []).map((o) => (
-											<option key={o} value={o}>{o}</option>
+											<option key={o} value={o}>
+												{o}
+											</option>
 										))}
 									</select>
 								</label>
@@ -239,16 +237,6 @@ export function ComponentPlayground({ entry }: Props) {
 					})}
 				</div>
 			</aside>
-
-			<section className="playground__code">
-				<div className="playground__code-header">
-					<h3>Code</h3>
-					<button type="button" className="btn btn-secondary btn-sm" onClick={copySnippet}>
-						{copied ? 'Copied' : 'Copy'}
-					</button>
-				</div>
-				<pre className="code-block" data-testid="playground-snippet">{snippet}</pre>
-			</section>
 		</div>
 	);
 }

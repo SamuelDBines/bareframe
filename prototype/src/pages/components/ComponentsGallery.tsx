@@ -1,63 +1,96 @@
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Button } from '@bareframe/react';
-import { COMPONENT_LIBRARY } from '../../data/components';
-import { THEME_LABELS, type ThemeId } from '../../theme/themes';
+import { COMPONENT_REGISTRY } from '../../components/library/registry';
+import { useDocPageToc } from './docs/DocsShell';
+import { GalleryPreviewScaler } from './docs/GalleryPreviewScaler';
+import { renderGalleryPreview } from './docs/galleryPreviews';
 
-const THEME_COMPARE: ThemeId[] = ['light', 'dark', 'aurora', 'noir'];
+const CATEGORIES = [...new Set(COMPONENT_REGISTRY.map((c) => c.category))].sort();
 
 export function ComponentsGallery() {
-	const stable = COMPONENT_LIBRARY.filter((c) => c.status === 'stable');
+	const [query, setQuery] = useState('');
+	const [category, setCategory] = useState<string>('All');
+
+	useDocPageToc([{ id: 'components-index', label: 'Browse', depth: 2 }]);
+
+	const filtered = useMemo(() => {
+		const q = query.trim().toLowerCase();
+		return COMPONENT_REGISTRY.filter((c) => {
+			if (category !== 'All' && c.category !== category) return false;
+			if (!q) return true;
+			return (
+				c.name.toLowerCase().includes(q) ||
+				c.slug.includes(q) ||
+				c.description.toLowerCase().includes(q)
+			);
+		});
+	}, [query, category]);
+
+	const stableCount = COMPONENT_REGISTRY.filter((c) => c.status === 'stable').length;
 
 	return (
-		<>
-			<div className="page-hero">
-				<h1>Component gallery</h1>
-				<p className="lead">
-					Preview @bareframe/react primitives with live playgrounds, theme switching, and copy-ready snippets.
+		<div id="components-index">
+			<header className="doc-page-header">
+				<h1>Components</h1>
+				<p className="doc-page-header__lead">
+					Accessible React primitives with live previews, token-driven themes, and copy-ready snippets.
 				</p>
-			</div>
+				<p className="doc-prose" style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--bf-theme-text-2)' }}>
+					{stableCount} stable · {COMPONENT_REGISTRY.length} documented
+				</p>
+			</header>
 
-			<section className="gallery-theme-matrix card">
-				<h2>Across themes</h2>
-				<p style={{ margin: 0, color: 'var(--bf-theme-text-2)', fontSize: '0.9rem' }}>
-					Primary button and alert surfaces on a few theme presets — open any component for the full playground.
-				</p>
-				<div className="gallery-theme-row">
-					{THEME_COMPARE.map((themeId) => (
-						<div key={themeId} className="gallery-theme-cell" data-bf-theme={themeId}>
-							<span className="gallery-theme-cell__label">{THEME_LABELS[themeId]}</span>
-							<Button size="sm" variant="primary">Action</Button>
-							<Alert variant="info" title="Note" dismissible={false}>
-								Token-driven UI
-							</Alert>
-						</div>
+			<div className="docs-index-toolbar">
+				<input
+					type="search"
+					className="docs-index-search"
+					placeholder="Search components…"
+					value={query}
+					onChange={(e) => setQuery(e.target.value)}
+					aria-label="Search components"
+				/>
+				<div className="docs-filter-chips" role="group" aria-label="Filter by category">
+					<button
+						type="button"
+						className={`docs-filter-chip${category === 'All' ? ' is-active' : ''}`}
+						onClick={() => setCategory('All')}
+					>
+						All
+					</button>
+					{CATEGORIES.map((cat) => (
+						<button
+							key={cat}
+							type="button"
+							className={`docs-filter-chip${category === cat ? ' is-active' : ''}`}
+							onClick={() => setCategory(cat)}
+						>
+							{cat}
+						</button>
 					))}
 				</div>
-			</section>
+			</div>
 
-			<div className="grid-2" style={{ marginTop: '1.5rem' }}>
-				{COMPONENT_LIBRARY.map((c) => (
-					<Link
-						key={c.slug}
-						to={`/components/${c.slug}`}
-						className="card"
-						style={{ textDecoration: 'none', color: 'inherit' }}
-					>
-						<div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem' }}>
-							<h3>{c.name}</h3>
-							<span className={`badge-pill ${c.status === 'stable' ? 'success' : c.status}`}>
-								{c.status}
-							</span>
+			<div className="docs-gallery-grid">
+				{filtered.map((entry) => (
+					<Link key={entry.slug} to={`/components/${entry.slug}`} className="docs-gallery-card">
+						<GalleryPreviewScaler>{renderGalleryPreview(entry)}</GalleryPreviewScaler>
+						<div className="docs-gallery-card__body">
+							<div className="docs-gallery-card__row">
+								<h3>{entry.name}</h3>
+								<span className={`doc-status doc-status--${entry.status === 'stable' ? 'stable' : 'beta'}`}>
+									{entry.status}
+								</span>
+							</div>
+							<p>{entry.description}</p>
 						</div>
-						<p style={{ marginBottom: 0 }}>{c.description}</p>
-						<p style={{ marginTop: '0.75rem', fontSize: '0.8rem' }}>{c.category}</p>
 					</Link>
 				))}
 			</div>
-
-			<p className="footer-note">
-				{stable.length} stable components · {COMPONENT_LIBRARY.length} documented total
-			</p>
-		</>
+			{filtered.length === 0 ? (
+				<p className="doc-prose" style={{ marginTop: '1.5rem' }}>
+					No components match your search.
+				</p>
+			) : null}
+		</div>
 	);
 }

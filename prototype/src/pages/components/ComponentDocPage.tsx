@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { loadDocExamples, type LoadedDocExample } from '../../components/library/loadDocExamples';
 import type { ComponentRegistryEntry } from '../../components/library/types';
-import { THEME_LABELS, type ThemeId } from '../../theme/themes';
+import { PreviewCodeTabs } from './docs/PreviewCodeTabs';
+import { DocSection } from './docs/DocsShell';
 import { ComponentPlayground } from './ComponentPlayground';
 
 export function ComponentDocPage({ entry }: { entry: ComponentRegistryEntry }) {
@@ -28,59 +29,63 @@ export function ComponentDocPage({ entry }: { entry: ComponentRegistryEntry }) {
 
 	return (
 		<>
-			<section className="doc-section">
-				<h2>Overview</h2>
-				<p>{entry.overview ?? entry.description}</p>
-				{entry.whenToUse ? <p>{entry.whenToUse}</p> : null}
-			</section>
+			<DocSection id="overview" title="Overview">
+				<div className="doc-prose">
+					<p>{entry.overview ?? entry.description}</p>
+					{entry.whenToUse ? <p>{entry.whenToUse}</p> : null}
+				</div>
+			</DocSection>
 
-			<section className="doc-section">
-				<h2>Playground</h2>
+			<DocSection id="playground" title="Playground">
 				<ComponentPlayground entry={entry} />
-			</section>
+			</DocSection>
 
 			{examplesLoading ? (
-				<section className="doc-section">
-					<h2>Examples</h2>
-					<p>Loading examples…</p>
-				</section>
+				<DocSection id="examples" title="Examples">
+					<p className="doc-prose">Loading examples…</p>
+				</DocSection>
 			) : docExamples.length > 0 ? (
-				<section className="doc-section">
-					<h2>Examples</h2>
-					<div className="doc-examples">
+				<DocSection id="examples" title="Examples">
+					<div className="doc-examples-list">
 						{docExamples.map((ex) => (
 							<DocExampleCard key={ex.title} {...ex} />
 						))}
 					</div>
-				</section>
+				</DocSection>
 			) : null}
 
 			{entry.dosDonts?.length ? (
-				<section className="doc-section">
-					<h2>Do&apos;s and don&apos;ts</h2>
-					<ul className="doc-dosdonts">
+				<DocSection id="guidelines" title="Do's and don'ts">
+					<div className="doc-dodont-grid">
 						{entry.dosDonts.map((row) => (
-							<li key={row.do}>
-								<span className="doc-do">Do</span> {row.do}
-								<br />
-								<span className="doc-dont">Don&apos;t</span> {row.dont}
-							</li>
+							<div key={row.do} style={{ display: 'contents' }}>
+								<div className="doc-dodont-card doc-dodont-card--do">
+									<strong>Do</strong>
+									{row.do}
+								</div>
+								<div className="doc-dodont-card doc-dodont-card--dont">
+									<strong>Don&apos;t</strong>
+									{row.dont}
+								</div>
+							</div>
 						))}
-					</ul>
-				</section>
+					</div>
+				</DocSection>
 			) : null}
 
 			{entry.themeTokens?.length ? (
-				<section className="doc-section">
-					<h2>Theming tokens</h2>
-					<ul>
+				<DocSection id="tokens" title="Theme tokens">
+					<ul className="doc-token-list">
 						{entry.themeTokens.map((t) => (
 							<li key={t}>
-								<code>{t}</code>
+								<span className="doc-token-swatch">
+									<span className="doc-token-swatch__chip" style={{ ['--token-preview' as string]: `var(${t})` }} />
+									<code>{t}</code>
+								</span>
 							</li>
 						))}
 					</ul>
-				</section>
+				</DocSection>
 			) : null}
 		</>
 	);
@@ -97,48 +102,18 @@ function DocExampleCard({
 	Component: React.ComponentType;
 	source: string;
 }) {
-	const [copied, setCopied] = useState(false);
 	return (
-		<div className="card doc-example-card">
+		<article className="doc-example-card-v2">
 			<h3>{title}</h3>
 			{description ? <p>{description}</p> : null}
-			<div className="playground__example-preview" data-bf-theme="light">
-				<Component />
-			</div>
-			<div className="playground__code-header">
-				<span className="doc-example-source-label">Source</span>
-				<button
-					type="button"
-					className="btn btn-secondary btn-sm"
-					onClick={async () => {
-						await navigator.clipboard.writeText(source.trim());
-						setCopied(true);
-						window.setTimeout(() => setCopied(false), 1500);
-					}}
-				>
-					{copied ? 'Copied' : 'Copy'}
-				</button>
-			</div>
-			<pre className="code-block">{source.trim()}</pre>
-		</div>
-	);
-}
-
-export function VariantThemeMatrix({ entry }: { entry: ComponentRegistryEntry }) {
-	const themes: ThemeId[] = ['light', 'dark', 'aurora', 'noir'];
-	if (!entry.variants.length) return null;
-	const variant = entry.variants[0];
-	return (
-		<section className="doc-section">
-			<h2>Variants across themes</h2>
-			<div className="gallery-theme-row">
-				{themes.map((themeId) => (
-					<div key={themeId} className="gallery-theme-cell" data-bf-theme={themeId}>
-						<span className="gallery-theme-cell__label">{THEME_LABELS[themeId]}</span>
-						<div className="bf-docs-preview">{entry.render({ ...entry.defaultProps, variant })}</div>
+			<PreviewCodeTabs
+				preview={
+					<div className="doc-example-preview" data-bf-theme="light">
+						<Component />
 					</div>
-				))}
-			</div>
-		</section>
+				}
+				code={source}
+			/>
+		</article>
 	);
 }

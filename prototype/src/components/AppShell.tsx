@@ -11,6 +11,8 @@ export function AppShell() {
 		location.pathname.startsWith('/designer/theme') ||
 		location.pathname.startsWith('/designer/tokens');
 
+	const docs = location.pathname.startsWith('/components');
+
 	return (
 		<div className="app-shell">
 			<header className="app-header">
@@ -23,7 +25,7 @@ export function AppShell() {
 				<UserMenu />
 				<ThemeSwitcher />
 			</header>
-			<main className={`app-main${wide ? ' wide' : ''}`}>
+			<main className={`app-main${wide ? ' wide' : ''}${docs ? ' docs-main' : ''}`}>
 				<Outlet />
 			</main>
 		</div>

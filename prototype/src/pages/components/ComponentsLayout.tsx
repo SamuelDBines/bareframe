@@ -1,15 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { DocsShell } from './docs/DocsShell';
+import './docs/docs.css';
 
 export function ComponentsLayout() {
-	return (
-		<>
-			<nav className="subnav" aria-label="Components section">
-				<NavLink to="/components/start">Get started</NavLink>
-				<NavLink to="/components" end>Gallery</NavLink>
-				<NavLink to="/components/tokens">Tokens</NavLink>
-				<NavLink to="/components/mcp">Connect agent</NavLink>
-			</nav>
-			<Outlet />
-		</>
-	);
+	return <DocsShell />;
 }

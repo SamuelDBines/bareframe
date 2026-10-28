@@ -220,16 +220,16 @@ export function ComponentPlayground({ entry }: Props) {
 					</div>
 				</div>
 			</div>
-			<PlaygroundPortalProvider portalRoot={portalRoot} floatingPortalRoot={floatingPortalRoot}>
-				<PlaygroundOverlayLayer onPortalRootChange={setPortalRoot} />
-				<div
-					className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
-					data-testid="playground-preview"
-				>
+			<div
+				className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
+				data-testid="playground-preview"
+			>
+				<PlaygroundPortalProvider portalRoot={portalRoot} floatingPortalRoot={floatingPortalRoot}>
+					<PlaygroundOverlayLayer onPortalRootChange={setPortalRoot} />
 					<div className="playground-preview-content">{entry.render(previewProps)}</div>
-				</div>
-				<PlaygroundFloatingPortalLayer onPortalRootChange={setFloatingPortalRoot} />
-			</PlaygroundPortalProvider>
+					<PlaygroundFloatingPortalLayer onPortalRootChange={setFloatingPortalRoot} />
+				</PlaygroundPortalProvider>
+			</div>
 		</div>
 	);
 

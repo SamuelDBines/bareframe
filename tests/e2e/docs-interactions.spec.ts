@@ -84,20 +84,19 @@ test.describe('Overlay interactions', () => {
 		const option = overlay.getByRole('option', { name: 'Vue' });
 		await expect(option).toBeVisible();
 		if (isMobileProject(testInfo.project.name)) {
-			const pick = overlay.getByRole('option', { name: 'Vue' });
 			if (testInfo.project.name === 'webkit-mobile') {
 				await expect(async () => {
 					const vue = overlay.getByRole('option', { name: 'Vue' });
 					await expect(vue).toBeVisible();
 					await vue.scrollIntoViewIfNeeded();
-					await vue.tap({ timeout: 5000 });
+					await vue.tap({ timeout: 3000 });
 					await expect(input).toHaveValue('Vue');
 				}).toPass({ timeout: 45_000 });
 			} else {
 				await expect
-					.poll(async () => (await pick.boundingBox())?.width ?? 0, { timeout: 15_000 })
+					.poll(async () => (await option.boundingBox())?.width ?? 0, { timeout: 15_000 })
 					.toBeGreaterThan(50);
-				await pick.tap();
+				await option.tap();
 			}
 		} else {
 			await option.click();

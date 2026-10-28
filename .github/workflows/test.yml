@@ -131,6 +131,12 @@ jobs:
       - name: Build @bareframe/react package
         run: pnpm run build:react
 
+      - name: publint + @arethetypeswrong for @bareframe/react
+        run: pnpm run react:pack-quality
+
+      - name: Consumer smoke test (packed tarball + Vite)
+        run: pnpm run react:consumer-smoke
+
       - name: Typecheck (root TS)
         run: pnpm run typecheck
 

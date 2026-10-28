@@ -91,21 +91,6 @@
 	background: transparent;
 }
 
-.bf-btn--destructive {
-	background: #dc2626;
-	color: #fff;
-	border-color: #dc2626;
-}
-.bf-btn--lg { padding: 0.7rem 1.25rem; }
-.bf-btn__spinner {
-	width: 0.9rem;
-	height: 0.9rem;
-	border: 2px solid currentColor;
-	border-right-color: transparent;
-	border-radius: 50%;
-	animation: bf-spin 0.7s linear infinite;
-}
-
 .bf-card {
 	border-radius: calc(var(--bf-theme-radius-md, 8px) + 2px);
 	border: 1px solid var(--bf-theme-card-border-color, var(--bf-theme-border-1));

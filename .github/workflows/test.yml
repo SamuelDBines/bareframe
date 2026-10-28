@@ -125,11 +125,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Playwright Chromium (consumer smoke + e2e)
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Test @bareframe/react (unit + coverage)
         run: pnpm run test:react
 
       - name: Build @bareframe/react package
         run: pnpm run build:react
+
+      - name: publint + @arethetypeswrong for @bareframe/react
+        run: pnpm run react:pack-quality
+
+      - name: Consumer smoke test (packed tarball + Vite)
+        run: pnpm run react:consumer-smoke
 
       - name: Typecheck (root TS)
         run: pnpm run typecheck
@@ -165,8 +174,8 @@ jobs:
       - name: Smoke-check Pages artifact
         run: pnpm run smoke:pages
 
-      - name: Install Playwright (Chromium + WebKit)
-        run: pnpm exec playwright install --with-deps chromium webkit
+      - name: Install Playwright (WebKit for e2e)
+        run: pnpm exec playwright install --with-deps webkit
 
       - name: Run Playwright tests
         run: pnpm exec playwright test

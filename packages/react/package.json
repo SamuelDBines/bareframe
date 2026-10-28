@@ -1,18 +1,29 @@
 {
   "name": "@bareframe/react",
   "version": "0.1.0",
-  "description": "Accessible React components for Bareframe design systems",
+  "description": "Accessible React components for Bareframe design systems — theme tokens, legacy Repkit (--rk-*) compatibility, and React Aria primitives.",
   "license": "MIT",
   "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./theme.css": "./dist/themes/light.css",
+    "./themes/*.css": "./dist/themes/*.css"
   },
   "files": [
     "dist",
@@ -22,7 +33,10 @@
     "build": "tsup && node ./scripts/copy-css.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "pnpm run build",
+    "pack-quality": "node ./scripts/pack-quality.mjs",
+    "consumer-smoke": "node ./scripts/consumer-smoke.mjs"
   },
   "peerDependencies": {
     "react": "^18.3.0 || ^19.0.0",
@@ -36,6 +50,7 @@
     "react-stately": "^3.39.0"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
     "@axe-core/react": "^4.10.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -45,6 +60,7 @@
     "@vitest/coverage-v8": "^3.2.4",
     "axe-core": "^4.11.0",
     "jsdom": "^26.1.0",
+    "publint": "^0.3.12",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tsup": "^8.5.0",
@@ -53,6 +69,29 @@
     "vitest-axe": "^0.1.0"
   },
   "publishConfig": {
-    "access": "public"
-  }
+    "access": "public",
+    "provenance": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamuelDBines/bareframe.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://bareframe.org",
+  "bugs": {
+    "url": "https://github.com/SamuelDBines/bareframe/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "bareframe",
+    "react",
+    "components",
+    "design-system",
+    "accessibility",
+    "react-aria",
+    "ui",
+    "repkit"
+  ]
 }

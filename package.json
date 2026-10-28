@@ -2,7 +2,9 @@
   "description": "Lightweight, dependency-free Web Components for reusable app UI.",
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
+    "@changesets/cli": "^2.29.7",
     "@playwright/test": "^1.60.0",
+    "playwright": "^1.60.0",
     "@stencil/core": "^4.43.4",
     "@types/node": "^25.6.0",
     "esbuild": "^0.27.3",
@@ -67,6 +69,11 @@
     "prototype:dev": "pnpm --prefix prototype dev",
     "prototype:build": "pnpm run build:react && pnpm --prefix prototype install && pnpm test:react && BAREFRAME_PAGES_ROOT=1 pnpm --prefix prototype run build",
     "test:react": "pnpm --filter @bareframe/react test:coverage",
+    "react:pack-quality": "pnpm --filter @bareframe/react pack-quality",
+    "react:consumer-smoke": "pnpm --filter @bareframe/react consumer-smoke",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "node ./scripts/release-npm.mjs",
     "pages:finalize": "node ./scripts/finalize-pages.mjs",
     "typecheck": "tsc --noEmit",
     "watch": "node --watch --watch-path=src --watch-path=themes --watch-path=scripts --watch-path=stencil --watch-path=tsconfig.json ./scripts/build.mjs"

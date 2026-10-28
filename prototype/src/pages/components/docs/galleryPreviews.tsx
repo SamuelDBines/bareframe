@@ -58,27 +58,29 @@ export function galleryPreviewProps(entry: ComponentRegistryEntry): Record<strin
 		case 'toast':
 			return { variant: 'success', children: 'Published.' };
 		case 'pagination':
-			return { page: 2, total: 3 };
+			return { page: 2, total: 3, className: 'bf-pagination--gallery' };
 		case 'tabs':
 			return {
 				variant: 'line',
 				defaultValue: 'overview',
+				className: 'bf-tabs--gallery',
 				items: [
 					{ id: 'overview', label: 'Overview', content: 'Summary.' },
 					{ id: 'settings', label: 'Settings', content: 'Prefs.' },
 				],
 			};
 		case 'progress':
-			return { label: 'Upload', value: 45 };
+			return { label: 'Upload', value: 45, className: 'bf-progress--gallery' };
 		case 'spinner':
 			return { size: 'sm', label: 'Loading' };
 		case 'skeleton':
 			return { lines: 2 };
 		case 'breadcrumbs':
 			return {
+				className: 'bf-breadcrumbs--gallery',
 				items: [
 					{ href: '/', label: 'Home' },
-					{ label: 'Alert' },
+					{ label: 'Docs' },
 				],
 			};
 		case 'accordion':
@@ -95,8 +97,9 @@ export function galleryPreviewProps(entry: ComponentRegistryEntry): Record<strin
 		case 'empty-state':
 			return {
 				title: 'No projects',
-				description: 'Create one to get started.',
+				description: 'Create one to start.',
 				actionLabel: 'Create',
+				className: 'bf-empty--gallery',
 			};
 		case 'stat-card':
 			return { label: 'Active teams', value: '128', delta: '+12%' };
@@ -124,15 +127,35 @@ export function renderGalleryPreview(entry: ComponentRegistryEntry): ReactNode {
 	const props = galleryPreviewProps(entry);
 
 	switch (entry.slug) {
+		case 'pagination':
+			return (
+				<nav className="bf-pagination bf-pagination--gallery" aria-label="Pagination preview">
+					<button type="button" className="bf-pagination__chip">
+						‹
+					</button>
+					<button type="button" className="bf-pagination__chip">
+						1
+					</button>
+					<button type="button" className="bf-pagination__chip is-active" aria-current="page">
+						2
+					</button>
+					<button type="button" className="bf-pagination__chip">
+						3
+					</button>
+					<button type="button" className="bf-pagination__chip">
+						›
+					</button>
+				</nav>
+			);
 		case 'modal':
 			return (
 				<div className="docs-gallery-mock docs-gallery-mock--dialog" aria-hidden>
-					<div className="bf-modal docs-gallery-mock__panel">
+					<div className="docs-gallery-mock__panel bf-modal">
 						<header className="bf-modal__header">
 							<h3 className="bf-modal__title">Delete project?</h3>
 						</header>
 						<div className="bf-modal__body">
-							<p>This action cannot be undone.</p>
+							<p>This cannot be undone.</p>
 						</div>
 					</div>
 				</div>
@@ -140,12 +163,12 @@ export function renderGalleryPreview(entry: ComponentRegistryEntry): ReactNode {
 		case 'drawer':
 			return (
 				<div className="docs-gallery-mock docs-gallery-mock--drawer" aria-hidden>
-					<div className="bf-drawer docs-gallery-mock__panel">
+					<div className="docs-gallery-mock__panel bf-drawer">
 						<header className="bf-drawer__header">
 							<h3>Filters</h3>
 						</header>
 						<div className="bf-drawer__body">
-							<p>Status, owner, date</p>
+							<p>Status · owner</p>
 						</div>
 					</div>
 				</div>

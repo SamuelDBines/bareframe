@@ -428,6 +428,7 @@
 	background: var(--docs-surface);
 	overflow: visible;
 	box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+	position: relative;
 }
 
 .playground-frame__toolbar {
@@ -475,25 +476,46 @@
 }
 
 .playground-frame__canvas {
-	padding: 1.5rem 1.25rem;
-	min-height: 10rem;
+	padding: 1.5rem 1.25rem 12rem;
+	min-height: 14rem;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	transition: max-width 0.2s ease;
 	overflow: visible;
+	position: relative;
+}
+
+.playground-preview-content {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .playground-overlay-root {
-	position: relative;
-	width: 100%;
-	min-height: 8rem;
+	position: absolute;
+	inset: 0;
+	z-index: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	isolation: isolate;
+	pointer-events: none;
 }
 
+.playground-overlay-root:not(:empty) {
+	z-index: 30;
+}
+
+.playground-overlay-root > * {
+	pointer-events: auto;
+}
+
+.playground-overlay-root .bf-doc-modal-preview,
+.playground-overlay-root .bf-doc-drawer-preview,
 .playground-overlay-root .bf-popover-anchor,
 .playground-overlay-root .bf-doc-modal-preview,
 .playground-overlay-root .bf-doc-drawer-preview {
@@ -528,9 +550,32 @@
 .playground-overlay-root .bf-datepicker__popover,
 .playground-overlay-root .bf-popover,
 .playground-overlay-root .bf-dropdown__popover,
-.playground-overlay-root .bf-select-popover,
-.playground-overlay-root .bf-combobox__popover {
+.playground-overlay-root .bf-select-popover {
 	z-index: 30;
+}
+
+.playground-floating-portal {
+	position: fixed;
+	inset: 0;
+	z-index: 10000;
+	overflow: visible;
+	pointer-events: none;
+}
+
+.playground-floating-portal > * {
+	pointer-events: auto;
+}
+
+.playground-floating-portal .bf-combobox__popover {
+	max-height: min(11rem, 40vh);
+	overflow-y: auto;
+	animation: none;
+}
+
+.playground-frame .bf-combobox__popover,
+.playground-frame .bf-select-popover {
+	max-height: 11rem;
+	overflow-y: auto;
 }
 
 .bf-doc-toast-preview {
@@ -554,7 +599,6 @@
 	background: var(--docs-surface);
 	padding: 1rem;
 	position: relative;
-	z-index: 10000;
 }
 
 .playground-panel__title {

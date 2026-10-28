@@ -9,6 +9,13 @@ export function preview(page: Page) {
 	return page.getByTestId('playground-preview');
 }
 
+/** Playground listboxes portaled to `document.body` (still part of the same preview surface). */
+export function previewOverlays(page: Page) {
+	return page.locator(
+		'[data-testid="playground-preview"], [data-testid="playground-floating-portal"]',
+	);
+}
+
 export function panel(page: Page) {
 	return page.locator('.playground-panel');
 }
@@ -30,7 +37,7 @@ export async function expectExamplesSection(page: Page) {
 }
 
 export function isMobileProject(projectName: string) {
-	return projectName === 'chromium-mobile';
+	return projectName === 'chromium-mobile' || projectName === 'webkit-mobile';
 }
 
 export function isDesktopProject(projectName: string) {

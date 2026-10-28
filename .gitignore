@@ -7,5 +7,7 @@ prototype/public/themes
 /test-results/
 /playwright-report/
 /blob-report/
+/coverage/
+public/legacy/dist/
 
 /actionlint

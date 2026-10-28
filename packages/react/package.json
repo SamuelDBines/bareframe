@@ -45,7 +45,9 @@
   "dependencies": {
     "@internationalized/date": "^3.8.2",
     "@react-aria/i18n": "^3.12.10",
-    "react-aria-components": "^1.11.0"
+    "react-aria": "^3.41.0",
+    "react-aria-components": "^1.11.0",
+    "react-stately": "^3.39.0"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",

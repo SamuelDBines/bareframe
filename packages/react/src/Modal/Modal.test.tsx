@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -66,6 +66,38 @@ describe('Modal', () => {
 		expect(onOpenChange).toHaveBeenCalledWith(false);
 	});
 
+	it('full modal traps focus inside the dialog', async () => {
+		const user = userEvent.setup();
+		const outside = document.createElement('button');
+		outside.type = 'button';
+		outside.textContent = 'Outside control';
+		document.body.appendChild(outside);
+
+		render(
+			<Modal
+				isOpen
+				title="Confirm"
+				footer={
+					<>
+						<Button variant="ghost">Cancel</Button>
+						<Button variant="primary">OK</Button>
+					</>
+				}
+			>
+				Body
+			</Modal>,
+		);
+
+		const dialog = await screen.findByRole('dialog');
+
+		await user.tab();
+		expect(dialog.contains(document.activeElement)).toBe(true);
+		await user.tab();
+		expect(dialog.contains(document.activeElement)).toBe(true);
+		expect(outside).not.toHaveFocus();
+		outside.remove();
+	});
+
 	it('has no axe violations when open', async () => {
 		const { container } = render(
 			<Modal isOpen title="Title">
@@ -73,6 +105,73 @@ describe('Modal', () => {
 			</Modal>,
 		);
 		expect(await axe(container)).toHaveNoViolations();
+	});
+
+	it('marks page content inert when open as a full modal', async () => {
+		const outside = document.createElement('button');
+		outside.type = 'button';
+		outside.textContent = 'Outside';
+		document.body.appendChild(outside);
+
+		render(
+			<Modal isOpen title="Confirm">
+				Body
+			</Modal>,
+		);
+
+		await waitFor(() => {
+			expect(outside).toHaveAttribute('aria-hidden', 'true');
+		});
+		outside.remove();
+	});
+
+	it('contained mode leaves outside elements interactive and not inert', async () => {
+		const outside = document.createElement('button');
+		outside.type = 'button';
+		outside.textContent = 'Outside';
+		document.body.appendChild(outside);
+
+		render(
+			<Modal isOpen contained title="Preview">
+				Scoped
+			</Modal>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByRole('dialog')).toBeInTheDocument();
+		});
+		expect(document.querySelector('.bf-modal-overlay--contained')).toBeTruthy();
+		expect(outside).not.toHaveAttribute('inert');
+		expect(outside).not.toHaveAttribute('aria-hidden', 'true');
+
+		outside.remove();
+	});
+
+	it('contained mode keeps focus within the dialog', async () => {
+		const user = userEvent.setup();
+		render(
+			<>
+				<button type="button">Outside control</button>
+				<Modal
+					isOpen
+					contained
+					showCloseButton
+					title="Preview"
+					footer={<Button variant="primary">Done</Button>}
+				>
+					Scoped
+				</Modal>
+			</>,
+		);
+
+		const dialog = await screen.findByRole('dialog');
+		const outside = screen.getByRole('button', { name: 'Outside control' });
+
+		await user.tab();
+		expect(dialog.contains(document.activeElement)).toBe(true);
+		await user.tab();
+		expect(dialog.contains(document.activeElement)).toBe(true);
+		expect(outside).not.toHaveFocus();
 	});
 });
 
@@ -93,5 +192,24 @@ describe('Drawer', () => {
 			</Drawer>,
 		);
 		expect(await axe(container)).toHaveNoViolations();
+	});
+
+	it('contained mode does not inert outside content', async () => {
+		const outside = document.createElement('button');
+		outside.type = 'button';
+		outside.textContent = 'Outside';
+		document.body.appendChild(outside);
+
+		render(
+			<Drawer isOpen contained title="Panel">
+				Body
+			</Drawer>,
+		);
+
+		await waitFor(() => {
+			expect(screen.getByRole('dialog')).toBeInTheDocument();
+		});
+		expect(outside).not.toHaveAttribute('inert');
+		outside.remove();
 	});
 });

@@ -5,6 +5,7 @@ import {
 	openComponent,
 	panel,
 	preview,
+	previewOverlays,
 	setPreviewColorMode,
 } from './docs-helpers';
 
@@ -58,35 +59,68 @@ test.describe('Overlay interactions', () => {
 		await expect(page.getByRole('menu')).toBeVisible();
 	});
 
-	test('Select: listbox opens and Value control updates selection', async ({ page }) => {
+	test('Select: listbox opens and Value control updates selection', async ({ page }, testInfo) => {
 		await openComponent(page, 'select');
-		await preview(page).getByRole('button').click();
+		const trigger = preview(page).getByRole('button');
+		await trigger.click();
 		await expect(page.getByRole('listbox')).toBeVisible();
-		await page.getByRole('option', { name: 'Option B' }).click();
+		if (isMobileProject(testInfo.project.name)) {
+			await page.getByRole('option', { name: 'Option B' }).tap();
+		} else {
+			await page.keyboard.press('ArrowDown');
+			await page.keyboard.press('Enter');
+		}
 		await expect(preview(page).getByRole('button')).toContainText('Option B');
 		await panel(page).getByLabel('Value').selectOption('c');
 		await expect(preview(page).getByRole('button')).toContainText('Option C');
 	});
 
 	test('Combobox: type and pick option', async ({ page }, testInfo) => {
-		await openComponent(page, 'combobox');
-		const input = preview(page).getByRole('combobox');
-		await input.fill('Vue');
-		const option = page.getByRole('option', { name: 'Vue' });
 		if (isMobileProject(testInfo.project.name)) {
-			await option.click({ force: true });
-		} else {
-			await option.click();
+			test.setTimeout(90_000);
 		}
-		await expect(input).toHaveValue('Vue');
+		await openComponent(page, 'combobox');
+		const input = preview(page).getByRole('combobox', { name: 'Framework' });
+		await input.scrollIntoViewIfNeeded();
+		const overlay = previewOverlays(page);
+
+		if (isMobileProject(testInfo.project.name)) {
+			await input.tap();
+			await input.pressSequentially('Vue', { delay: 40 });
+			await expect(async () => {
+				const listbox = page.getByRole('listbox');
+				await expect(listbox).toBeVisible();
+				const vue = overlay.getByRole('option', { name: 'Vue' });
+				await expect(vue).toBeVisible();
+				if (testInfo.project.name === 'webkit-mobile') {
+					await vue.scrollIntoViewIfNeeded();
+				} else {
+					expect((await vue.boundingBox())?.width ?? 0).toBeGreaterThan(50);
+				}
+				await vue.tap({ timeout: 10_000 });
+				await expect(input).toHaveValue('Vue');
+			}).toPass({ timeout: 45_000 });
+		} else {
+			await input.fill('Vue');
+			const option = overlay.getByRole('option', { name: 'Vue' });
+			await expect(option).toBeVisible();
+			await option.click();
+			await expect(input).toHaveValue('Vue');
+		}
 		await setPreviewColorMode(page, 'dark');
 		await expect(input).toBeVisible();
 	});
 
-	test('MultiSelect: adds a chip via listbox', async ({ page }) => {
+	test('MultiSelect: adds a chip via listbox', async ({ page }, testInfo) => {
 		await openComponent(page, 'multiselect');
-		await preview(page).getByRole('button').click();
-		await page.getByRole('option', { name: 'Design' }).click();
+		const trigger = preview(page).getByRole('button');
+		if (isMobileProject(testInfo.project.name)) {
+			await trigger.tap();
+			await page.getByRole('option', { name: 'Design' }).tap();
+		} else {
+			await trigger.click();
+			await page.getByRole('option', { name: 'Design' }).click();
+		}
 		await expect(preview(page).getByText('Design')).toBeVisible();
 	});
 });

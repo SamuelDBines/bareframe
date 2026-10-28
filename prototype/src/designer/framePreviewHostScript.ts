@@ -26,6 +26,7 @@ export function framePreviewHostScript(): string {
       deltaMode: e.deltaMode,
       ctrlKey: e.ctrlKey,
       metaKey: e.metaKey,
+      shiftKey: e.shiftKey,
       clientX: e.clientX,
       clientY: e.clientY,
     });
@@ -60,17 +61,22 @@ export function framePreviewHostScript(): string {
 
   var panActive = false;
   function shouldPan(e) {
-    return e.getModifierState(' ') || e.button === 1;
+    return e.getModifierState(' ') || e.button === 1 || (e.buttons & 4) === 4;
+  }
+  function beginPan(e) {
+    panActive = true;
+    post({ type: 'pan', phase: 'start', clientX: e.clientX, clientY: e.clientY, button: e.button });
   }
   function onPointerDown(e) {
     if (!shouldPan(e)) return;
     e.preventDefault();
     e.stopPropagation();
-    panActive = true;
-    try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
-    post({ type: 'pan', phase: 'start', clientX: e.clientX, clientY: e.clientY, button: e.button });
+    beginPan(e);
   }
   function onPointerMove(e) {
+    if (!panActive && shouldPan(e) && e.buttons > 0) {
+      beginPan(e);
+    }
     if (!panActive) return;
     e.preventDefault();
     post({ type: 'pan', phase: 'move', clientX: e.clientX, clientY: e.clientY, button: e.button });

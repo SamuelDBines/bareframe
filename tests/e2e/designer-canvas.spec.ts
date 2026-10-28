@@ -79,6 +79,116 @@ test.describe('designer canvas', () => {
 		await expect(page.locator('.infinite-canvas')).not.toHaveClass(/infinite-canvas--space-pan/);
 	});
 
+	test('middle-drag across frame iframes keeps moving camera left (no pan wall)', async ({ page }) => {
+		await page.setViewportSize({ width: 1280, height: 800 });
+		const readCamX = () =>
+			page.evaluate(() => {
+				const m = document.querySelector('.canvas-world')?.style.transform?.match(/translate\(([-0-9.]+)px/);
+				return m ? parseFloat(m[1]) : 0;
+			});
+		const iframe = page.locator('.frame-preview-iframe').first();
+		const iframeBox = await iframe.boundingBox();
+		expect(iframeBox).toBeTruthy();
+		const startX = await readCamX();
+		await page.mouse.move(iframeBox!.x + 80, iframeBox!.y + 120);
+		await page.mouse.down({ button: 'middle' });
+		const samples: number[] = [];
+		for (let i = 0; i < 28; i++) {
+			await page.mouse.move(iframeBox!.x + 80 - i * 32, iframeBox!.y + 120);
+			samples.push(await readCamX());
+		}
+		await page.mouse.up({ button: 'middle' });
+		const endX = await readCamX();
+		expect(endX).toBeLessThan(startX - 400);
+		const tail = samples.slice(-10);
+		expect(Math.max(...tail) - Math.min(...tail)).toBeGreaterThan(80);
+	});
+
+	test('wheel inside rightmost frame keeps decreasing camera x', async ({ page }) => {
+		await page.setViewportSize({ width: 1280, height: 800 });
+		const readCamX = () =>
+			page.evaluate(() => {
+				const m = document.querySelector('.canvas-world')?.style.transform?.match(/translate\(([-0-9.]+)px/);
+				return m ? parseFloat(m[1]) : 0;
+			});
+		const startX = await readCamX();
+		await page.frameLocator('.frame-preview-iframe').first().locator('body').evaluate((body) => {
+			for (let i = 0; i < 20; i++) {
+				body.dispatchEvent(
+					new WheelEvent('wheel', {
+						bubbles: true,
+						cancelable: true,
+						deltaX: 120,
+						deltaY: 0,
+						clientX: 120,
+						clientY: 200,
+					}),
+				);
+			}
+		});
+		const endX = await readCamX();
+		expect(endX).toBeLessThan(startX - 300);
+	});
+
+	test('wheel at canvas-inspector edge: shift+line, line horizontal, page deltaMode', async ({ page }) => {
+		await page.setViewportSize({ width: 1280, height: 800 });
+		const readCamX = () =>
+			page.evaluate(() => {
+				const m = document.querySelector('.canvas-world')?.style.transform?.match(/translate\(([-0-9.]+)px/);
+				return m ? parseFloat(m[1]) : 0;
+			});
+
+		const dispatchOnCanvasRightEdge = async (detail: {
+			deltaX?: number;
+			deltaY?: number;
+			deltaMode?: number;
+			shiftKey?: boolean;
+		}) => {
+			await page.evaluate((d) => {
+				const canvas = document.querySelector('.infinite-canvas');
+				if (!canvas) return;
+				const r = canvas.getBoundingClientRect();
+				canvas.dispatchEvent(
+					new WheelEvent('wheel', {
+						bubbles: true,
+						cancelable: true,
+						clientX: r.right - 10,
+						clientY: r.top + r.height / 2,
+						deltaX: d.deltaX ?? 0,
+						deltaY: d.deltaY ?? 0,
+						deltaMode: d.deltaMode ?? 0,
+						shiftKey: Boolean(d.shiftKey),
+					}),
+				);
+			}, detail);
+		};
+
+		const start = await readCamX();
+		for (let i = 0; i < 10; i++) {
+			await dispatchOnCanvasRightEdge({ deltaY: 4, deltaX: 0, deltaMode: 1, shiftKey: true });
+		}
+		expect(await readCamX()).toBeLessThan(start - 80);
+
+		const startLineX = await readCamX();
+		for (let i = 0; i < 10; i++) {
+			await dispatchOnCanvasRightEdge({ deltaX: 3, deltaY: 0, deltaMode: 1 });
+		}
+		expect(await readCamX()).toBeLessThan(startLineX - 80);
+
+		const startPage = await readCamX();
+		await dispatchOnCanvasRightEdge({ deltaX: 1, deltaY: 0, deltaMode: 2 });
+		expect(await readCamX()).toBeLessThan(startPage - 200);
+
+		const metrics = await page.evaluate(() => ({
+			scrollX: window.scrollX,
+			overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+			bodyOverflowX: getComputedStyle(document.body).overflowX,
+		}));
+		expect(metrics.scrollX).toBe(0);
+		expect(metrics.overflow).toBe(false);
+		expect(['clip', 'hidden']).toContain(metrics.bodyOverflowX);
+	});
+
 	test('no horizontal document scroll after canvas wheel gestures', async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 });
 		const canvas = page.locator('.infinite-canvas');

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, type RefObject } from 'react';
 import { applyCanvasGestureScale, applyCanvasWheel } from './canvasInputHandlers';
+import { cameraForPan } from './canvasPanSession';
 import type { Camera } from './camera';
 import { FRAME_PREVIEW_MESSAGE_SOURCE } from './framePreviewHostScript';
 
@@ -96,14 +97,24 @@ export function useDesignerCanvasInput({
 	);
 
 	const handleWheelAtScreen = useCallback(
-		(clientX: number, clientY: number, deltaX: number, deltaY: number, ctrlKey: boolean) => {
+		(
+			clientX: number,
+			clientY: number,
+			deltaX: number,
+			deltaY: number,
+			ctrlKey: boolean,
+			options?: { deltaMode?: number; shiftKey?: boolean },
+		) => {
 			const { left, top } = canvasOrigin();
 			const next = applyCanvasWheel(liveCameraRef.current, left, top, {
 				clientX,
 				clientY,
 				deltaX,
 				deltaY,
+				deltaMode: options?.deltaMode,
+				shiftKey: options?.shiftKey,
 				ctrlKey,
+				pageSize: window.innerHeight,
 			});
 			commitCamera(next);
 		},
@@ -232,15 +243,20 @@ export function useDesignerCanvasInput({
 		const onWheel = (e: WheelEvent) => {
 			if (!document.body.classList.contains('designer-editor-active')) return;
 
-			if (Math.abs(e.deltaX) > 0 && !isInDesignerPanel(e.target)) {
-				e.preventDefault();
+			const overCanvas = isOverCanvas(e.clientX, e.clientY);
+
+			if (!overCanvas) {
+				if (Math.abs(e.deltaX) > 0 && !isInDesignerPanel(e.target)) {
+					e.preventDefault();
+				}
+				return;
 			}
 
-			if (!isOverCanvas(e.clientX, e.clientY)) return;
-			if (isInDesignerPanel(e.target)) return;
-
 			e.preventDefault();
-			handleWheelAtScreen(e.clientX, e.clientY, e.deltaX, e.deltaY, e.ctrlKey);
+			handleWheelAtScreen(e.clientX, e.clientY, e.deltaX, e.deltaY, e.ctrlKey, {
+				deltaMode: e.deltaMode,
+				shiftKey: e.shiftKey,
+			});
 		};
 
 		window.addEventListener('wheel', onWheel, { passive: false, capture: true });
@@ -256,7 +272,10 @@ export function useDesignerCanvasInput({
 			if (data.type === 'wheel') {
 				const pt = toScreenPoint(e.source, data.clientX, data.clientY);
 				if (!pt) return;
-				handleWheelAtScreen(pt.x, pt.y, data.deltaX, data.deltaY, Boolean(data.ctrlKey));
+				handleWheelAtScreen(pt.x, pt.y, data.deltaX, data.deltaY, Boolean(data.ctrlKey), {
+					deltaMode: data.deltaMode,
+					shiftKey: Boolean(data.shiftKey),
+				});
 				return;
 			}
 
@@ -302,11 +321,7 @@ export function useDesignerCanvasInput({
 				const pan = iframePanRef.current;
 				if (!pan) return;
 				if (data.phase === 'move') {
-					commitCamera({
-						...liveCameraRef.current,
-						x: pan.camX + (pt.x - pan.startX),
-						y: pan.camY + (pt.y - pan.startY),
-					});
+					commitCamera(cameraForPan(pan, pt.x, pt.y, liveCameraRef.current));
 					return;
 				}
 				if (data.phase === 'end') {

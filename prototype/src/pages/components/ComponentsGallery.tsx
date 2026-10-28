@@ -3,39 +3,7 @@ import { Link } from 'react-router-dom';
 import { COMPONENT_REGISTRY } from '../../components/library/registry';
 import { useDocPageToc } from './docs/DocsShell';
 import { GalleryPreviewScaler } from './docs/GalleryPreviewScaler';
-
-const DEMO_OPTIONS = [{ value: 'a', label: 'Option A' }];
-
-function galleryPreviewProps(entry: (typeof COMPONENT_REGISTRY)[number]) {
-	const props: Record<string, unknown> = { ...entry.defaultProps };
-	if (['select', 'combobox', 'multiselect', 'native-select'].includes(entry.slug)) {
-		props.options = props.options ?? DEMO_OPTIONS;
-		props['aria-label'] = entry.name;
-	}
-	if (entry.slug === 'calendar' || entry.slug === 'datepicker') {
-		props.label = props.label ?? entry.name;
-	}
-	if (entry.slug === 'toast') {
-		const msg = props.message ?? 'Saved successfully.';
-		props.children = props.children ?? msg;
-		delete props.message;
-	}
-	if (entry.slug === 'pagination') {
-		props.total = 3;
-		props.page = 2;
-	}
-	if (entry.slug === 'tabs') {
-		props.items = [
-			{ id: 'overview', label: 'Overview', content: 'Summary content.' },
-			{ id: 'settings', label: 'Settings', content: 'Preferences.' },
-		];
-	}
-	if (entry.slug === 'progress') {
-		props.label = 'Upload';
-		props.value = 45;
-	}
-	return props;
-}
+import { renderGalleryPreview } from './docs/galleryPreviews';
 
 const CATEGORIES = [...new Set(COMPONENT_REGISTRY.map((c) => c.category))].sort();
 
@@ -105,7 +73,7 @@ export function ComponentsGallery() {
 			<div className="docs-gallery-grid">
 				{filtered.map((entry) => (
 					<Link key={entry.slug} to={`/components/${entry.slug}`} className="docs-gallery-card">
-						<GalleryPreviewScaler>{entry.render(galleryPreviewProps(entry))}</GalleryPreviewScaler>
+						<GalleryPreviewScaler>{renderGalleryPreview(entry)}</GalleryPreviewScaler>
 						<div className="docs-gallery-card__body">
 							<div className="docs-gallery-card__row">
 								<h3>{entry.name}</h3>

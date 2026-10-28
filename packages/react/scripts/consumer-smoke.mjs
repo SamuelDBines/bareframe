@@ -3,14 +3,8 @@
  * Installs the packed tarball in a throwaway Vite app outside the workspace
  * and verifies typecheck + production build with several components.
  */
-import { execSync } from 'node:child_process';
-import {
-	cpSync,
-	mkdirSync,
-	readFileSync,
-	rmSync,
-	writeFileSync,
-} from 'node:fs';
+import { execSync, spawnSync } from 'node:child_process';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -44,16 +38,11 @@ writeFileSync(join(appDir, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`)
 
 execSync('npm install', { cwd: appDir, stdio: 'inherit' });
 
-const themesDir = join(appDir, 'src', 'themes');
-mkdirSync(themesDir, { recursive: true });
-cpSync(join(repoRoot, 'themes', 'layout.css'), join(themesDir, 'layout.css'));
-cpSync(join(repoRoot, 'themes', 'light.css'), join(themesDir, 'light.css'));
-
 writeFileSync(
 	join(appDir, 'src', 'App.tsx'),
 	`import { useState } from 'react';
 import '@bareframe/react/styles.css';
-import './themes/light.css';
+import '@bareframe/react/themes/light.css';
 import {
 	Alert,
 	Badge,
@@ -77,7 +66,7 @@ export default function App() {
 			<h1>Bareframe consumer smoke</h1>
 			<Alert variant="info">Packed tarball import works.</Alert>
 			<Badge>New</Badge>
-			<Button onPress={() => setOpen(true)}>Open modal</Button>
+			<Button data-testid="smoke-primary-btn" onPress={() => setOpen(true)}>Open modal</Button>
 			<Input aria-label="Name" placeholder="Ada" />
 			<Select aria-label="Pick one" options={options} defaultSelectedKey="a" />
 			<Combobox label="Search" options={options} />
@@ -118,7 +107,18 @@ if (!distCss) {
 }
 const css = readFileSync(join(appDir, distCss), 'utf8');
 if (!css.includes('.bf-btn') && !css.includes('--bf-theme')) {
-	console.warn('consumer-smoke: CSS bundle may be missing Bareframe rules (check sideEffects)');
+	throw new Error('consumer-smoke: Vite bundle missing Bareframe component CSS');
 }
 
-console.log('consumer-smoke: typecheck and Vite build passed');
+execSync('pnpm exec playwright install chromium', { cwd: repoRoot, stdio: 'inherit' });
+
+const themeAssert = spawnSync(
+	process.execPath,
+	[join(scriptDir, 'consumer-theme-assert.mjs'), appDir, repoRoot],
+	{ stdio: 'inherit', env: process.env },
+);
+if (themeAssert.status !== 0) {
+	process.exit(themeAssert.status ?? 1);
+}
+
+console.log('consumer-smoke: typecheck, Vite build, and theme styling checks passed');

@@ -1,6 +1,6 @@
 # @bareframe/react
 
-Accessible React components for [Bareframe](https://bareframe.org) design systems. Components use **CSS theme tokens** (`--bf-theme-*`) and ship legacy **`--rk-*` aliases** for Repkit compatibility.
+Accessible React components for [Bareframe](https://bareframe.org) design systems. Components use **CSS theme tokens** (`--bf-theme-*`). **`@bareframe/react/styles.css`** also defines legacy **Repkit `--rk-*` aliases** that point at the same tokens.
 
 Docs and live examples: [bareframe.org](https://bareframe.org)
 
@@ -18,18 +18,42 @@ Peer dependencies: **React 18.3+ or 19**.
 
 ## Styles and themes
 
-1. Import the component stylesheet (required):
+The package is **self-contained**: themes ship inside the npm tarball. You do not need a checkout of the bareframe repo.
+
+### 1. Component styles (required)
 
 ```tsx
 import '@bareframe/react/styles.css';
 ```
 
-2. Load a Bareframe **theme** CSS file (defines `--bf-theme-*` and optional `--rk-*` aliases). Themes live in the main repo under [`themes/`](https://github.com/SamuelDBines/bareframe/tree/main/themes) (for example `themes/light.css`, `themes/system.css`).
+This file includes component rules and Repkit legacy variable aliases (`--rk-theme-*` → `--bf-theme-*`).
+
+### 2. Theme tokens (required)
+
+Pick a built-in theme (tokens only — import **after** `styles.css`):
 
 ```tsx
 import '@bareframe/react/styles.css';
-import './themes/light.css'; // copy or link from the bareframe repo
+import '@bareframe/react/themes/light.css';
 ```
+
+Shortcut for the default light theme:
+
+```tsx
+import '@bareframe/react/styles.css';
+import '@bareframe/react/theme.css'; // same as themes/light.css
+```
+
+**Shipped themes** (each under `@bareframe/react/themes/<name>.css`):
+
+| Theme | Import |
+|--------|--------|
+| Light (default) | `@bareframe/react/themes/light.css` or `@bareframe/react/theme.css` |
+| Dark | `@bareframe/react/themes/dark.css` |
+| System (light/dark) | `@bareframe/react/themes/system.css` |
+| Aurora, Desert, Future, Matrix, Modern, Nature, Nebula, Noir, Oceanic, Retro, Simple, Sprint, Sunrise | `@bareframe/react/themes/<name>.css` |
+
+`layout.css` is included for `@import` resolution inside theme files; you normally import a named theme, not `layout.css` alone.
 
 Optionally scope a subtree:
 
@@ -37,11 +61,21 @@ Optionally scope a subtree:
 <div data-bf-theme="dark">...</div>
 ```
 
+Then import the matching theme file (e.g. `themes/dark.css`).
+
+### Repkit legacy tokens
+
+Repkit apps can keep using `--rk-theme-*` custom properties. They are defined in `styles.css` and resolve once a theme sets the underlying `--bf-theme-*` values:
+
+```css
+--rk-theme-button-primary-bg: var(--bf-theme-button-primary-bg);
+```
+
 ## Quick usage
 
 ```tsx
 import '@bareframe/react/styles.css';
-import './themes/light.css';
+import '@bareframe/react/themes/light.css';
 import { Alert, Badge, Button, Input, Modal, Select } from '@bareframe/react';
 
 export function Example() {
@@ -86,6 +120,14 @@ cd /path/to/niproround/frontend
 npm install /tmp/bareframe-react-0.1.0.tgz
 ```
 
+In the app:
+
+```tsx
+import '@bareframe/react/styles.css';
+import '@bareframe/react/themes/light.css';
+import { Button } from '@bareframe/react';
+```
+
 Re-run `pnpm pack` in bareframe after you pull library changes.
 
 ### Option B — `pnpm link`
@@ -101,13 +143,7 @@ cd /path/to/niproround/frontend
 pnpm link --global @bareframe/react
 ```
 
-You still need `import '@bareframe/react/styles.css'` and a theme file in the app.
-
-### Option C — monorepo `workspace:` (if both repos were one pnpm workspace)
-
-Not applicable to separate repos; use A or B.
-
-### Option D — path dependency
+### Option C — path dependency
 
 In niproround `package.json`:
 
@@ -123,8 +159,10 @@ Run `pnpm install`, then ensure `packages/react` is built (`pnpm --filter @baref
 pnpm --filter @bareframe/react test:coverage
 pnpm --filter @bareframe/react build
 pnpm --filter @bareframe/react pack-quality    # publint + attw
-pnpm --filter @bareframe/react consumer-smoke  # external Vite tarball test
+pnpm --filter @bareframe/react consumer-smoke  # external Vite tarball + theme assert
 ```
+
+Themes in `dist/themes/` are copied from the repo root `themes/` during `pnpm build`.
 
 ## Publishing
 

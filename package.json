@@ -4,6 +4,7 @@
     "@axe-core/playwright": "^4.11.3",
     "@changesets/cli": "^2.29.7",
     "@playwright/test": "^1.60.0",
+    "playwright": "^1.60.0",
     "@stencil/core": "^4.43.4",
     "@types/node": "^25.6.0",
     "esbuild": "^0.27.3",

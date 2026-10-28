@@ -1,0 +1,9 @@
+import { Tooltip } from '@bareframe/react';
+
+export default function Example() {
+  return (
+    <div data-bf-theme="dark">
+      <Tooltip content="Experimental feature">Labs</Tooltip>
+    </div>
+  );
+}

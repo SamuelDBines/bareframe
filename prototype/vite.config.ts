@@ -43,6 +43,22 @@ export default defineConfig({
 	build: {
 		outDir: path.join(repoRoot, 'public', 'prototype'),
 		emptyOutDir: true,
+		rollupOptions: {
+			output: {
+				manualChunks(id) {
+					if (id.includes('react-aria-components') || id.includes('@react-aria')) {
+						return 'react-aria';
+					}
+					if (id.includes('/docs/examples/')) {
+						const match = id.match(/docs\/examples\/([^/]+)\//);
+						if (match) return `doc-examples-${match[1]}`;
+					}
+					if (id.includes('/components/library/registry')) {
+						return 'component-registry';
+					}
+				},
+			},
+		},
 	},
 	server: {
 		open: '/',

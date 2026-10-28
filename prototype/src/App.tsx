@@ -1,6 +1,9 @@
+import { Suspense, lazy } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
-import { ComponentDetailPage } from './pages/components/ComponentDetail';
+const ComponentDetailPage = lazy(() =>
+	import('./pages/components/ComponentDetail').then((m) => ({ default: m.ComponentDetailPage })),
+);
 import { ComponentsGallery } from './pages/components/ComponentsGallery';
 import { ComponentsLayout } from './pages/components/ComponentsLayout';
 import { GettingStartedPage } from './pages/components/GettingStartedPage';
@@ -36,7 +39,11 @@ export default function App() {
 							<Route path="tokens" element={<TokensPage />} />
 							<Route path="mcp" element={<McpPage />} />
 							<Route path="start" element={<GettingStartedPage />} />
-							<Route path=":slug" element={<ComponentDetailPage />} />
+							<Route path=":slug" element={
+								<Suspense fallback={<p className="card">Loading component docs…</p>}>
+									<ComponentDetailPage />
+								</Suspense>
+							} />
 						</Route>
 
 						<Route path="designer" element={<DesignerLayout />}>

@@ -18,6 +18,7 @@ Point these hostnames at the ingress load balancer (A record → `159.89.249.41`
 | `www.bareframe.org` | 301 → `https://bareframe.org` |
 | `bareframe.co.uk` | 301 → `https://bareframe.org` |
 | `www.bareframe.co.uk` | 301 → `https://bareframe.org` |
+| `mcp.bareframe.dev` | Hosted MCP (`/v1`) |
 
 ## API (GitHub sign-in)
 
@@ -92,6 +93,19 @@ docker compose up --build
 
 For the Vite prototype, `pnpm dev` proxies `/api` to `http://127.0.0.1:8080` (override with `BAREFRAME_API_PROXY`).
 
+## MCP (agents)
+
+The `mcp/` service exposes read-only MCP tools at **`https://mcp.bareframe.dev/v1`**. Image: `ghcr.io/samueldbines/bareframe/mcp`.
+
+### Kubernetes secret `bareframe-mcp-env`
+
+```bash
+kubectl create secret generic bareframe-mcp-env -n bareframe \
+  --from-literal=BAREFRAME_MCP_TOKENS='[{"id":"cursor","token":"REPLACE_ME","scopes":["components:read","themes:read"]}]'
+```
+
+See [`docs/MCP-MIGRATION.md`](../docs/MCP-MIGRATION.md) for client configuration and scope mapping.
+
 ## CI deploy
 
 Workflow: [`.github/workflows/deploy-k8s.yml`](../.github/workflows/deploy-k8s.yml)
@@ -99,7 +113,7 @@ Workflow: [`.github/workflows/deploy-k8s.yml`](../.github/workflows/deploy-k8s.y
 On push to `main` (and `workflow_dispatch`):
 
 1. Build and push `ghcr.io/samueldbines/bareframe/site` and `ghcr.io/samueldbines/bareframe/api` with tags `sha-<7-char-commit>` and `latest`.
-2. If the repo secret **`DIGITALOCEAN_ACCESS_TOKEN`** is set, deploy with `kubectl apply -k deploy/k8s` and wait for rollout of `bareframe-site` and `bareframe-api`.
+2. If the repo secret **`DIGITALOCEAN_ACCESS_TOKEN`** is set, deploy with `kubectl apply -k deploy/k8s` and wait for rollout of `bareframe-site`, `bareframe-api`, and `bareframe-mcp`.
 
 If the secret is missing, the deploy job skips and **main stays green**; image build/push still runs.
 
@@ -123,6 +137,7 @@ kustomize edit set image ghcr.io/samueldbines/bareframe/site=ghcr.io/samueldbine
 kubectl apply -k deploy/k8s
 kubectl rollout status deployment/bareframe-site -n bareframe --timeout=180s
 kubectl rollout status deployment/bareframe-api -n bareframe --timeout=180s
+kubectl rollout status deployment/bareframe-mcp -n bareframe --timeout=180s
 ```
 
 Preview rendered manifests without applying:

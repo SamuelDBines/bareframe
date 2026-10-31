@@ -65,6 +65,13 @@ export function McpPage() {
 					</table>
 				</div>
 			</section>
+			<p style={{ marginTop: '1.5rem' }}>
+				Migrating from HTML scraping? See the{' '}
+				<a href="https://github.com/SamuelDBines/bareframe/blob/main/docs/MCP-MIGRATION.md">
+					MCP migration guide
+				</a>
+				.
+			</p>
 		</>
 	);
 }

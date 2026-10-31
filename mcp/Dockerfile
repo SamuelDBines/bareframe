@@ -5,7 +5,11 @@ WORKDIR /repo
 
 COPY dist/manifest.json dist/tokens.json ./dist/
 COPY themes ./themes
+COPY docs ./docs
 COPY prototype/src/components/library/generated-props.json ./prototype/src/components/library/generated-props.json
+COPY prototype/src/docs/examples ./prototype/src/docs/examples
+COPY packages/react/README.md ./packages/react/README.md
+COPY packages/react/src/styles/bareframe-ui.css ./packages/react/src/styles/bareframe-ui.css
 COPY package.json ./package.json
 
 COPY mcp/package.json mcp/package-lock.json ./mcp/

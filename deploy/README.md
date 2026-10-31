@@ -19,6 +19,8 @@ Point these hostnames at the ingress load balancer (A record → `159.89.249.41`
 | `bareframe.co.uk` | 301 → `https://bareframe.org` |
 | `www.bareframe.co.uk` | 301 → `https://bareframe.org` |
 
+MCP is served on the **same host** at `https://bareframe.org/mcp` (no extra DNS).
+
 ## API (GitHub sign-in)
 
 The `api/` service handles first-party auth at `https://bareframe.org/api/*` (same origin as the static site). Image: `ghcr.io/samueldbines/bareframe/api`.
@@ -92,14 +94,24 @@ docker compose up --build
 
 For the Vite prototype, `pnpm dev` proxies `/api` to `http://127.0.0.1:8080` (override with `BAREFRAME_API_PROXY`).
 
+## MCP (agents)
+
+The `mcp/` service exposes a **public read-only** MCP server at **`https://bareframe.org/mcp`**. Image: `ghcr.io/samueldbines/bareframe/mcp`.
+
+Routing is on the main `bareframe.org` Ingress (`/mcp` → `bareframe-mcp` Service). Health check: `https://bareframe.org/mcp/healthz`.
+
+No Kubernetes secret is required (no bearer tokens). Rate limits are configured on the Deployment via `BAREFRAME_MCP_RATE_MAX` and `BAREFRAME_MCP_RATE_WINDOW_MS`.
+
+Docs: [`docs/MIGRATING-TO-BAREFRAME-REACT.md`](../docs/MIGRATING-TO-BAREFRAME-REACT.md) · site page `#/components/mcp`
+
 ## CI deploy
 
 Workflow: [`.github/workflows/deploy-k8s.yml`](../.github/workflows/deploy-k8s.yml)
 
 On push to `main` (and `workflow_dispatch`):
 
-1. Build and push `ghcr.io/samueldbines/bareframe/site` and `ghcr.io/samueldbines/bareframe/api` with tags `sha-<7-char-commit>` and `latest`.
-2. If the repo secret **`DIGITALOCEAN_ACCESS_TOKEN`** is set, deploy with `kubectl apply -k deploy/k8s` and wait for rollout of `bareframe-site` and `bareframe-api`.
+1. Build and push `ghcr.io/samueldbines/bareframe/site`, `ghcr.io/samueldbines/bareframe/api`, and `ghcr.io/samueldbines/bareframe/mcp` with tags `sha-<7-char-commit>` and `latest`.
+2. If the repo secret **`DIGITALOCEAN_ACCESS_TOKEN`** is set, deploy with `kubectl apply -k deploy/k8s` and wait for rollout of `bareframe-site`, `bareframe-api`, and `bareframe-mcp`.
 
 If the secret is missing, the deploy job skips and **main stays green**; image build/push still runs.
 
@@ -123,6 +135,7 @@ kustomize edit set image ghcr.io/samueldbines/bareframe/site=ghcr.io/samueldbine
 kubectl apply -k deploy/k8s
 kubectl rollout status deployment/bareframe-site -n bareframe --timeout=180s
 kubectl rollout status deployment/bareframe-api -n bareframe --timeout=180s
+kubectl rollout status deployment/bareframe-mcp -n bareframe --timeout=180s
 ```
 
 Preview rendered manifests without applying:

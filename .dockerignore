@@ -2,7 +2,9 @@
 .github
 **/.git
 **/node_modules
-dist
+dist/*
+!dist/manifest.json
+!dist/tokens.json
 public/prototype
 public/CNAME
 public/.nojekyll

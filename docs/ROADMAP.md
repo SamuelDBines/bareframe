@@ -34,3 +34,9 @@ This file tracks phased progress; update checkboxes when a phase exits.
 - [x] Deep link `?component=<slug>` in Component Studio
 - [x] Optional: broaden visual snapshots (opt-in via `VISUAL=1`; see `tests/e2e/visual.spec.ts`)
 
+## Phase 6 — Agent MCP (read path)
+
+- [x] Hosted MCP server (`mcp/`) with `list_components`, `get_component`, `list_themes`, `export_tokens`
+- [x] Kubernetes manifests + CI image build for `ghcr.io/samueldbines/bareframe/mcp`
+- [x] [`docs/MIGRATING-TO-BAREFRAME-REACT.md`](./MIGRATING-TO-BAREFRAME-REACT.md) + public MCP at `https://bareframe.org/mcp`
+

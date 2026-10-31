@@ -14,7 +14,7 @@ Links:
 - GitHub Pages examples: https://samueldbines.github.io/bareframe/
 - **[Component Studio](https://samueldbines.github.io/bareframe/showcase/)** (after deploy)
 
-**Docs:** [Vision](docs/VISION.md) · [Roadmap](docs/ROADMAP.md) · [Themes](docs/THEMES.md) · [Component contract](docs/COMPONENT-CONTRACT.md) · [Tiering](docs/TIERING.md) · [Studio fidelity](docs/STUDIO-FIDELITY.md) · [Testing](docs/TESTING.md)
+**Docs:** [Vision](docs/VISION.md) · [Roadmap](docs/ROADMAP.md) · [Themes](docs/THEMES.md) · [Component contract](docs/COMPONENT-CONTRACT.md) · [Tiering](docs/TIERING.md) · [Studio fidelity](docs/STUDIO-FIDELITY.md) · [Testing](docs/TESTING.md) · [Migrating to @bareframe/react](docs/MIGRATING-TO-BAREFRAME-REACT.md)
 
 ![Tests](https://github.com/SamuelDBines/bareframe/actions/workflows/test.yml/badge.svg)
 

@@ -103,10 +103,12 @@ describe('auth flow', () => {
 		expect(rows[0].name).toBe('The Octocat');
 	});
 
-	it('returns 401 for /api/me without a session cookie', async () => {
+	it('returns 200 with null user for /api/me without a session cookie', async () => {
 		const app = createTestApp(pool, github);
 		const res = await app.request('/api/me');
-		expect(res.status).toBe(401);
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.user).toBeNull();
 	});
 
 	it('logout clears the session', async () => {
@@ -127,7 +129,9 @@ describe('auth flow', () => {
 		expect(logout.status).toBe(200);
 
 		const me = await app.request('/api/me', { headers: { Cookie: sessionCookie } });
-		expect(me.status).toBe(401);
+		expect(me.status).toBe(200);
+		const body = await me.json();
+		expect(body.user).toBeNull();
 
 		const { rows } = await pool.query('SELECT COUNT(*)::int AS n FROM sessions');
 		expect(rows[0].n).toBe(0);

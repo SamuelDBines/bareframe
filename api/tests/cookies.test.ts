@@ -76,6 +76,8 @@ describe('cookie security and headers', () => {
 		const res = await app.request('/api/me', {
 			headers: { Cookie: `${SESSION_COOKIE}=%E0%A4%A` },
 		});
-		expect(res.status).toBe(401);
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.user).toBeNull();
 	});
 });

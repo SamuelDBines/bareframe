@@ -1,4 +1,5 @@
-import { createMcpExpressApp } from '@modelcontextprotocol/sdk/server/express.js';
+import express from 'express';
+import { hostHeaderValidation } from '@modelcontextprotocol/sdk/server/middleware/hostHeaderValidation.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import type { Request, Response } from 'express';
 import type { Config } from './config.js';
@@ -13,16 +14,22 @@ function normalizeBasePath(basePath: string): string {
 
 export function createHttpApp(config: Config) {
 	const base = normalizeBasePath(config.publicBasePath);
-	const app = createMcpExpressApp({ host: '0.0.0.0', allowedHosts: config.allowedHosts });
+	const mountPath = base || '/';
+	const app = express();
 	app.set('trust proxy', true);
 
 	const limiter = createRateLimiter(config);
 
+	// Kubernetes probes hit the pod IP in Host; skip allow-list on health only.
 	app.get(`${base}/healthz`, limiter, (_req: Request, res: Response) => {
 		res.type('text/plain').send('ok');
 	});
 
-	app.post(`${base}`, limiter, async (req: Request, res: Response) => {
+	const mcp = express.Router();
+	mcp.use(hostHeaderValidation(config.allowedHosts));
+	mcp.use(express.json());
+
+	mcp.post('/', limiter, async (req: Request, res: Response) => {
 		const server = createBareframeMcpServer();
 		const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
 
@@ -45,7 +52,7 @@ export function createHttpApp(config: Config) {
 		}
 	});
 
-	app.get(`${base}`, limiter, (_req: Request, res: Response) => {
+	mcp.get('/', limiter, (_req: Request, res: Response) => {
 		res.status(405).json({
 			jsonrpc: '2.0',
 			error: { code: -32000, message: 'Method not allowed.' },
@@ -53,13 +60,15 @@ export function createHttpApp(config: Config) {
 		});
 	});
 
-	app.delete(`${base}`, limiter, (_req: Request, res: Response) => {
+	mcp.delete('/', limiter, (_req: Request, res: Response) => {
 		res.status(405).json({
 			jsonrpc: '2.0',
 			error: { code: -32000, message: 'Method not allowed.' },
 			id: null,
 		});
 	});
+
+	app.use(mountPath, mcp);
 
 	return app;
 }

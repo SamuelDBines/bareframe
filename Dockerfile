@@ -37,7 +37,7 @@ WORKDIR /app/showcase
 RUN pnpm install --frozen-lockfile && pnpm exec vite build
 
 WORKDIR /app/prototype
-RUN pnpm install --frozen-lockfile && BAREFRAME_PAGES_ROOT=1 pnpm run build
+RUN pnpm install --frozen-lockfile && VITE_TELEMETRY=1 BAREFRAME_PAGES_ROOT=1 pnpm run build
 
 WORKDIR /app
 RUN node ./scripts/finalize-pages.mjs \

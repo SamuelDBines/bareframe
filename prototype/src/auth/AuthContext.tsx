@@ -27,12 +27,30 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+let apiAvailability: 'unknown' | 'available' | 'missing' = 'unknown';
+
+async function probeApiAvailable(): Promise<boolean> {
+	if (apiAvailability === 'available') return true;
+	if (apiAvailability === 'missing') return false;
+	try {
+		const res = await fetch('/api/healthz', { credentials: 'same-origin' });
+		if (!res.ok) {
+			apiAvailability = 'missing';
+			return false;
+		}
+		apiAvailability = 'available';
+		return true;
+	} catch {
+		apiAvailability = 'missing';
+		return false;
+	}
+}
+
 async function fetchMe(): Promise<AuthUser | null> {
 	const res = await fetch('/api/me', { credentials: 'include' });
-	if (res.status === 401) return null;
 	if (!res.ok) throw new Error(`me ${res.status}`);
-	const data = (await res.json()) as { user: AuthUser };
-	return data.user;
+	const data = (await res.json()) as { user: AuthUser | null };
+	return data.user ?? null;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -41,6 +59,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const refresh = useCallback(async () => {
 		try {
+			const hasApi = await probeApiAvailable();
+			if (!hasApi) {
+				setUser(null);
+				setStatus('anonymous');
+				return;
+			}
 			const u = await fetchMe();
 			setUser(u);
 			setStatus(u ? 'authenticated' : 'anonymous');
@@ -56,7 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const signOut = useCallback(async () => {
 		try {
-			await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+			if (await probeApiAvailable()) {
+				await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+			}
 			setUser(null);
 			setStatus('anonymous');
 		} catch {

@@ -88,10 +88,10 @@ export function createApp(deps: AppDeps): Hono {
 
 	app.get('/api/me', async (c) => {
 		const token = readSignedCookie(c, SESSION_COOKIE, config.sessionSecret);
-		if (!token) return c.json({ error: 'unauthorized' }, 401);
+		if (!token) return c.json({ user: null });
 
 		const user = await findUserBySessionToken(pool, hashToken(token));
-		if (!user) return c.json({ error: 'unauthorized' }, 401);
+		if (!user) return c.json({ user: null });
 
 		return c.json({ user: toPublicUser(user) });
 	});

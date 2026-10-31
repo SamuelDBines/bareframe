@@ -1,5 +1,6 @@
 import { createMcpExpressApp } from '@modelcontextprotocol/sdk/server/express.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import type { Request, Response } from 'express';
 import type { Config } from './config.js';
 import { createBareframeMcpServer } from './create-server.js';
 import { createRateLimiter } from './rate-limit.js';
@@ -17,11 +18,11 @@ export function createHttpApp(config: Config) {
 
 	const limiter = createRateLimiter(config);
 
-	app.get(`${base}/healthz`, limiter, (_req, res) => {
+	app.get(`${base}/healthz`, limiter, (_req: Request, res: Response) => {
 		res.type('text/plain').send('ok');
 	});
 
-	app.post(`${base}`, limiter, async (req, res) => {
+	app.post(`${base}`, limiter, async (req: Request, res: Response) => {
 		const server = createBareframeMcpServer();
 		const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
 
@@ -44,7 +45,7 @@ export function createHttpApp(config: Config) {
 		}
 	});
 
-	app.get(`${base}`, limiter, (_req, res) => {
+	app.get(`${base}`, limiter, (_req: Request, res: Response) => {
 		res.status(405).json({
 			jsonrpc: '2.0',
 			error: { code: -32000, message: 'Method not allowed.' },
@@ -52,7 +53,7 @@ export function createHttpApp(config: Config) {
 		});
 	});
 
-	app.delete(`${base}`, limiter, (_req, res) => {
+	app.delete(`${base}`, limiter, (_req: Request, res: Response) => {
 		res.status(405).json({
 			jsonrpc: '2.0',
 			error: { code: -32000, message: 'Method not allowed.' },

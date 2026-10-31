@@ -11,7 +11,6 @@ resources:
   - mcp-service.yaml
   - ingress.yaml
   - ingress-aliases.yaml
-  - mcp-ingress.yaml
 images:
   - name: ghcr.io/samueldbines/bareframe/site
     newName: ghcr.io/samueldbines/bareframe/site

@@ -6,28 +6,11 @@ import {
 	listComponents,
 	listThemes,
 	loadCatalog,
+	searchDocs,
 	usageSnippet,
 } from './catalog.js';
-import type { McpScope } from './types.js';
 
-export type ToolAuth = {
-	scopes: McpScope[];
-};
-
-export class ScopeError extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = 'ScopeError';
-	}
-}
-
-function assertScope(auth: ToolAuth, scope: McpScope) {
-	if (!auth.scopes.includes(scope)) {
-		throw new ScopeError(`This tool requires the ${scope} scope`);
-	}
-}
-
-export function createBareframeMcpServer(auth: ToolAuth): McpServer {
+export function createBareframeMcpServer(): McpServer {
 	const catalog = loadCatalog();
 	const server = new McpServer(
 		{
@@ -51,7 +34,6 @@ export function createBareframeMcpServer(auth: ToolAuth): McpServer {
 			},
 		},
 		async ({ category, stability }) => {
-			assertScope(auth, 'components:read');
 			let items = listComponents(catalog);
 			if (category) items = items.filter((c) => c.category === category);
 			if (stability) items = items.filter((c) => c.stability === stability);
@@ -82,13 +64,13 @@ export function createBareframeMcpServer(auth: ToolAuth): McpServer {
 	server.registerTool(
 		'get_component',
 		{
-			description: 'Props table, variants, and usage snippet for one component slug.',
+			description:
+				'Props, real docs .example.tsx sources, and usage for one component slug.',
 			inputSchema: {
 				slug: z.string().describe('Component slug, e.g. button or date-picker'),
 			},
 		},
 		async ({ slug }) => {
-			assertScope(auth, 'components:read');
 			const component = getComponent(catalog, slug);
 			if (!component) {
 				return {
@@ -102,9 +84,14 @@ export function createBareframeMcpServer(auth: ToolAuth): McpServer {
 						type: 'text',
 						text: JSON.stringify(
 							{
-								...component,
-								usage: usageSnippet(component),
-								docsUrl: `https://bareframe.org/${slug}/`,
+								slug: component.slug,
+								category: component.category,
+								stability: component.stability,
+								reactExport: component.reactExport,
+								props: component.props,
+								examples: component.examples,
+								suggestedUsage: usageSnippet(component),
+								docsUrl: `https://bareframe.org/#/components/${component.slug}`,
 							},
 							null,
 							2,
@@ -128,7 +115,6 @@ export function createBareframeMcpServer(auth: ToolAuth): McpServer {
 			},
 		},
 		async ({ includeVariables }) => {
-			assertScope(auth, 'themes:read');
 			const themes = listThemes(catalog).map((theme) => ({
 				id: theme.id,
 				label: theme.label,
@@ -159,7 +145,6 @@ export function createBareframeMcpServer(auth: ToolAuth): McpServer {
 			},
 		},
 		async ({ themeId }) => {
-			assertScope(auth, 'themes:read');
 			if (themeId) {
 				const theme = getTheme(catalog, themeId);
 				if (!theme) {
@@ -196,5 +181,103 @@ export function createBareframeMcpServer(auth: ToolAuth): McpServer {
 		},
 	);
 
+	server.registerTool(
+		'search_docs',
+		{
+			description: 'Search Bareframe docs pages (markdown guides and component reference text).',
+			inputSchema: {
+				query: z.string().min(1).describe('Search phrase'),
+				limit: z.number().int().min(1).max(25).optional().default(10),
+			},
+		},
+		async ({ query, limit }) => {
+			const hits = searchDocs(catalog, query, limit);
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify(
+							{
+								query,
+								count: hits.length,
+								results: hits.map((p) => ({
+									id: p.id,
+									title: p.title,
+									path: p.path,
+									url: p.url,
+									excerpt: p.body.slice(0, 400),
+								})),
+							},
+							null,
+							2,
+						),
+					},
+				],
+			};
+		},
+	);
+
+	server.registerTool(
+		'get_install_steps',
+		{
+			description: 'Install and CSS import steps for @bareframe/react from the published README.',
+			inputSchema: z.object({}),
+		},
+		async () => {
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify(catalog.installSteps, null, 2),
+					},
+				],
+			};
+		},
+	);
+
+	server.registerTool(
+		'get_migration_guide',
+		{
+			description:
+				'Full “Migrating to @bareframe/react” guide for apps moving from @repkit/components or repkit-components.',
+			inputSchema: {
+				format: z.enum(['markdown', 'json']).optional().default('markdown'),
+			},
+		},
+		async ({ format }) => {
+			if (format === 'json') {
+				return {
+					content: [
+						{
+							type: 'text',
+							text: JSON.stringify(
+								{
+									title: 'Migrating to @bareframe/react',
+									markdown: catalog.migrationGuideMarkdown,
+									repkitTokenAliases: catalog.repkitTokenAliases,
+								},
+								null,
+								2,
+							),
+						},
+					],
+				};
+			}
+			return {
+				content: [{ type: 'text', text: catalog.migrationGuideMarkdown }],
+			};
+		},
+	);
+
 	return server;
 }
+
+export const TOOL_NAMES = [
+	'list_components',
+	'get_component',
+	'list_themes',
+	'export_tokens',
+	'search_docs',
+	'get_install_steps',
+	'get_migration_guide',
+] as const;

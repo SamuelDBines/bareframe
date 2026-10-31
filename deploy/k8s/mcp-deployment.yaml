@@ -30,12 +30,13 @@ spec:
               protocol: TCP
           env:
             - name: BAREFRAME_MCP_BASE_PATH
-              value: /v1
+              value: /mcp
             - name: BAREFRAME_MCP_ALLOWED_HOSTS
-              value: mcp.bareframe.dev
-          envFrom:
-            - secretRef:
-                name: bareframe-mcp-env
+              value: bareframe.org
+            - name: BAREFRAME_MCP_RATE_MAX
+              value: "120"
+            - name: BAREFRAME_MCP_RATE_WINDOW_MS
+              value: "60000"
           resources:
             requests:
               cpu: 25m
@@ -52,7 +53,7 @@ spec:
                 - ALL
           readinessProbe:
             httpGet:
-              path: /v1/healthz
+              path: /mcp/healthz
               port: http
             initialDelaySeconds: 3
             periodSeconds: 10
@@ -60,7 +61,7 @@ spec:
             failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /v1/healthz
+              path: /mcp/healthz
               port: http
             initialDelaySeconds: 10
             periodSeconds: 20

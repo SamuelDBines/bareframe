@@ -112,11 +112,9 @@ jobs:
       - name: Verify MCP image health endpoint
         run: |
           set -euo pipefail
-          docker run -d --name bareframe-mcp -p 18081:8080 \
-            -e BAREFRAME_MCP_TOKENS='[{"id":"ci","token":"ci","scopes":["components:read","themes:read"]}]' \
-            bareframe-mcp:ci
+          docker run -d --name bareframe-mcp -p 18081:8080 bareframe-mcp:ci
           sleep 2
-          curl -sf http://127.0.0.1:18081/v1/healthz | grep -q '^ok$'
+          curl -sf http://127.0.0.1:18081/mcp/healthz | grep -q '^ok$'
           docker rm -f bareframe-mcp
 
   docker:

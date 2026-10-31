@@ -1,41 +1,65 @@
 import { Link } from 'react-router-dom';
 
+const CURSOR_SNIPPET = `{
+  "mcpServers": {
+    "bareframe": {
+      "url": "https://bareframe.org/mcp"
+    }
+  }
+}`;
+
+const CLAUDE_SNIPPET = `{
+  "mcpServers": {
+    "bareframe": {
+      "type": "http",
+      "url": "https://bareframe.org/mcp"
+    }
+  }
+}`;
+
 export function McpPage() {
 	return (
 		<>
 			<div className="page-hero">
 				<h1>Connect your agent</h1>
 				<p className="lead">
-					Bareframe exposes an MCP server so coding agents can read components, themes, and tokens
-					without brittle HTML scraping.
+					Bareframe hosts a public, read-only MCP server on the same origin as the docs. Agents can
+					list components, read real doc examples, search guides, and fetch the Repkit → Bareframe
+					migration guide — no HTML scraping and no API keys.
 				</p>
 			</div>
 
 			<div className="grid-2">
 				<div className="card">
-					<h3>1. Add the server</h3>
-					<pre className="code-block">{`{
-  "mcpServers": {
-    "bareframe": {
-      "url": "https://mcp.bareframe.dev/v1"
-    }
-  }
-}`}</pre>
+					<h3>Cursor</h3>
+					<p>Add to your MCP config (Settings → MCP, or project <code>.cursor/mcp.json</code>):</p>
+					<pre className="code-block">{CURSOR_SNIPPET}</pre>
 				</div>
 				<div className="card">
-					<h3>2. Authenticate</h3>
+					<h3>Claude Desktop</h3>
 					<p>
-						Generate a read token in Designer → Settings → Agent connections. Scope it to
-						<code> components:read</code> and <code>themes:read</code>.
+						Add under <code>mcpServers</code> in Claude&apos;s config (see Anthropic docs for the file
+						location on your OS):
 					</p>
-					<Link to="/designer/settings/agent" className="btn btn-secondary">
-						Open connection settings
-					</Link>
+					<pre className="code-block">{CLAUDE_SNIPPET}</pre>
 				</div>
 			</div>
 
 			<section style={{ marginTop: '2rem' }}>
-				<h2>Example tools</h2>
+				<h2>Endpoint</h2>
+				<ul className="doc-prose">
+					<li>
+						MCP (Streamable HTTP): <code>https://bareframe.org/mcp</code>
+					</li>
+					<li>
+						Health: <code>https://bareframe.org/mcp/healthz</code>
+					</li>
+					<li>Auth: none (public read-only; per-IP rate limits apply)</li>
+				</ul>
+			</section>
+
+			<section style={{ marginTop: '2rem' }}>
+				<h2>Tools</h2>
 				<div className="table-wrap" style={{ marginTop: '0.75rem' }}>
 					<table className="props-table">
 						<thead>
@@ -47,30 +71,42 @@ export function McpPage() {
 						<tbody>
 							<tr>
 								<td><code>list_components</code></td>
-								<td>Returns slugs, categories, and stability for @bareframe/react.</td>
+								<td>Slugs, categories, stability, and @bareframe/react export names.</td>
 							</tr>
 							<tr>
 								<td><code>get_component</code></td>
-								<td>Props table, variants, and usage snippet for one component.</td>
+								<td>Props plus real <code>.example.tsx</code> sources from the docs app.</td>
 							</tr>
 							<tr>
 								<td><code>list_themes</code></td>
-								<td>Theme ids and CSS variable bundles.</td>
+								<td>Built-in theme ids and CSS import paths.</td>
 							</tr>
 							<tr>
 								<td><code>export_tokens</code></td>
-								<td>JSON token manifest aligned with tokens.json.</td>
+								<td>Token manifest (<code>tokens.json</code>) or per-theme values.</td>
+							</tr>
+							<tr>
+								<td><code>search_docs</code></td>
+								<td>Search markdown guides and component reference text.</td>
+							</tr>
+							<tr>
+								<td><code>get_install_steps</code></td>
+								<td>Install and CSS import steps for @bareframe/react.</td>
+							</tr>
+							<tr>
+								<td><code>get_migration_guide</code></td>
+								<td>
+									Full &quot;Migrating to @bareframe/react&quot; guide (Repkit → Bareframe).
+								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 			</section>
+
 			<p style={{ marginTop: '1.5rem' }}>
-				Migrating from HTML scraping? See the{' '}
-				<a href="https://github.com/SamuelDBines/bareframe/blob/main/docs/MCP-MIGRATION.md">
-					MCP migration guide
-				</a>
-				.
+				Migrating from <code>@repkit/components</code>? Read{' '}
+				<Link to="/components/migrating">Migrating to @bareframe/react</Link>.
 			</p>
 		</>
 	);

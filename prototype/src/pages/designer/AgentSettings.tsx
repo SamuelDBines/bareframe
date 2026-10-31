@@ -1,34 +1,24 @@
-import { Link } from 'react-router-dom';
-
 export function AgentSettingsPage() {
 	return (
 		<>
 			<div className="page-hero">
 				<h1>Agent & MCP connections</h1>
-				<p className="lead">Issue scoped tokens so AI tools can read your library and themes safely.</p>
+				<p className="lead">
+					The hosted MCP server is public and read-only — no tokens to mint here yet. Point your IDE
+					or Claude config at <code>https://bareframe.org/mcp</code>.
+				</p>
 			</div>
-			<div className="card form-stack" style={{ maxWidth: 520 }}>
-				<div className="field">
-					<label>Connection name</label>
-					<input defaultValue="Cursor — design system" />
-				</div>
-				<div className="field">
-					<label>API token</label>
-					<input readOnly value="bf_mcp_••••••••••••4f9c" />
-				</div>
-				<div className="field">
-					<label>Scopes</label>
-					<div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.9rem' }}>
-						<label><input type="checkbox" checked readOnly /> components:read</label>
-						<label><input type="checkbox" checked readOnly /> themes:read</label>
-						<label><input type="checkbox" readOnly /> designer:write</label>
-					</div>
-				</div>
-				<button type="button" className="btn btn-primary">Rotate token</button>
+			<div className="card" style={{ maxWidth: 560 }}>
+				<h3>Hosted server</h3>
+				<p>
+					See <a href="#/components/mcp">Connect agent</a> for Cursor and Claude snippets, tool list,
+					and rate-limit notes.
+				</p>
+				<p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--bf-theme-text-2)' }}>
+					Designer-scoped write tokens (<code>designer:write</code>) for canvas mutations are planned
+					for a later milestone.
+				</p>
 			</div>
-			<p style={{ marginTop: '1.5rem' }}>
-				See also <Link to="/components/mcp">Components MCP docs</Link>
-			</p>
 		</>
 	);
 }

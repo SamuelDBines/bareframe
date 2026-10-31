@@ -5,6 +5,7 @@ import './docs.css';
 
 const UTILITY_LINKS = [
 	{ to: '/components/start', label: 'Get started' },
+	{ to: '/components/migrating', label: 'Migrating from Repkit' },
 	{ to: '/components', label: 'Components', end: true },
 	{ to: '/components/tokens', label: 'Tokens' },
 	{ to: '/components/mcp', label: 'Connect agent' },

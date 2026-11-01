@@ -1,31 +1,108 @@
-import { Link } from 'react-router-dom';
-import { MOCK_PROJECTS } from '../../data/projects';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext';
+import {
+	createProject,
+	listProjects,
+	loadLocalProject,
+	migrateLocalProjectToServer,
+	type ApiProjectSummary,
+} from '../../designer/projectApi';
+import { fromProjectDocument } from '../../designer/localProject';
+import { createInitialProject } from '../../designer/initialProject';
 
 export function DesignerDashboard() {
+	const { status } = useAuth();
+	const navigate = useNavigate();
+	const [projects, setProjects] = useState<ApiProjectSummary[]>([]);
+	const [error, setError] = useState<string | null>(null);
+	const [busy, setBusy] = useState(false);
+
+	useEffect(() => {
+		if (status !== 'authenticated') return;
+		listProjects()
+			.then(setProjects)
+			.catch((err) => setError(err instanceof Error ? err.message : 'Failed to load projects'));
+	}, [status]);
+
+	async function handleCreate() {
+		setBusy(true);
+		setError(null);
+		try {
+			const created = await createProject('Untitled project');
+			navigate(`/designer/editor/${created.id}`);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Could not create project');
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	async function handleMigrateLocal() {
+		const local = loadLocalProject();
+		const project = local
+			? fromProjectDocument(local.document)
+			: createInitialProject();
+		setBusy(true);
+		try {
+			const migrated = await migrateLocalProjectToServer(project);
+			navigate(`/designer/editor/${migrated.id}`);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Migration failed');
+		} finally {
+			setBusy(false);
+		}
+	}
+
 	return (
 		<>
 			<div className="page-hero" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end' }}>
 				<div style={{ flex: 1 }}>
 					<h1>Projects</h1>
 					<p className="lead">
-						Open the canvas to pan/zoom across device frames, compare themes, and edit the shared page tree.
+						Signed-in projects sync to Bareframe. When signed out, the canvas stays in this browser only.
 					</p>
 				</div>
-				<Link to="/designer/editor" className="btn btn-primary">Open canvas</Link>
+				<div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+					<Link to="/designer/editor" className="btn btn-secondary">
+						Local canvas
+					</Link>
+					{status === 'authenticated' && (
+						<>
+							<button type="button" className="btn btn-secondary" disabled={busy} onClick={handleMigrateLocal}>
+								Migrate local → cloud
+							</button>
+							<button type="button" className="btn btn-primary" disabled={busy} onClick={handleCreate}>
+								New project
+							</button>
+						</>
+					)}
+				</div>
 			</div>
+			{error && (
+				<p className="card" style={{ color: 'var(--bf-theme-danger, #b42318)' }}>
+					{error}
+				</p>
+			)}
+			{status !== 'authenticated' && (
+				<p className="card">Sign in with GitHub to create server-saved projects and MCP tokens.</p>
+			)}
 			<div className="grid-2">
-				{MOCK_PROJECTS.map((p) => (
+				{projects.map((p) => (
 					<article key={p.id} className="card">
 						<h3>{p.name}</h3>
 						<p>
-							{p.screens} screens · Theme <code>{p.theme}</code> · Updated {p.updatedAt}
+							Version {p.version}
+							{p.updatedAt ? ` · Updated ${new Date(p.updatedAt).toLocaleString()}` : null}
 						</p>
-						<p style={{ fontSize: '0.85rem' }}>
-							<span className="badge-pill">iPhone 15</span>
-							<span className="badge-pill" style={{ marginLeft: '0.35rem' }}>iPad Mini</span>
-							<span className="badge-pill" style={{ marginLeft: '0.35rem' }}>Desktop 1440</span>
-						</p>
-						<Link to="/designer/editor" className="btn btn-secondary">Open in canvas</Link>
+						<div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+							<Link to={`/designer/editor/${p.id}`} className="btn btn-secondary">
+								Open in canvas
+							</Link>
+							<Link to={`/designer/settings/project/${p.id}`} className="btn btn-ghost">
+								Project settings
+							</Link>
+						</div>
 					</article>
 				))}
 			</div>

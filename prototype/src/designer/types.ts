@@ -48,13 +48,18 @@ export type DesignNode = {
 		| 'column'
 		| 'section'
 		| 'text'
-		| 'instance';
+		| 'instance'
+		| 'image';
 	parentId: string | null;
 	children: string[];
 	instance?: {
 		definitionId: string;
 		variantKey: string;
 		props?: Record<string, unknown>;
+	};
+	image?: {
+		assetId: string;
+		alt?: string;
 	};
 	content?: { text?: string; textTag?: 'h1' | 'h2' | 'h3' | 'p' };
 	layout: LayoutModel;
@@ -112,6 +117,25 @@ export type CompareMode =
 		}
 	| { kind: 'trials'; pageId: string; frameIds: string[] };
 
+export type Connector = {
+	id: string;
+	fromFrameId: string;
+	toFrameId: string;
+	label?: string;
+	trigger?: string;
+};
+
+export type Annotation = {
+	id: string;
+	frameId: string;
+	kind: 'callout' | 'arrow' | 'box' | 'note';
+	target:
+		| { kind: 'node'; nodeId: string }
+		| { kind: 'rect'; x: number; y: number; w: number; h: number };
+	index?: number;
+	text: string;
+};
+
 export type DesignerProject = {
 	id: string;
 	name: string;
@@ -121,6 +145,8 @@ export type DesignerProject = {
 	trials: StyleTrial[];
 	customTokenOverrides: Record<string, string>;
 	canvas: { x: number; y: number; zoom: number };
+	connectors: Connector[];
+	annotations: Annotation[];
 };
 
 export type EditScope = 'base' | 'breakpoint';

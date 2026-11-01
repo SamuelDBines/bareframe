@@ -270,7 +270,11 @@
     {
       "name": "value",
       "type": "string[]",
-      "default": "[]",
+      "description": ""
+    },
+    {
+      "name": "defaultValue",
+      "type": "string[]",
       "description": ""
     },
     {
@@ -282,6 +286,11 @@
       "name": "placeholder",
       "type": "string",
       "default": "Select…",
+      "description": ""
+    },
+    {
+      "name": "label",
+      "type": "string",
       "description": ""
     },
     {
@@ -303,6 +312,11 @@
       "description": ""
     },
     {
+      "name": "label",
+      "type": "string",
+      "description": ""
+    },
+    {
       "name": "className",
       "type": "string",
       "description": ""
@@ -321,6 +335,18 @@
       "name": "onChange",
       "type": "(value: string) => void",
       "description": ""
+    },
+    {
+      "name": "contained",
+      "type": "boolean",
+      "default": "false",
+      "description": "Docs preview: portal the listbox into `portalContainer` (playground floating layer)."
+    },
+    {
+      "name": "portalContainer",
+      "type": "Element",
+      "default": "null",
+      "description": ""
     }
   ],
   "modal": [
@@ -338,6 +364,28 @@
       "name": "dialogClassName",
       "type": "string",
       "description": ""
+    },
+    {
+      "name": "showCloseButton",
+      "type": "boolean",
+      "default": "false",
+      "description": ""
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "description": "Alias for `isOpen` used by docs/codegen."
+    },
+    {
+      "name": "contained",
+      "type": "boolean",
+      "default": "false",
+      "description": "Non-modal overlay scoped to `portalContainer` (docs preview). Omit for full-page modals\nwith focus trap and an inert page background."
+    },
+    {
+      "name": "portalContainer",
+      "type": "Element",
+      "description": "Portal target; required when `contained` is true."
     }
   ],
   "drawer": [
@@ -351,6 +399,22 @@
       "type": "\"left\" | \"right\"",
       "default": "right",
       "description": ""
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "description": ""
+    },
+    {
+      "name": "contained",
+      "type": "boolean",
+      "default": "false",
+      "description": ""
+    },
+    {
+      "name": "portalContainer",
+      "type": "Element",
+      "description": ""
     }
   ],
   "tooltip": [
@@ -363,6 +427,16 @@
       "name": "className",
       "type": "string",
       "description": ""
+    },
+    {
+      "name": "isOpen",
+      "type": "boolean",
+      "description": ""
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean) => void",
+      "description": ""
     }
   ],
   "popover": [
@@ -374,6 +448,32 @@
     {
       "name": "className",
       "type": "string",
+      "description": ""
+    },
+    {
+      "name": "isOpen",
+      "type": "boolean",
+      "description": ""
+    },
+    {
+      "name": "defaultOpen",
+      "type": "boolean",
+      "description": ""
+    },
+    {
+      "name": "onOpenChange",
+      "type": "(open: boolean) => void",
+      "description": ""
+    },
+    {
+      "name": "contained",
+      "type": "boolean",
+      "default": "false",
+      "description": "Non-modal popover for docs preview; keeps the rest of the page interactive."
+    },
+    {
+      "name": "portalContainer",
+      "type": "Element",
       "description": ""
     }
   ],
@@ -483,6 +583,21 @@
     {
       "name": "className",
       "type": "string",
+      "description": ""
+    },
+    {
+      "name": "defaultExpandedKeys",
+      "type": "Iterable<string>",
+      "description": ""
+    },
+    {
+      "name": "expandedKeys",
+      "type": "Iterable<string>",
+      "description": ""
+    },
+    {
+      "name": "onExpandedChange",
+      "type": "(keys: Set<string | number>) => void",
       "description": ""
     }
   ],

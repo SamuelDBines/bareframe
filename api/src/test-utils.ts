@@ -15,6 +15,10 @@ export const testConfig: Config = {
 };
 
 export async function setupTestDb(pool: pg.Pool): Promise<void> {
+	await pool.query('DROP TABLE IF EXISTS project_revisions CASCADE');
+	await pool.query('DROP TABLE IF EXISTS project_api_tokens CASCADE');
+	await pool.query('DROP TABLE IF EXISTS project_assets CASCADE');
+	await pool.query('DROP TABLE IF EXISTS projects CASCADE');
 	await pool.query('DROP TABLE IF EXISTS sessions CASCADE');
 	await pool.query('DROP TABLE IF EXISTS users CASCADE');
 	await pool.query('DROP TABLE IF EXISTS schema_migrations CASCADE');

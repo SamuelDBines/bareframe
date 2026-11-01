@@ -72,7 +72,8 @@ type Action =
 	| { type: 'setTrialToken'; token: string; value: string }
 	| { type: 'setCustomToken'; token: string; value: string }
 	| { type: 'assistantOpen'; open: boolean }
-	| { type: 'applyAgentAction'; action: string; args?: Record<string, unknown> };
+	| { type: 'applyAgentAction'; action: string; args?: Record<string, unknown> }
+	| { type: 'hydrateProject'; project: DesignerProject };
 
 function reducer(state: DesignerState, action: Action): DesignerState {
 	switch (action.type) {
@@ -109,6 +110,20 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 			return { ...state, ui: { ...state.ui, mobilePanel: action.panel } };
 		case 'assistantOpen':
 			return { ...state, ui: { ...state.ui, assistantOpen: action.open } };
+		case 'hydrateProject': {
+			const project = cloneProject(action.project);
+			return {
+				...state,
+				project,
+				history: [project],
+				historyIndex: 0,
+				ui: {
+					...state.ui,
+					activePageId: project.pages[0]?.id ?? state.ui.activePageId,
+					camera: { ...project.canvas },
+				},
+			};
+		}
 		default:
 			break;
 	}

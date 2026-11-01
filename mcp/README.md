@@ -5,9 +5,18 @@ Public **Model Context Protocol** server for Bareframe — served at **`https://
 - **Health:** `https://bareframe.org/mcp/healthz`
 - **Migration guide (Repkit → React):** [`docs/MIGRATING-TO-BAREFRAME-REACT.md`](../docs/MIGRATING-TO-BAREFRAME-REACT.md)
 
-No authentication. Per-IP rate limits apply (`BAREFRAME_MCP_RATE_MAX` / `BAREFRAME_MCP_RATE_WINDOW_MS`).
+No authentication on the public endpoint. Per-IP rate limits apply (`BAREFRAME_MCP_RATE_MAX` / `BAREFRAME_MCP_RATE_WINDOW_MS`).
 
-## Tools
+## Studio (authenticated writes)
+
+- **Endpoint:** `https://bareframe.org/mcp/studio`
+- **Auth:** `Authorization: Bearer bf_proj_…` (project token from Designer → Project settings)
+- **Backend:** proxies to `@bareframe/api` project routes (`BAREFRAME_API_URL` in the MCP deployment)
+- **Rate limit:** per token (`BAREFRAME_MCP_STUDIO_RATE_MAX`, default 120/min)
+
+Studio tools: `list_projects`, `get_project`, `create_canvas`, `add_screen`, `add_component`, `add_connector`, `add_annotation`, `update_node`, `delete_node`, `import_screenshots`, `get_upload_url`.
+
+## Public read tools
 
 | Tool | Description |
 | --- | --- |

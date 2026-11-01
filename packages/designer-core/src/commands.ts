@@ -307,7 +307,7 @@ export function applyProjectCommand(
 				parentId: parsed.parentNodeId,
 				children: [] as string[],
 				instance: {
-				 definitionId: parsed.slug,
+					definitionId: parsed.slug,
 				 variantKey: parsed.variantKey ?? 'primary',
 				 props: parsed.props ?? { children: 'Label' },
 				},

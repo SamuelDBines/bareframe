@@ -37,6 +37,10 @@ spec:
               value: "120"
             - name: BAREFRAME_MCP_RATE_WINDOW_MS
               value: "60000"
+            - name: BAREFRAME_API_URL
+              value: "http://bareframe-api:8080"
+            - name: BAREFRAME_MCP_STUDIO_RATE_MAX
+              value: "120"
           resources:
             requests:
               cpu: 25m

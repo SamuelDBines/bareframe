@@ -15,6 +15,7 @@ import { DesignerDashboard } from './pages/designer/Dashboard';
 import { DesignerEditor } from './pages/designer/Editor';
 import { DesignerLayout } from './pages/designer/DesignerLayout';
 import { ExportPage } from './pages/designer/Export';
+import { ProjectSettingsPage } from './pages/designer/ProjectSettings';
 import { ThemesWorkspace } from './pages/designer/ThemesWorkspace';
 import { LandingPage } from './pages/site/Landing';
 import { PricingPage } from './pages/site/Pricing';
@@ -51,11 +52,13 @@ export default function App() {
 						<Route path="designer" element={<DesignerLayout />}>
 							<Route index element={<DesignerDashboard />} />
 							<Route path="editor" element={<DesignerEditor />} />
+							<Route path="editor/:projectId" element={<DesignerEditor />} />
 							<Route path="themes" element={<ThemesWorkspace />} />
 							<Route path="theme" element={<ThemesWorkspace />} />
 							<Route path="tokens" element={<ThemesWorkspace />} />
 							<Route path="export" element={<ExportPage />} />
 							<Route path="settings/agent" element={<AgentSettingsPage />} />
+							<Route path="settings/project/:projectId" element={<ProjectSettingsPage />} />
 						</Route>
 
 						<Route path="*" element={<Navigate to="/" replace />} />

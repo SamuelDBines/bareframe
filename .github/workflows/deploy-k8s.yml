@@ -54,7 +54,8 @@ jobs:
       - name: Build and push API image
         uses: docker/build-push-action@v6
         with:
-          context: api
+          context: .
+          file: api/Dockerfile
           push: true
           tags: |
             ${{ env.API_IMAGE }}:sha-${{ steps.meta.outputs.short_sha }}

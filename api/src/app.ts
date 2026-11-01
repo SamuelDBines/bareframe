@@ -23,6 +23,7 @@ import {
 	toPublicUser,
 	upsertUser,
 } from './db/index.js';
+import { createProjectsRouter } from './projects/routes.js';
 
 export type AppDeps = {
 	config: Config;
@@ -104,6 +105,8 @@ export function createApp(deps: AppDeps): Hono {
 		clearSessionCookie(c, cookieSettings);
 		return c.json({ ok: true });
 	});
+
+	app.route('/api', createProjectsRouter(pool, config));
 
 	return app;
 }

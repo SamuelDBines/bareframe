@@ -358,6 +358,8 @@ export function createInitialProject(defaultTheme: ThemeId = 'light'): DesignerP
 		frames,
 		trials: [],
 		customTokenOverrides: {},
+		connectors: [],
+		annotations: [],
 		canvas: {
 			zoom: defaultZoom,
 			x: viewW / 2 - cx * defaultZoom,

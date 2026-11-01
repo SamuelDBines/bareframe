@@ -3,6 +3,7 @@ import { CanvasToolbar } from './components/CanvasToolbar';
 import { InfiniteCanvas } from './components/InfiniteCanvas';
 import { InspectorPanel } from './components/InspectorPanel';
 import { LibrarySidebar } from './components/LibrarySidebar';
+import { DesignerCloudSync } from './DesignerCloudSync';
 import { DesignerProvider, useDesigner } from './store';
 import { useDesignerEditorChrome } from './useDesignerEditorChrome';
 
@@ -35,9 +36,10 @@ function WorkspaceInner() {
 	);
 }
 
-export function DesignerWorkspace() {
+export function DesignerWorkspace({ projectId }: { projectId?: string }) {
 	return (
 		<DesignerProvider>
+			<DesignerCloudSync projectId={projectId} />
 			<WorkspaceInner />
 		</DesignerProvider>
 	);

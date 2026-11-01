@@ -10,6 +10,7 @@ import {
 	type ProjectDocument,
 } from '@bareframe/designer-core';
 import { hashToken } from '../auth/crypto.js';
+import { mapProjectRow, normalizeUserId } from './normalize.js';
 
 export type ProjectRow = {
 	id: string;
@@ -94,7 +95,7 @@ export async function createProject(pool: pg.Pool, userId: number, name: string,
 			[row.id, { type: 'bootstrap' }, String(userId)],
 		);
 		await client.query('COMMIT');
-		return { ...row, document, version: 1 };
+		return mapProjectRow({ ...row, document, version: 1 });
 	} catch (e) {
 		await client.query('ROLLBACK');
 		throw e;
@@ -107,8 +108,9 @@ export async function getProjectById(pool: pg.Pool, projectId: string): Promise<
 	const { rows } = await pool.query<ProjectRow>(`SELECT * FROM projects WHERE id = $1`, [projectId]);
 	const row = rows[0];
 	if (!row) return null;
-	row.document = normalizeDocument(row.document, row.id, row.name);
-	return row;
+	const mapped = mapProjectRow(row);
+	mapped.document = normalizeDocument(mapped.document, mapped.id, mapped.name);
+	return mapped;
 }
 
 export async function assertProjectAccess(
@@ -121,7 +123,7 @@ export async function assertProjectAccess(
 	if (!project) throw new ProjectAccessError('Project not found', 404);
 
 	if (actor.kind === 'user') {
-		if (project.owner_user_id !== actor.userId) {
+		if (project.owner_user_id !== normalizeUserId(actor.userId)) {
 			throw new ProjectAccessError('Forbidden', 403);
 		}
 		return project;
@@ -130,7 +132,7 @@ export async function assertProjectAccess(
 	if (actor.projectId !== projectId) {
 		throw new ProjectAccessError('Token project mismatch', 403);
 	}
-	if (project.owner_user_id !== actor.userId) {
+	if (project.owner_user_id !== normalizeUserId(actor.userId)) {
 		throw new ProjectAccessError('Forbidden', 403);
 	}
 	if (requiredScope && !tokenHasScope(actor.scopes, requiredScope)) {
@@ -321,7 +323,9 @@ export async function findProjectToken(pool: pg.Pool, bearerToken: string) {
     `,
 		[hashToken(bearerToken)],
 	);
-	return rows[0] ?? null;
+	const row = rows[0];
+	if (!row) return null;
+	return { ...row, owner_user_id: normalizeUserId(row.owner_user_id) };
 }
 
 export async function touchProjectToken(pool: pg.Pool, tokenId: string) {
@@ -330,7 +334,7 @@ export async function touchProjectToken(pool: pg.Pool, tokenId: string) {
 
 export async function listProjectTokens(pool: pg.Pool, projectId: string, userId: number) {
 	const project = await getProjectById(pool, projectId);
-	if (!project || project.owner_user_id !== userId) {
+	if (!project || project.owner_user_id !== normalizeUserId(userId)) {
 		throw new ProjectAccessError('Project not found', 404);
 	}
 	const { rows } = await pool.query<{
@@ -358,7 +362,7 @@ export async function createProjectToken(
 	plaintextToken: string,
 ) {
 	const project = await getProjectById(pool, projectId);
-	if (!project || project.owner_user_id !== userId) {
+	if (!project || project.owner_user_id !== normalizeUserId(userId)) {
 		throw new ProjectAccessError('Project not found', 404);
 	}
 	const tokenHash = hashToken(plaintextToken);
@@ -374,7 +378,7 @@ export async function createProjectToken(
 
 export async function revokeProjectToken(pool: pg.Pool, projectId: string, userId: number, tokenId: string) {
 	const project = await getProjectById(pool, projectId);
-	if (!project || project.owner_user_id !== userId) {
+	if (!project || project.owner_user_id !== normalizeUserId(userId)) {
 		throw new ProjectAccessError('Project not found', 404);
 	}
 	await pool.query(

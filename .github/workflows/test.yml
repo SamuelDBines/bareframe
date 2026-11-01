@@ -204,6 +204,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build @bareframe/designer-core
+        run: pnpm --filter @bareframe/designer-core build
+
       - name: Install Playwright Chromium (consumer smoke + e2e)
         run: pnpm exec playwright install --with-deps chromium
 

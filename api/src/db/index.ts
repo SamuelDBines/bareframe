@@ -1,6 +1,7 @@
 import type pg from 'pg';
 import type { Config } from '../config.js';
 import { createPoolFromDatabaseUrl } from './pool.js';
+import { mapUserRow } from './normalize.js';
 
 export type UserRow = {
 	id: number;
@@ -41,7 +42,7 @@ export async function upsertUser(
     `,
 		[data.githubId, data.login, data.name, data.avatarUrl, data.email],
 	);
-	return rows[0]!;
+	return mapUserRow(rows[0]!);
 }
 
 export async function createSession(
@@ -80,7 +81,8 @@ export async function findUserBySessionToken(
     `,
 		[tokenHash],
 	);
-	return rows[0] ?? null;
+	const row = rows[0];
+	return row ? mapUserRow(row) : null;
 }
 
 export function toPublicUser(row: UserRow) {

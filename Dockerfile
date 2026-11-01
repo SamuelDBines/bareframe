@@ -8,6 +8,7 @@ RUN corepack enable && corepack prepare pnpm@10.8.0 --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/react/package.json packages/react/tsconfig.json packages/react/tsup.config.ts ./packages/react/
+COPY packages/designer-core/package.json packages/designer-core/tsconfig.json packages/designer-core/vitest.config.ts ./packages/designer-core/
 COPY packages/react/scripts ./packages/react/scripts
 COPY scripts ./scripts
 COPY src ./src
@@ -23,10 +24,13 @@ COPY prototype/package.json prototype/pnpm-lock.yaml ./prototype/
 RUN pnpm install --frozen-lockfile
 
 COPY packages/react/src ./packages/react/src
+COPY packages/designer-core/src ./packages/designer-core/src
+COPY packages/designer-core/tests ./packages/designer-core/tests
 COPY showcase ./showcase
 COPY prototype ./prototype
 
 RUN pnpm run build:react
+RUN pnpm --filter @bareframe/designer-core build
 
 RUN pnpm run build \
     && node ./scripts/generate-examples.mjs \

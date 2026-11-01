@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Bareframe Record flow",
+  "version": "0.1.0",
+  "description": "Record click-through journeys for Bareframe Designer canvases.",
+  "permissions": ["activeTab", "storage", "tabs", "scripting", "webNavigation"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Bareframe Record"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png"
+  }
+}

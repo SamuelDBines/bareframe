@@ -18,6 +18,7 @@ env:
   SITE_IMAGE: ghcr.io/samueldbines/bareframe/site
   API_IMAGE: ghcr.io/samueldbines/bareframe/api
   MCP_IMAGE: ghcr.io/samueldbines/bareframe/mcp
+  RENDER_IMAGE: ghcr.io/samueldbines/bareframe/render-worker
 
 jobs:
   build-and-push:
@@ -72,6 +73,18 @@ jobs:
           tags: |
             ${{ env.MCP_IMAGE }}:sha-${{ steps.meta.outputs.short_sha }}
             ${{ env.MCP_IMAGE }}:latest
+          labels: |
+            org.opencontainers.image.source=https://github.com/SamuelDBines/bareframe
+
+      - name: Build and push render worker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: render/Dockerfile
+          push: true
+          tags: |
+            ${{ env.RENDER_IMAGE }}:sha-${{ steps.meta.outputs.short_sha }}
+            ${{ env.RENDER_IMAGE }}:latest
           labels: |
             org.opencontainers.image.source=https://github.com/SamuelDBines/bareframe
 

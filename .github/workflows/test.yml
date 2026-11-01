@@ -46,6 +46,12 @@ jobs:
           npm install
           npm run build
 
+      - name: Build flow-map-engine
+        run: |
+          cd packages/flow-map-engine
+          npm install
+          npm run build
+
       - name: Install API dependencies
         working-directory: api
         run: npm ci
@@ -54,10 +60,16 @@ jobs:
         working-directory: api
         run: npm run typecheck
 
+      - name: Install Playwright Chromium for render tests
+        working-directory: api
+        run: npx playwright install --with-deps chromium
+
       - name: API tests
         working-directory: api
         env:
           DATABASE_URL: postgres://bareframe:bareframe@127.0.0.1:54329/bareframe
+          RENDER_ALLOW_HOSTS: 127.0.0.1
+          RENDER_INLINE: "1"
         run: npm test
 
       - name: Set up Docker Buildx
@@ -119,6 +131,7 @@ jobs:
       - name: Build designer-core and API (studio e2e)
         run: |
           cd packages/designer-core && npm install && npm run build
+          cd packages/flow-map-engine && npm install && npm run build
           cd "$GITHUB_WORKSPACE/api" && npm install && npm run build
 
       - name: MCP typecheck

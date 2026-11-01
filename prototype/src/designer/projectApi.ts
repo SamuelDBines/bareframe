@@ -16,6 +16,15 @@ export type ApiProjectSummary = {
 	updatedAt?: string;
 };
 
+export type RecordingRow = {
+	id: string;
+	name: string;
+	status: string;
+	created_at: string;
+	expires_at: string;
+	built_page_id: string | null;
+};
+
 async function parseJson<T>(res: Response): Promise<T> {
 	if (!res.ok) {
 		const text = await res.text();
@@ -56,6 +65,13 @@ export async function fetchProject(projectId: string): Promise<{
 	return parseJson(
 		await fetch(`/api/projects/${projectId}`, { credentials: 'include' }),
 	);
+}
+
+export async function listRecordings(projectId: string): Promise<RecordingRow[]> {
+	const data = await parseJson<{ recordings: RecordingRow[] }>(
+		await fetch(`/api/projects/${projectId}/recordings`, { credentials: 'include' }),
+	);
+	return data.recordings;
 }
 
 export async function saveProjectDocument(

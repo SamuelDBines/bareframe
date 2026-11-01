@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { font: 13px system-ui, sans-serif; min-width: 280px; margin: 12px; }
+    button { margin: 4px 4px 4px 0; padding: 6px 10px; }
+    .row { margin-bottom: 8px; }
+    label { display: block; font-size: 11px; color: #555; }
+    input { width: 100%; box-sizing: border-box; }
+    #steps { max-height: 160px; overflow: auto; font-size: 11px; }
+    .recording #rec-dot { color: #dc2626; }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <label>Project upload token (recordings:upload)</label>
+    <input id="token" type="password" autocomplete="off" />
+  </div>
+  <div class="row">
+    <label>API base URL</label>
+    <input id="apiBase" value="https://bareframe.org" />
+  </div>
+  <div class="row">
+    <label>Project ID</label>
+    <input id="projectId" />
+  </div>
+  <div class="row">
+    <button id="record">Record</button>
+    <button id="pause" disabled>Pause</button>
+    <button id="stop" disabled>Stop</button>
+    <span id="rec-dot"></span>
+  </div>
+  <div id="steps"></div>
+  <div class="row">
+    <button id="upload" disabled>Upload journey</button>
+  </div>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

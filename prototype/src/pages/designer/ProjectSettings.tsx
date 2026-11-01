@@ -122,7 +122,9 @@ export function ProjectSettingsPage() {
 				<pre style={{ overflow: 'auto', fontSize: '0.85rem' }}>{snippet}</pre>
 				<p style={{ fontSize: '0.85rem', color: 'var(--bf-theme-text-2)' }}>
 					Tools: list_projects, get_project, create_canvas, add_screen, add_component, add_connector,
-					add_annotation, update_node, delete_node, import_screenshots, get_upload_url.
+					add_annotation, update_node, delete_node, import_screenshots, get_upload_url,
+					create_flow_map, screenshot_url, render_frame, list_recordings, build_flow_from_recording.
+					Scopes: <code>flowmap:write</code>, <code>render</code>, <code>recordings:upload</code> for those features.
 				</p>
 			</div>
 		</>

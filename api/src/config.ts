@@ -6,6 +6,7 @@ export type Config = {
 	publicUrl: string;
 	port: number;
 	nodeEnv: string;
+	renderWorkerSecret: string;
 };
 
 function required(name: string): string {
@@ -23,6 +24,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
 		publicUrl: (env.PUBLIC_URL ?? 'http://localhost:8080').replace(/\/$/, ''),
 		port: Number(env.PORT ?? 8080),
 		nodeEnv: env.NODE_ENV ?? 'development',
+		renderWorkerSecret: env.RENDER_WORKER_SECRET ?? 'dev-render-worker-secret',
 	};
 }
 

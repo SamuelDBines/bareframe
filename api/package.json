@@ -9,13 +9,16 @@
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "migrate": "tsx src/migrate-cli.ts"
+    "migrate": "tsx src/migrate-cli.ts",
+    "render-worker": "tsx src/render/worker.ts"
   },
   "dependencies": {
     "@bareframe/designer-core": "file:../packages/designer-core",
+    "@bareframe/flow-map-engine": "file:../packages/flow-map-engine",
     "@hono/node-server": "^1.14.0",
     "hono": "^4.7.6",
     "pg": "^8.14.1",
+    "playwright": "^1.52.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

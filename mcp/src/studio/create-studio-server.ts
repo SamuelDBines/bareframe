@@ -15,6 +15,11 @@ export const STUDIO_TOOL_NAMES = [
 	'delete_node',
 	'import_screenshots',
 	'get_upload_url',
+	'create_flow_map',
+	'screenshot_url',
+	'render_frame',
+	'list_recordings',
+	'build_flow_from_recording',
 ] as const;
 
 type ProjectSummary = { id: string; name: string; version: number; updatedAt?: string };
@@ -350,6 +355,160 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 					size: args.size,
 				}),
 			});
+			return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'create_flow_map',
+		{
+			description:
+				'Crawl a URL (or route list), screenshot pages, build a flow canvas with connectors, and run a consistency audit.',
+			inputSchema: {
+				projectId: z.string(),
+				baseVersion: z.number().int().positive(),
+				url: z.string().optional(),
+				routes: z.array(z.string()).optional(),
+				viewports: z.array(z.enum(['mobile', 'desktop'])).optional(),
+				maxPages: z.number().int().optional(),
+			},
+		},
+		async (args) => {
+			const created = await api.request<{ jobId: string; renderJobId: string }>(
+				`/api/projects/${args.projectId}/flow-maps`,
+				{
+					method: 'POST',
+					body: JSON.stringify({
+						baseVersion: args.baseVersion,
+						url: args.url,
+						routes: args.routes,
+						viewports: args.viewports,
+						maxPages: args.maxPages,
+					}),
+				},
+			);
+			let status = 'queued';
+			let result: unknown = null;
+			for (let i = 0; i < 60; i++) {
+				const job = await api.request<{ status: string; result: unknown }>(
+					`/api/projects/${args.projectId}/flow-maps/${created.jobId}`,
+				);
+				status = job.status;
+				result = job.result;
+				if (status === 'completed' || status === 'failed') break;
+				await new Promise((r) => setTimeout(r, 500));
+			}
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify({ jobId: created.jobId, status, result }, null, 2),
+					},
+				],
+			};
+		},
+	);
+
+	server.registerTool(
+		'screenshot_url',
+		{
+			description: 'Capture a live URL to PNG at a mobile or desktop viewport preset.',
+			inputSchema: {
+				projectId: z.string(),
+				url: z.string(),
+				viewport: z.enum(['mobile', 'desktop']).optional(),
+			},
+		},
+		async (args) => {
+			const { jobId } = await api.request<{ jobId: string }>(
+				`/api/projects/${args.projectId}/render-jobs`,
+				{
+					method: 'POST',
+					body: JSON.stringify({
+						kind: 'screenshot_url',
+						url: args.url,
+						viewport: args.viewport ?? 'mobile',
+					}),
+				},
+			);
+			for (let i = 0; i < 40; i++) {
+				const job = await api.request<{ status: string; result: unknown }>(
+					`/api/projects/${args.projectId}/render-jobs/${jobId}`,
+				);
+				if (job.status === 'completed' || job.status === 'failed') {
+					return { content: [{ type: 'text', text: JSON.stringify(job, null, 2) }] };
+				}
+				await new Promise((r) => setTimeout(r, 300));
+			}
+			return { isError: true, content: [{ type: 'text', text: 'Screenshot timed out' }] };
+		},
+	);
+
+	server.registerTool(
+		'render_frame',
+		{
+			description: 'Render a Designer frame to PNG, optionally including annotation overlays.',
+			inputSchema: {
+				projectId: z.string(),
+				frameId: z.string(),
+				withAnnotations: z.boolean().optional(),
+			},
+		},
+		async (args) => {
+			const { jobId } = await api.request<{ jobId: string }>(
+				`/api/projects/${args.projectId}/render-jobs`,
+				{
+					method: 'POST',
+					body: JSON.stringify({
+						kind: 'render_frame',
+						frameId: args.frameId,
+						withAnnotations: args.withAnnotations ?? true,
+					}),
+				},
+			);
+			for (let i = 0; i < 40; i++) {
+				const job = await api.request<{ status: string; result: unknown }>(
+					`/api/projects/${args.projectId}/render-jobs/${jobId}`,
+				);
+				if (job.status === 'completed' || job.status === 'failed') {
+					return { content: [{ type: 'text', text: JSON.stringify(job, null, 2) }] };
+				}
+				await new Promise((r) => setTimeout(r, 300));
+			}
+			return { isError: true, content: [{ type: 'text', text: 'Render timed out' }] };
+		},
+	);
+
+	server.registerTool(
+		'list_recordings',
+		{
+			description: 'List flow recordings uploaded for a project.',
+			inputSchema: { projectId: z.string() },
+		},
+		async ({ projectId }) => {
+			const data = await api.request(`/api/projects/${projectId}/recordings`);
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'build_flow_from_recording',
+		{
+			description: 'Build a canvas journey from a completed recording.',
+			inputSchema: {
+				projectId: z.string(),
+				recordingId: z.string(),
+				baseVersion: z.number().int().positive(),
+			},
+		},
+		async (args) => {
+			const result = await api.request(
+				`/api/projects/${args.projectId}/recordings/${args.recordingId}/build`,
+				{
+					method: 'POST',
+					body: JSON.stringify({ baseVersion: args.baseVersion }),
+				},
+			);
 			return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
 		},
 	);

@@ -3,6 +3,13 @@ export type PropDef = {
 	type: string;
 	default?: string;
 	description: string;
+	required?: boolean;
+};
+
+export type PropsSummary = {
+	required: string[];
+	optional: { name: string; type: string; default?: string }[];
+	variants?: string[];
 };
 
 export type ExampleSource = {
@@ -13,10 +20,12 @@ export type ExampleSource = {
 
 export type ComponentRecord = {
 	slug: string;
+	description: string;
 	category: string;
 	stability: 'stable' | 'beta' | 'experimental';
 	reactExport: string | null;
 	props: PropDef[];
+	propsSummary: PropsSummary;
 	examples: ExampleSource[];
 };
 
@@ -47,6 +56,7 @@ export type InstallSteps = {
 export type Catalog = {
 	bundledAt: string;
 	bareframeVersion: string;
+	defaultThemeId: string;
 	manifest: { generatedAt: string; componentCount: number; components: string[] };
 	tokens: { generatedAt: string; tokens: string[] };
 	themes: ThemeRecord[];

@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import * as z from 'zod';
 import {
 	getComponent,
+	getDesignTokens,
 	getTheme,
 	listComponents,
 	listThemes,
@@ -9,6 +10,8 @@ import {
 	searchDocs,
 	usageSnippet,
 } from './catalog.js';
+import { compactComponentListItem } from './component-summary.js';
+import { scaffoldScreen } from './scaffold-screen.js';
 
 export function createBareframeMcpServer(): McpServer {
 	const catalog = loadCatalog();
@@ -24,16 +27,21 @@ export function createBareframeMcpServer(): McpServer {
 		'list_components',
 		{
 			description:
-				'Returns slugs, categories, and stability for Bareframe web components and @bareframe/react exports.',
+				'List Bareframe components with stability, one-line description, category, and compact props summaries. Use detail=full only when you need full prop tables.',
 			inputSchema: {
 				category: z.string().optional().describe('Optional category filter (forms, actions, …)'),
 				stability: z
 					.enum(['stable', 'beta', 'experimental'])
 					.optional()
 					.describe('Optional stability filter'),
+				detail: z
+					.enum(['summary', 'full'])
+					.optional()
+					.default('summary')
+					.describe('summary (default) keeps payloads small; full adds prop tables'),
 			},
 		},
-		async ({ category, stability }) => {
+		async ({ category, stability, detail }) => {
 			let items = listComponents(catalog);
 			if (category) items = items.filter((c) => c.category === category);
 			if (stability) items = items.filter((c) => c.stability === stability);
@@ -45,12 +53,7 @@ export function createBareframeMcpServer(): McpServer {
 							{
 								generatedAt: catalog.manifest.generatedAt,
 								count: items.length,
-								components: items.map(({ slug, category: cat, stability: stab, reactExport }) => ({
-									slug,
-									category: cat,
-									stability: stab,
-									reactExport,
-								})),
+								components: items.map((c) => compactComponentListItem(c, detail)),
 							},
 							null,
 							2,
@@ -85,9 +88,11 @@ export function createBareframeMcpServer(): McpServer {
 						text: JSON.stringify(
 							{
 								slug: component.slug,
+								description: component.description,
 								category: component.category,
 								stability: component.stability,
 								reactExport: component.reactExport,
+								propsSummary: component.propsSummary,
 								props: component.props,
 								examples: component.examples,
 								suggestedUsage: usageSnippet(component),
@@ -134,9 +139,80 @@ export function createBareframeMcpServer(): McpServer {
 	);
 
 	server.registerTool(
+		'get_design_tokens',
+		{
+			description:
+				'Structured design tokens for a Bareframe theme (colors, spacing, typography, radii, shadows) sourced from themes/*.css. Defaults to the light theme.',
+			inputSchema: {
+				themeId: z
+					.string()
+					.optional()
+					.describe('Theme id from list_themes (default: catalog default, usually light)'),
+				includeCssVariables: z
+					.boolean()
+					.optional()
+					.default(false)
+					.describe('When true, include raw --bf-theme-* maps alongside grouped tokens'),
+			},
+		},
+		async ({ themeId, includeCssVariables }) => {
+			const payload = getDesignTokens(catalog, themeId, includeCssVariables);
+			if (!payload) {
+				return {
+					isError: true,
+					content: [
+						{
+							type: 'text',
+							text: `Unknown theme id: ${themeId ?? catalog.defaultThemeId}`,
+						},
+					],
+				};
+			}
+			return {
+				content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }],
+			};
+		},
+	);
+
+	server.registerTool(
+		'scaffold_screen',
+		{
+			description:
+				'Generate a type-safe @bareframe/react page layout (TSX) from a screen intent and/or component slugs. Uses real exports and theme CSS imports.',
+			inputSchema: {
+				intent: z
+					.string()
+					.optional()
+					.describe('Short description of the screen, e.g. "delivery dashboard" or "login form"'),
+				components: z
+					.array(z.string())
+					.optional()
+					.describe('Component slugs with @bareframe/react exports (see list_components)'),
+				themeId: z.string().optional().describe('Theme id (default light)'),
+				title: z.string().optional().describe('Page heading shown in the scaffold'),
+			},
+		},
+		async ({ intent, components, themeId, title }) => {
+			try {
+				const result = scaffoldScreen(catalog, { intent, components, themeId, title });
+				return {
+					content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+				};
+			} catch (err) {
+				const message = err instanceof Error ? err.message : String(err);
+				return {
+					isError: true,
+					content: [{ type: 'text', text: message }],
+				};
+			}
+		},
+	);
+
+	server.registerTool(
 		'export_tokens',
 		{
-			description: 'JSON token manifest aligned with bareframe/tokens.json.',
+			description:
+				'Legacy flat token export (tokens.json names or per-theme --bf-theme-* map). Prefer get_design_tokens for structured color/spacing/typography.',
 			inputSchema: {
 				themeId: z
 					.string()
@@ -276,6 +352,8 @@ export const TOOL_NAMES = [
 	'list_components',
 	'get_component',
 	'list_themes',
+	'get_design_tokens',
+	'scaffold_screen',
 	'export_tokens',
 	'search_docs',
 	'get_install_steps',

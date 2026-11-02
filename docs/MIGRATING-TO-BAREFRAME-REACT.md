@@ -163,6 +163,8 @@ Props are documented from **`packages/react`** sources (see MCP **`get_component
 
 Run MCP **`get_component`** with a slug (e.g. `button`) for the prop table and **real `.example.tsx` sources** from the docs app.
 
+Use **`get_design_tokens`** with a theme id (e.g. `aurora`) for resolved color, spacing, and typography values instead of guessing from CSS. Use **`list_components`** for stability (`stable` / `beta` / `experimental`) and compact props summaries before calling **`get_component`** for every slug.
+
 ---
 
 ## 6. Migration checklist
@@ -182,5 +184,5 @@ Run MCP **`get_component`** with a slug (e.g. `button`) for the prop table and *
 ## 7. Need help?
 
 - **Docs:** [Get started](https://bareframe.org/#/components/start) on bareframe.org  
-- **MCP:** `get_migration_guide`, `get_install_steps`, `search_docs` tools  
+- **MCP:** `get_migration_guide`, `get_install_steps`, `get_design_tokens`, `scaffold_screen`, `list_components`, `search_docs`  
 - **Issues:** [github.com/SamuelDBines/bareframe/issues](https://github.com/SamuelDBines/bareframe/issues)

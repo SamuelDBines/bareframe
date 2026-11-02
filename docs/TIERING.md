@@ -32,3 +32,5 @@ Tier B inherits Tier A checklist but **interaction tests are required before dec
 Examples: heavyweight or placeholder visuals (`chart` placeholder stubs, `video-player`, `map`, niche widgets).
 
 Promotion rule: Tier C → Tier B opens a tracking issue referencing [COMPONENT-CONTRACT.md](./COMPONENT-CONTRACT.md) completeness.
+
+Tier lists for automation live in [`docs/component-tiers.json`](../docs/component-tiers.json) (used by the public MCP catalog).

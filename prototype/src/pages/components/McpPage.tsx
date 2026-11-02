@@ -71,7 +71,10 @@ export function McpPage() {
 						<tbody>
 							<tr>
 								<td><code>list_components</code></td>
-								<td>Slugs, categories, stability, and @bareframe/react export names.</td>
+								<td>
+									Stability, description, category, React export, and compact props summaries (optional{' '}
+									<code>detail=full</code>).
+								</td>
 							</tr>
 							<tr>
 								<td><code>get_component</code></td>
@@ -82,8 +85,22 @@ export function McpPage() {
 								<td>Built-in theme ids and CSS import paths.</td>
 							</tr>
 							<tr>
+								<td><code>get_design_tokens</code></td>
+								<td>
+									Structured theme tokens (semantic colors, spacing, typography, radii, shadows) from{' '}
+									<code>themes/*.css</code>.
+								</td>
+							</tr>
+							<tr>
+								<td><code>scaffold_screen</code></td>
+								<td>
+									Generate a working <code>@bareframe/react</code> page layout (TSX) from intent and/or
+									component slugs.
+								</td>
+							</tr>
+							<tr>
 								<td><code>export_tokens</code></td>
-								<td>Token manifest (<code>tokens.json</code>) or per-theme values.</td>
+								<td>Legacy flat token manifest; prefer <code>get_design_tokens</code>.</td>
 							</tr>
 							<tr>
 								<td><code>search_docs</code></td>

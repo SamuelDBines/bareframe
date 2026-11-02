@@ -68,6 +68,26 @@ describe('Bareframe MCP HTTP integration', () => {
 		const themesResult = await client.callTool({ name: 'list_themes', arguments: {} });
 		expect(themesResult.isError).not.toBe(true);
 
+		const designTokensResult = await client.callTool({
+			name: 'get_design_tokens',
+			arguments: { themeId: 'aurora' },
+		});
+		expect(designTokensResult.isError).not.toBe(true);
+		expect(JSON.stringify(designTokensResult.content)).toContain('buttonPrimary');
+
+		const scaffoldResult = await client.callTool({
+			name: 'scaffold_screen',
+			arguments: { intent: 'delivery dashboard', themeId: 'aurora', components: ['button', 'card'] },
+		});
+		expect(scaffoldResult.isError).not.toBe(true);
+		expect(JSON.stringify(scaffoldResult.content)).toContain('@bareframe/react');
+
+		const listDetailed = await client.callTool({
+			name: 'list_components',
+			arguments: { stability: 'stable', detail: 'summary' },
+		});
+		expect(JSON.stringify(listDetailed.content)).toContain('propsSummary');
+
 		const tokensResult = await client.callTool({ name: 'export_tokens', arguments: {} });
 		expect(tokensResult.isError).not.toBe(true);
 

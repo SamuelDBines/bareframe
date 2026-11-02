@@ -5,6 +5,12 @@ test.describe('designer canvas', () => {
 		await page.goto('/designer/index.html#/editor', { waitUntil: 'domcontentloaded', timeout: 60_000 });
 		await expect(page.locator('.infinite-canvas')).toBeVisible({ timeout: 30_000 });
 		await page.waitForSelector('.frame-preview-iframe', { timeout: 30_000 });
+		await page
+			.locator('.frame-preview-shell--ready')
+			.first()
+			.waitFor({ state: 'attached', timeout: 30_000 })
+			.catch(() => undefined);
+		await page.waitForTimeout(300);
 	});
 
 	test('canvas column sits beside inspector (no horizontal overlap)', async ({ page }) => {

@@ -6,6 +6,7 @@ import {
   createOpenAiCompatibleAdapter,
   runPipelineStages,
 } from '@bareframe/package-generator';
+import type { StageProgress } from '@bareframe/package-generator';
 import { normalizeIntake, validateBareframePackage, type IntakePayload } from '@bareframe/package-contracts';
 import type { Config } from '../config.js';
 import { isValidComponentSlug } from '../catalog/components.js';
@@ -65,7 +66,7 @@ export async function processPackageGenerationJob(
     const artifacts = await runPipelineStages(llm, {
       intake,
       projectName,
-      onProgress: (p) => {
+      onProgress: (p: StageProgress) => {
         void updatePackageJob(pool, jobId, {
           stage: p.stage,
           progress: { index: p.index, total: p.total, label: p.label },

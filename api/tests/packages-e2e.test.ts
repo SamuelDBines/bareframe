@@ -37,7 +37,7 @@ describe('product package generation e2e', () => {
       });
     });
 
-    const start = await fetch(`${baseUrl}/api/auth/github?returnTo=/`);
+    const start = await fetch(`${baseUrl}/api/auth/github?returnTo=/`, { redirect: 'manual' });
     const oauthCookie = cookieHeaderFromResponse(start);
     const state = new URL(start.headers.get('location')!).searchParams.get('state')!;
     const callback = await fetch(

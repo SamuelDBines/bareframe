@@ -76,6 +76,23 @@ export async function incrementReviewUsage(pool: pg.Pool, userId: number) {
   );
 }
 
+export async function assertScreenCountForUser(
+  pool: pg.Pool,
+  userId: number,
+  document: { project?: { frames?: unknown[] } },
+) {
+  const tier = await getUserPlanTier(pool, userId);
+  const limits = PLAN_LIMITS[tier];
+  if (limits.maxScreensPerProject === Number.POSITIVE_INFINITY) return;
+  const count = countScreensInDocument(document);
+  if (count > limits.maxScreensPerProject) {
+    throw new PlanLimitError(
+      'screen_limit',
+      `Free plan allows ${limits.maxScreensPerProject} screens per project. Upgrade to Bareframe Pro.`,
+    );
+  }
+}
+
 export async function assertCanCreateProject(pool: pg.Pool, userId: number) {
   const tier = await getUserPlanTier(pool, userId);
   const limits = PLAN_LIMITS[tier];

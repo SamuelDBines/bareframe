@@ -34,6 +34,31 @@ export type ReviewLlmAdapter = {
   completeJson<T>(input: { projectName: string; frameCount: number; pageCount: number }): Promise<T>;
 };
 
+export type ReviewDiff = {
+  added: { title: string; category: string }[];
+  removed: { title: string; category: string }[];
+  unchanged: number;
+};
+
+export function computeReviewDiff(
+  previous: ReviewIssue[] | null | undefined,
+  current: ReviewIssue[],
+): ReviewDiff | null {
+  if (!previous?.length) return null;
+  const key = (i: Pick<ReviewIssue, 'title' | 'category'>) => `${i.category}::${i.title.trim().toLowerCase()}`;
+  const prevOpen = previous.filter((i) => i.status === 'open');
+  const prevKeys = new Set(prevOpen.map(key));
+  const curKeys = new Set(current.filter((i) => i.status === 'open').map(key));
+  const added = current
+    .filter((i) => i.status === 'open' && !prevKeys.has(key(i)))
+    .map((i) => ({ title: i.title, category: i.category }));
+  const removed = prevOpen
+    .filter((i) => !curKeys.has(key(i)))
+    .map((i) => ({ title: i.title, category: i.category }));
+  const unchanged = current.filter((i) => i.status === 'open' && prevKeys.has(key(i))).length;
+  return { added, removed, unchanged };
+}
+
 export function createFixtureReviewLlm(project: ProjectDocument): ReviewLlmAdapter {
   return {
     async completeJson<T>() {
@@ -131,6 +156,12 @@ export async function processReviewRun(
     if (!project) throw new Error('Project not found');
 
     const doc = project.document as ProjectDocument;
+    let previousIssues: ReviewIssue[] | null = null;
+    if (row.previous_run_id) {
+      const prevRun = await getReviewRun(pool, row.previous_run_id, userId);
+      previousIssues = (prevRun?.issues as ReviewIssue[] | undefined) ?? null;
+    }
+
     const out = await llm.completeJson<{ issues: ReviewIssue[] }>({
       projectName: project.name,
       frameCount: doc.project.frames.length,
@@ -175,11 +206,14 @@ export async function processReviewRun(
       newVersion,
     ]);
 
+    const diff = computeReviewDiff(previousIssues, issues);
+
     const summary = {
       open: issues.filter((i) => i.status === 'open').length,
       resolved: issues.filter((i) => i.status === 'resolved').length,
       dismissed: issues.filter((i) => i.status === 'dismissed').length,
       changedFromPrevious: Boolean(row.previous_run_id),
+      diff,
     };
 
     await pool.query(

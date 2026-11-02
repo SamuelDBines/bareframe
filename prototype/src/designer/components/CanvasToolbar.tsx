@@ -2,6 +2,9 @@ import { Select } from '../../components/Select';
 import { THEME_IDS, THEME_LABELS, type ThemeId } from '../../theme/themes';
 import { DEFAULT_DEVICE_PRESETS, DUPLICATE_TO_DEVICES_DEFAULT } from '../devicePresets';
 import { useDesigner } from '../store';
+import { useAppCanvasChrome } from '../AppCanvasChrome';
+import { createProjectShare, startProCheckout } from '../../app/reviewApi';
+import { useState } from 'react';
 
 function compareSelectValue(compare: ReturnType<typeof useDesigner>['state']['ui']['compare']): string {
 	if (!compare) return '';
@@ -13,9 +16,50 @@ export function CanvasToolbar() {
 	const { project, ui } = state;
 	const frame = project.frames.find((f) => f.id === ui.selectedFrameId);
 	const compareValue = compareSelectValue(ui.compare);
+	const chrome = useAppCanvasChrome();
+	const [toast, setToast] = useState<string | null>(null);
+
+	async function handleShare() {
+		if (!chrome.projectId) return;
+		try {
+			const { publicUrl } = await createProjectShare(chrome.projectId);
+			await navigator.clipboard.writeText(publicUrl);
+			setToast('Share link copied');
+		} catch {
+			setToast('Could not create share link');
+		}
+	}
+
+	async function handleUpgrade() {
+		try {
+			const result = await startProCheckout();
+			if (result.checkoutUrl) {
+				window.location.href = result.checkoutUrl;
+				return;
+			}
+			setToast(result.message ?? 'Checkout unavailable');
+		} catch (e) {
+			setToast(e instanceof Error ? e.message : 'Checkout failed');
+		}
+	}
 
 	return (
 		<div className="canvas-subtoolbar">
+			{(chrome.showShare || chrome.showUpgrade) && (
+				<div className="canvas-app-actions">
+					{chrome.showShare && chrome.projectId ? (
+						<button type="button" className="btn btn-secondary btn-sm" onClick={() => void handleShare()}>
+							Share canvas
+						</button>
+					) : null}
+					{chrome.showUpgrade ? (
+						<button type="button" className="btn btn-primary btn-sm" onClick={() => void handleUpgrade()}>
+							Upgrade · £20/mo
+						</button>
+					) : null}
+					{toast ? <span className="canvas-app-toast">{toast}</span> : null}
+				</div>
+			)}
 			<div className="canvas-subtoolbar-mobile-toggles">
 				<button
 					type="button"

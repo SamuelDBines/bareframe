@@ -97,5 +97,18 @@ describe('journey AI review e2e', () => {
       body: JSON.stringify({ url: 'https://example.com' }),
     });
     expect(check.status).toBe(200);
+
+    const review2 = await fetch(`${baseUrl}/api/projects/${project.id}/reviews`, {
+      method: 'POST',
+      headers: { Cookie: sessionCookie },
+    });
+    expect(review2.status).toBe(202);
+    const { runId: runId2 } = (await review2.json()) as { runId: string };
+    const run2 = await fetch(`${baseUrl}/api/projects/${project.id}/reviews/${runId2}`, {
+      headers: { Cookie: sessionCookie },
+    });
+    const run2Json = (await run2.json()) as { summary?: { changedFromPrevious?: boolean; diff?: unknown } };
+    expect(run2Json.summary?.changedFromPrevious).toBe(true);
+    expect(run2Json.summary?.diff).toBeTruthy();
   }, 120_000);
 });

@@ -9,7 +9,15 @@ import {
   getPlanSummary,
   PlanLimitError,
 } from '../plans/limits.js';
-import { createFixtureReviewLlm, createReviewRun, getReviewRun, listReviewRuns, patchReviewIssue, processReviewRun } from './process-review.js';
+import { createOpenAiCompatibleReviewLlm } from './llm.js';
+import {
+  createFixtureReviewLlm,
+  createReviewRun,
+  getReviewRun,
+  listReviewRuns,
+  patchReviewIssue,
+  processReviewRun,
+} from './process-review.js';
 
 function reviewLlmForProject(config: Config, projectDoc: import('@bareframe/designer-core').ProjectDocument) {
   if (config.llmAdapter === 'fixture' || config.nodeEnv === 'test') {
@@ -17,6 +25,9 @@ function reviewLlmForProject(config: Config, projectDoc: import('@bareframe/desi
   }
   if (config.llmAdapter === 'disabled') {
     return null;
+  }
+  if (config.llmAdapter === 'openai_compatible') {
+    return createOpenAiCompatibleReviewLlm(config, projectDoc);
   }
   return createFixtureReviewLlm(projectDoc);
 }

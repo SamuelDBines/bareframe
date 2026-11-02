@@ -66,3 +66,35 @@ export async function fetchPublicShare(token: string) {
   if (!res.ok) throw new Error('Share link not found');
   return res.json();
 }
+
+export async function fetchBillingConfig() {
+  const res = await fetch('/api/billing/config');
+  if (!res.ok) throw new Error('Billing config unavailable');
+  return res.json() as Promise<{ stripeEnabled: boolean; priceLabel: string; planName: string }>;
+}
+
+export async function startProCheckout(): Promise<{
+  checkoutUrl?: string;
+  message?: string;
+  disabled?: boolean;
+}> {
+  const res = await fetch('/api/billing/checkout', { method: 'POST', credentials: 'include' });
+  const data = (await res.json().catch(() => ({}))) as {
+    checkoutUrl?: string;
+    message?: string;
+    disabled?: boolean;
+  };
+  if (res.status === 503) {
+    return { disabled: true, message: data.message ?? 'Stripe is not configured on this deployment.' };
+  }
+  if (!res.ok) {
+    throw new Error(data.message ?? 'Checkout failed');
+  }
+  return data;
+}
+
+export async function listReviewRuns(projectId: string) {
+  const res = await fetch(`/api/projects/${projectId}/reviews`, { credentials: 'include' });
+  if (!res.ok) throw new Error('Failed to list reviews');
+  return res.json() as Promise<{ runs: { id: string; status: string }[] }>;
+}

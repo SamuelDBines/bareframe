@@ -19,7 +19,7 @@ import {
 	revokeProjectToken,
 	VersionConflictError,
 } from '../db/projects.js';
-import { assertCanCreateProject, PlanLimitError } from '../plans/limits.js';
+import { assertCanCreateProject, assertScreenCountForUser, PlanLimitError } from '../plans/limits.js';
 import type { ProjectDocument } from '@bareframe/designer-core';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from './auth.js';
 import { publishProjectUpdate, subscribeProject } from './events.js';

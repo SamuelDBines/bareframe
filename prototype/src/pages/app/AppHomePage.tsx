@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Button } from '@bareframe/react';
 import { createProject, listProjects } from '../../designer/projectApi';
-import { fetchPlan } from '../../app/reviewApi';
+import { createFlowMap, fetchPlan, startProCheckout } from '../../app/reviewApi';
 import { NewProductPage } from '../designer/NewProductPage';
 
 export function AppHomePage() {
@@ -47,7 +47,6 @@ export function AppHomePage() {
     setError(null);
     try {
       const p = await createProject(`Import: ${new URL(importUrl).hostname}`);
-      const { createFlowMap } = await import('../../app/reviewApi');
       await createFlowMap(p.id, importUrl.trim(), p.version);
       navigate(`/app/project/${p.id}`);
     } catch (e) {
@@ -123,7 +122,17 @@ export function AppHomePage() {
       {error ? <p className="app-error">{error}</p> : null}
       {projects.length > 0 ? (
         <section className="app-card" style={{ marginTop: '2rem' }}>
-          <h2>Your projects</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+            <h2 style={{ margin: 0 }}>Your projects</h2>
+            {planTier === 'free' ? (
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => void startProCheckout().then((r) => {
+                if (r.checkoutUrl) window.location.href = r.checkoutUrl;
+                else setError(r.message ?? 'Checkout unavailable');
+              })}>
+                Upgrade · £20/mo
+              </button>
+            ) : null}
+          </div>
           <ul className="app-project-list">
             {projects.map((p) => (
               <li key={p.id}>

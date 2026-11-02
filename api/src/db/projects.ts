@@ -10,6 +10,7 @@ import {
 	type ProjectDocument,
 } from '@bareframe/designer-core';
 import { hashToken } from '../auth/crypto.js';
+import { assertScreenCountForUser } from '../plans/limits.js';
 import { mapProjectRow, normalizeUserId } from './normalize.js';
 
 export type ProjectRow = {
@@ -205,6 +206,8 @@ export async function applyProjectCommandTx(pool: pg.Pool, input: ApplyCommandIn
 		const nextVersion = row.version + 1;
 		result.document.project.id = row.id;
 		result.document.project.name = row.name;
+		const ownerId = input.actor.userId;
+		await assertScreenCountForUser(pool, ownerId, result.document);
 		await client.query(
 			`UPDATE projects SET document = $2, version = $3, updated_at = NOW() WHERE id = $1`,
 			[row.id, result.document, nextVersion],
@@ -250,6 +253,8 @@ export async function applyImportScreenshotsTx(
 		if (row.version !== input.baseVersion) throw new VersionConflictError(row.version);
 		const document = normalizeDocument(row.document, row.id, row.name);
 		const result = applyImportScreenshots(document, input.shots, input.links, ctx);
+		const ownerId = input.actor.kind === 'user' ? input.actor.userId : input.actor.userId;
+		await assertScreenCountForUser(pool, ownerId, result.document);
 		const nextVersion = row.version + 1;
 		await client.query(
 			`UPDATE projects SET document = $2, version = $3, updated_at = NOW() WHERE id = $1`,
@@ -296,6 +301,7 @@ export async function replaceProjectDocument(
 		}
 		document.project.id = row.id;
 		document.project.name = row.name;
+		await assertScreenCountForUser(pool, userId, document);
 		const nextVersion = row.version + 1;
 		await client.query(
 			`UPDATE projects SET document = $2, version = $3, updated_at = NOW() WHERE id = $1`,

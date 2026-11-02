@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@bareframe/react';
 import { DEMO_REVIEW_ISSUES } from '../../designer/demoReviewProject';
-import { getReviewRun, patchReviewIssue, startReview } from '../../app/reviewApi';
+import {
+  getReviewRun,
+  patchReviewIssue,
+  startProCheckout,
+  startReview,
+} from '../../app/reviewApi';
 
 type Issue = {
   id: string;
@@ -13,18 +18,40 @@ type Issue = {
   status: string;
 };
 
+type ReviewDiff = {
+  added: { title: string; category: string }[];
+  removed: { title: string; category: string }[];
+  unchanged: number;
+};
+
+type ReviewSummary = {
+  changedFromPrevious?: boolean;
+  diff?: ReviewDiff | null;
+};
+
 export function AppReviewPanel({
   projectId,
   demoIssues,
+  showUpgrade,
 }: {
   projectId: string;
   demoIssues?: boolean;
+  showUpgrade?: boolean;
 }) {
   const [runId, setRunId] = useState<string | null>(null);
   const [issues, setIssues] = useState<Issue[]>(demoIssues ? [...DEMO_REVIEW_ISSUES] : []);
+  const [summary, setSummary] = useState<ReviewSummary | null>(
+    demoIssues
+      ? {
+          changedFromPrevious: false,
+          diff: null,
+        }
+      : null,
+  );
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [checkoutMsg, setCheckoutMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (!runId) return;
@@ -32,6 +59,7 @@ export function AppReviewPanel({
       void getReviewRun(projectId, runId).then((run) => {
         setStatus(run.status);
         setIssues(run.issues ?? []);
+        setSummary(run.summary ?? null);
         if (run.status === 'completed' || run.status === 'failed') clearInterval(t);
       });
     }, 800);
@@ -59,17 +87,56 @@ export function AppReviewPanel({
     setIssues((prev) => prev.map((i) => (i.id === issueId ? { ...i, status: next } : i)));
   }
 
+  async function upgrade() {
+    try {
+      const result = await startProCheckout();
+      if (result.checkoutUrl) {
+        window.location.href = result.checkoutUrl;
+        return;
+      }
+      setCheckoutMsg(result.message ?? 'Configure Stripe env vars to enable checkout.');
+    } catch (e) {
+      setCheckoutMsg(e instanceof Error ? e.message : 'Checkout failed');
+    }
+  }
+
+  const diff = summary?.diff;
+
   return (
     <aside className="app-review-panel" aria-label="AI review">
       <header>
         <h2>AI review</h2>
         <p className="ds-meta">UX, gaps, a11y, consistency, and suggested fixes.</p>
       </header>
-      <Button variant="primary" isDisabled={busy} onPress={() => void runReview()}>
-        Run review pass
-      </Button>
+      <div className="app-actions">
+        <Button variant="primary" isDisabled={busy} onPress={() => void runReview()}>
+          Run review pass
+        </Button>
+        {showUpgrade ? (
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => void upgrade()}>
+            Pro · £20/mo
+          </button>
+        ) : null}
+      </div>
+      {checkoutMsg ? <p className="ds-meta">{checkoutMsg}</p> : null}
       {error ? <p className="app-error">{error}</p> : null}
       {status ? <p className="ds-meta">Status: {status}</p> : null}
+      {summary?.changedFromPrevious && diff ? (
+        <div className="app-review-diff card" style={{ marginTop: '0.75rem', padding: '0.75rem' }}>
+          <strong>Changes since last run</strong>
+          {diff.added.length > 0 ? (
+            <p className="ds-meta">
+              New: {diff.added.map((d) => d.title).join('; ')}
+            </p>
+          ) : null}
+          {diff.removed.length > 0 ? (
+            <p className="ds-meta">
+              Resolved or removed: {diff.removed.map((d) => d.title).join('; ')}
+            </p>
+          ) : null}
+          {diff.unchanged > 0 ? <p className="ds-meta">{diff.unchanged} open issue(s) unchanged</p> : null}
+        </div>
+      ) : null}
       <ol className="app-review-issues">
         {issues.map((issue) => (
           <li key={issue.id} className={`app-review-issue severity-${issue.severity}`}>
@@ -81,10 +148,18 @@ export function AppReviewPanel({
             </p>
             {issue.status === 'open' ? (
               <div className="app-actions">
-                <button type="button" className="btn btn-sm btn-secondary" onClick={() => void setIssueStatus(issue.id, 'resolved')}>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary"
+                  onClick={() => void setIssueStatus(issue.id, 'resolved')}
+                >
                   Resolve
                 </button>
-                <button type="button" className="btn btn-sm btn-ghost" onClick={() => void setIssueStatus(issue.id, 'dismissed')}>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-ghost"
+                  onClick={() => void setIssueStatus(issue.id, 'dismissed')}
+                >
                   Dismiss
                 </button>
               </div>

@@ -1,4 +1,6 @@
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { serve } from '@hono/node-server';
 import type { Server } from 'node:http';
 import { validateBareframePackage } from '@bareframe/package-contracts';
@@ -20,6 +22,9 @@ describe('product package generation e2e', () => {
   beforeAll(async () => {
     process.env.NODE_ENV = 'test';
     process.env.PACKAGE_INLINE = '1';
+    const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+    process.env.BAREFRAME_CATALOG_PATH =
+      process.env.BAREFRAME_CATALOG_PATH ?? path.join(repoRoot, 'mcp/data/catalog.json');
     resetPackageJobEventBusForTests();
     resetPackageRateLimitForTests();
     pool = createPool(testConfig);
@@ -38,8 +43,12 @@ describe('product package generation e2e', () => {
     });
 
     const start = await fetch(`${baseUrl}/api/auth/github?returnTo=/`, { redirect: 'manual' });
+    expect(start.status).toBe(302);
+    const location = start.headers.get('location');
+    expect(location).toBeTruthy();
     const oauthCookie = cookieHeaderFromResponse(start);
-    const state = new URL(start.headers.get('location')!).searchParams.get('state')!;
+    const state = new URL(location!).searchParams.get('state');
+    expect(state).toBeTruthy();
     const callback = await fetch(
       `${baseUrl}/api/auth/github/callback?code=ok&state=${encodeURIComponent(state)}`,
       { headers: { Cookie: oauthCookie }, redirect: 'manual' },

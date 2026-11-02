@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { serve } from '@hono/node-server';
 import type { Server } from 'node:http';
-import { createEmptyProjectDocument } from '@bareframe/designer-core';
+import { createEmptyProjectDocument, defaultNewId } from '@bareframe/designer-core';
 import { createApp } from '../src/app.js';
 import { createPool } from '../src/db/index.js';
 import { setupTestDb, testConfig, mockGitHubUser } from '../src/test-utils.js';
@@ -54,7 +54,7 @@ describe('free plan screen limit', () => {
       body: JSON.stringify({ name: 'Screen cap' }),
     });
     const project = (await created.json()) as { id: string; version: number; document: { project: { pages: { id: string }[] } } };
-    const doc = createEmptyProjectDocument(project.id, 'Screen cap', 'light');
+    const doc = createEmptyProjectDocument(project.id, 'Screen cap', 'light', { newId: defaultNewId });
     const pageId = doc.project.pages[0]!.id;
     doc.project.frames = Array.from({ length: 11 }, (_, i) => ({
       id: `frame-${i}`,

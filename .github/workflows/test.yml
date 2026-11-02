@@ -52,6 +52,12 @@ jobs:
           npm install
           npm run build
 
+      - name: Build package contracts and generator
+        run: |
+          cd packages/package-contracts && npm install && npm run build
+          cd ../design-handoff && npm install && npm run build
+          cd ../package-generator && npm install && npm run build
+
       - name: Install API dependencies
         working-directory: api
         run: npm ci
@@ -141,6 +147,11 @@ jobs:
         run: |
           pnpm run build:lib
           pnpm run generate:component-props
+          pnpm run build:react
+
+      - name: Build design-handoff
+        run: |
+          cd packages/design-handoff && npm install && npm run build
 
       - name: Build designer-core and API (studio e2e)
         run: |

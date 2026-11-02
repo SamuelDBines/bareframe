@@ -13,6 +13,7 @@
     "stdio": "node dist/stdio.js"
   },
   "dependencies": {
+    "@bareframe/design-handoff": "file:../packages/design-handoff",
     "@modelcontextprotocol/sdk": "1.32.2",
     "express": "^5.1.0",
     "zod": "^3.25.76"

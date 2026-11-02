@@ -17,6 +17,7 @@
     "vitest": "^3.1.1"
   },
   "dependencies": {
+    "@bareframe/design-handoff": "file:../design-handoff",
     "@bareframe/designer-core": "file:../designer-core",
     "@bareframe/package-contracts": "file:../package-contracts"
   }

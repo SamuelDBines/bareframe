@@ -1,6 +1,7 @@
 import type { BareframePackage } from '@bareframe/package-contracts';
 import type { IntakePayload } from '@bareframe/package-contracts';
 import { buildReviewChecklist, buildDeliveryFlowContracts } from '../delivery-flow/build.js';
+import { buildRealHandoff } from '../handoff/build-real-handoff.js';
 import type { LlmAdapter, PipelineArtifacts, PipelineContext, StageProgress } from '../types.js';
 
 const STAGES: { stage: StageProgress['stage']; label: string }[] = [
@@ -120,7 +121,13 @@ export function assembleBareframePackage(input: AssembleInput): BareframePackage
     (input.artifacts.product as { value_proposition?: string })?.value_proposition ??
     input.intake.idea.slice(0, 160);
 
-  const delivery = buildDeliveryFlowContracts(input.projectName, summary, input.intake, input.artifacts);
+  const themeId =
+    (input.artifacts.design_options[0] as { bareframe_theme?: { base_theme?: string } })?.bareframe_theme
+      ?.base_theme ?? 'simple';
+  const handoff = buildRealHandoff(input.artifacts, themeId, input.libraryVersion);
+  const artifacts = { ...input.artifacts, handoff };
+
+  const delivery = buildDeliveryFlowContracts(input.projectName, summary, input.intake, artifacts);
 
   const pkg: BareframePackage = {
     contract: 'bareframe.package',
@@ -160,8 +167,8 @@ export function assembleBareframePackage(input: AssembleInput): BareframePackage
         story_ids: s.story_ids,
       })),
     },
-    copy: input.artifacts.copy,
-    handoff: input.artifacts.handoff,
+    copy: artifacts.copy,
+    handoff,
     review: {
       checklist: buildReviewChecklist(),
       rounds_included: 2,

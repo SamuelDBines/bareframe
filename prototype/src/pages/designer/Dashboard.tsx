@@ -2,117 +2,157 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import {
-	createProject,
-	listProjects,
-	loadLocalProject,
-	migrateLocalProjectToServer,
-	type ApiProjectSummary,
+  createProject,
+  listProjects,
+  loadLocalProject,
+  migrateLocalProjectToServer,
+  type ApiProjectSummary,
 } from '../../designer/projectApi';
+import { listProductPackages, type PackageSummary } from '../../designer/packageApi';
 import { fromProjectDocument } from '../../designer/localProject';
 import { createInitialProject } from '../../designer/initialProject';
 import { designerPath } from '../../sites/urls';
+import { DsCard, DsHero, DsPage } from '../../designer/DesignerUiPrimitives';
 
 export function DesignerDashboard() {
-	const { status } = useAuth();
-	const navigate = useNavigate();
-	const [projects, setProjects] = useState<ApiProjectSummary[]>([]);
-	const [error, setError] = useState<string | null>(null);
-	const [busy, setBusy] = useState(false);
+  const { status } = useAuth();
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState<ApiProjectSummary[]>([]);
+  const [packages, setPackages] = useState<PackageSummary[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-	useEffect(() => {
-		if (status !== 'authenticated') return;
-		listProjects()
-			.then(setProjects)
-			.catch((err) => setError(err instanceof Error ? err.message : 'Failed to load projects'));
-	}, [status]);
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    listProjects()
+      .then(setProjects)
+      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load projects'));
+    listProductPackages()
+      .then(setPackages)
+      .catch(() => setPackages([]));
+  }, [status]);
 
-	async function handleCreate() {
-		setBusy(true);
-		setError(null);
-		try {
-			const created = await createProject('Untitled project');
-			navigate(designerPath(`/editor/${created.id}`));
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Could not create project');
-		} finally {
-			setBusy(false);
-		}
-	}
+  async function handleCreate() {
+    setBusy(true);
+    setError(null);
+    try {
+      const created = await createProject('Untitled project');
+      navigate(designerPath(`/editor/${created.id}`));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not create project');
+    } finally {
+      setBusy(false);
+    }
+  }
 
-	async function handleMigrateLocal() {
-		const local = loadLocalProject();
-		const project = local
-			? fromProjectDocument(local.document)
-			: createInitialProject();
-		setBusy(true);
-		try {
-			const migrated = await migrateLocalProjectToServer(project);
-			navigate(designerPath(`/editor/${migrated.id}`));
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Migration failed');
-		} finally {
-			setBusy(false);
-		}
-	}
+  async function handleMigrateLocal() {
+    const local = loadLocalProject();
+    const project = local ? fromProjectDocument(local.document) : createInitialProject();
+    setBusy(true);
+    try {
+      const migrated = await migrateLocalProjectToServer(project);
+      navigate(designerPath(`/editor/${migrated.id}`));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Migration failed');
+    } finally {
+      setBusy(false);
+    }
+  }
 
-	return (
-		<>
-			<div className="page-hero" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end' }}>
-				<div style={{ flex: 1 }}>
-					<h1>Projects</h1>
-					<p className="lead">
-						Signed-in projects sync to Bareframe. When signed out, the canvas stays in this browser only.
-					</p>
-				</div>
-				<div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-					<Link to={designerPath('/editor')} className="btn btn-secondary">
-						Local canvas
-					</Link>
-					{status === 'authenticated' && (
-						<>
-							<Link to={designerPath('/product/new')} className="btn btn-primary">
-								New product
-							</Link>
-							<button type="button" className="btn btn-secondary" disabled={busy} onClick={handleMigrateLocal}>
-								Migrate local → cloud
-							</button>
-							<button type="button" className="btn btn-secondary" disabled={busy} onClick={handleCreate}>
-								New project
-							</button>
-						</>
-					)}
-				</div>
-			</div>
-			{error && (
-				<p className="card" style={{ color: 'var(--bf-theme-danger, #b42318)' }}>
-					{error}
-				</p>
-			)}
-			{status !== 'authenticated' && (
-				<p className="card">Sign in with GitHub to create server-saved projects and MCP tokens.</p>
-			)}
-			<div className="grid-2">
-				{projects.map((p) => (
-					<article key={p.id} className="card">
-						<h3>{p.name}</h3>
-						<p>
-							Version {p.version}
-							{p.updatedAt ? ` · Updated ${new Date(p.updatedAt).toLocaleString()}` : null}
-						</p>
-						<div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-							<Link to={designerPath(`/editor/${p.id}`)} className="btn btn-secondary">
-								Open in canvas
-							</Link>
-							<Link to={designerPath(`/settings/project/${p.id}`)} className="btn btn-ghost">
-								Project settings
-							</Link>
-							<Link to={designerPath(`/recordings/${p.id}`)} className="btn btn-ghost">
-								Recordings
-							</Link>
-						</div>
-					</article>
-				))}
-			</div>
-		</>
-	);
+  return (
+    <DsPage>
+      <DsHero
+        eyebrow="Bareframe Designer"
+        title="Prototype-first product design"
+        lead="Turn a brief into a reviewable package: journeys, playable screens, and handoff — built from real @bareframe/react components."
+        actions={
+          <>
+            <Link to={designerPath('/product/new')} className="btn btn-primary">
+              New product
+            </Link>
+            <Link to={designerPath('/editor')} className="btn btn-secondary">
+              Open canvas
+            </Link>
+          </>
+        }
+      />
+
+      {error && (
+        <DsCard>
+          <p style={{ color: 'var(--bf-theme-danger, #b42318)', margin: 0 }}>{error}</p>
+        </DsCard>
+      )}
+
+      {status !== 'authenticated' && (
+        <DsCard>
+          <p className="ds-meta" style={{ margin: 0 }}>
+            Sign in with GitHub to sync projects, generate packages, and share review links.
+          </p>
+        </DsCard>
+      )}
+
+      {packages.length > 0 && (
+        <section>
+          <h2 style={{ fontSize: '1.125rem', marginBottom: '0.75rem' }}>Product packages</h2>
+          <div className="ds-grid">
+            {packages.map((pkg) => (
+              <DsCard key={pkg.id} className="ds-project-card">
+                <h3>{pkg.name}</h3>
+                <p className="ds-meta">
+                  {pkg.status} · revision {pkg.revision}
+                </p>
+                <div className="ds-actions">
+                  <Link to={designerPath(`/product/${pkg.id}`)} className="btn btn-primary">
+                    Review package
+                  </Link>
+                </div>
+              </DsCard>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <h2 style={{ fontSize: '1.125rem', margin: 0 }}>Canvas projects</h2>
+          {status === 'authenticated' && (
+            <div className="ds-actions">
+              <button type="button" className="btn btn-secondary" disabled={busy} onClick={handleMigrateLocal}>
+                Migrate local
+              </button>
+              <button type="button" className="btn btn-secondary" disabled={busy} onClick={handleCreate}>
+                New project
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="ds-grid">
+          {projects.map((p) => (
+            <DsCard key={p.id} className="ds-project-card">
+              <h3>{p.name}</h3>
+              <p className="ds-meta">
+                v{p.version}
+                {p.updatedAt ? ` · ${new Date(p.updatedAt).toLocaleDateString()}` : null}
+              </p>
+              <div className="ds-actions">
+                <Link to={designerPath(`/editor/${p.id}`)} className="btn btn-primary">
+                  Open canvas
+                </Link>
+                <Link to={designerPath(`/recordings/${p.id}`)} className="btn btn-ghost">
+                  Flow map
+                </Link>
+              </div>
+            </DsCard>
+          ))}
+          {projects.length === 0 && status === 'authenticated' && (
+            <DsCard>
+              <p className="ds-meta" style={{ margin: 0 }}>
+                No cloud projects yet — start from the canvas or generate a product package.
+              </p>
+            </DsCard>
+          )}
+        </div>
+      </section>
+    </DsPage>
+  );
 }

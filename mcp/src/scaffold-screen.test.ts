@@ -17,7 +17,7 @@ function assertTsxTypechecks(source: string) {
 		path.join(dir, 'tsconfig.json'),
 		JSON.stringify(
 			{
-				extends: path.join(mcpRoot, 'tsconfig.scaffold.json'),
+				extends: path.join(mcpRoot, '../packages/design-handoff/tsconfig.scaffold.json'),
 				include: ['Screen.tsx'],
 			},
 			null,

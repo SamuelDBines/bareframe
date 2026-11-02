@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import {
-  fetchPackageJob,
-  subscribePackageJobEvents,
-} from '../../designer/packageApi';
+import { fetchPackageJob, subscribePackageJobEvents } from '../../designer/packageApi';
+import { DsCard, DsPage } from '../../designer/DesignerUiPrimitives';
 import { designerPath } from '../../sites/urls';
 
 export function PackageGeneratingPage() {
@@ -13,7 +11,7 @@ export function PackageGeneratingPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!jobId) return;
+    if (!jobId || jobId === 'demo-job') return;
     let closed = false;
 
     fetchPackageJob(jobId).then((job) => {
@@ -42,21 +40,30 @@ export function PackageGeneratingPage() {
   }, [jobId, navigate]);
 
   return (
-    <div className="card" style={{ maxWidth: 480, margin: '2rem auto', textAlign: 'center' }}>
-      <h1>Generating your package</h1>
-      {!error ? (
-        <>
-          <p className="lead">{label}</p>
-          <p style={{ fontSize: '0.85rem', color: 'var(--bf-theme-text-2)' }}>Stages run sequentially with validation.</p>
-        </>
-      ) : (
-        <>
-          <p style={{ color: 'var(--bf-theme-danger)' }}>{error}</p>
-          <Link to={designerPath('/product/new')} className="btn btn-secondary">
-            Back to intake
-          </Link>
-        </>
-      )}
-    </div>
+    <DsPage>
+      <DsCard style={{ maxWidth: 440, margin: '3rem auto', textAlign: 'center' }}>
+        <p className="ds-eyebrow" style={{ justifyContent: 'center' }}>
+          Generating
+        </p>
+        <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Building your package</h1>
+        {!error ? (
+          <>
+            <p className="ds-lead" style={{ margin: '0 auto' }}>
+              {label}
+            </p>
+            <p className="ds-meta" style={{ marginTop: '1rem' }}>
+              Stages run sequentially with schema validation.
+            </p>
+          </>
+        ) : (
+          <>
+            <p style={{ color: 'var(--bf-theme-danger, #b42318)' }}>{error}</p>
+            <Link to={designerPath('/product/new')} className="btn btn-secondary" style={{ marginTop: '1rem' }}>
+              Back to intake
+            </Link>
+          </>
+        )}
+      </DsCard>
+    </DsPage>
   );
 }

@@ -1,11 +1,10 @@
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
-import { strToU8, zipSync } from 'fflate';
+import { Buffer } from 'node:buffer';
 import type pg from 'pg';
 import {
   getContractSchema,
   INTAKE_QUESTIONS,
-  validateBareframePackage,
 } from '@bareframe/package-contracts';
 import type { Config } from '../config.js';
 import {
@@ -24,6 +23,8 @@ import {
 } from '../db/packages.js';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from '../projects/auth.js';
 import { subscribePackageJob } from './events.js';
+import { reviseProductPackage, patchProductPackage } from './package-mutations.js';
+import { buildPackageZip } from './export-zip.js';
 import { processPackageGenerationJob } from './process-job.js';
 
 const recentGenerations = new Map<number, number[]>();
@@ -41,10 +42,6 @@ function rateLimitOk(userId: number, limitPerHour: number): boolean {
 
 export function resetPackageRateLimitForTests() {
   recentGenerations.clear();
-}
-
-function packageMarkdown(doc: Record<string, unknown>): string {
-  return `# ${doc.project}\n\n${doc.summary}\n\n_Status: ${doc.status}_\n`;
 }
 
 export function createPackagesRouter(pool: pg.Pool, config: Config) {
@@ -234,22 +231,19 @@ export function createPackagesRouter(pool: pg.Pool, config: Config) {
       if (review.rounds_used >= review.rounds_included) {
         return c.json({ error: 'no_revision_rounds', message: 'All included revision rounds are used.' }, 400);
       }
-      const body = await c.req.json<{ deliverable: string; feedback: string }>();
-      const doc = { ...pkg.document } as Record<string, unknown>;
-      review.rounds_used += 1;
-      doc.revision = ((doc.revision as number) ?? 0) + 1;
-      doc.status = 'revision_requested';
-      const checklist = (doc.review as { checklist: { id: string; section?: string; comment?: string; status: string }[] }).checklist;
-      const item = checklist.find((x) => x.id.includes(body.deliverable) || x.section === body.deliverable);
-      if (item) {
-        item.status = 'change_requested';
-        item.comment = body.feedback;
+      if (config.llmAdapter === 'disabled') {
+        return c.json({ error: 'llm_not_configured', message: 'LLM is not configured on the server.' }, 503);
       }
-      await updateProductPackageDocument(pool, pkg.id, doc, {
-        revision: doc.revision as number,
-        status: 'revision_requested',
-      });
-      return c.json({ ok: true, roundsUsed: review.rounds_used });
+      const body = await c.req.json<{ deliverable: string; feedback: string }>();
+      const result = await reviseProductPackage(
+        pool,
+        config,
+        actor.userId,
+        pkg.id,
+        body.deliverable,
+        body.feedback,
+      );
+      return c.json({ ok: true, document: result.document, roundsUsed: (result.document.review as { rounds_used: number }).rounds_used });
     } catch (err) {
       if (err instanceof PackageAccessError) return c.json({ error: err.message }, err.status as 404);
       return handleProjectError(c, err);
@@ -260,35 +254,18 @@ export function createPackagesRouter(pool: pg.Pool, config: Config) {
     try {
       const actor = getActor(c);
       if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
-      const pkg = await assertPackageOwner(pool, c.req.param('id'), actor.userId);
       const body = await c.req.json<{
         selectedDirection?: string;
         status?: 'approved';
         checklist?: { id: string; status: string; comment?: string }[];
       }>();
-      const doc = { ...pkg.document } as Record<string, unknown>;
-      if (body.selectedDirection) doc.selected_direction = body.selectedDirection;
-      if (body.checklist) {
-        const review = doc.review as { checklist: { id: string; status: string; comment?: string }[] };
-        review.checklist = review.checklist.map((item) => {
-          const patch = body.checklist!.find((x) => x.id === item.id);
-          return patch ? { ...item, ...patch } : item;
-        });
-      }
-      if (body.status === 'approved') {
-        doc.status = 'approved';
-        const review = doc.review as Record<string, unknown>;
-        review.approved_at = new Date().toISOString();
-        review.approved_by = String(actor.userId);
-      }
-      const validation = validateBareframePackage(doc);
-      if (!validation.ok) return c.json({ error: 'invalid_package', details: validation.errors }, 400);
-      await updateProductPackageDocument(pool, pkg.id, doc, {
-        status: doc.status as string,
-      });
-      return c.json({ ok: true });
+      const doc = await patchProductPackage(pool, config, actor.userId, c.req.param('id'), body);
+      return c.json({ ok: true, document: doc });
     } catch (err) {
       if (err instanceof PackageAccessError) return c.json({ error: err.message }, err.status as 404);
+      if (err instanceof Error && err.message.startsWith('invalid_package')) {
+        return c.json({ error: 'invalid_package', details: err.message }, 400);
+      }
       return handleProjectError(c, err);
     }
   });
@@ -298,9 +275,23 @@ export function createPackagesRouter(pool: pg.Pool, config: Config) {
       const actor = getActor(c);
       if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
       const pkg = await assertPackageOwner(pool, c.req.param('id'), actor.userId);
+      if (pkg.share_token_hash) {
+        const { rows } = await pool.query<{ share_token: string | null }>(
+          `SELECT share_token FROM product_packages WHERE id = $1`,
+          [pkg.id],
+        );
+        const existing = rows[0]?.share_token;
+        if (existing) {
+          return c.json({ url: `${config.designerPublicUrl}/#/share/${existing}`, token: existing });
+        }
+      }
       const { token, hash } = mintShareToken();
       await setPackageShareToken(pool, pkg.id, hash);
+      await pool.query(`UPDATE product_packages SET share_token = $2 WHERE id = $1`, [pkg.id, token]);
       const url = `${config.designerPublicUrl}/#/share/${token}`;
+      const doc = { ...pkg.document } as Record<string, unknown>;
+      (doc.prototype as { share_url: string }).share_url = url;
+      await updateProductPackageDocument(pool, pkg.id, doc);
       return c.json({ url, token });
     } catch (err) {
       if (err instanceof PackageAccessError) return c.json({ error: err.message }, err.status as 404);
@@ -313,24 +304,14 @@ export function createPackagesRouter(pool: pg.Pool, config: Config) {
       const actor = getActor(c);
       if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
       const pkg = await assertPackageOwner(pool, c.req.param('id'), actor.userId);
-      const doc = pkg.document as Record<string, unknown>;
-      const files: Record<string, Uint8Array> = {};
-      files['bareframe.package.json'] = strToU8(JSON.stringify(doc, null, 2));
-      files['README.md'] = strToU8(packageMarkdown(doc));
-      files['delivery-flow/define.requirements.json'] = strToU8(
-        JSON.stringify((doc.delivery_flow as { define: unknown }).define, null, 2),
-      );
-      files['delivery-flow/design.spec.json'] = strToU8(
-        JSON.stringify((doc.delivery_flow as { design: unknown }).design, null, 2),
-      );
-      const scaffolds = (doc.handoff as { scaffolded_screens?: { path: string; tsx: string }[] })?.scaffolded_screens ?? [];
-      for (const s of scaffolds) {
-        files[s.path.replace(/^\//, '')] = strToU8(s.tsx);
-      }
-      const zipped = zipSync(files);
-      c.header('Content-Type', 'application/zip');
-      c.header('Content-Disposition', `attachment; filename="${pkg.name.replace(/\s+/g, '-').toLowerCase()}-package.zip"`);
-      return c.body(zipped);
+      const zipped = await buildPackageZip(pool, pkg);
+      const filename = `${pkg.name.replace(/\s+/g, '-').toLowerCase()}-package.zip`;
+      return new Response(Buffer.from(zipped), {
+        headers: {
+          'Content-Type': 'application/zip',
+          'Content-Disposition': `attachment; filename="${filename}"`,
+        },
+      });
     } catch (err) {
       if (err instanceof PackageAccessError) return c.json({ error: err.message }, err.status as 404);
       return handleProjectError(c, err);

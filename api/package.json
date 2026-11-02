@@ -15,6 +15,7 @@
   "dependencies": {
     "@bareframe/designer-core": "file:../packages/designer-core",
     "@bareframe/flow-map-engine": "file:../packages/flow-map-engine",
+    "@bareframe/design-handoff": "file:../packages/design-handoff",
     "@bareframe/package-contracts": "file:../packages/package-contracts",
     "@bareframe/package-generator": "file:../packages/package-generator",
     "@hono/node-server": "^1.14.0",

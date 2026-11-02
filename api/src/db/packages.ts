@@ -100,11 +100,12 @@ export async function insertProductPackage(
   name: string,
   document: Record<string, unknown>,
   designerProjectId: string,
+  shareToken: string,
 ) {
   const { rows } = await pool.query<{ id: string }>(
-    `INSERT INTO product_packages (owner_user_id, name, status, document, designer_project_id)
-     VALUES ($1, $2, 'in_review', $3, $4) RETURNING id`,
-    [userId, name, JSON.stringify(document), designerProjectId],
+    `INSERT INTO product_packages (owner_user_id, name, status, document, designer_project_id, share_token, share_token_hash)
+     VALUES ($1, $2, 'in_review', $3, $4, $5, $6) RETURNING id`,
+    [userId, name, JSON.stringify(document), designerProjectId, shareToken, hashToken(shareToken)],
   );
   return rows[0]!.id;
 }
@@ -167,8 +168,8 @@ export async function setPackageShareToken(pool: pg.Pool, packageId: string, tok
 
 export async function getPackageByShareToken(pool: pg.Pool, token: string) {
   const { rows } = await pool.query<ProductPackageRow>(
-    `SELECT * FROM product_packages WHERE share_token_hash = $1`,
-    [hashToken(token)],
+    `SELECT * FROM product_packages WHERE share_token = $1 OR share_token_hash = $2`,
+    [token, hashToken(token)],
   );
   return rows[0] ?? null;
 }

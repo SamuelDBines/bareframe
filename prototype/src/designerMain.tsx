@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client';
 import DesignerApp from './DesignerApp';
 import '../../packages/react/src/styles/bareframe-ui.css';
 import './index.css';
+import './designer/designer-ui.css';
+
+document.documentElement.classList.add('designer-app');
+document.documentElement.setAttribute('data-bf-theme', 'simple');
 
 function initTelemetry() {
 	if (import.meta.env.VITE_TELEMETRY !== '1') return;

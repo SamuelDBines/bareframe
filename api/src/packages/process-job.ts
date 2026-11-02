@@ -13,6 +13,7 @@ import { createProject, replaceProjectDocument } from '../db/projects.js';
 import {
   incrementUsage,
   insertProductPackage,
+  mintShareToken,
   updatePackageJob,
 } from '../db/packages.js';
 import { publishPackageJobEvent } from './events.js';
@@ -22,7 +23,7 @@ function projectNameFromIntake(intake: IntakePayload): string {
   return firstLine.length > 60 ? `${firstLine.slice(0, 57)}…` : firstLine;
 }
 
-function createLlm(config: Config, intake: IntakePayload, projectName: string) {
+export function createPackageLlm(config: Config, intake: IntakePayload, projectName: string) {
   if (config.llmAdapter === 'fixture') {
     return createFixtureLlmAdapter(intake, projectName);
   }
@@ -34,6 +35,10 @@ function createLlm(config: Config, intake: IntakePayload, projectName: string) {
     apiKey: config.llmApiKey,
     model: config.llmModel,
   });
+}
+
+function createLlm(config: Config, intake: IntakePayload, projectName: string) {
+  return createPackageLlm(config, intake, projectName);
 }
 
 export async function processPackageGenerationJob(
@@ -97,14 +102,13 @@ export async function processPackageGenerationJob(
 
     await replaceProjectDocument(pool, created.id, userId, designerDoc, created.version);
 
-    const sharePath = `/share/pending`;
-    const shareUrl = `${config.designerPublicUrl}/#${sharePath}`;
+    const { token: shareToken } = mintShareToken();
 
     const pkg = assembleBareframePackage({
       intake,
       projectName,
       designerProjectId: created.id,
-      shareUrl,
+      shareUrl: `${config.designerPublicUrl}/#/share/${shareToken}`,
       libraryVersion: '0.0.0',
       artifacts,
       selectedDirection: direction.id ?? null,
@@ -115,12 +119,18 @@ export async function processPackageGenerationJob(
       throw new Error(`Package validation failed: ${validation.errors.slice(0, 5).join('; ')}`);
     }
 
-    const packageId = await insertProductPackage(pool, userId, projectName, pkg as Record<string, unknown>, created.id);
+    const packageId = await insertProductPackage(
+      pool,
+      userId,
+      projectName,
+      pkg as Record<string, unknown>,
+      created.id,
+      shareToken,
+    );
     await incrementUsage(pool, userId);
 
-    const finalShareUrl = `${config.designerPublicUrl}/#/product/${packageId}`;
     const docRecord = pkg as Record<string, unknown>;
-    (docRecord.prototype as { share_url: string }).share_url = finalShareUrl;
+    (docRecord.prototype as { share_url: string }).share_url = `${config.designerPublicUrl}/#/share/${shareToken}`;
     await pool.query(`UPDATE product_packages SET document = $2 WHERE id = $1`, [
       packageId,
       JSON.stringify(docRecord),

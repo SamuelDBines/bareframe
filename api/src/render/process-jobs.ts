@@ -112,6 +112,7 @@ export async function processFlowMapJob(
 		}
 
 		const importLinks = links
+			.filter((l) => l.fromPath !== l.toPath)
 			.map((l) => {
 				const from = pathToAsset.get(l.fromPath);
 				const to = pathToAsset.get(l.toPath);

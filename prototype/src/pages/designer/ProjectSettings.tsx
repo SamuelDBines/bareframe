@@ -6,6 +6,7 @@ import {
 	revokeProjectToken,
 	type ProjectTokenSummary,
 } from '../../designer/projectApi';
+import { designerPath } from '../../sites/urls';
 
 export function ProjectSettingsPage() {
 	const { projectId = '' } = useParams<{ projectId: string }>();
@@ -82,7 +83,7 @@ export function ProjectSettingsPage() {
 					Public read tools stay at <code>/mcp</code>; writes use <code>/mcp/studio</code>.
 				</p>
 				<p>
-					<Link to="/designer">← All projects</Link>
+					<Link to={designerPath('/')}>← All projects</Link>
 				</p>
 			</div>
 			{error && <p className="card">{error}</p>}

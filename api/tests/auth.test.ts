@@ -77,6 +77,23 @@ describe('auth flow', () => {
 		expect(body.user.login).toBe('octocat');
 	});
 
+	it('redirects to Designer after OAuth when returnTo is an absolute Designer URL', async () => {
+		const app = createTestApp(pool, github);
+		const returnTo = 'https://designer.bareframe.org/#/editor';
+		const start = await app.request(
+			'/api/auth/github?returnTo=' + encodeURIComponent(returnTo),
+		);
+		const oauthCookie = cookieHeaderFromResponse(start);
+		const state = new URL(start.headers.get('location')!).searchParams.get('state')!;
+
+		const callback = await app.request(
+			`/api/auth/github/callback?code=good&state=${encodeURIComponent(state)}`,
+			{ headers: { Cookie: oauthCookie } },
+		);
+		expect(callback.status).toBe(302);
+		expect(callback.headers.get('location')).toBe(returnTo);
+	});
+
 	it('updates an existing user on login', async () => {
 		await pool.query(
 			`INSERT INTO users (github_id, login, name, avatar_url, email) VALUES ($1, $2, $3, $4, $5)`,

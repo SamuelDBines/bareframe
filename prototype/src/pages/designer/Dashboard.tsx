@@ -10,6 +10,7 @@ import {
 } from '../../designer/projectApi';
 import { fromProjectDocument } from '../../designer/localProject';
 import { createInitialProject } from '../../designer/initialProject';
+import { designerPath } from '../../sites/urls';
 
 export function DesignerDashboard() {
 	const { status } = useAuth();
@@ -30,7 +31,7 @@ export function DesignerDashboard() {
 		setError(null);
 		try {
 			const created = await createProject('Untitled project');
-			navigate(`/designer/editor/${created.id}`);
+			navigate(designerPath(`/editor/${created.id}`));
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Could not create project');
 		} finally {
@@ -46,7 +47,7 @@ export function DesignerDashboard() {
 		setBusy(true);
 		try {
 			const migrated = await migrateLocalProjectToServer(project);
-			navigate(`/designer/editor/${migrated.id}`);
+			navigate(designerPath(`/editor/${migrated.id}`));
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Migration failed');
 		} finally {
@@ -64,7 +65,7 @@ export function DesignerDashboard() {
 					</p>
 				</div>
 				<div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-					<Link to="/designer/editor" className="btn btn-secondary">
+					<Link to={designerPath('/editor')} className="btn btn-secondary">
 						Local canvas
 					</Link>
 					{status === 'authenticated' && (
@@ -96,13 +97,13 @@ export function DesignerDashboard() {
 							{p.updatedAt ? ` · Updated ${new Date(p.updatedAt).toLocaleString()}` : null}
 						</p>
 						<div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-							<Link to={`/designer/editor/${p.id}`} className="btn btn-secondary">
+							<Link to={designerPath(`/editor/${p.id}`)} className="btn btn-secondary">
 								Open in canvas
 							</Link>
-							<Link to={`/designer/settings/project/${p.id}`} className="btn btn-ghost">
+							<Link to={designerPath(`/settings/project/${p.id}`)} className="btn btn-ghost">
 								Project settings
 							</Link>
-							<Link to={`/designer/recordings/${p.id}`} className="btn btn-ghost">
+							<Link to={designerPath(`/recordings/${p.id}`)} className="btn btn-ghost">
 								Recordings
 							</Link>
 						</div>

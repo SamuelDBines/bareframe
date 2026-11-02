@@ -38,7 +38,9 @@ describe('cookie security and headers', () => {
 		const start = await app.request('http://internal/api/auth/github');
 		const oauthHeaders = setCookieLines(start);
 		expect(
-			oauthHeaders.some((h) => h.includes(OAUTH_STATE_COOKIE) && h.includes('Secure')),
+			oauthHeaders.some(
+				(h) => h.includes(OAUTH_STATE_COOKIE) && h.includes('Secure') && h.includes('Domain=.bareframe.org'),
+			),
 		).toBe(true);
 
 		const state = new URL(start.headers.get('location')!).searchParams.get('state')!;
@@ -48,7 +50,9 @@ describe('cookie security and headers', () => {
 		);
 		const callbackCookies = setCookieLines(callback);
 		expect(
-			callbackCookies.some((h) => h.includes(SESSION_COOKIE) && h.includes('Secure')),
+			callbackCookies.some(
+				(h) => h.includes(SESSION_COOKIE) && h.includes('Secure') && h.includes('Domain=.bareframe.org'),
+			),
 		).toBe(true);
 	});
 

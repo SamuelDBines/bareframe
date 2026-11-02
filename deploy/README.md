@@ -18,8 +18,9 @@ Point these hostnames at the ingress load balancer (A record → `159.89.249.41`
 | `www.bareframe.org` | 301 → `https://bareframe.org` |
 | `bareframe.co.uk` | 301 → `https://bareframe.org` |
 | `www.bareframe.co.uk` | 301 → `https://bareframe.org` |
+| `designer.bareframe.org` | Bareframe Designer (canvas, projects, themes) |
 
-MCP is served on the **same host** at `https://bareframe.org/mcp` (no extra DNS).
+MCP is served on the **same host** at `https://bareframe.org/mcp` (no extra DNS). Designer is at **`https://designer.bareframe.org`** with `/api` proxied on the same host for sign-in.
 
 ## API (GitHub sign-in)
 
@@ -31,8 +32,10 @@ Create a [GitHub OAuth App](https://github.com/settings/developers) (not a GitHu
 
 | Field | Value |
 |-------|--------|
-| Homepage URL | `https://bareframe.org` |
-| Authorization callback URL | `https://bareframe.org/api/auth/github/callback` |
+| Homepage URL | `https://bareframe.org` (unchanged) |
+| Authorization callback URL | `https://bareframe.org/api/auth/github/callback` (unchanged — do **not** add the Designer host) |
+
+Session cookies use `Domain=.bareframe.org`, so sign-in from `designer.bareframe.org` (which proxies `/api` to the same API service) shares the session with `bareframe.org`. OAuth `returnTo` may be an absolute `https://designer.bareframe.org/#/…` URL after deploy.
 
 Copy the **Client ID** and generate a **Client secret** for the Kubernetes secret below.
 
@@ -57,7 +60,7 @@ kubectl create secret generic bareframe-api-env -n bareframe \
 | `SESSION_SECRET` | Random string (32+ chars) for signing session and OAuth state cookies |
 | `DATABASE_URL` | Postgres URL for the dedicated `bareframe` role/database |
 
-`PUBLIC_URL` is set on the Deployment manifest (`https://bareframe.org`), not in the secret.
+`PUBLIC_URL` and `DESIGNER_PUBLIC_URL` are set on the Deployment manifest (`https://bareframe.org` and `https://designer.bareframe.org`), not in the secret.
 
 ### Postgres
 
@@ -110,8 +113,8 @@ Workflow: [`.github/workflows/deploy-k8s.yml`](../.github/workflows/deploy-k8s.y
 
 On push to `main` (and `workflow_dispatch`):
 
-1. Build and push `ghcr.io/samueldbines/bareframe/site`, `ghcr.io/samueldbines/bareframe/api`, and `ghcr.io/samueldbines/bareframe/mcp` with tags `sha-<7-char-commit>` and `latest`.
-2. If the repo secret **`DIGITALOCEAN_ACCESS_TOKEN`** is set, deploy with `kubectl apply -k deploy/k8s` and wait for rollout of `bareframe-site`, `bareframe-api`, and `bareframe-mcp`.
+1. Build and push `ghcr.io/samueldbines/bareframe/site`, `ghcr.io/samueldbines/bareframe/designer`, `ghcr.io/samueldbines/bareframe/api`, and `ghcr.io/samueldbines/bareframe/mcp` with tags `sha-<7-char-commit>` and `latest`.
+2. If the repo secret **`DIGITALOCEAN_ACCESS_TOKEN`** is set, deploy with `kubectl apply -k deploy/k8s` and wait for rollout of `bareframe-site`, `bareframe-designer`, `bareframe-api`, and `bareframe-mcp`.
 
 If the secret is missing, the deploy job skips and **main stays green**; image build/push still runs.
 
@@ -134,6 +137,7 @@ kustomize edit set image ghcr.io/samueldbines/bareframe/site=ghcr.io/samueldbine
 
 kubectl apply -k deploy/k8s
 kubectl rollout status deployment/bareframe-site -n bareframe --timeout=180s
+kubectl rollout status deployment/bareframe-designer -n bareframe --timeout=180s
 kubectl rollout status deployment/bareframe-api -n bareframe --timeout=180s
 kubectl rollout status deployment/bareframe-mcp -n bareframe --timeout=180s
 ```
@@ -149,6 +153,11 @@ kubectl kustomize deploy/k8s
 
 - **Image:** `ghcr.io/samueldbines/bareframe/site`
 - **Tags:** `latest`, `sha-<short-git-sha>` (e.g. `sha-a1b2c3d`)
+
+Designer static app:
+
+- **Image:** `ghcr.io/samueldbines/bareframe/designer`
+- **Tags:** `latest`, `sha-<short-git-sha>`
 
 ### Make the package public
 

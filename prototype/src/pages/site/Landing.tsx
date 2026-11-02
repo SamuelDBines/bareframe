@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { designerSiteUrl } from '../../sites/urls';
 
 export function LandingPage() {
 	return (
@@ -32,7 +33,7 @@ export function LandingPage() {
 					<article className="card product-card">
 						<h3>Bareframe Designer</h3>
 						<p>Compose screens with real components, edit themes, and hand off to code.</p>
-						<Link to="/designer">Open designer →</Link>
+						<a href={designerSiteUrl('/')}>Open designer →</a>
 					</article>
 				</div>
 			</section>

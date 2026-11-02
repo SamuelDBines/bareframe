@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { designerPath } from '../../sites/urls';
 
 export function ExportPage() {
 	return (
@@ -27,7 +28,7 @@ export function ExportPage() {
 				</article>
 			</div>
 			<p style={{ marginTop: '1.5rem' }}>
-				<Link to="/designer/editor">← Back to editor</Link>
+				<Link to={designerPath('/editor')}>← Back to editor</Link>
 			</p>
 		</>
 	);

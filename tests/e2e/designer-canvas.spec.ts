@@ -2,7 +2,7 @@ import { expect, test } from './fixtures';
 
 test.describe('designer canvas', () => {
 	test.beforeEach(async ({ page }) => {
-		await page.goto('/#/designer/editor', { waitUntil: 'domcontentloaded', timeout: 60_000 });
+		await page.goto('/designer/index.html#/editor', { waitUntil: 'domcontentloaded', timeout: 60_000 });
 		await expect(page.locator('.infinite-canvas')).toBeVisible({ timeout: 30_000 });
 		await page.waitForSelector('.frame-preview-iframe', { timeout: 30_000 });
 	});

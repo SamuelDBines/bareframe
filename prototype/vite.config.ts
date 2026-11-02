@@ -29,11 +29,12 @@ function syncThemesPlugin(): Plugin {
 }
 
 const pagesRoot = process.env.BAREFRAME_PAGES_ROOT === '1';
+const designerBuild = process.env.BAREFRAME_DESIGNER_BUILD === '1';
 
 export default defineConfig({
 	root: here,
 	// Custom domain serves the app at https://bareframe.org/ (absolute asset URLs).
-	base: pagesRoot ? '/' : './',
+	base: pagesRoot || designerBuild ? '/' : './',
 	plugins: [react(), syncThemesPlugin()],
 	resolve: {
 		alias: {
@@ -41,9 +42,14 @@ export default defineConfig({
 		},
 	},
 	build: {
-		outDir: path.join(repoRoot, 'public', 'prototype'),
+		outDir: designerBuild
+			? path.join(repoRoot, 'public', 'designer')
+			: path.join(repoRoot, 'public', 'prototype'),
 		emptyOutDir: true,
 		rollupOptions: {
+			input: designerBuild
+				? path.resolve(here, 'designer.html')
+				: path.resolve(here, 'index.html'),
 			output: {
 				manualChunks(id) {
 					if (id.includes('react-aria-components') || id.includes('@react-aria')) {

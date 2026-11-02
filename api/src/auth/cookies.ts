@@ -10,10 +10,26 @@ const MAX_AGE_SESSION = 60 * 60 * 24 * 30; // 30 days
 export type CookieSettings = {
 	/** True when the public site URL is HTTPS (TLS terminates at ingress). */
 	secure: boolean;
+	/** Shared parent domain for bareframe.org and subdomains. */
+	domain?: string;
 };
 
 export function cookieSettingsFromPublicUrl(publicUrl: string): CookieSettings {
-	return { secure: publicUrl.startsWith('https://') };
+	const secure = publicUrl.startsWith('https://');
+	let domain: string | undefined;
+	try {
+		const host = new URL(publicUrl).hostname;
+		if (host === 'bareframe.org' || host.endsWith('.bareframe.org')) {
+			domain = '.bareframe.org';
+		}
+	} catch {
+		/* ignore */
+	}
+	return { secure, domain };
+}
+
+function domainAttribute(settings: CookieSettings): string {
+	return settings.domain ? `; Domain=${settings.domain}` : '';
 }
 
 function sign(value: string, secret: string): string {
@@ -81,9 +97,10 @@ export function setSignedCookie(
 ): void {
 	const signed = sign(payload, secret);
 	const secure = settings.secure ? '; Secure' : '';
+	const domain = domainAttribute(settings);
 	setCookieHeader(
 		c,
-		`${name}=${encodeURIComponent(signed)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}${secure}`,
+		`${name}=${encodeURIComponent(signed)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}${secure}${domain}`,
 		append,
 	);
 }
@@ -105,9 +122,10 @@ export function clearCookie(
 	append = false,
 ): void {
 	const secure = settings.secure ? '; Secure' : '';
+	const domain = domainAttribute(settings);
 	setCookieHeader(
 		c,
-		`${name}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+		`${name}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}${domain}`,
 		append,
 	);
 }

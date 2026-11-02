@@ -35,10 +35,12 @@ Output is written to `../public/prototype/`. The root `pnpm run build:pages` pip
 | Components | `#/components/:slug` | Component detail |
 | Components | `#/components/tokens` | Tokens |
 | Components | `#/components/mcp` | Connect agent (MCP) |
-| Designer | `#/designer` | Project dashboard |
-| Designer | `#/designer/editor` | Infinite canvas (frames, compare, trials) |
-| Designer | `#/designer/themes` | Theme & tokens workspace |
-| Designer | `#/designer/export` | Export / handoff |
-| Designer | `#/designer/settings/agent` | Agent MCP settings |
+| Designer (production) | `https://designer.bareframe.org` | Project dashboard (`#/`) |
+| Designer | `#/editor` on designer host | Infinite canvas (frames, compare, trials) |
+| Designer | `#/themes` | Theme & tokens workspace |
+| Designer | `#/export` | Export / handoff |
+| Designer | `#/settings/agent` | Agent MCP settings |
+
+Legacy `bareframe.org/#/designer/*` URLs redirect to the designer host in production.
 
 Suggested click path: **Get started** → sign up → Designer dashboard → **Open in editor** → **Export** or **Theme editor**.

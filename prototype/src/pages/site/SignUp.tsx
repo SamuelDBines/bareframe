@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { githubSignInUrl, useAuth } from '../../auth/AuthContext';
+import { designerSiteUrl, githubAuthReturnTo } from '../../sites/urls';
 
 export function SignUpPage() {
 	const { status, user } = useAuth();
@@ -8,7 +9,7 @@ export function SignUpPage() {
 		return (
 			<div style={{ maxWidth: 440, margin: '0 auto', textAlign: 'center' }}>
 				<p className="lead">You are signed in as <strong>{user.login}</strong>.</p>
-				<Link to="/designer" className="btn btn-primary">Open Designer</Link>
+				<a href={designerSiteUrl('/')} className="btn btn-primary">Open Designer</a>
 			</div>
 		);
 	}
@@ -26,7 +27,7 @@ export function SignUpPage() {
 						<a href="https://bareframe.org/sign-in">bareframe.org</a>.
 					</p>
 				) : (
-					<a className="btn btn-primary" href={githubSignInUrl('/#/designer')}>
+					<a className="btn btn-primary" href={githubSignInUrl(githubAuthReturnTo('/'))}>
 						Continue with GitHub
 					</a>
 				)}

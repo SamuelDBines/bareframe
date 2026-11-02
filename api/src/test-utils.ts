@@ -12,6 +12,7 @@ export const testConfig: Config = {
 	sessionSecret: 'test-session-secret-min-32-chars-long',
 	databaseUrl: process.env.DATABASE_URL ?? 'postgres://bareframe:bareframe@127.0.0.1:54329/bareframe',
 	publicUrl: 'https://bareframe.org',
+	designerPublicUrl: 'https://designer.bareframe.org',
 	port: 0,
 	nodeEnv: 'test',
 	renderWorkerSecret: 'test-render-worker-secret',

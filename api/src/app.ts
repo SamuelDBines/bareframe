@@ -14,7 +14,7 @@ import {
 } from './auth/cookies.js';
 import { randomToken, hashToken } from './auth/crypto.js';
 import { githubAuthorizeUrl } from './auth/github.js';
-import { isSafeReturnTo, normalizeReturnTo } from './auth/returnTo.js';
+import { isSafeReturnTo, normalizeReturnTo, resolvePostAuthRedirect } from './auth/returnTo.js';
 import {
 	createSession,
 	deleteExpiredSessions,
@@ -40,7 +40,7 @@ export function createApp(deps: AppDeps): Hono {
 	app.get('/api/healthz', (c) => c.text('ok'));
 
 	app.get('/api/auth/github', (c) => {
-		const returnTo = normalizeReturnTo(c.req.query('returnTo'));
+		const returnTo = normalizeReturnTo(c.req.query('returnTo'), config.designerPublicUrl);
 		const state = randomToken(16);
 		setOAuthStateCookie(c, { state, returnTo }, config.sessionSecret, cookieSettings);
 
@@ -59,7 +59,9 @@ export function createApp(deps: AppDeps): Hono {
 			return c.text('Invalid OAuth state', 400);
 		}
 
-		const returnTo = isSafeReturnTo(stored.returnTo) ? stored.returnTo : '/';
+		const returnTo = isSafeReturnTo(stored.returnTo, config.designerPublicUrl)
+			? stored.returnTo
+			: '/';
 		const redirectUri = `${config.publicUrl}/api/auth/github/callback`;
 
 		try {
@@ -81,7 +83,7 @@ export function createApp(deps: AppDeps): Hono {
 			clearOAuthStateCookie(c, cookieSettings);
 			setSessionCookie(c, sessionToken, config.sessionSecret, cookieSettings, true);
 
-			return c.redirect(`${config.publicUrl}${returnTo}`, 302);
+			return c.redirect(resolvePostAuthRedirect(config.publicUrl, returnTo), 302);
 		} catch (err) {
 			console.error('OAuth callback error', err);
 			return c.text('Authentication failed', 500);

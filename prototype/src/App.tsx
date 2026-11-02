@@ -10,25 +10,19 @@ import { GettingStartedPage } from './pages/components/GettingStartedPage';
 import { MigratingToReactPage } from './pages/components/MigratingToReactPage';
 import { McpPage } from './pages/components/McpPage';
 import { TokensPage } from './pages/components/TokensPage';
-import { AgentSettingsPage } from './pages/designer/AgentSettings';
-import { DesignerDashboard } from './pages/designer/Dashboard';
-import { DesignerEditor } from './pages/designer/Editor';
-import { DesignerLayout } from './pages/designer/DesignerLayout';
-import { ExportPage } from './pages/designer/Export';
-import { RecordingsPage } from './pages/designer/Recordings';
-import { ProjectSettingsPage } from './pages/designer/ProjectSettings';
-import { ThemesWorkspace } from './pages/designer/ThemesWorkspace';
 import { LandingPage } from './pages/site/Landing';
 import { PricingPage } from './pages/site/Pricing';
 import { SignInPage } from './pages/site/SignIn';
 import { SignUpPage } from './pages/site/SignUp';
 import { AuthProvider } from './auth/AuthContext';
 import { ThemeProvider } from './theme/ThemeContext';
+import { LegacyDesignerRedirect } from './LegacyDesignerRedirect';
 
 export default function App() {
 	return (
 		<ThemeProvider>
 			<AuthProvider>
+			<LegacyDesignerRedirect />
 			<HashRouter>
 				<Routes>
 					<Route element={<AppShell />}>
@@ -48,19 +42,6 @@ export default function App() {
 									<ComponentDetailPage />
 								</Suspense>
 							} />
-						</Route>
-
-						<Route path="designer" element={<DesignerLayout />}>
-							<Route index element={<DesignerDashboard />} />
-							<Route path="editor" element={<DesignerEditor />} />
-							<Route path="editor/:projectId" element={<DesignerEditor />} />
-							<Route path="themes" element={<ThemesWorkspace />} />
-							<Route path="theme" element={<ThemesWorkspace />} />
-							<Route path="tokens" element={<ThemesWorkspace />} />
-							<Route path="export" element={<ExportPage />} />
-							<Route path="settings/agent" element={<AgentSettingsPage />} />
-							<Route path="settings/project/:projectId" element={<ProjectSettingsPage />} />
-							<Route path="recordings/:projectId" element={<RecordingsPage />} />
 						</Route>
 
 						<Route path="*" element={<Navigate to="/" replace />} />

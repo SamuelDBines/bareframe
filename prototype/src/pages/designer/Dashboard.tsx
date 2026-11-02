@@ -70,10 +70,13 @@ export function DesignerDashboard() {
 					</Link>
 					{status === 'authenticated' && (
 						<>
+							<Link to={designerPath('/product/new')} className="btn btn-primary">
+								New product
+							</Link>
 							<button type="button" className="btn btn-secondary" disabled={busy} onClick={handleMigrateLocal}>
 								Migrate local → cloud
 							</button>
-							<button type="button" className="btn btn-primary" disabled={busy} onClick={handleCreate}>
+							<button type="button" className="btn btn-secondary" disabled={busy} onClick={handleCreate}>
 								New project
 							</button>
 						</>

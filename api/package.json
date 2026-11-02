@@ -15,7 +15,10 @@
   "dependencies": {
     "@bareframe/designer-core": "file:../packages/designer-core",
     "@bareframe/flow-map-engine": "file:../packages/flow-map-engine",
+    "@bareframe/package-contracts": "file:../packages/package-contracts",
+    "@bareframe/package-generator": "file:../packages/package-generator",
     "@hono/node-server": "^1.14.0",
+    "fflate": "^0.8.2",
     "hono": "^4.7.6",
     "pg": "^8.14.1",
     "playwright": "^1.52.0",

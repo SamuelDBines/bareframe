@@ -10,6 +10,10 @@ import { ExportPage } from './pages/designer/Export';
 import { RecordingsPage } from './pages/designer/Recordings';
 import { ProjectSettingsPage } from './pages/designer/ProjectSettings';
 import { ThemesWorkspace } from './pages/designer/ThemesWorkspace';
+import { NewProductPage } from './pages/designer/NewProductPage';
+import { PackageGeneratingPage } from './pages/designer/PackageGeneratingPage';
+import { PackageReviewPage } from './pages/designer/PackageReviewPage';
+import { SharePackagePage } from './pages/designer/SharePackagePage';
 
 export default function DesignerApp() {
 	return (
@@ -20,6 +24,10 @@ export default function DesignerApp() {
 						<Route element={<DesignerAppShell />}>
 							<Route element={<DesignerLayout />}>
 								<Route index element={<DesignerDashboard />} />
+								<Route path="product/new" element={<NewProductPage />} />
+								<Route path="product/generating/:jobId" element={<PackageGeneratingPage />} />
+								<Route path="product/:packageId" element={<PackageReviewPage />} />
+								<Route path="share/:token" element={<SharePackagePage />} />
 								<Route path="editor" element={<DesignerEditor />} />
 								<Route path="editor/:projectId" element={<DesignerEditor />} />
 								<Route path="themes" element={<ThemesWorkspace />} />

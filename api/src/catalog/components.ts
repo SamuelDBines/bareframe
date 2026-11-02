@@ -20,7 +20,22 @@ function loadSlugSet(): Set<string> {
 		slugSet = new Set(slugs);
 		return slugSet;
 	}
-	slugSet = new Set(['button', 'card', 'input', 'badge', 'alert']);
+	slugSet = new Set([
+		'button',
+		'card',
+		'input',
+		'badge',
+		'alert',
+		'field',
+		'table',
+		'avatar',
+		'otp-input',
+		'stat-card',
+		'empty-state',
+		'textarea',
+		'switch',
+		'checkbox',
+	]);
 	return slugSet;
 }
 

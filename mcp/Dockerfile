@@ -32,6 +32,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 RUN groupadd -g 10001 bareframe && useradd -u 10001 -g 10001 -d /app bareframe
 
+COPY --from=build /repo/packages/design-handoff /packages/design-handoff
 COPY mcp/package.json mcp/package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 

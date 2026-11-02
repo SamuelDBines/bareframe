@@ -33,8 +33,9 @@ const designerBuild = process.env.BAREFRAME_DESIGNER_BUILD === '1';
 
 export default defineConfig({
 	root: here,
-	// Custom domain serves the app at https://bareframe.org/ (absolute asset URLs).
-	base: pagesRoot || designerBuild ? '/' : './',
+	// Docs site at bareframe.org uses absolute asset URLs; Designer uses relative paths
+	// so the same bundle works under /designer/ in CI and at / on designer.bareframe.org.
+	base: pagesRoot && !designerBuild ? '/' : './',
 	plugins: [react(), syncThemesPlugin()],
 	resolve: {
 		alias: {

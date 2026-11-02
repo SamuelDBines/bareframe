@@ -24,9 +24,9 @@ FROM node:20-bookworm-slim AS package-generator-build
 WORKDIR /repo/packages/package-generator
 COPY packages/package-generator/package.json packages/package-generator/tsconfig.json ./
 COPY packages/package-generator/src ./src
-COPY --from=designer-core-build /repo/packages/designer-core /packages/designer-core
-COPY --from=package-contracts-build /repo/packages/package-contracts /packages/package-contracts
-COPY --from=design-handoff-build /repo/packages/design-handoff /packages/design-handoff
+COPY --from=designer-core-build /repo/packages/designer-core /repo/packages/designer-core
+COPY --from=package-contracts-build /repo/packages/package-contracts /repo/packages/package-contracts
+COPY --from=design-handoff-build /repo/packages/design-handoff /repo/packages/design-handoff
 RUN npm install && npm run build
 
 FROM node:20-bookworm-slim AS flow-map-build

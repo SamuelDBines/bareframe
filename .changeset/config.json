@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["bareframe", "prototype", "showcase"]
+  "ignore": ["prototype", "bareframe-showcase"]
 }

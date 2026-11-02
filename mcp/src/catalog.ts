@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Catalog, ComponentRecord, DocPage, ThemeRecord } from './types.js';
+import { buildDesignTokensResponse } from './design-tokens.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,6 +30,17 @@ export function listThemes(catalog: Catalog): ThemeRecord[] {
 
 export function getTheme(catalog: Catalog, id: string): ThemeRecord | undefined {
 	return catalog.themes.find((t) => t.id === id);
+}
+
+export function getDesignTokens(
+	catalog: Catalog,
+	themeId: string | undefined,
+	includeCssVariables: boolean,
+) {
+	const id = themeId ?? catalog.defaultThemeId ?? 'light';
+	const theme = getTheme(catalog, id);
+	if (!theme) return undefined;
+	return buildDesignTokensResponse(theme, includeCssVariables, catalog.defaultThemeId ?? 'light');
 }
 
 export function searchDocs(catalog: Catalog, query: string, limit = 10): DocPage[] {

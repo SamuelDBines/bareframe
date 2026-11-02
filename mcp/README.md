@@ -20,10 +20,12 @@ Studio tools: `list_projects`, `get_project`, `create_canvas`, `add_screen`, `ad
 
 | Tool | Description |
 | --- | --- |
-| `list_components` | Slugs, categories, stability, React export |
+| `list_components` | Stability, description, category, React export, compact props summaries |
 | `get_component` | Props + real docs `.example.tsx` sources |
 | `list_themes` | Theme ids and `@bareframe/react/themes/*` imports |
-| `export_tokens` | `tokens.json` or per-theme values |
+| `get_design_tokens` | Structured tokens (colors, spacing, typography, radii, shadows) per theme |
+| `scaffold_screen` | Working `@bareframe/react` page TSX from intent and/or component slugs |
+| `export_tokens` | Legacy flat `tokens.json` / per-theme maps (prefer `get_design_tokens`) |
 | `search_docs` | Search markdown + component reference text |
 | `get_install_steps` | @bareframe/react install/CSS steps |
 | `get_migration_guide` | Full Repkit → Bareframe migration markdown |

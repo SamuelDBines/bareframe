@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["react"],
+    "typeRoots": ["./node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "@bareframe/react": ["../packages/react/dist/index.d.ts"],
+      "@bareframe/react/*": ["../packages/react/dist/*"]
+    }
+  },
+  "include": ["test-fixtures/scaffold-check/Screen.tsx"]
+}

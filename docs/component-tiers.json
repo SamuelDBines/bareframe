@@ -1,0 +1,33 @@
+{
+  "$schema": "Machine-readable component tiers aligned with docs/TIERING.md",
+  "tierA": [
+    "button",
+    "link",
+    "input",
+    "header",
+    "footer",
+    "modal",
+    "dialog",
+    "toast",
+    "message",
+    "error-summary",
+    "checkbox",
+    "radio",
+    "select",
+    "toggle"
+  ],
+  "tierB": [
+    "combobox",
+    "autocomplete",
+    "menu",
+    "dropdown",
+    "data-grid",
+    "date-picker",
+    "command-palette",
+    "nav",
+    "pagination",
+    "tab",
+    "breadcrumb"
+  ],
+  "tierCExamples": ["chart", "video-player", "map", "canvas", "editor"]
+}

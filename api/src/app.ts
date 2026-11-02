@@ -114,14 +114,14 @@ export function createApp(deps: AppDeps): Hono {
 		return c.json({ ok: true });
 	});
 
+	app.route('/api', createPublicShareRouter(pool));
+	app.route('/api', createPublicToolsRouter(pool));
 	app.route('/api', createInternalWorkerRouter(pool, config));
 	app.route('/api', createProjectsRouter(pool, config));
 	app.route('/api', createFlowMapRouter(pool, config));
 	app.route('/api', createPackagesRouter(pool, config));
 	app.route('/api', createReviewsRouter(pool, config));
 	app.route('/api', createBillingRouter(pool, config));
-	app.route('/api', createPublicToolsRouter(pool));
-	app.route('/api', createPublicShareRouter(pool));
 
 	return app;
 }

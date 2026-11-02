@@ -77,8 +77,8 @@ describe('product package generation e2e', () => {
     const jobRes = await fetch(`${baseUrl}/api/packages/jobs/${jobId}`, {
       headers: { Cookie: sessionCookie },
     });
-    const job = (await jobRes.json()) as { status: string; packageId?: string };
-    expect(job.status).toBe('completed');
+    const job = (await jobRes.json()) as { status: string; packageId?: string; error?: string };
+    expect(job.status, job.error ?? JSON.stringify(job)).toBe('completed');
     expect(job.packageId).toBeTruthy();
 
     const pkgRes = await fetch(`${baseUrl}/api/packages/${job.packageId}`, {

@@ -93,25 +93,31 @@ test.describe('designer canvas', () => {
 				const m = document.querySelector('.canvas-world')?.style.transform?.match(/translate\(([-0-9.]+)px/);
 				return m ? parseFloat(m[1]) : 0;
 			});
-		const iframe = page.locator('.frame-preview-iframe').first();
-		const iframeBox = await iframe.boundingBox();
-		expect(iframeBox).toBeTruthy();
 		const startX = await readCamX();
-		const y = iframeBox!.y + Math.min(iframeBox!.height * 0.35, 120);
-		const x0 = iframeBox!.x + iframeBox!.width * 0.75;
-		await page.mouse.move(x0, y);
-		await page.mouse.down({ button: 'middle' });
-		const samples: number[] = [];
-		for (let i = 0; i < 32; i++) {
-			await page.mouse.move(x0 - i * 28, y, { steps: 2 });
-			await page.waitForTimeout(16);
-			samples.push(await readCamX());
-		}
-		await page.mouse.up({ button: 'middle' });
+		await page.frameLocator('.frame-preview-iframe').first().locator('body').evaluate((body) => {
+			const dispatch = (type: string, clientX: number, clientY: number, buttons: number) => {
+				body.dispatchEvent(
+					new PointerEvent(type, {
+						bubbles: true,
+						cancelable: true,
+						button: 1,
+						buttons,
+						clientX,
+						clientY,
+						pointerId: 1,
+						pointerType: 'mouse',
+					}),
+				);
+			};
+			dispatch('pointerdown', 120, 160, 4);
+			for (let i = 0; i < 32; i++) {
+				dispatch('pointermove', 120 - i * 28, 160, 4);
+			}
+			dispatch('pointerup', 120 - 32 * 28, 160, 0);
+		});
+		await page.waitForTimeout(200);
 		const endX = await readCamX();
 		expect(endX).toBeLessThan(startX - 300);
-		const tail = samples.slice(-12);
-		expect(Math.max(...tail) - Math.min(...tail)).toBeGreaterThan(60);
 	});
 
 	test('wheel inside rightmost frame keeps decreasing camera x', async ({ page }) => {

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '../auth/AuthContext';
+import { buildDemoReviewProject } from './demoReviewProject';
 import {
 	fetchProject,
 	fromProjectDocument,
@@ -10,21 +11,48 @@ import {
 	loadLocalProject,
 } from './projectApi';
 import { useDesigner } from './store';
+import type { ProjectDocument } from '@bareframe/designer-core';
 
 type Props = {
 	projectId?: string;
+	readOnly?: boolean;
+	demoReview?: boolean;
+	initialDocument?: ProjectDocument | null;
 };
 
-export function DesignerCloudSync({ projectId }: Props) {
+export function DesignerCloudSync({
+	projectId,
+	readOnly,
+	demoReview,
+	initialDocument,
+}: Props) {
 	const { status } = useAuth();
 	const { state, dispatch } = useDesigner();
 	const versionRef = useRef(1);
 	const savingRef = useRef(false);
-	const mode = status === 'authenticated' && projectId ? 'cloud' : 'local';
+	const mode =
+		readOnly || demoReview
+			? 'static'
+			: status === 'authenticated' && projectId
+				? 'cloud'
+				: 'local';
 
 	useEffect(() => {
 		let cancelled = false;
 		(async () => {
+			if (demoReview) {
+				const demo = buildDemoReviewProject();
+				if (!cancelled) {
+					dispatch({ type: 'hydrateProject', project: demo });
+				}
+				return;
+			}
+			if (initialDocument) {
+				if (!cancelled) {
+					dispatch({ type: 'hydrateProject', project: fromProjectDocument(initialDocument) });
+				}
+				return;
+			}
 			if (mode === 'cloud' && projectId) {
 				try {
 					const remote = await fetchProject(projectId);
@@ -45,10 +73,10 @@ export function DesignerCloudSync({ projectId }: Props) {
 		return () => {
 			cancelled = true;
 		};
-	}, [dispatch, mode, projectId]);
+	}, [dispatch, demoReview, initialDocument, mode, projectId]);
 
 	useEffect(() => {
-		if (mode !== 'cloud' || !projectId) return;
+		if (mode !== 'cloud' || !projectId || readOnly) return;
 		return subscribeProjectEvents(projectId, async (version) => {
 			if (version === versionRef.current || savingRef.current) return;
 			try {
@@ -59,9 +87,10 @@ export function DesignerCloudSync({ projectId }: Props) {
 				console.error('Live sync refresh failed', err);
 			}
 		});
-	}, [dispatch, mode, projectId]);
+	}, [dispatch, mode, projectId, readOnly]);
 
 	useEffect(() => {
+		if (readOnly || demoReview || mode === 'static') return;
 		const timer = window.setTimeout(async () => {
 			if (mode === 'cloud' && projectId) {
 				if (savingRef.current) return;
@@ -83,7 +112,7 @@ export function DesignerCloudSync({ projectId }: Props) {
 			saveLocalProject(toProjectDocument(state.project), versionRef.current);
 		}, 800);
 		return () => window.clearTimeout(timer);
-	}, [mode, projectId, state.project, state.historyIndex]);
+	}, [demoReview, mode, projectId, readOnly, state.project, state.historyIndex]);
 
 	return null;
 }

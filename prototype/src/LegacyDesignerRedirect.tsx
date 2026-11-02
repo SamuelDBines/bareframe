@@ -1,16 +1,26 @@
 import { useEffect } from 'react';
-import { designerSiteUrl } from './sites/urls';
 
-/** Sends bareframe.org/#/designer/* traffic to designer.bareframe.org with the same deep link. */
+/** Sends legacy Designer host and hash paths to the unified /app product. */
 export function LegacyDesignerRedirect() {
 	useEffect(() => {
 		const redirect = () => {
+			const host = window.location.hostname;
 			const hash = window.location.hash;
-			if (!hash.startsWith('#/designer')) return;
-			if (!/(^|\.)bareframe\.org$/i.test(window.location.hostname)) return;
-			const suffix = hash.slice('#/designer'.length);
-			const path = suffix ? (suffix.startsWith('/') ? suffix : `/${suffix}`) : '/';
-			window.location.replace(designerSiteUrl(path));
+
+			if (/(^|\.)designer\.bareframe\.org$/i.test(host)) {
+				const suffix = hash.startsWith('#/') ? hash.slice(2) : '';
+				const mapped = suffix.startsWith('app') ? suffix : suffix ? `app/${suffix}` : 'app';
+				window.location.replace(`https://bareframe.org/#/${mapped.replace(/^\/+/, '')}`);
+				return;
+			}
+
+			if (!/(^|\.)bareframe\.org$/i.test(host)) return;
+
+			if (hash.startsWith('#/designer')) {
+				const rest = hash.slice('#/designer'.length);
+				const target = rest && rest !== '/' ? `/app${rest.startsWith('/') ? rest : `/${rest}`}` : '/app';
+				window.location.replace(`${window.location.origin}/#${target}`);
+			}
 		};
 		redirect();
 		window.addEventListener('hashchange', redirect);

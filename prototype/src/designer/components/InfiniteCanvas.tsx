@@ -352,6 +352,26 @@ export function InfiniteCanvas() {
 							/>
 						);
 					})}
+				{project.annotations.map((annotation) => {
+					if (annotation.target.kind !== 'rect') return null;
+					const frame = project.frames.find((f) => f.id === annotation.frameId);
+					if (!frame || !frames.some((f) => f.id === frame.id)) return null;
+					const { x, y, w, h } = annotation.target;
+					return (
+						<div
+							key={annotation.id}
+							className="canvas-annotation-callout"
+							style={{
+								left: frame.x + x,
+								top: frame.y + y,
+								width: w,
+								minHeight: h,
+							}}
+						>
+							{annotation.text}
+						</div>
+					);
+				})}
 			</div>
 			<div className="canvas-zoom-controls">
 				<button

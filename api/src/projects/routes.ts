@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
 import type pg from 'pg';
-import { randomToken } from '../auth/crypto.js';
+import { randomToken, hashToken } from '../auth/crypto.js';
 import { isValidComponentSlug } from '../catalog/components.js';
 import {
 	applyImportScreenshotsTx,
@@ -19,6 +19,7 @@ import {
 	revokeProjectToken,
 	VersionConflictError,
 } from '../db/projects.js';
+import { assertCanCreateProject, PlanLimitError } from '../plans/limits.js';
 import type { ProjectDocument } from '@bareframe/designer-core';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from './auth.js';
 import { publishProjectUpdate, subscribeProject } from './events.js';
@@ -52,6 +53,14 @@ export function createProjectsRouter(pool: pg.Pool, config: import('../config.js
 	router.post('/projects', async (c) => {
 		const actor = getActor(c);
 		if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
+		try {
+			await assertCanCreateProject(pool, actor.userId);
+		} catch (err) {
+			if (err instanceof PlanLimitError) {
+				return c.json({ error: err.code, message: err.message }, 429);
+			}
+			throw err;
+		}
 		const body = (await c.req.json<{ name?: string; themeId?: string }>().catch(() => ({
 			name: undefined,
 			themeId: undefined,
@@ -276,6 +285,27 @@ export function createProjectsRouter(pool: pg.Pool, config: import('../config.js
 				headers: { 'Content-Type': body.contentType ?? 'image/png' },
 				maxBytes: 5 * 1024 * 1024,
 				note: 'Upload raw bytes to uploadUrl with the same Authorization you used for this request.',
+			});
+		} catch (err) {
+			return handleProjectError(c, err);
+		}
+	});
+
+	router.post('/projects/:projectId/share', async (c) => {
+		try {
+			const actor = getActor(c);
+			if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
+			const projectId = c.req.param('projectId');
+			await assertProjectAccess(pool, projectId, actor, 'projects:write');
+			const token = randomToken(24);
+			await pool.query(
+				`UPDATE projects SET share_token_hash = $2, is_private = false, updated_at = NOW() WHERE id = $1`,
+				[projectId, hashToken(token)],
+			);
+			return c.json({
+				token,
+				sharePath: `/share/${token}`,
+				publicUrl: `${config.publicUrl}/#/share/${token}`,
 			});
 		} catch (err) {
 			return handleProjectError(c, err);

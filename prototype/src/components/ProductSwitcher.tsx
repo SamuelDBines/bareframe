@@ -1,5 +1,4 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { designerSiteUrl } from '../sites/urls';
 
 export function ProductSwitcher() {
 	const { pathname } = useLocation();
@@ -7,13 +6,17 @@ export function ProductSwitcher() {
 	const siteActive =
 		pathname === '/' ||
 		pathname.startsWith('/pricing') ||
+		pathname.startsWith('/examples') ||
 		pathname.startsWith('/sign-in') ||
 		pathname.startsWith('/sign-up');
 
 	return (
 		<nav className="product-switcher" aria-label="Bareframe products">
 			<NavLink to="/" className={siteActive ? 'active' : ''}>
-				Site
+				Product
+			</NavLink>
+			<NavLink to="/app" className={pathname.startsWith('/app') ? 'active' : ''}>
+				App
 			</NavLink>
 			<NavLink
 				to="/components"
@@ -21,12 +24,6 @@ export function ProductSwitcher() {
 			>
 				Components
 			</NavLink>
-			<a
-				href={designerSiteUrl('/')}
-				className={pathname.startsWith('/designer') ? 'active' : ''}
-			>
-				Designer
-			</a>
 		</nav>
 	);
 }

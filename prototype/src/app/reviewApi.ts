@@ -1,0 +1,68 @@
+export async function createProjectShare(projectId: string) {
+  const res = await fetch(`/api/projects/${projectId}/share`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Could not create share link');
+  return res.json() as Promise<{ token: string; sharePath: string; publicUrl: string }>;
+}
+
+export async function fetchPlan() {
+  const res = await fetch('/api/plan', { credentials: 'include' });
+  if (!res.ok) throw new Error('Failed to load plan');
+  return res.json();
+}
+
+export async function startReview(projectId: string) {
+  const res = await fetch(`/api/projects/${projectId}/reviews`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(data.message ?? 'Review failed to start');
+  }
+  return res.json() as Promise<{ runId: string; status: string }>;
+}
+
+export async function getReviewRun(projectId: string, runId: string) {
+  const res = await fetch(`/api/projects/${projectId}/reviews/${runId}`, { credentials: 'include' });
+  if (!res.ok) throw new Error('Review not found');
+  return res.json();
+}
+
+export async function patchReviewIssue(
+  projectId: string,
+  runId: string,
+  issueId: string,
+  status: 'open' | 'resolved' | 'dismissed',
+) {
+  const res = await fetch(`/api/projects/${projectId}/reviews/${runId}/issues/${issueId}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error('Update failed');
+  return res.json();
+}
+
+export async function createFlowMap(projectId: string, url: string, baseVersion: number) {
+  const res = await fetch(`/api/projects/${projectId}/flow-maps`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, baseVersion }),
+  });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(data.message ?? 'Import failed');
+  }
+  return res.json();
+}
+
+export async function fetchPublicShare(token: string) {
+  const res = await fetch(`/api/share/${token}`);
+  if (!res.ok) throw new Error('Share link not found');
+  return res.json();
+}

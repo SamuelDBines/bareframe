@@ -16,7 +16,7 @@ const QUESTION_IDS = [
   'q8_existing_assets',
 ] as const;
 
-export function NewProductPage() {
+export function NewProductPage({ appMode }: { appMode?: boolean } = {}) {
   const { status } = useAuth();
   const navigate = useNavigate();
   const [idea, setIdea] = useState('');
@@ -68,7 +68,7 @@ export function NewProductPage() {
         references,
         answers: answerMap,
       });
-      navigate(designerPath(`/product/generating/${jobId}`));
+      navigate(appMode ? `/app/product/generating/${jobId}` : designerPath(`/product/generating/${jobId}`));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not start generation');
     } finally {

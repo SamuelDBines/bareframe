@@ -36,10 +36,27 @@ function WorkspaceInner() {
 	);
 }
 
-export function DesignerWorkspace({ projectId }: { projectId?: string }) {
+type DesignerWorkspaceProps = {
+	projectId?: string;
+	readOnly?: boolean;
+	demoReview?: boolean;
+	initialDocument?: import('@bareframe/designer-core').ProjectDocument | null;
+};
+
+export function DesignerWorkspace({
+	projectId,
+	readOnly,
+	demoReview,
+	initialDocument,
+}: DesignerWorkspaceProps) {
 	return (
 		<DesignerProvider>
-			<DesignerCloudSync projectId={projectId} />
+			<DesignerCloudSync
+				projectId={projectId}
+				readOnly={readOnly}
+				demoReview={demoReview}
+				initialDocument={initialDocument}
+			/>
 			<WorkspaceInner />
 		</DesignerProvider>
 	);

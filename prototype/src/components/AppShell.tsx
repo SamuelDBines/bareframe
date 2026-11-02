@@ -9,7 +9,17 @@ export function AppShell() {
 		location.pathname.startsWith('/editor') ||
 		location.pathname.startsWith('/themes') ||
 		location.pathname.startsWith('/theme') ||
-		location.pathname.startsWith('/tokens');
+		location.pathname.startsWith('/tokens') ||
+		location.pathname.startsWith('/app/project') ||
+		location.pathname.startsWith('/share') ||
+		location.pathname.startsWith('/demo/journey-review') ||
+		location.pathname.startsWith('/demo/share-canvas');
+
+	const fullBleed =
+		location.pathname.startsWith('/app/project') ||
+		location.pathname.startsWith('/share') ||
+		location.pathname.startsWith('/demo/journey-review') ||
+		location.pathname.startsWith('/demo/share-canvas');
 
 	const docs = location.pathname.startsWith('/components');
 
@@ -25,7 +35,9 @@ export function AppShell() {
 				<UserMenu />
 				<ThemeSwitcher />
 			</header>
-			<main className={`app-main${wide ? ' wide' : ''}${docs ? ' docs-main' : ''}`}>
+			<main
+				className={`app-main${wide ? ' wide' : ''}${fullBleed ? ' app-full-bleed' : ''}${docs ? ' docs-main' : ''}`}
+			>
 				<Outlet />
 			</main>
 		</div>

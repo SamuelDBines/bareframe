@@ -148,6 +148,7 @@ function tokenHasScope(scopes: string[], required: string): boolean {
 	if (required === 'flowmap:write' && scopes.includes('flowmap:write')) return true;
 	if (required === 'render' && scopes.includes('render')) return true;
 	if (required === 'recordings:upload' && scopes.includes('recordings:upload')) return true;
+	if (required === 'reviews:write' && scopes.includes('projects:write')) return true;
 	return scopes.includes(required);
 }
 

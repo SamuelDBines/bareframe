@@ -20,6 +20,8 @@ export const STUDIO_TOOL_NAMES = [
 	'render_frame',
 	'list_recordings',
 	'build_flow_from_recording',
+	'review_project',
+	'check_url',
 ] as const;
 
 type ProjectSummary = { id: string; name: string; version: number; updatedAt?: string };
@@ -510,6 +512,49 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 				},
 			);
 			return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'review_project',
+		{
+			description:
+				'Run an AI UX review pass on a project canvas. Adds callouts and returns structured issues (requires Pro MCP access).',
+			inputSchema: {
+				projectId: z.string(),
+				waitSeconds: z.number().int().min(1).max(120).optional().default(45),
+			},
+		},
+		async ({ projectId, waitSeconds }) => {
+			const started = await api.request<{ runId: string; status: string }>(
+				`/api/projects/${projectId}/reviews`,
+				{ method: 'POST' },
+			);
+			const deadline = Date.now() + waitSeconds * 1000;
+			let last = started;
+			while (Date.now() < deadline && last.status !== 'completed' && last.status !== 'failed') {
+				await new Promise((r) => setTimeout(r, 800));
+				last = await api.request<{ id: string; status: string; issues: unknown[]; summary: unknown }>(
+					`/api/projects/${projectId}/reviews/${started.runId}`,
+				);
+			}
+			return { content: [{ type: 'text', text: JSON.stringify(last, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'check_url',
+		{
+			description:
+				'Public-style URL check: screenshot metrics and flow-map audit findings for a single page (uses studio API credentials).',
+			inputSchema: { url: z.string().url() },
+		},
+		async ({ url }) => {
+			const data = await api.request(`/api/public/check-url`, {
+				method: 'POST',
+				body: JSON.stringify({ url }),
+			});
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
 		},
 	);
 

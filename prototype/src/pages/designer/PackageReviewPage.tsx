@@ -34,7 +34,7 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]['id'];
 
-export function PackageReviewPage({ demo }: { demo?: boolean }) {
+export function PackageReviewPage({ demo, appMode }: { demo?: boolean; appMode?: boolean } = {}) {
   const { packageId } = useParams<{ packageId: string }>();
   const [tab, setTab] = useState<TabId>('prototype');
   const [doc, setDoc] = useState<Record<string, unknown> | null>(demo ? DEMO_PACKAGE_DOC : null);
@@ -151,7 +151,14 @@ export function PackageReviewPage({ demo }: { demo?: boolean }) {
         </div>
         <div className="ds-actions ds-review-topbar__actions">
           {meta.designerProjectId && !demo && (
-            <Link to={designerPath(`/editor/${meta.designerProjectId}`)} className="btn btn-secondary">
+            <Link
+              to={
+                appMode
+                  ? `/app/project/${meta.designerProjectId}`
+                  : designerPath(`/editor/${meta.designerProjectId}`)
+              }
+              className="btn btn-secondary"
+            >
               Open in Designer
             </Link>
           )}

@@ -86,6 +86,24 @@ export async function closePlaywrightBrowser(): Promise<void> {
 	}
 }
 
+export async function capturePublicUrlCheck(
+	url: string,
+	width: number,
+	height: number,
+): Promise<{ metrics: PageCaptureMetrics; outboundLinks: CapturedPage['outboundLinks'] }> {
+	await assertResolvedPublicHost(url);
+	const browser = await getBrowser();
+	const context = await browser.newContext({ viewport: { width, height } });
+	const page = await context.newPage();
+	try {
+		await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+		const { metrics, outboundLinks } = await collectMetrics(page, url);
+		return { metrics: { ...metrics, url, path: metrics.path }, outboundLinks };
+	} finally {
+		await context.close();
+	}
+}
+
 export const capturePageWithPlaywright: BrowserCapture = async (
 	pool,
 	projectId,

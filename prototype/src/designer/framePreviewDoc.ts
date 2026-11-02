@@ -4,8 +4,6 @@ import { breakpointForWidth } from './breakpoints';
 import type { DesignNode, Page, StyleTrial } from './types';
 import { framePreviewHostScript } from './framePreviewHostScript';
 
-const base = import.meta.env.BASE_URL;
-
 function layoutCss(layout: ReturnType<typeof resolveLayout>): string {
 	const flexDir =
 		layout.mode === 'row' ? 'row' : layout.mode === 'column' || layout.mode === 'stack' ? 'column' : 'row';
@@ -93,8 +91,10 @@ export function buildFramePreviewDoc(opts: {
 	tokenOverrides: Record<string, string>;
 	trial?: StyleTrial;
 	selectedNodeId: string | null;
+	assetBase: string;
+	themeCss?: string;
 }): string {
-	const { page, frameWidth, themeId, tokenOverrides, trial, selectedNodeId } = opts;
+	const { page, frameWidth, themeId, tokenOverrides, trial, selectedNodeId, assetBase, themeCss } = opts;
 	const root = page.nodes[page.rootNodeId];
 	const overrides = { ...tokenOverrides, ...(trial?.tokenOverrides ?? {}) };
 	const varBlock = Object.entries(overrides)
@@ -103,13 +103,18 @@ export function buildFramePreviewDoc(opts: {
 
 	const inner = root ? renderNode(root, page, frameWidth, trial, selectedNodeId) : '';
 
+	const themeBlock = themeCss
+		? `<style id="bf-theme">${themeCss}</style>`
+		: `<link rel="stylesheet" href="themes/${themeId}.css" />`;
+
 	return `<!DOCTYPE html>
 <html data-bf-theme="${themeId}">
 <head>
 <meta charset="utf-8" />
+<base href="${assetBase}" />
 <meta name="viewport" content="width=${frameWidth}" />
-<link rel="stylesheet" href="${base}themes/${themeId}.css" />
-<link rel="stylesheet" href="${base}themes/layout.css" />
+<link rel="stylesheet" href="themes/layout.css" />
+${themeBlock}
 <style>
   html, body { margin:0; min-height:100%; font-family:var(--bf-theme-font-family); font-size:16px; background:var(--bf-theme-surface-2); color:var(--bf-theme-text-1); touch-action:none; overscroll-behavior:none; }
   h1 { font-size:clamp(1.35rem, 4vw, 2rem); margin:0; line-height:1.15; }

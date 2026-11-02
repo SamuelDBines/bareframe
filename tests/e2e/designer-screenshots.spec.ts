@@ -6,8 +6,18 @@ const BASE = '/designer/index.html#';
 
 async function shot(page: import('@playwright/test').Page, hash: string, name: string) {
   await page.goto(`${BASE}${hash}`, { waitUntil: 'domcontentloaded', timeout: 60_000 });
-  await page.waitForSelector('.app-shell, .designer-workspace-v2', { timeout: 30_000 });
-  await page.waitForTimeout(400);
+  await page.waitForSelector('.app-shell, .designer-workspace-v2, .ds-review-workspace', { timeout: 30_000 });
+
+  const iframe = page.locator('.frame-preview-iframe');
+  if (hash.includes('package-review') && (await iframe.count()) > 0) {
+    await page
+      .frameLocator('.ds-review-stage .frame-preview-iframe')
+      .locator('.bf-btn-primary')
+      .first()
+      .waitFor({ timeout: 15_000 });
+  }
+
+  await page.waitForTimeout(300);
   await page.screenshot({
     path: path.join(ARTIFACTS, name),
     fullPage: true,

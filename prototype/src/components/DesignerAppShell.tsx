@@ -19,7 +19,9 @@ export function DesignerAppShell() {
     location.pathname.startsWith('/editor') ||
     location.pathname.startsWith('/themes') ||
     location.pathname.startsWith('/theme') ||
-    location.pathname.startsWith('/tokens');
+    location.pathname.startsWith('/tokens') ||
+    location.pathname.startsWith('/product/') ||
+    location.pathname.startsWith('/demo/');
   const crumb = breadcrumb(location.pathname);
 
   return (
@@ -47,7 +49,7 @@ export function DesignerAppShell() {
         <UserMenu designerApp />
         {!wide && <ThemeSwitcher />}
       </header>
-      <main className={`app-main${wide ? ' wide' : ''}`}>
+      <main className={`app-main${wide ? ' wide ds-review-bleed' : ''}`}>
         <Outlet />
       </main>
     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@bareframe/react';
 import {
@@ -11,9 +11,10 @@ import {
 } from '../../designer/packageApi';
 import { fetchProject } from '../../designer/projectApi';
 import { DEMO_PACKAGE_DOC } from '../../designer/demoPackageFixture';
-import { DsCard, DsHero, DsPage } from '../../designer/DesignerUiPrimitives';
+import { getHookohDemoPreview } from '../../designer/demoHookohPreview';
+import { swatchForTheme } from '../../designer/themeSwatches';
+import { DsCard } from '../../designer/DesignerUiPrimitives';
 import { FramePreview } from '../../designer/components/FramePreview';
-import { createInitialProject } from '../../designer/initialProject';
 import type { ThemeId } from '../../theme/themes';
 import { designerPath } from '../../sites/urls';
 import type { Frame, Page } from '../../designer/types';
@@ -46,8 +47,6 @@ export function PackageReviewPage({ demo }: { demo?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [previewPage, setPreviewPage] = useState<Page | null>(null);
   const [previewFrame, setPreviewFrame] = useState<Frame | null>(null);
-
-  const demoProject = useMemo(() => createInitialProject(), []);
 
   useEffect(() => {
     if (demo || !packageId) return;
@@ -84,25 +83,27 @@ export function PackageReviewPage({ demo }: { demo?: boolean }) {
   })();
 
   useEffect(() => {
-    if (!playScreen) {
-      setPreviewPage(demoProject.pages[0] ?? null);
-      setPreviewFrame(demoProject.frames[0] ?? null);
+    const screenKey = playScreenId ?? playScreen?.id;
+    if (!screenKey) {
+      setPreviewPage(null);
+      setPreviewFrame(null);
       return;
     }
-    const designerProjectId = meta?.designerProjectId;
-    if (!designerProjectId || demo) {
-      setPreviewPage(demoProject.pages[0] ?? null);
-      setPreviewFrame(demoProject.frames[0] ?? null);
+    if (demo || !meta?.designerProjectId) {
+      const { page, frame } = getHookohDemoPreview(screenKey);
+      setPreviewPage(page);
+      setPreviewFrame(frame);
       return;
     }
-    fetchProject(designerProjectId).then((res) => {
+    if (!playScreen) return;
+    fetchProject(meta.designerProjectId).then((res) => {
       const pages = res.document.project.pages;
       const page = pages.find((p) => p.routePath === playScreen.route || p.name === playScreen.name) ?? pages[0];
       const frame = res.document.project.frames.find((f) => f.pageId === page?.id) ?? res.document.project.frames[0];
       setPreviewPage(page ?? null);
       setPreviewFrame((frame ?? null) as Frame | null);
     });
-  }, [playScreen, meta?.designerProjectId, demo, demoProject]);
+  }, [playScreen, playScreenId, meta?.designerProjectId, demo]);
 
   async function selectDirection(id: string) {
     if (demo || !packageId) {
@@ -119,170 +120,248 @@ export function PackageReviewPage({ demo }: { demo?: boolean }) {
     setDoc((d) => (d ? { ...d, status: 'approved' } : d));
   }
 
-  if (error) return <DsPage><DsCard><p style={{ margin: 0 }}>{error}</p></DsCard></DsPage>;
-  if (!doc || !meta) return <DsPage><DsCard><p className="ds-meta" style={{ margin: 0 }}>Loading package…</p></DsCard></DsPage>;
+  if (error) {
+    return (
+      <div className="ds-review-workspace">
+        <DsCard>
+          <p style={{ margin: 0 }}>{error}</p>
+        </DsCard>
+      </div>
+    );
+  }
+  if (!doc || !meta) {
+    return (
+      <div className="ds-review-workspace">
+        <DsCard>
+          <p className="ds-meta" style={{ margin: 0 }}>
+            Loading package…
+          </p>
+        </DsCard>
+      </div>
+    );
+  }
 
   return (
-    <DsPage>
-      <DsHero
-        eyebrow="Package review"
-        title={meta.name}
-        lead={String(doc.summary)}
-        actions={
-          <>
-            {meta.designerProjectId && !demo && (
-              <Link to={designerPath(`/editor/${meta.designerProjectId}`)} className="btn btn-secondary">
-                Open in Designer
-              </Link>
-            )}
-            {!demo && packageId && (
-              <>
-                <a className="btn btn-secondary" href={exportZipUrl(packageId)}>
-                  Download zip
-                </a>
-                <a className="btn btn-secondary" href={deliveryFlowUrl(packageId)}>
-                  Delivery Flow
-                </a>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => createShareLink(packageId!).then((r) => setShareUrl(r.url))}
-                >
-                  Share
-                </button>
-                <button type="button" className="btn btn-primary" onClick={() => approve()}>
-                  Approve
-                </button>
-              </>
-            )}
-          </>
-        }
-      />
+    <div className="ds-review-workspace">
+      <header className="ds-review-topbar">
+        <div className="ds-review-topbar__main">
+          <p className="ds-eyebrow">Package review</p>
+          <h1>{meta.name}</h1>
+          <p className="ds-lead">{String(doc.summary)}</p>
+        </div>
+        <div className="ds-actions ds-review-topbar__actions">
+          {meta.designerProjectId && !demo && (
+            <Link to={designerPath(`/editor/${meta.designerProjectId}`)} className="btn btn-secondary">
+              Open in Designer
+            </Link>
+          )}
+          {!demo && packageId && (
+            <>
+              <a className="btn btn-secondary" href={exportZipUrl(packageId)}>
+                Download zip
+              </a>
+              <a className="btn btn-secondary" href={deliveryFlowUrl(packageId)}>
+                Delivery Flow
+              </a>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => createShareLink(packageId!).then((r) => setShareUrl(r.url))}
+              >
+                Share
+              </button>
+              <button type="button" className="btn btn-primary" onClick={() => approve()}>
+                Approve
+              </button>
+            </>
+          )}
+        </div>
+      </header>
 
       {shareUrl && (
-        <DsCard>
+        <div className="ds-review-banner">
           <p className="ds-meta" style={{ margin: 0 }}>
             Share: <a href={shareUrl}>{shareUrl}</a>
           </p>
-        </DsCard>
-      )}
-
-      <div className="ds-tabs" role="tablist">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            className={tab === t.id ? 'active' : undefined}
-            onClick={() => setTab(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {tab === 'prototype' && (
-        <div className="ds-split">
-          <DsCard>
-            <h2 style={{ fontSize: '1rem', marginBottom: '1rem' }}>Play journeys</h2>
-            <label style={{ display: 'block', marginBottom: '1rem' }}>
-              <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Journey</span>
-              <select
-                value={playJourneyId ?? ''}
-                onChange={(e) => {
-                  setPlayJourneyId(e.target.value);
-                  setPlayStep(0);
-                }}
-                style={{ width: '100%', marginTop: '0.35rem', padding: '0.5rem' }}
-              >
-                {journeys.map((j) => (
-                  <option key={j.id} value={j.id}>
-                    {j.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {activeJourney && (
-              <>
-                <p style={{ marginTop: '1rem', fontSize: '0.9rem' }}>
-                  Step {playStep + 1} of {activeJourney.steps.length}:{' '}
-                  <strong>{playScreen?.name ?? playScreenId}</strong>
-                </p>
-                <p className="ds-meta">{activeJourney.steps[playStep]?.action}</p>
-                <div className="ds-actions" style={{ marginTop: '1rem' }}>
-                  <Button variant="secondary" isDisabled={playStep === 0} onPress={() => setPlayStep((s) => s - 1)}>
-                    Back
-                  </Button>
-                  <Button
-                    variant="primary"
-                    isDisabled={playStep >= activeJourney.steps.length - 1}
-                    onPress={() => setPlayStep((s) => s + 1)}
-                  >
-                    {activeJourney.steps[playStep]?.action ?? 'Next'}
-                  </Button>
-                </div>
-              </>
-            )}
-            <h3 style={{ fontSize: '0.875rem', marginTop: '1.5rem', marginBottom: '0.5rem' }}>Design direction</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              {designOptions.map((d) => (
-                <Button
-                  key={d.id}
-                  variant={doc.selected_direction === d.id ? 'primary' : 'secondary'}
-                  onPress={() => selectDirection(d.id)}
-                >
-                  {d.name}
-                </Button>
-              ))}
-            </div>
-          </DsCard>
-          <DsCard className="ds-play-frame">
-            {previewPage && previewFrame ? (
-              <FramePreview
-                frame={previewFrame}
-                page={previewPage}
-                themeId={themeId}
-                customTokens={{}}
-                selectedNodeId={null}
-                onSelectNode={() => undefined}
-              />
-            ) : (
-              <p className="ds-meta">Preview loading…</p>
-            )}
-          </DsCard>
         </div>
       )}
 
-      {tab !== 'prototype' && (
-        <DsCard>
-          <pre style={{ overflow: 'auto', maxHeight: '60vh', fontSize: '0.75rem', margin: 0 }}>
-            {JSON.stringify(
-              tab === 'review'
-                ? doc.review
-                : tab === 'design'
-                  ? { selected: doc.selected_direction, options: doc.design_options }
-                  : (doc as Record<string, unknown>)[tab === 'product' ? 'product' : tab],
-              null,
-              2,
-            )}
-          </pre>
-        </DsCard>
-      )}
+      <div className="ds-review-tabs-wrap">
+        <div className="ds-tabs" role="tablist">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              className={tab === t.id ? 'active' : undefined}
+              onClick={() => setTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {tab === 'review' && !demo && packageId && (
-        <DsCard>
-          <h3>Request revision</h3>
-          <RevisionForm
-            onSubmit={async (deliverable, feedback) => {
-              await requestRevision(packageId, deliverable, feedback);
-              const refreshed = await fetchProductPackage(packageId);
-              setDoc(refreshed.document as Record<string, unknown>);
-            }}
-          />
-        </DsCard>
+      {tab === 'prototype' ? (
+        <div className="ds-review-layout">
+          <aside className="ds-review-sidebar">
+            <section className="ds-review-panel">
+              <h2>Journey</h2>
+              <label className="ds-review-select">
+                <span>Flow</span>
+                <select
+                  value={playJourneyId ?? ''}
+                  onChange={(e) => {
+                    setPlayJourneyId(e.target.value);
+                    setPlayStep(0);
+                  }}
+                >
+                  {journeys.map((j) => (
+                    <option key={j.id} value={j.id}>
+                      {j.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              {activeJourney ? (
+                <ol className="ds-journey-steps" aria-label="Journey steps">
+                  {activeJourney.steps.map((step, index) => {
+                    const screen = screens.find((s) => s.id === step.screen_id);
+                    const active = index === playStep;
+                    return (
+                      <li key={`${step.screen_id}-${index}`}>
+                        <button
+                          type="button"
+                          className={`ds-journey-step${active ? ' active' : ''}`}
+                          onClick={() => setPlayStep(index)}
+                        >
+                          <span className="ds-journey-step-num">{index + 1}</span>
+                          <span className="ds-journey-step-body">
+                            <strong>{screen?.name ?? step.screen_id}</strong>
+                            <span className="ds-meta">{step.action}</span>
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ol>
+              ) : null}
+
+              <div className="ds-review-play-controls">
+                <Button variant="secondary" isDisabled={playStep === 0} onPress={() => setPlayStep((s) => s - 1)}>
+                  Back
+                </Button>
+                <Button
+                  variant="primary"
+                  isDisabled={!activeJourney || playStep >= activeJourney.steps.length - 1}
+                  onPress={() => setPlayStep((s) => s + 1)}
+                >
+                  {activeJourney?.steps[playStep]?.action ?? 'Next'}
+                </Button>
+              </div>
+            </section>
+
+            <section className="ds-review-panel">
+              <h2>Design direction</h2>
+              <p className="ds-meta">Palette and typography preview — updates the playable prototype.</p>
+              <div className="ds-direction-list">
+                {designOptions.map((d) => {
+                  const tid = (d.bareframe_theme?.base_theme ?? 'simple') as ThemeId;
+                  const sw = swatchForTheme(tid);
+                  const selected = doc.selected_direction === d.id;
+                  return (
+                    <button
+                      key={d.id}
+                      type="button"
+                      className={`ds-direction-card${selected ? ' selected' : ''}`}
+                      onClick={() => selectDirection(d.id)}
+                    >
+                      <div className="ds-direction-swatches" aria-hidden>
+                        <span style={{ background: sw.surface }} title="Surface" />
+                        <span style={{ background: sw.surfaceMuted }} title="Surface muted" />
+                        <span style={{ background: sw.accent }} title="Accent" />
+                        <span style={{ background: sw.text }} title="Text" />
+                      </div>
+                      <div className="ds-direction-meta">
+                        <strong>{d.name}</strong>
+                        <span className="ds-meta">
+                          {sw.fontSample} · {tid}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="ds-review-panel ds-review-panel--muted">
+              <h3>Screens in package</h3>
+              <ul className="ds-screen-list">
+                {screens.map((s) => (
+                  <li key={s.id}>
+                    <span>{s.name}</span>
+                    <code>{s.route}</code>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </aside>
+
+          <main className="ds-review-stage">
+            <div className="ds-review-stage__chrome">
+              <span className="ds-meta">
+                {playScreen?.name ?? 'Screen'} · {themeId} theme · @bareframe/react preview
+              </span>
+            </div>
+            <div className="ds-review-stage__device">
+              {previewPage && previewFrame ? (
+                <FramePreview
+                  frame={previewFrame}
+                  page={previewPage}
+                  themeId={themeId}
+                  customTokens={{}}
+                  selectedNodeId={null}
+                  onSelectNode={() => undefined}
+                />
+              ) : (
+                <p className="ds-meta">Preview loading…</p>
+              )}
+            </div>
+          </main>
+        </div>
+      ) : (
+        <div className="ds-review-body">
+          <DsCard>
+            <pre style={{ overflow: 'auto', maxHeight: '60vh', fontSize: '0.75rem', margin: 0 }}>
+              {JSON.stringify(
+                tab === 'review'
+                  ? doc.review
+                  : tab === 'design'
+                    ? { selected: doc.selected_direction, options: doc.design_options }
+                    : (doc as Record<string, unknown>)[tab === 'product' ? 'product' : tab],
+                null,
+                2,
+              )}
+            </pre>
+          </DsCard>
+
+          {tab === 'review' && !demo && packageId && (
+            <DsCard>
+              <h3>Request revision</h3>
+              <RevisionForm
+                onSubmit={async (deliverable, feedback) => {
+                  await requestRevision(packageId, deliverable, feedback);
+                  const refreshed = await fetchProductPackage(packageId);
+                  setDoc(refreshed.document as Record<string, unknown>);
+                }}
+              />
+            </DsCard>
+          )}
+        </div>
       )}
-    </DsPage>
+    </div>
   );
 }
 

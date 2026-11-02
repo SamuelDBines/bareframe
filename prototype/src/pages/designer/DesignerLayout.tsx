@@ -12,8 +12,10 @@ const LINKS = [
 export function DesignerLayout() {
   const location = useLocation();
   const isEditor = location.pathname.startsWith('/editor');
+  const isReview =
+    location.pathname.startsWith('/product/') || location.pathname.startsWith('/demo/');
 
-  if (isEditor) return <Outlet />;
+  if (isEditor || isReview) return <Outlet />;
 
   return (
     <div className="designer-route-shell">

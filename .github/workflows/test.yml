@@ -148,6 +148,7 @@ jobs:
           pnpm run build:lib
           pnpm run generate:component-props
           pnpm run build:react
+          node mcp/scripts/bundle-catalog.mjs
 
       - name: Build design-handoff
         run: |

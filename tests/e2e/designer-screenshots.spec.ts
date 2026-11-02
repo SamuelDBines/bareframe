@@ -12,7 +12,7 @@ async function shot(page: import('@playwright/test').Page, hash: string, name: s
   if (hash.includes('package-review') && (await iframe.count()) > 0) {
     await page
       .frameLocator('.ds-review-stage .frame-preview-iframe')
-      .locator('.bf-btn-primary')
+      .locator('.bf-btn--primary, .bf-btn-primary')
       .first()
       .waitFor({ timeout: 15_000 });
   }

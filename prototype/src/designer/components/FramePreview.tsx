@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import type { ThemeId } from '../../theme/themes';
 import { buildFramePreviewDoc } from '../framePreviewDoc';
+import { loadFramePreviewStyles } from '../framePreviewStyles';
 import type { Frame, Page, StyleTrial } from '../types';
 
 type Props = {
@@ -37,13 +38,7 @@ export const FramePreview = memo(function FramePreview({
 
 		void (async () => {
 			const assetBase = designerAssetBase();
-			let themeCss: string | undefined;
-			try {
-				const res = await fetch(new URL(`themes/${themeId}.css`, assetBase));
-				if (res.ok) themeCss = await res.text();
-			} catch {
-				themeCss = undefined;
-			}
+			const previewCss = await loadFramePreviewStyles(assetBase, themeId);
 			if (cancelled) return;
 			el.srcdoc = buildFramePreviewDoc({
 				page,
@@ -53,7 +48,7 @@ export const FramePreview = memo(function FramePreview({
 				trial,
 				selectedNodeId,
 				assetBase,
-				themeCss,
+				previewCss,
 			});
 		})();
 

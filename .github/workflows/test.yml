@@ -89,6 +89,20 @@ jobs:
           set -euo pipefail
           docker run --rm --entrypoint id bareframe-api:ci | grep -q 'uid=10001'
 
+      - name: Build render worker image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: render/Dockerfile
+          push: false
+          load: true
+          tags: bareframe-render-worker:ci
+
+      - name: Verify render worker image runs as uid 10001
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint id bareframe-render-worker:ci | grep -q 'uid=10001'
+
   mcp:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -137,9 +151,15 @@ jobs:
       - name: MCP typecheck
         run: pnpm run mcp:typecheck
 
+      - name: Install Playwright Chromium for flow-map MCP e2e
+        working-directory: api
+        run: npx playwright install --with-deps chromium
+
       - name: MCP build and tests
         env:
           DATABASE_URL: postgres://bareframe:bareframe@127.0.0.1:54329/bareframe
+          RENDER_ALLOW_HOSTS: 127.0.0.1
+          RENDER_INLINE: "1"
         run: pnpm run mcp:build && pnpm run mcp:test
 
       - name: Set up Docker Buildx

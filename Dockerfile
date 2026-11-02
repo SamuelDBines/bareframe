@@ -9,6 +9,7 @@ RUN corepack enable && corepack prepare pnpm@10.8.0 --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/react/package.json packages/react/tsconfig.json packages/react/tsup.config.ts ./packages/react/
 COPY packages/designer-core/package.json packages/designer-core/tsconfig.json packages/designer-core/vitest.config.ts ./packages/designer-core/
+COPY packages/flow-map-engine/package.json packages/flow-map-engine/tsconfig.json packages/flow-map-engine/vitest.config.ts ./packages/flow-map-engine/
 COPY packages/react/scripts ./packages/react/scripts
 COPY scripts ./scripts
 COPY src ./src

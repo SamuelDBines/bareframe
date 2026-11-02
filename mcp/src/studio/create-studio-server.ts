@@ -531,10 +531,10 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 				{ method: 'POST' },
 			);
 			const deadline = Date.now() + waitSeconds * 1000;
-			let last = started;
+			let last: Record<string, unknown> = { ...started };
 			while (Date.now() < deadline && last.status !== 'completed' && last.status !== 'failed') {
 				await new Promise((r) => setTimeout(r, 800));
-				last = await api.request<{ id: string; status: string; issues: unknown[]; summary: unknown }>(
+				last = await api.request<Record<string, unknown>>(
 					`/api/projects/${projectId}/reviews/${started.runId}`,
 				);
 			}

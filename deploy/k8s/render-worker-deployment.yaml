@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bareframe-render-worker
+  namespace: bareframe
+  labels:
+    app: bareframe-render-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bareframe-render-worker
+  template:
+    metadata:
+      labels:
+        app: bareframe-render-worker
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+      containers:
+        - name: worker
+          image: ghcr.io/samueldbines/bareframe/render-worker:latest
+          envFrom:
+            - secretRef:
+                name: bareframe-api-env
+          env:
+            - name: RENDER_WORKER_POLL_MS
+              value: "1500"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: bareframe-recordings-retention
+  namespace: bareframe
+spec:
+  schedule: "0 4 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: purge
+              image: curlimages/curl:8.5.0
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  curl -sf -X POST \
+                    -H "x-render-worker-secret: ${RENDER_WORKER_SECRET}" \
+                    "${PUBLIC_URL}/api/internal/recordings/purge-expired"
+              envFrom:
+                - secretRef:
+                    name: bareframe-api-env

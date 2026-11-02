@@ -102,6 +102,9 @@ export function DesignerDashboard() {
 							<Link to={`/designer/settings/project/${p.id}`} className="btn btn-ghost">
 								Project settings
 							</Link>
+							<Link to={`/designer/recordings/${p.id}`} className="btn btn-ghost">
+								Recordings
+							</Link>
 						</div>
 					</article>
 				))}

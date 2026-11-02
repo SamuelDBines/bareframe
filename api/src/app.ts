@@ -24,6 +24,7 @@ import {
 	upsertUser,
 } from './db/index.js';
 import { createProjectsRouter } from './projects/routes.js';
+import { createFlowMapRouter } from './flow-map/routes.js';
 
 export type AppDeps = {
 	config: Config;
@@ -107,6 +108,7 @@ export function createApp(deps: AppDeps): Hono {
 	});
 
 	app.route('/api', createProjectsRouter(pool, config));
+	app.route('/api', createFlowMapRouter(pool, config));
 
 	return app;
 }

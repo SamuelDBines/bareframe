@@ -437,12 +437,13 @@ export function applyImportScreenshots(
 	shots: ImportScreenshotShot[],
 	links: ImportScreenshotLink[],
 	ctx: CommandContext,
+	opts?: { pageId?: string },
 ): CommandResult {
 	let doc = document;
 	const frameByAsset = new Map<string, string>();
 
 	for (const shot of shots) {
-		const pageId = doc.project.pages[0]?.id;
+		const pageId = opts?.pageId ?? doc.project.pages[0]?.id;
 		if (!pageId) throw new CommandError('Project has no pages', 'no_pages');
 		const page = findPage(doc.project, pageId);
 		const frameRes = applyProjectCommand(

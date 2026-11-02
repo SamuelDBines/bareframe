@@ -4,6 +4,8 @@ import type { Config } from './config.js';
 import type { GitHubClient, GitHubUser } from './auth/github.js';
 import { runMigrations } from './db/migrate.js';
 
+let testDbSetupChain: Promise<void> = Promise.resolve();
+
 export const testConfig: Config = {
 	githubClientId: 'test-client-id',
 	githubClientSecret: 'test-client-secret',
@@ -12,17 +14,27 @@ export const testConfig: Config = {
 	publicUrl: 'https://bareframe.org',
 	port: 0,
 	nodeEnv: 'test',
+	renderWorkerSecret: 'test-render-worker-secret',
 };
 
 export async function setupTestDb(pool: pg.Pool): Promise<void> {
-	await pool.query('DROP TABLE IF EXISTS project_revisions CASCADE');
-	await pool.query('DROP TABLE IF EXISTS project_api_tokens CASCADE');
-	await pool.query('DROP TABLE IF EXISTS project_assets CASCADE');
-	await pool.query('DROP TABLE IF EXISTS projects CASCADE');
-	await pool.query('DROP TABLE IF EXISTS sessions CASCADE');
-	await pool.query('DROP TABLE IF EXISTS users CASCADE');
-	await pool.query('DROP TABLE IF EXISTS schema_migrations CASCADE');
-	await runMigrations(pool);
+	const run = async () => {
+		await pool.query('DROP TABLE IF EXISTS recording_steps CASCADE');
+		await pool.query('DROP TABLE IF EXISTS recordings CASCADE');
+		await pool.query('DROP TABLE IF EXISTS audit_findings CASCADE');
+		await pool.query('DROP TABLE IF EXISTS flow_map_jobs CASCADE');
+		await pool.query('DROP TABLE IF EXISTS render_jobs CASCADE');
+		await pool.query('DROP TABLE IF EXISTS project_revisions CASCADE');
+		await pool.query('DROP TABLE IF EXISTS project_api_tokens CASCADE');
+		await pool.query('DROP TABLE IF EXISTS project_assets CASCADE');
+		await pool.query('DROP TABLE IF EXISTS projects CASCADE');
+		await pool.query('DROP TABLE IF EXISTS sessions CASCADE');
+		await pool.query('DROP TABLE IF EXISTS users CASCADE');
+		await pool.query('DROP TABLE IF EXISTS schema_migrations CASCADE');
+		await runMigrations(pool);
+	};
+	testDbSetupChain = testDbSetupChain.then(run, run);
+	await testDbSetupChain;
 }
 
 export function createTestApp(

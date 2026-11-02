@@ -14,7 +14,7 @@ No authentication on the public endpoint. Per-IP rate limits apply (`BAREFRAME_M
 - **Backend:** proxies to `@bareframe/api` project routes (`BAREFRAME_API_URL` in the MCP deployment)
 - **Rate limit:** per token (`BAREFRAME_MCP_STUDIO_RATE_MAX`, default 120/min)
 
-Studio tools: `list_projects`, `get_project`, `create_canvas`, `add_screen`, `add_component`, `add_connector`, `add_annotation`, `update_node`, `delete_node`, `import_screenshots`, `get_upload_url`.
+Studio tools: `list_projects`, `get_project`, `create_canvas`, `add_screen`, `add_component`, `add_connector`, `add_annotation`, `update_node`, `delete_node`, `import_screenshots`, `get_upload_url`, `create_flow_map`, `screenshot_url`, `render_frame`, `list_recordings`, `build_flow_from_recording`.
 
 ## Public read tools
 

@@ -13,7 +13,6 @@ import {
 	createRecording,
 	getRecording,
 	listRecordings,
-	purgeExpiredRecordings,
 	type RecordingStepInput,
 } from '../db/recordings.js';
 import { assertProjectAccess, getProjectById } from '../db/projects.js';
@@ -25,9 +24,11 @@ import { VersionConflictError } from '../db/projects.js';
 export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 	const auth = createProjectAuthMiddleware(pool, config);
 	const router = new Hono();
-	router.use('*', auth);
 
-	router.post('/projects/:projectId/flow-maps', async (c) => {
+	const authed = new Hono();
+	authed.use('*', auth);
+
+	authed.post('/projects/:projectId/flow-maps', async (c) => {
 		try {
 			const actor = getActor(c);
 			const projectId = c.req.param('projectId');
@@ -77,7 +78,7 @@ export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 		}
 	});
 
-	router.get('/projects/:projectId/flow-maps/:jobId', async (c) => {
+	authed.get('/projects/:projectId/flow-maps/:jobId', async (c) => {
 		try {
 			const actor = getActor(c);
 			const projectId = c.req.param('projectId');
@@ -97,7 +98,7 @@ export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 		}
 	});
 
-	router.post('/projects/:projectId/render-jobs', async (c) => {
+	authed.post('/projects/:projectId/render-jobs', async (c) => {
 		try {
 			const actor = getActor(c);
 			const projectId = c.req.param('projectId');
@@ -139,7 +140,7 @@ export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 		}
 	});
 
-	router.get('/projects/:projectId/render-jobs/:jobId', async (c) => {
+	authed.get('/projects/:projectId/render-jobs/:jobId', async (c) => {
 		try {
 			const actor = getActor(c);
 			const projectId = c.req.param('projectId');
@@ -152,7 +153,7 @@ export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 		}
 	});
 
-	router.get('/projects/:projectId/recordings', async (c) => {
+	authed.get('/projects/:projectId/recordings', async (c) => {
 		try {
 			const actor = getActor(c);
 			const projectId = c.req.param('projectId');
@@ -164,7 +165,7 @@ export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 		}
 	});
 
-	router.post('/projects/:projectId/recordings', async (c) => {
+	authed.post('/projects/:projectId/recordings', async (c) => {
 		try {
 			const actor = getActor(c);
 			const projectId = c.req.param('projectId');
@@ -199,7 +200,7 @@ export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 		}
 	});
 
-	router.post('/projects/:projectId/recordings/:recordingId/build', async (c) => {
+	authed.post('/projects/:projectId/recordings/:recordingId/build', async (c) => {
 		try {
 			const actor = getActor(c);
 			const projectId = c.req.param('projectId');
@@ -222,14 +223,6 @@ export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 		}
 	});
 
-	router.post('/internal/recordings/purge-expired', async (c) => {
-		const secret = c.req.header('x-render-worker-secret');
-		if (!secret || secret !== config.renderWorkerSecret) {
-			return c.json({ error: 'Forbidden' }, 403);
-		}
-		const deleted = await purgeExpiredRecordings(pool);
-		return c.json({ deleted });
-	});
-
+	router.route('/', authed);
 	return router;
 }

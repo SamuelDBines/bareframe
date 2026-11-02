@@ -200,6 +200,15 @@ jobs:
           load: true
           tags: bareframe-site:ci
 
+      - name: Build Designer image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: designer/Dockerfile
+          push: false
+          load: true
+          tags: bareframe-designer:ci
+
       - name: Verify nginx redirects in container
         run: |
           set -euo pipefail
@@ -211,6 +220,14 @@ jobs:
           ALIAS_LOC=$(curl -sI -H 'Host: www.bareframe.org' 'http://127.0.0.1:18080/legacy/foo' | tr -d '\r' | awk 'tolower($1)=="location:" {print $2}')
           test "$ALIAS_LOC" = 'https://bareframe.org/legacy/foo'
           docker rm -f bareframe-nginx
+
+      - name: Verify Designer nginx health in container
+        run: |
+          set -euo pipefail
+          docker run -d --name bareframe-designer -p 18082:8080 bareframe-designer:ci
+          sleep 2
+          curl -sf http://127.0.0.1:18082/healthz | grep -q '^ok$'
+          docker rm -f bareframe-designer
 
   test:
     runs-on: ubuntu-24.04
@@ -282,6 +299,16 @@ jobs:
       - name: Build product prototype (→ public/prototype/)
         working-directory: prototype
         run: pnpm install --frozen-lockfile && pnpm test && BAREFRAME_PAGES_ROOT=1 pnpm run build
+
+      - name: Build Designer app (→ public/designer/)
+        working-directory: prototype
+        run: |
+          VITE_BAREFRAME_APP=designer \
+          VITE_DOCS_SITE_URL=https://bareframe.org \
+          VITE_DESIGNER_SITE_URL=https://designer.bareframe.org \
+          BAREFRAME_DESIGNER_BUILD=1 \
+          pnpm run build
+          cp ../public/designer/designer.html ../public/designer/index.html
 
       - name: Finalize Pages layout (prototype @ root, legacy @ /legacy/)
         run: node ./scripts/finalize-pages.mjs

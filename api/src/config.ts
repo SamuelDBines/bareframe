@@ -4,6 +4,7 @@ export type Config = {
 	sessionSecret: string;
 	databaseUrl: string;
 	publicUrl: string;
+	designerPublicUrl: string;
 	port: number;
 	nodeEnv: string;
 	renderWorkerSecret: string;
@@ -22,6 +23,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
 		sessionSecret: required('SESSION_SECRET'),
 		databaseUrl: required('DATABASE_URL'),
 		publicUrl: (env.PUBLIC_URL ?? 'http://localhost:8080').replace(/\/$/, ''),
+		designerPublicUrl: (env.DESIGNER_PUBLIC_URL ?? 'https://designer.bareframe.org').replace(
+			/\/$/,
+			'',
+		),
 		port: Number(env.PORT ?? 8080),
 		nodeEnv: env.NODE_ENV ?? 'development',
 		renderWorkerSecret: env.RENDER_WORKER_SECRET ?? 'dev-render-worker-secret',

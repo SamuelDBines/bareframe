@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
+import { designerSiteUrl } from '../sites/urls';
 
 export function ProductSwitcher() {
 	const { pathname } = useLocation();
@@ -20,12 +21,12 @@ export function ProductSwitcher() {
 			>
 				Components
 			</NavLink>
-			<NavLink
-				to="/designer"
+			<a
+				href={designerSiteUrl('/')}
 				className={pathname.startsWith('/designer') ? 'active' : ''}
 			>
 				Designer
-			</NavLink>
+			</a>
 		</nav>
 	);
 }

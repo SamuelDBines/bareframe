@@ -1,15 +1,16 @@
 import { Link } from 'react-router-dom';
 import { githubSignInUrl, useAuth } from '../../auth/AuthContext';
+import { designerSiteUrl, githubAuthReturnTo } from '../../sites/urls';
 
 export function SignInPage() {
 	const { status, user } = useAuth();
-	const returnTo = '/#/designer';
+	const returnTo = githubAuthReturnTo('/');
 
 	if (user) {
 		return (
 			<div style={{ maxWidth: 440, margin: '0 auto', textAlign: 'center' }}>
 				<p className="lead">Signed in as <strong>{user.login}</strong>.</p>
-				<Link to="/designer" className="btn btn-primary">Open Designer</Link>
+				<a href={designerSiteUrl('/')} className="btn btn-primary">Open Designer</a>
 			</div>
 		);
 	}

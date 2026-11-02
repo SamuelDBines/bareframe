@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom';
 import { githubSignInUrl, useAuth } from '../auth/AuthContext';
+import { githubAuthReturnTo } from '../sites/urls';
 
-export function UserMenu() {
+type Props = {
+	designerApp?: boolean;
+};
+
+export function UserMenu({ designerApp = false }: Props) {
 	const { status, user, signOut } = useAuth();
 
 	if (status === 'loading') {
@@ -28,9 +33,18 @@ export function UserMenu() {
 
 	return (
 		<div className="user-menu">
-			<Link to="/sign-in" className="btn btn-ghost btn-sm">Sign in</Link>
+			{designerApp ? null : (
+				<Link to="/sign-in" className="btn btn-ghost btn-sm">Sign in</Link>
+			)}
 			{status !== 'unavailable' ? (
-				<a className="btn btn-primary btn-sm" href={githubSignInUrl('/#/designer')}>
+				<a
+					className="btn btn-primary btn-sm"
+					href={githubSignInUrl(
+						designerApp
+							? githubAuthReturnTo(window.location.hash.replace(/^#/, '') || '/')
+							: undefined,
+					)}
+				>
 					Sign in with GitHub
 				</a>
 			) : null}

@@ -31,6 +31,8 @@ spec:
           env:
             - name: PUBLIC_URL
               value: https://bareframe.org
+            - name: DESIGNER_PUBLIC_URL
+              value: https://designer.bareframe.org
           envFrom:
             - secretRef:
                 name: bareframe-api-env

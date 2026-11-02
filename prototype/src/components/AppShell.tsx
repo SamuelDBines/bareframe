@@ -6,10 +6,10 @@ import { UserMenu } from './UserMenu';
 export function AppShell() {
 	const location = useLocation();
 	const wide =
-		location.pathname.startsWith('/designer/editor') ||
-		location.pathname.startsWith('/designer/themes') ||
-		location.pathname.startsWith('/designer/theme') ||
-		location.pathname.startsWith('/designer/tokens');
+		location.pathname.startsWith('/editor') ||
+		location.pathname.startsWith('/themes') ||
+		location.pathname.startsWith('/theme') ||
+		location.pathname.startsWith('/tokens');
 
 	const docs = location.pathname.startsWith('/components');
 

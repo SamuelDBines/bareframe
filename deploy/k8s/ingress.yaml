@@ -10,6 +10,9 @@ spec:
     - hosts:
         - bareframe.org
       secretName: bareframe-tls
+    - hosts:
+        - designer.bareframe.org
+      secretName: designer-bareframe-tls
   rules:
     - host: bareframe.org
       http:
@@ -33,5 +36,22 @@ spec:
             backend:
               service:
                 name: bareframe-site
+                port:
+                  name: http
+    - host: designer.bareframe.org
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: bareframe-api
+                port:
+                  name: http
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bareframe-designer
                 port:
                   name: http

@@ -7,6 +7,7 @@ import {
 	useState,
 	type ReactNode,
 } from 'react';
+import { githubSignInUrl as buildGithubSignInUrl } from './signIn';
 
 export type AuthUser = {
 	id: number;
@@ -105,7 +106,6 @@ export function useAuth(): AuthContextValue {
 	return ctx;
 }
 
-export function githubSignInUrl(returnTo: string): string {
-	const q = new URLSearchParams({ returnTo });
-	return `/api/auth/github?${q}`;
+export function githubSignInUrl(returnTo?: string): string {
+	return buildGithubSignInUrl(returnTo);
 }

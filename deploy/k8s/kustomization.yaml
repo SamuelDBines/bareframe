@@ -10,6 +10,8 @@ resources:
   - mcp-deployment.yaml
   - mcp-service.yaml
   - render-worker-deployment.yaml
+  - designer-deployment.yaml
+  - designer-service.yaml
   - ingress.yaml
   - ingress-aliases.yaml
 images:
@@ -24,4 +26,7 @@ images:
     newTag: latest
   - name: ghcr.io/samueldbines/bareframe/render-worker
     newName: ghcr.io/samueldbines/bareframe/render-worker
+    newTag: latest
+  - name: ghcr.io/samueldbines/bareframe/designer
+    newName: ghcr.io/samueldbines/bareframe/designer
     newTag: latest

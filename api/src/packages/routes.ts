@@ -22,6 +22,7 @@ import {
   updateProductPackageDocument,
 } from '../db/packages.js';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from '../projects/auth.js';
+import { normalizeUserId } from '../db/normalize.js';
 import { subscribePackageJob } from './events.js';
 import { reviseProductPackage, patchProductPackage } from './package-mutations.js';
 import { buildPackageZip } from './export-zip.js';
@@ -176,7 +177,7 @@ export function createPackagesRouter(pool: pg.Pool, config: Config) {
     const actor = getActor(c);
     if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
     const job = await getPackageJob(pool, c.req.param('jobId'));
-    if (!job || job.owner_user_id !== actor.userId) return c.json({ error: 'Not found' }, 404);
+    if (!job || normalizeUserId(job.owner_user_id) !== normalizeUserId(actor.userId)) return c.json({ error: 'Not found' }, 404);
     return c.json({
       id: job.id,
       status: job.status,
@@ -192,7 +193,7 @@ export function createPackagesRouter(pool: pg.Pool, config: Config) {
     if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
     const jobId = c.req.param('jobId');
     const job = await getPackageJob(pool, jobId);
-    if (!job || job.owner_user_id !== actor.userId) return c.json({ error: 'Not found' }, 404);
+    if (!job || normalizeUserId(job.owner_user_id) !== normalizeUserId(actor.userId)) return c.json({ error: 'Not found' }, 404);
 
     return streamSSE(c, async (stream) => {
       const send = (data: Record<string, unknown>) => stream.writeSSE({ data: JSON.stringify(data) });

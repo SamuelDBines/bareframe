@@ -1,5 +1,6 @@
 import type pg from 'pg';
 import { randomToken, hashToken } from '../auth/crypto.js';
+import { normalizeUserId } from './normalize.js';
 
 export type ProductPackageRow = {
   id: string;
@@ -53,13 +54,15 @@ export async function listPackagesForUser(pool: pg.Pool, userId: number) {
 
 export async function getPackageById(pool: pg.Pool, id: string) {
   const { rows } = await pool.query<ProductPackageRow>(`SELECT * FROM product_packages WHERE id = $1`, [id]);
-  return rows[0] ?? null;
+  const row = rows[0];
+  if (!row) return null;
+  return { ...row, owner_user_id: normalizeUserId(row.owner_user_id) };
 }
 
 export async function assertPackageOwner(pool: pg.Pool, packageId: string, userId: number) {
   const pkg = await getPackageById(pool, packageId);
   if (!pkg) throw new PackageAccessError('Not found', 404);
-  if (pkg.owner_user_id !== userId) throw new PackageAccessError('Forbidden', 403);
+  if (normalizeUserId(pkg.owner_user_id) !== normalizeUserId(userId)) throw new PackageAccessError('Forbidden', 403);
   return pkg;
 }
 
@@ -73,7 +76,9 @@ export async function createPackageJob(pool: pg.Pool, userId: number, intake: Re
 
 export async function getPackageJob(pool: pg.Pool, jobId: string) {
   const { rows } = await pool.query<PackageJobRow>(`SELECT * FROM package_generation_jobs WHERE id = $1`, [jobId]);
-  return rows[0] ?? null;
+  const row = rows[0];
+  if (!row) return null;
+  return { ...row, owner_user_id: normalizeUserId(row.owner_user_id) };
 }
 
 export async function updatePackageJob(

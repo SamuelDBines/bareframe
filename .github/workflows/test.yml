@@ -161,8 +161,8 @@ jobs:
           node mcp/scripts/bundle-catalog.mjs
           cd "$GITHUB_WORKSPACE/packages/package-contracts" && npm install && npm run build
           cd "$GITHUB_WORKSPACE/packages/design-handoff" && npm install && npm run build
-          cd "$GITHUB_WORKSPACE/packages/package-generator" && npm install && npm run build
           cd "$GITHUB_WORKSPACE/packages/designer-core" && npm install && npm run build
+          cd "$GITHUB_WORKSPACE/packages/package-generator" && npm install && npm run build
           cd "$GITHUB_WORKSPACE/packages/flow-map-engine" && npm install && npm run build
           cd "$GITHUB_WORKSPACE/api" && npm ci && npm run build
 

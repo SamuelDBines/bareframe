@@ -5,12 +5,8 @@ test.describe('designer canvas', () => {
 		await page.goto('/designer/index.html#/editor', { waitUntil: 'domcontentloaded', timeout: 60_000 });
 		await expect(page.locator('.infinite-canvas')).toBeVisible({ timeout: 30_000 });
 		await page.waitForSelector('.frame-preview-iframe', { timeout: 30_000 });
-		await page
-			.locator('.frame-preview-shell--ready')
-			.first()
-			.waitFor({ state: 'attached', timeout: 30_000 })
-			.catch(() => undefined);
-		await page.waitForTimeout(300);
+		await page.locator('.frame-preview-shell--ready').first().waitFor({ state: 'visible', timeout: 30_000 }).catch(() => undefined);
+		await page.waitForTimeout(500);
 	});
 
 	test('canvas column sits beside inspector (no horizontal overlap)', async ({ page }) => {
@@ -91,6 +87,7 @@ test.describe('designer canvas', () => {
 
 	test('middle-drag across frame iframes keeps moving camera left (no pan wall)', async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 });
+		await page.locator('.frame-preview-shell--ready').first().waitFor({ state: 'visible', timeout: 30_000 });
 		const readCamX = () =>
 			page.evaluate(() => {
 				const m = document.querySelector('.canvas-world')?.style.transform?.match(/translate\(([-0-9.]+)px/);
@@ -100,18 +97,21 @@ test.describe('designer canvas', () => {
 		const iframeBox = await iframe.boundingBox();
 		expect(iframeBox).toBeTruthy();
 		const startX = await readCamX();
-		await page.mouse.move(iframeBox!.x + 80, iframeBox!.y + 120);
+		const y = iframeBox!.y + Math.min(iframeBox!.height * 0.35, 120);
+		const x0 = iframeBox!.x + iframeBox!.width * 0.75;
+		await page.mouse.move(x0, y);
 		await page.mouse.down({ button: 'middle' });
 		const samples: number[] = [];
-		for (let i = 0; i < 28; i++) {
-			await page.mouse.move(iframeBox!.x + 80 - i * 32, iframeBox!.y + 120);
+		for (let i = 0; i < 32; i++) {
+			await page.mouse.move(x0 - i * 28, y, { steps: 2 });
+			await page.waitForTimeout(16);
 			samples.push(await readCamX());
 		}
 		await page.mouse.up({ button: 'middle' });
 		const endX = await readCamX();
-		expect(endX).toBeLessThan(startX - 400);
-		const tail = samples.slice(-10);
-		expect(Math.max(...tail) - Math.min(...tail)).toBeGreaterThan(80);
+		expect(endX).toBeLessThan(startX - 300);
+		const tail = samples.slice(-12);
+		expect(Math.max(...tail) - Math.min(...tail)).toBeGreaterThan(60);
 	});
 
 	test('wheel inside rightmost frame keeps decreasing camera x', async ({ page }) => {

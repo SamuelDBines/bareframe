@@ -2,23 +2,31 @@ import { Link } from 'react-router-dom';
 
 const PLANS = [
 	{
-		name: 'Starter',
-		price: '$0',
-		blurb: 'For exploring components and themes.',
-		features: ['Public component docs', '3 Designer projects', 'Community themes'],
+		name: 'Free',
+		price: '£0',
+		blurb: 'Try journey mapping and AI review on one project.',
+		features: [
+			'1 project',
+			'Up to 10 screens',
+			'3 AI reviews / month',
+			'Public share links',
+		],
+		cta: 'Start free',
+		to: '/sign-up',
 	},
 	{
-		name: 'Team',
-		price: '$29',
-		blurb: 'For product teams shipping together.',
-		features: ['Private packages', 'Unlimited projects', 'Token export & CI hooks', 'MCP seats'],
+		name: 'Bareframe Pro',
+		price: '£20',
+		blurb: 'For teams shipping journeys every week.',
+		features: [
+			'Unlimited projects',
+			'50 AI reviews / month',
+			'URL import & private canvases',
+			'Export & MCP studio tools',
+		],
 		highlight: true,
-	},
-	{
-		name: 'Enterprise',
-		price: 'Custom',
-		blurb: 'SSO, audit logs, and dedicated support.',
-		features: ['Custom SLAs', 'On-prem token registry', 'Design system consulting'],
+		cta: 'Upgrade in app',
+		to: '/app',
 	},
 ];
 
@@ -27,9 +35,12 @@ export function PricingPage() {
 		<>
 			<div className="page-hero">
 				<h1>Pricing</h1>
-				<p className="lead">Simple plans for sites, libraries, and designer workspaces.</p>
+				<p className="lead">
+					One product: journey canvas plus AI UX review. Stripe checkout activates when{' '}
+					<code>STRIPE_SECRET_KEY</code> and <code>STRIPE_PRICE_ID</code> are configured on the server.
+				</p>
 			</div>
-			<div className="grid-3">
+			<div className="grid-2" style={{ maxWidth: 880, margin: '0 auto' }}>
 				{PLANS.map((plan) => (
 					<article
 						key={plan.name}
@@ -38,18 +49,17 @@ export function PricingPage() {
 							plan.highlight
 								? {
 										borderColor: 'var(--bf-theme-button-primary-bg)',
-										boxShadow: '0 12px 40px color-mix(in srgb, var(--bf-theme-button-primary-bg) 15%, transparent)',
+										boxShadow:
+											'0 12px 40px color-mix(in srgb, var(--bf-theme-button-primary-bg) 15%, transparent)',
 									}
 								: undefined
 						}
 					>
-						{plan.highlight && <span className="badge-pill success">Popular</span>}
+						{plan.highlight && <span className="badge-pill success">Pro</span>}
 						<h3 style={{ marginTop: '0.5rem' }}>{plan.name}</h3>
 						<p style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--bf-theme-text-1)' }}>
 							{plan.price}
-							{plan.price.startsWith('$') && (
-								<span style={{ fontSize: '0.9rem', fontWeight: 500 }}>/mo</span>
-							)}
+							<span style={{ fontSize: '0.9rem', fontWeight: 500 }}>/mo</span>
 						</p>
 						<p>{plan.blurb}</p>
 						<ul style={{ paddingLeft: '1.1rem', color: 'var(--bf-theme-text-2)' }}>
@@ -57,8 +67,8 @@ export function PricingPage() {
 								<li key={f}>{f}</li>
 							))}
 						</ul>
-						<Link to="/sign-up" className="btn btn-primary" style={{ marginTop: '0.5rem' }}>
-							Choose {plan.name}
+						<Link to={plan.to} className="btn btn-primary" style={{ marginTop: '0.5rem' }}>
+							{plan.cta}
 						</Link>
 					</article>
 				))}

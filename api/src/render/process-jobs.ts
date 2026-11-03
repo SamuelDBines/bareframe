@@ -186,7 +186,7 @@ export async function processFlowMapJob(
 			pageId,
 			pageCount: routes.length,
 			findingsSummary: summary,
-			canvasPath: `/designer/editor/${projectId}`,
+			canvasPath: `/#/app/project/${projectId}`,
 		};
 		await updateFlowMapJobStatus(pool, flowMapJobId, 'completed', result);
 		await completeRenderJob(pool, renderJobId, result);

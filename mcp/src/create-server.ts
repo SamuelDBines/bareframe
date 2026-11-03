@@ -345,6 +345,31 @@ export function createBareframeMcpServer(): McpServer {
 		},
 	);
 
+	server.registerTool(
+		'check_url',
+		{
+			description:
+				'Rate-limited public URL check: capture metrics and accessibility/flow audit findings for one page.',
+			inputSchema: { url: z.string().url() },
+		},
+		async ({ url }) => {
+			const apiBase = (process.env.BAREFRAME_API_URL ?? 'http://127.0.0.1:8080').replace(/\/$/, '');
+			const res = await fetch(`${apiBase}/api/public/check-url`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ url }),
+			});
+			const text = await res.text();
+			if (!res.ok) {
+				return {
+					isError: true,
+					content: [{ type: 'text', text: `API ${res.status}: ${text}` }],
+				};
+			}
+			return { content: [{ type: 'text', text }] };
+		},
+	);
+
 	return server;
 }
 
@@ -358,4 +383,5 @@ export const TOOL_NAMES = [
 	'search_docs',
 	'get_install_steps',
 	'get_migration_guide',
+	'check_url',
 ] as const;

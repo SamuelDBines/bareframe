@@ -1,0 +1,64 @@
+/* Published with @bareframe/react/styles.css — not imported by the bareframe.org docs app. */
+.bf-btn,
+.btn.bf-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	padding: 0.55rem 1rem;
+	border-radius: var(--bf-theme-radius-md, 8px);
+	border: var(--bf-theme-border-width, 1px) solid transparent;
+	font: inherit;
+	font-weight: 500;
+	cursor: var(--bf-theme-cursor-button, pointer);
+	transition:
+		transform 0.12s ease,
+		opacity 0.12s ease,
+		background 0.12s ease;
+}
+.bf-btn:active,
+.btn.bf-btn:active {
+	transform: translateY(var(--bf-theme-active-translate-y, 1px));
+}
+.bf-btn--primary,
+.btn.bf-btn--primary {
+	background: var(--bf-theme-button-primary-bg);
+	color: var(--bf-theme-button-primary-color);
+	border-color: var(--bf-theme-button-primary-border-color);
+}
+.bf-btn--primary:hover,
+.btn.bf-btn--primary:hover {
+	opacity: var(--bf-theme-opacity-hover, 0.96);
+}
+.bf-btn--secondary,
+.btn.bf-btn--secondary {
+	background: var(--bf-theme-button-secondary-bg);
+	color: var(--bf-theme-button-secondary-color);
+	border-color: var(--bf-theme-button-secondary-border-color);
+}
+.bf-btn--ghost,
+.btn.bf-btn--ghost {
+	background: transparent;
+	color: var(--bf-theme-text-1);
+	border-color: var(--bf-theme-border-1);
+}
+.bf-btn--sm,
+.btn.bf-btn--sm {
+	padding: 0.35rem 0.65rem;
+	font-size: 0.8125rem;
+}
+
+.bf-btn--destructive {
+	background: #dc2626;
+	color: #fff;
+	border-color: #dc2626;
+}
+.bf-btn--lg { padding: 0.7rem 1.25rem; }
+.bf-btn__spinner {
+	width: 0.9rem;
+	height: 0.9rem;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: bf-spin 0.7s linear infinite;
+}

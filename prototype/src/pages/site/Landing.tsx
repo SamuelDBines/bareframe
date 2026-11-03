@@ -1,60 +1,67 @@
 import { Link } from 'react-router-dom';
-import { designerSiteUrl } from '../../sites/urls';
 
 export function LandingPage() {
 	return (
 		<>
 			<section className="page-hero landing-hero">
-				<p className="badge-pill success">Product prototype</p>
-				<h1>Design systems that agents and teams share</h1>
+				<p className="badge-pill success">Journey review</p>
+				<h1>Map journeys and designs. AI shows where people get stuck.</h1>
 				<p className="lead">
-					Bareframe unifies your marketing site, React component library, and visual designer —
-					with themes, tokens, and MCP connections built in.
+					Bareframe is one calm workspace for user flows, screen maps, and AI review callouts —
+					what&apos;s confusing, what&apos;s missing, likely drop-offs (estimates), accessibility, and
+					suggested fixes built from @bareframe/react. <strong>£20/month</strong> for Pro.
 				</p>
 				<div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '1.25rem' }}>
-					<Link to="/sign-up" className="btn btn-primary">Get started</Link>
-					<Link to="/components" className="btn btn-secondary">Browse components</Link>
+					<Link to="/app" className="btn btn-primary">
+						Open app
+					</Link>
+					<Link to="/pricing" className="btn btn-secondary">
+						See pricing
+					</Link>
+					<Link to="/examples" className="btn btn-ghost">
+						Examples
+					</Link>
 				</div>
 			</section>
 
 			<section style={{ marginTop: '2.5rem' }}>
-				<h2>Three products, one brand</h2>
+				<h2>Three ways to start</h2>
 				<div className="grid-3" style={{ marginTop: '1rem' }}>
 					<article className="card product-card">
-						<h3>Marketing site</h3>
-						<p>Launch pages, pricing, and docs on your domain with Bareframe themes.</p>
-						<Link to="/pricing">View pricing →</Link>
+						<h3>Product brief</h3>
+						<p>Describe your idea — we generate journeys, screens, and a canvas you can review.</p>
+						<Link to="/app">Start from brief →</Link>
 					</article>
 					<article className="card product-card">
-						<h3>@bareframe/react</h3>
-						<p>Accessible components, live docs, token export, and agent-readable APIs.</p>
-						<Link to="/components">Open gallery →</Link>
+						<h3>Import a live URL</h3>
+						<p>Screenshot pages and link them into a draft journey map (Pro).</p>
+						<Link to="/app">Import website →</Link>
 					</article>
 					<article className="card product-card">
-						<h3>Bareframe Designer</h3>
-						<p>Compose screens with real components, edit themes, and hand off to code.</p>
-						<a href={designerSiteUrl('/')}>Open designer →</a>
+						<h3>Blank canvas</h3>
+						<p>Place screens, connectors, and flows yourself, then run an AI review pass.</p>
+						<Link to="/app">New project →</Link>
 					</article>
 				</div>
 			</section>
 
 			<section style={{ marginTop: '2.5rem' }}>
-				<h2>Built for humans and agents</h2>
+				<h2>Review categories agents understand</h2>
 				<div className="grid-2" style={{ marginTop: '1rem' }}>
 					<div className="card">
-						<h3>Theme-aware</h3>
+						<h3>UX &amp; gaps</h3>
 						<p>
-							Switch among 16 curated themes — the same CSS variables power site, docs, and
-							designer previews.
+							Confusing steps, missing empty/error/loading states, and estimated drop-off points pinned on
+							the map.
 						</p>
 					</div>
 					<div className="card">
-						<h3>MCP-ready</h3>
+						<h3>A11y &amp; consistency</h3>
 						<p>
-							Agents connect to list components, read props, and apply themes without scraping
-							docs.
+							WCAG 2.2 AA signals from the render worker plus design consistency against Bareframe
+							components — with alternative fixes and previews.
 						</p>
-						<Link to="/components/mcp">Connect your agent →</Link>
+						<Link to="/components/mcp">MCP tools →</Link>
 					</div>
 				</div>
 			</section>
@@ -69,11 +76,14 @@ export function LandingPage() {
 						'linear-gradient(135deg, color-mix(in srgb, var(--bf-theme-button-primary-bg) 12%, var(--bf-theme-surface-1)), var(--bf-theme-surface-1))',
 				}}
 			>
-				<h2>Ready to try Bareframe?</h2>
-				<p style={{ margin: '0 auto 1rem', maxWidth: '40ch' }}>
-					Create a free account, pick a theme, and open your first project in Designer.
+				<h2>Start free, upgrade when you ship</h2>
+				<p style={{ margin: '0 auto 1rem', maxWidth: '44ch' }}>
+					Free includes one project and three AI reviews a month. Pro unlocks URL import, private canvases,
+					export, and studio MCP tools.
 				</p>
-				<Link to="/sign-up" className="btn btn-primary">Start free</Link>
+				<Link to="/sign-up" className="btn btn-primary">
+					Create account
+				</Link>
 			</section>
 		</>
 	);

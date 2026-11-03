@@ -4,7 +4,7 @@ import { fetchPackageJob, subscribePackageJobEvents } from '../../designer/packa
 import { DsCard, DsPage } from '../../designer/DesignerUiPrimitives';
 import { designerPath } from '../../sites/urls';
 
-export function PackageGeneratingPage() {
+export function PackageGeneratingPage({ appMode }: { appMode?: boolean } = {}) {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
   const [label, setLabel] = useState('Starting…');
@@ -16,7 +16,10 @@ export function PackageGeneratingPage() {
 
     fetchPackageJob(jobId).then((job) => {
       if (job.status === 'completed' && job.packageId) {
-        navigate(designerPath(`/product/${job.packageId}`), { replace: true });
+        navigate(
+          appMode ? `/app/product/${job.packageId}` : designerPath(`/product/${job.packageId}`),
+          { replace: true },
+        );
       } else if (job.status === 'failed') {
         setError(job.error ?? 'Generation failed');
       } else if (job.progress?.label) {
@@ -28,7 +31,10 @@ export function PackageGeneratingPage() {
       if (closed) return;
       if (ev.type === 'progress' && ev.label) setLabel(String(ev.label));
       if (ev.type === 'completed' && ev.packageId) {
-        navigate(designerPath(`/product/${ev.packageId}`), { replace: true });
+        navigate(
+          appMode ? `/app/product/${ev.packageId}` : designerPath(`/product/${ev.packageId}`),
+          { replace: true },
+        );
       }
       if (ev.type === 'failed') setError(String(ev.error ?? 'Failed'));
     });

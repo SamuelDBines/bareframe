@@ -1,20 +1,34 @@
 import { AssistantFab } from './components/AssistantDrawer';
 import { CanvasToolbar } from './components/CanvasToolbar';
 import { InfiniteCanvas } from './components/InfiniteCanvas';
+import { FlowMapProjectWorkspace } from './flowmap/FlowMapProjectWorkspace';
 import { InspectorPanel } from './components/InspectorPanel';
 import { LibrarySidebar } from './components/LibrarySidebar';
 import { DesignerCloudSync } from './DesignerCloudSync';
 import { DesignerProvider, useDesigner } from './store';
 import { useDesignerEditorChrome } from './useDesignerEditorChrome';
+import { AppCanvasChromeProvider, type AppCanvasChromeValue } from './AppCanvasChrome';
+import { DemoReviewCameraFit } from './DemoReviewCameraFit';
 
-function WorkspaceInner() {
+function WorkspaceInner({
+	compactChrome,
+	flowMap,
+	readOnly,
+}: {
+	compactChrome?: boolean;
+	flowMap?: boolean;
+	readOnly?: boolean;
+}) {
 	const { state, dispatch } = useDesigner();
 	const { mobilePanel } = state.ui;
 	useDesignerEditorChrome();
+	const useFlowMap = flowMap ?? compactChrome;
 
 	return (
 		<div
-			className={`designer-workspace-v2${mobilePanel !== 'none' ? ' mobile-panel-open' : ''}`}
+			className={`designer-workspace-v2${compactChrome ? ' designer-workspace-v2--compact' : ''}${
+				useFlowMap ? ' designer-workspace-v2--flow-map' : ''
+			}${mobilePanel !== 'none' ? ' mobile-panel-open' : ''}`}
 			data-mobile-panel={mobilePanel}
 		>
 			{mobilePanel !== 'none' && (
@@ -25,22 +39,55 @@ function WorkspaceInner() {
 					onClick={() => dispatch({ type: 'setMobilePanel', panel: 'none' })}
 				/>
 			)}
-			<LibrarySidebar />
+			{!compactChrome ? <LibrarySidebar /> : null}
 			<div className="designer-canvas-column">
-				<CanvasToolbar />
-				<InfiniteCanvas />
-				<AssistantFab />
+				{useFlowMap ? null : <CanvasToolbar />}
+				{useFlowMap ? <FlowMapProjectWorkspace readOnly={readOnly} /> : <InfiniteCanvas />}
+				{!compactChrome ? <AssistantFab /> : null}
 			</div>
-			<InspectorPanel />
+			{!compactChrome ? <InspectorPanel /> : null}
 		</div>
 	);
 }
 
-export function DesignerWorkspace({ projectId }: { projectId?: string }) {
+type DesignerWorkspaceProps = {
+	projectId?: string;
+	readOnly?: boolean;
+	demoReview?: boolean;
+	compactChrome?: boolean;
+	appChrome?: AppCanvasChromeValue;
+	initialDocument?: import('@bareframe/designer-core').ProjectDocument | null;
+};
+
+export function DesignerWorkspace({
+	projectId,
+	readOnly,
+	demoReview,
+	compactChrome,
+	appChrome,
+	initialDocument,
+}: DesignerWorkspaceProps) {
+	const chrome: AppCanvasChromeValue = {
+		...appChrome,
+		projectId: appChrome?.projectId ?? projectId,
+	};
+
 	return (
 		<DesignerProvider>
-			<DesignerCloudSync projectId={projectId} />
-			<WorkspaceInner />
+			<AppCanvasChromeProvider value={chrome}>
+				<DesignerCloudSync
+					projectId={projectId}
+					readOnly={readOnly}
+					demoReview={demoReview}
+					initialDocument={initialDocument}
+				/>
+				{demoReview ? <DemoReviewCameraFit /> : null}
+				<WorkspaceInner
+					compactChrome={compactChrome ?? Boolean(demoReview)}
+					flowMap={compactChrome ?? Boolean(demoReview)}
+					readOnly={readOnly ?? demoReview}
+				/>
+			</AppCanvasChromeProvider>
 		</DesignerProvider>
 	);
 }

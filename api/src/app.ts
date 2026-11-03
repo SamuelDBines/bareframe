@@ -27,6 +27,10 @@ import { createProjectsRouter } from './projects/routes.js';
 import { createFlowMapRouter } from './flow-map/routes.js';
 import { createInternalWorkerRouter } from './internal/routes.js';
 import { createPackagesRouter } from './packages/routes.js';
+import { createReviewsRouter, createPublicShareRouter } from './reviews/routes.js';
+import { createBillingRouter } from './billing/routes.js';
+import { createFigmaRouter } from './figma/routes.js';
+import { createPublicToolsRouter } from './public/check-url.js';
 
 export type AppDeps = {
 	config: Config;
@@ -111,10 +115,15 @@ export function createApp(deps: AppDeps): Hono {
 		return c.json({ ok: true });
 	});
 
+	app.route('/api', createPublicShareRouter(pool));
+	app.route('/api', createPublicToolsRouter(pool));
 	app.route('/api', createInternalWorkerRouter(pool, config));
 	app.route('/api', createProjectsRouter(pool, config));
 	app.route('/api', createFlowMapRouter(pool, config));
 	app.route('/api', createPackagesRouter(pool, config));
+	app.route('/api', createReviewsRouter(pool, config));
+	app.route('/api', createBillingRouter(pool, config));
+	app.route('/api', createFigmaRouter(pool, config));
 
 	return app;
 }

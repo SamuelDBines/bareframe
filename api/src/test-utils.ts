@@ -22,6 +22,9 @@ export const testConfig: Config = {
 	llmModel: null,
 	packageMonthlyLimit: 20,
 	packageRateLimitPerHour: 100,
+	stripeSecretKey: null,
+	stripePriceId: null,
+	figmaAccessToken: null,
 };
 
 export async function setupTestDb(pool: pg.Pool): Promise<void> {
@@ -37,7 +40,9 @@ export async function setupTestDb(pool: pg.Pool): Promise<void> {
 		await pool.query('DROP TABLE IF EXISTS projects CASCADE');
 		await pool.query('DROP TABLE IF EXISTS package_generation_jobs CASCADE');
 		await pool.query('DROP TABLE IF EXISTS product_packages CASCADE');
-		await pool.query('DROP TABLE IF EXISTS user_package_usage CASCADE');
+    await pool.query('DROP TABLE IF EXISTS url_check_log CASCADE');
+    await pool.query('DROP TABLE IF EXISTS review_runs CASCADE');
+    await pool.query('DROP TABLE IF EXISTS user_plan_usage CASCADE');
 		await pool.query('DROP TABLE IF EXISTS sessions CASCADE');
 		await pool.query('DROP TABLE IF EXISTS users CASCADE');
 		await pool.query('DROP TABLE IF EXISTS schema_migrations CASCADE');

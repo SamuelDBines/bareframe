@@ -10,6 +10,7 @@ import {
 	type AuthActor,
 	ProjectAccessError,
 } from '../db/projects.js';
+import { PlanLimitError } from '../plans/limits.js';
 
 export type ProjectAuthVariables = {
 	actor: AuthActor;
@@ -48,6 +49,9 @@ export function getActor(c: Context): AuthActor {
 }
 
 export function handleProjectError(c: Context, err: unknown) {
+	if (err instanceof PlanLimitError) {
+		return c.json({ error: err.code, message: err.message }, 429);
+	}
 	if (err instanceof ProjectAccessError) {
 		return c.json({ error: err.message }, err.status as 400);
 	}

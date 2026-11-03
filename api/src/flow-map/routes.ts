@@ -15,6 +15,7 @@ import {
 	listRecordings,
 	type RecordingStepInput,
 } from '../db/recordings.js';
+import { assertFeature, PlanLimitError } from '../plans/limits.js';
 import { assertProjectAccess, getProjectById } from '../db/projects.js';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from '../projects/auth.js';
 import { publishProjectUpdate } from '../projects/events.js';
@@ -45,6 +46,16 @@ export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 				return c.json({ error: 'Version conflict', currentVersion: project.version }, 409);
 			}
 			const userId = actor.kind === 'user' ? actor.userId : actor.userId;
+			if (actor.kind === 'user') {
+				try {
+					await assertFeature(pool, userId, 'urlImport');
+				} catch (err) {
+					if (err instanceof PlanLimitError) {
+						return c.json({ error: err.code, message: err.message }, 429);
+					}
+					throw err;
+				}
+			}
 			const renderJobId = await insertRenderJob(
 				pool,
 				'flow_map',

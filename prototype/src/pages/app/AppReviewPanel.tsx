@@ -67,7 +67,11 @@ export function AppReviewPanel({
   }, [projectId, runId]);
 
   async function runReview() {
-    if (demoIssues) return;
+    if (demoIssues) {
+      setStatus('completed');
+      setError(null);
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -103,14 +107,17 @@ export function AppReviewPanel({
   const diff = summary?.diff;
 
   return (
-    <aside className="app-review-panel" aria-label="AI review">
+    <aside
+      className={`app-review-panel${demoIssues ? ' app-review-panel--demo' : ''}`}
+      aria-label="AI review"
+    >
       <header>
         <h2>AI review</h2>
         <p className="app-review-panel__intro">UX gaps, accessibility, consistency, and suggested fixes on your map.</p>
       </header>
       <div className="app-form-actions">
-        <Button variant="primary" isDisabled={busy || demoIssues} onPress={() => void runReview()}>
-          {busy ? 'Starting…' : 'Run review pass'}
+        <Button variant="primary" isDisabled={busy} onPress={() => void runReview()}>
+          {busy ? 'Starting…' : demoIssues ? 'Replay sample review' : 'Run review pass'}
         </Button>
         {showUpgrade ? (
           <Button variant="secondary" size="sm" onPress={() => void upgrade()}>
@@ -118,6 +125,9 @@ export function AppReviewPanel({
           </Button>
         ) : null}
       </div>
+      {demoIssues ? (
+        <p className="app-review-panel__demo-hint">Interactive demo — sample issues are loaded below.</p>
+      ) : null}
       {checkoutMsg ? <p className="ds-meta">{checkoutMsg}</p> : null}
       {error ? <p className="app-error">{error}</p> : null}
       {status ? <p className="ds-meta">Status: {status}</p> : null}

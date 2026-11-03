@@ -62,9 +62,21 @@ export function connectorMidpoint(
   from: { x: number; y: number },
   to: { x: number; y: number },
 ): { x: number; y: number } {
+  return connectorLabelPoint(from, to);
+}
+
+/** Place edge labels away from the target arrow (t ≈ 0.38 along the chord). */
+export function connectorLabelPoint(
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  t = 0.38,
+): { x: number; y: number } {
   const x1 = from.x + FLOW_CARD_WIDTH;
   const y1 = from.y + FLOW_THUMB_HEIGHT / 2;
   const x2 = to.x;
   const y2 = to.y + FLOW_THUMB_HEIGHT / 2;
-  return { x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 6 };
+  return {
+    x: x1 + (x2 - x1) * t,
+    y: (y1 + y2) / 2 - 22,
+  };
 }

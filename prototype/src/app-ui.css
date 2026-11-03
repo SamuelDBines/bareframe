@@ -256,18 +256,52 @@
 }
 
 .app-form-stack .bf-field,
-.app-textarea-field {
+.app-textarea-field,
+.app-text-field {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 0.35rem;
   width: 100%;
 }
 
+.app-form-stack .bf-field .react-aria-TextField {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: 0.35rem;
+}
+
+.app-form-stack .bf-field__hint {
+  order: 3;
+  margin-top: 0.15rem;
+}
+
 .app-form-stack .bf-input,
+.app-text-field__control.bf-input,
 .app-textarea-field__control.bf-textarea {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   min-height: 2.75rem;
   font-size: 0.95rem;
+}
+
+.app-submit-primary.bf-btn {
+  min-width: 10rem;
+  font-weight: 600;
+}
+
+.app-review-panel--demo .app-review-panel__demo-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--bf-theme-text-2);
+}
+
+.app-review-panel--demo .bf-btn--primary {
+  opacity: 1;
+  cursor: pointer;
 }
 
 .app-textarea-field__control.bf-textarea {

@@ -74,6 +74,14 @@
   font-family: Inter, system-ui, sans-serif;
 }
 
+.flow-map-edge-label {
+  pointer-events: none;
+}
+
+.flow-map-edges .flow-map-edge-label {
+  isolation: isolate;
+}
+
 .flow-map-card {
   position: absolute;
   display: flex;

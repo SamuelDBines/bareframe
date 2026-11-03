@@ -6,9 +6,9 @@ import {
   AppInlineNotice,
   AppPage,
   AppPageHeader,
+  AppSubmitButton,
   AppTextAreaField,
-  Button,
-  Field,
+  AppTextField,
 } from '../../app/AppUi';
 import { createProject } from '../../designer/projectApi';
 import { useAuth } from '../../auth/AuthContext';
@@ -56,12 +56,12 @@ export function NewProjectBriefPage() {
 
       <AppFormPanel title="Project brief">
         <form className="app-form-stack" onSubmit={(e) => void handleSubmit(e)}>
-          <Field
+          <AppTextField
             label="Project name"
-            hint="e.g. Hookoh onboarding"
+            placeholder="e.g. Hookoh onboarding"
             value={name}
             onChange={setName}
-            isRequired
+            required
           />
           <AppTextAreaField
             label="What journey are you mapping?"
@@ -72,9 +72,9 @@ export function NewProjectBriefPage() {
             onChange={setSummary}
             placeholder="Sign-up → first booking → confirmation for a barber shop…"
           />
-          <Field
+          <AppTextField
             label="Who is it for?"
-            hint="Primary audience"
+            placeholder="Primary audience"
             value={audience}
             onChange={setAudience}
           />
@@ -86,9 +86,9 @@ export function NewProjectBriefPage() {
           ) : null}
 
           <AppFormActions>
-            <Button variant="primary" type="submit" isDisabled={busy}>
+            <AppSubmitButton isDisabled={busy} loading={busy}>
               {busy ? 'Creating…' : 'Create project'}
-            </Button>
+            </AppSubmitButton>
             <Link to="/app" className="app-link-button">
               Cancel
             </Link>

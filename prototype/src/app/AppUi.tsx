@@ -75,7 +75,6 @@ export function AppTextAreaField({
   return (
     <label className="bf-field app-textarea-field">
       <span className="bf-field__label">{label}</span>
-      {hint ? <span className="bf-field__hint">{hint}</span> : null}
       <Textarea
         className="bf-textarea app-textarea-field__control"
         rows={rows}
@@ -84,12 +83,62 @@ export function AppTextAreaField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
+      {hint ? <span className="bf-field__hint">{hint}</span> : null}
+    </label>
+  );
+}
+
+export function AppTextField({
+  label,
+  placeholder,
+  hint,
+  value,
+  onChange,
+  required,
+  type = 'text',
+}: {
+  label: string;
+  placeholder?: string;
+  hint?: string;
+  value: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+  type?: string;
+}) {
+  return (
+    <label className="bf-field app-text-field">
+      <span className="bf-field__label">{label}</span>
+      <input
+        className="bf-input app-text-field__control"
+        type={type}
+        required={required}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {hint ? <span className="bf-field__hint">{hint}</span> : null}
     </label>
   );
 }
 
 export function AppFormActions({ children }: { children: ReactNode }) {
   return <div className="app-form-actions">{children}</div>;
+}
+
+export function AppSubmitButton({
+  children,
+  isDisabled,
+  loading,
+}: {
+  children: ReactNode;
+  isDisabled?: boolean;
+  loading?: boolean;
+}) {
+  return (
+    <Button variant="primary" type="submit" className="app-submit-primary" isDisabled={isDisabled} loading={loading}>
+      {children}
+    </Button>
+  );
 }
 
 export { Button, Card, Field };

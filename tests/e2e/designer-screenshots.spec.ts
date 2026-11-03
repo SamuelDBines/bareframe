@@ -6,7 +6,14 @@ const BASE = '/designer/index.html#';
 
 async function shot(page: import('@playwright/test').Page, hash: string, name: string) {
   await page.goto(`${BASE}${hash}`, { waitUntil: 'domcontentloaded', timeout: 60_000 });
-  await page.waitForSelector('.app-shell, .designer-workspace-v2, .ds-review-workspace', { timeout: 30_000 });
+  if (hash.includes('flow-map')) {
+    await page.waitForSelector('[data-testid="flow-map-workspace"]', { timeout: 30_000 });
+    await page.waitForSelector('.flow-map-card', { timeout: 15_000 });
+  } else {
+    await page.waitForSelector('.app-shell, .designer-workspace-v2, .ds-review-workspace, .app-page', {
+      timeout: 30_000,
+    });
+  }
 
   const iframe = page.locator('.frame-preview-iframe');
   if (hash.includes('package-review') && (await iframe.count()) > 0) {

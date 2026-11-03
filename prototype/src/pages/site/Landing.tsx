@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Button } from '@bareframe/react';
 
 export function LandingPage() {
 	return (
@@ -7,40 +8,39 @@ export function LandingPage() {
 				<p className="badge-pill success">Journey review</p>
 				<h1>Map journeys and designs. AI shows where people get stuck.</h1>
 				<p className="lead">
-					Bareframe is one calm workspace for user flows, screen maps, and AI review callouts —
-					what&apos;s confusing, what&apos;s missing, likely drop-offs (estimates), accessibility, and
-					suggested fixes built from @bareframe/react. <strong>£20/month</strong> for Pro.
+					Bareframe is one calm workspace for user flows, screen maps, and AI review callouts — confusing steps,
+					missing states, accessibility, and suggested fixes. <strong>£20/month</strong> for Pro.
 				</p>
-				<div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '1.25rem' }}>
-					<Link to="/app" className="btn btn-primary">
-						Open app
+				<div className="landing-actions">
+					<Link to="/demo/flow-map" className="app-hero-cta">
+						<Button variant="primary">Try live demo</Button>
 					</Link>
-					<Link to="/pricing" className="btn btn-secondary">
-						See pricing
+					<Link to="/app" className="app-hero-cta">
+						<Button variant="secondary">Open app</Button>
 					</Link>
-					<Link to="/examples" className="btn btn-ghost">
-						Examples
+					<Link to="/pricing" className="app-hero-cta">
+						<Button variant="ghost">See pricing</Button>
 					</Link>
 				</div>
 			</section>
 
 			<section style={{ marginTop: '2.5rem' }}>
 				<h2>Three ways to start</h2>
-				<div className="grid-3" style={{ marginTop: '1rem' }}>
+				<div className="product-card-grid">
 					<article className="card product-card">
-						<h3>Product brief</h3>
-						<p>Describe your idea — we generate journeys, screens, and a canvas you can review.</p>
-						<Link to="/app">Start from brief →</Link>
+						<h3>Start from a brief</h3>
+						<p>Describe the journey, then refine screens and connectors on the flow map.</p>
+						<Link to="/app/product/new">New project brief →</Link>
 					</article>
 					<article className="card product-card">
-						<h3>Import a live URL</h3>
-						<p>Screenshot pages and link them into a draft journey map (Pro).</p>
-						<Link to="/app">Import website →</Link>
+						<h3>Import Figma or URL</h3>
+						<p>Pull frames or live pages into a draft map (URL import on Pro).</p>
+						<Link to="/app">Open app hub →</Link>
 					</article>
 					<article className="card product-card">
-						<h3>Blank canvas</h3>
-						<p>Place screens, connectors, and flows yourself, then run an AI review pass.</p>
-						<Link to="/app">New project →</Link>
+						<h3>See it first</h3>
+						<p>Walk through the public demo with connectors, minimap, and review callouts.</p>
+						<Link to="/demo/flow-map">Flow map demo →</Link>
 					</article>
 				</div>
 			</section>

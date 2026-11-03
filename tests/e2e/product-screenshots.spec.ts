@@ -21,14 +21,14 @@ test.describe('Product marketing screenshots', () => {
     await shot(page, 'pricing', 'product-pricing.png');
 
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`${BASE}demo/journey-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}demo/flow-map`, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('[data-testid="flow-map-workspace"]', { timeout: 30_000 });
     await page.waitForSelector('.flow-map-card', { timeout: 15_000 });
     await page.waitForTimeout(1200);
     await page.locator('.app-project-canvas').screenshot({
       path: path.join(ARTIFACTS, 'product-flow-map.png'),
     });
-    await page.locator('.app-project-layout').screenshot({
+    await page.locator('.app-project-layout__body, .app-project-layout').first().screenshot({
       path: path.join(ARTIFACTS, 'product-app-review-callouts.png'),
     });
 
@@ -41,7 +41,7 @@ test.describe('Product marketing screenshots', () => {
       fullPage: true,
     });
 
-    await page.goto(`${BASE}demo/journey-review`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}demo/flow-map`, { waitUntil: 'domcontentloaded' });
     await page.getByTestId('flow-mode-prototype').click();
     await page.waitForSelector('[data-testid="prototype-player"]');
     await page.waitForTimeout(800);

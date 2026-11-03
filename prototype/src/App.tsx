@@ -22,7 +22,7 @@ import { AppHomePage } from './pages/app/AppHomePage';
 import { AppProjectPage } from './pages/app/AppProjectPage';
 import { ShareCanvasPage } from './pages/app/ShareCanvasPage';
 import { DemoJourneyReviewPage, DemoShareCanvasPage } from './pages/app/DemoJourneyReviewPage';
-import { NewProductPage } from './pages/designer/NewProductPage';
+import { NewProjectBriefPage } from './pages/app/NewProjectBriefPage';
 import { PackageGeneratingPage } from './pages/designer/PackageGeneratingPage';
 import { PackageReviewPage } from './pages/designer/PackageReviewPage';
 import { FlowMapDemoPage } from './pages/designer/FlowMapDemoPage';
@@ -65,7 +65,7 @@ export default function App() {
 
 						<Route path="app" element={<AppHomePage />} />
 						<Route path="app/project/:projectId" element={<AppProjectPage />} />
-						<Route path="app/product/new" element={<NewProductPage appMode />} />
+						<Route path="app/product/new" element={<NewProjectBriefPage />} />
 						<Route path="app/product/generating/:jobId" element={<PackageGeneratingPage appMode />} />
 						<Route path="app/product/:packageId" element={<PackageReviewPage appMode />} />
 

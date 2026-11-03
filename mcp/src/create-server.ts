@@ -346,6 +346,35 @@ export function createBareframeMcpServer(): McpServer {
 	);
 
 	server.registerTool(
+		'review_project',
+		{
+			description:
+				'Run an AI UX review on a Bareframe project canvas. Requires the studio MCP endpoint with a project Bearer token.',
+			inputSchema: {
+				projectId: z.string().describe('Bareframe cloud project id'),
+			},
+		},
+		async ({ projectId }) => {
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify(
+							{
+								ok: false,
+								hint: 'Call https://bareframe.org/mcp/studio with Authorization: Bearer bf_proj_…',
+								projectId,
+							},
+							null,
+							2,
+						),
+					},
+				],
+			};
+		},
+	);
+
+	server.registerTool(
 		'check_url',
 		{
 			description:
@@ -383,5 +412,6 @@ export const TOOL_NAMES = [
 	'search_docs',
 	'get_install_steps',
 	'get_migration_guide',
+	'review_project',
 	'check_url',
 ] as const;

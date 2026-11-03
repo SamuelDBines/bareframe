@@ -35,6 +35,23 @@ COPY packages/flow-map-engine/package.json packages/flow-map-engine/tsconfig.jso
 COPY packages/flow-map-engine/src ./src
 RUN npm install && npm run build
 
+# catalog.json is gitignored; bake it at image build time (same inputs as mcp/Dockerfile).
+FROM node:20-bookworm-slim AS catalog-build
+WORKDIR /repo
+
+COPY dist/manifest.json dist/tokens.json ./dist/
+COPY themes ./themes
+COPY docs ./docs
+COPY prototype/src/components/library/generated-props.json ./prototype/src/components/library/generated-props.json
+COPY prototype/src/components/library/registry.tsx ./prototype/src/components/library/registry.tsx
+COPY prototype/src/docs/examples ./prototype/src/docs/examples
+COPY packages/react/README.md ./packages/react/README.md
+COPY packages/react/src/styles/bareframe-ui.css ./packages/react/src/styles/bareframe-ui.css
+COPY package.json ./package.json
+COPY mcp/scripts/bundle-catalog.mjs ./mcp/scripts/bundle-catalog.mjs
+
+RUN node ./mcp/scripts/bundle-catalog.mjs
+
 FROM node:20-bookworm-slim AS build
 WORKDIR /app
 
@@ -43,7 +60,7 @@ COPY --from=flow-map-build /repo/packages/flow-map-engine /packages/flow-map-eng
 COPY --from=package-contracts-build /repo/packages/package-contracts /packages/package-contracts
 COPY --from=design-handoff-build /repo/packages/design-handoff /packages/design-handoff
 COPY --from=package-generator-build /repo/packages/package-generator /packages/package-generator
-COPY mcp/data/catalog.json /catalog/catalog.json
+COPY --from=catalog-build /repo/mcp/data/catalog.json /catalog/catalog.json
 
 COPY api/package.json api/package-lock.json ./
 RUN npm ci
@@ -63,7 +80,7 @@ COPY --from=flow-map-build /repo/packages/flow-map-engine /packages/flow-map-eng
 COPY --from=package-contracts-build /repo/packages/package-contracts /packages/package-contracts
 COPY --from=design-handoff-build /repo/packages/design-handoff /packages/design-handoff
 COPY --from=package-generator-build /repo/packages/package-generator /packages/package-generator
-COPY mcp/data/catalog.json /catalog/catalog.json
+COPY --from=catalog-build /repo/mcp/data/catalog.json /catalog/catalog.json
 
 COPY api/package.json api/package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force

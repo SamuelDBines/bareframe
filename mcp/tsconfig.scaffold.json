@@ -14,5 +14,6 @@
       "@bareframe/react": ["../packages/react/dist/index.d.ts"],
       "@bareframe/react/*": ["../packages/react/dist/*"]
     }
-  }
+  },
+  "include": ["test-fixtures/scaffold-check/Screen.tsx"]
 }

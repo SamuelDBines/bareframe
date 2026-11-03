@@ -61,6 +61,47 @@ export async function createFlowMap(projectId: string, url: string, baseVersion:
   return res.json();
 }
 
+export async function fetchFigmaTokenStatus() {
+  const res = await fetch('/api/me/figma-token', { credentials: 'include' });
+  if (!res.ok) throw new Error('Could not load Figma settings');
+  return res.json() as Promise<{ configured: boolean; source: 'user' | 'server' | null }>;
+}
+
+export async function saveFigmaToken(token: string) {
+  const res = await fetch('/api/me/figma-token', {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  });
+  if (!res.ok) throw new Error('Could not save token');
+  return res.json() as Promise<{ ok: boolean; configured: boolean }>;
+}
+
+export async function importFigmaDesign(
+  projectId: string,
+  url: string,
+  baseVersion: number,
+  token?: string,
+) {
+  const res = await fetch(`/api/projects/${projectId}/figma-import`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, baseVersion, token }),
+  });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { message?: string; error?: string };
+    throw new Error(data.message ?? data.error ?? 'Figma import failed');
+  }
+  return res.json() as Promise<{
+    version: number;
+    framesImported: number;
+    connectorsImported: number;
+    fileName: string;
+  }>;
+}
+
 export async function fetchPublicShare(token: string) {
   const res = await fetch(`/api/share/${token}`);
   if (!res.ok) throw new Error('Share link not found');

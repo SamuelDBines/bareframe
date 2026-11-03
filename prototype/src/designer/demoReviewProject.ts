@@ -1,6 +1,7 @@
 import type { ThemeId } from '../theme/themes';
-import type { DesignerProject } from './types';
 import { getHookohDemoPreview } from './demoHookohPreview';
+import { layoutFramesInFlowRow } from '@bareframe/designer-core';
+import type { DesignerProject } from './types';
 
 export const demoReviewProjectId = 'demo-journey-review';
 
@@ -37,45 +38,70 @@ export const DEMO_REVIEW_ISSUES = [
   },
 ] as const;
 
-/** Single Hookoh landing screen — matches review callouts and marketing screenshots. */
+/** Hookoh journey as a left-to-right flow map with connectors and review pins. */
 export function buildDemoReviewProject(): DesignerProject {
-  const { page, frame } = getHookohDemoPreview('scr_landing');
-  const frameId = frame.id;
-  const viewW = 720;
-  const viewH = 780;
-  const zoom = Math.min((viewW - 48) / frame.width, (viewH - 80) / frame.height, 0.92);
-  const cx = frame.x + frame.width / 2;
-  const cy = frame.y + frame.height / 2;
+  const landing = getHookohDemoPreview('scr_landing');
+  const code = getHookohDemoPreview('scr_code');
+  const home = getHookohDemoPreview('scr_home');
+
+  const frames = [
+    { ...landing.frame, x: 80, y: 120 },
+    { ...code.frame, x: 400, y: 120 },
+    { ...home.frame, x: 720, y: 120 },
+  ];
+  layoutFramesInFlowRow(frames, 80, 120);
+
+  const landingId = frames[0]!.id;
+  const codeId = frames[1]!.id;
+  const homeId = frames[2]!.id;
 
   return {
     id: demoReviewProjectId,
     name: 'Hookoh — social queue',
     defaultThemeId: 'noir' as ThemeId,
-    pages: [page],
-    frames: [{ ...frame, x: 48, y: 56 }],
+    pages: [landing.page, code.page, home.page],
+    frames,
     trials: [],
     customTokenOverrides: {},
-    connectors: [],
+    connectors: [
+      {
+        id: 'conn-landing-code',
+        fromFrameId: landingId,
+        toFrameId: codeId,
+        label: 'Email me a sign-in code',
+        trigger: 'tap',
+      },
+      {
+        id: 'conn-code-home',
+        fromFrameId: codeId,
+        toFrameId: homeId,
+        label: 'Enter code',
+        trigger: 'tap',
+      },
+    ],
     annotations: [
       {
         id: 'anno-1',
-        frameId,
+        frameId: landingId,
         kind: 'callout',
         target: { kind: 'rect', x: 20, y: 168, w: 300, h: 56 },
         text: 'Sign in competes with signup CTA\nDemote Sign in below the email field.',
       },
       {
         id: 'anno-2',
-        frameId,
+        frameId: codeId,
         kind: 'callout',
         target: { kind: 'rect', x: 20, y: 420, w: 280, h: 52 },
         text: 'Magic-link drop-off (estimate)\nAdd progress + resend on code step.',
       },
+      {
+        id: 'anno-3',
+        frameId: homeId,
+        kind: 'callout',
+        target: { kind: 'rect', x: 20, y: 320, w: 280, h: 64 },
+        text: 'Missing empty queue state\nGuide users to compose first post.',
+      },
     ],
-    canvas: {
-      zoom,
-      x: viewW / 2 - cx * zoom,
-      y: viewH / 2 - cy * zoom,
-    },
+    canvas: { zoom: 0.72, x: 40, y: 20 },
   };
 }

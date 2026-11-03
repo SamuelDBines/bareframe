@@ -17,6 +17,7 @@ import {
 	layoutCompareMatrix,
 	relayoutFrameSet,
 } from './frameLayout';
+import { boundsForFlowMapFrames } from './flowmap/flowMapLayout';
 import { createInitialProject, PAGE_ID } from './initialProject';
 import type {
 	CompareMode,
@@ -58,6 +59,13 @@ type Action =
 	| { type: 'setFrameSize'; frameId: string; width: number; height: number }
 	| { type: 'duplicateFrameToDevices'; frameId: string; presetIds: string[] }
 	| { type: 'addFrame'; pageId?: string; presetId?: string; x?: number; y?: number }
+	| {
+			type: 'addConnector';
+			fromFrameId: string;
+			toFrameId: string;
+			label?: string;
+			trigger?: string;
+	  }
 	| { type: 'deleteFrame'; frameId: string }
 	| { type: 'setDefaultTheme'; themeId: ThemeId }
 	| { type: 'updateNodeLayout'; nodeId: string; layout: Partial<LayoutModel> }
@@ -196,6 +204,21 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 			};
 			project.frames.push(frame);
 			return commit(project, { ...ui, selectedFrameId: frame.id });
+		}
+		case 'addConnector': {
+			if (action.fromFrameId === action.toFrameId) return state;
+			const exists = project.connectors.some(
+				(c) => c.fromFrameId === action.fromFrameId && c.toFrameId === action.toFrameId,
+			);
+			if (exists) return state;
+			project.connectors.push({
+				id: newId('conn'),
+				fromFrameId: action.fromFrameId,
+				toFrameId: action.toFrameId,
+				label: action.label,
+				trigger: action.trigger ?? 'tap',
+			});
+			return commit(project);
 		}
 		case 'deleteFrame': {
 			project.frames = project.frames.filter((f) => f.id !== action.frameId);
@@ -530,7 +553,8 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 	const [state, dispatch] = useReducer(reducer, initialState);
 
 	const getCanvasViewport = () => {
-		const el = document.querySelector('.infinite-canvas');
+		const flowEl = document.querySelector('.flow-map-viewport');
+		const el = flowEl ?? document.querySelector('.infinite-canvas');
 		return {
 			w: el?.clientWidth ?? Math.max(400, window.innerWidth - 560),
 			h: el?.clientHeight ?? Math.max(300, window.innerHeight - 160),
@@ -539,10 +563,11 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 
 	const fitAll = useCallback(() => {
 		const { ui, project } = state;
-		const frames = project.frames.filter(
-			(f) => f.ghost || f.pageId === ui.activePageId,
-		);
-		let bounds = boundsForFrames(frames);
+		const flowMap = Boolean(document.querySelector('.flow-map-viewport'));
+		const frames = flowMap
+			? project.frames.filter((f) => !f.ghost && project.pages.some((p) => p.id === f.pageId))
+			: project.frames.filter((f) => f.ghost || f.pageId === ui.activePageId);
+		let bounds = flowMap ? boundsForFlowMapFrames(frames) : boundsForFrames(frames);
 		if (ui.compare?.kind === 'matrix' && ui.compare.layout) {
 			const l = ui.compare.layout;
 			const headerBounds = {

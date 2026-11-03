@@ -6,8 +6,8 @@ const BASE = '/#/';
 
 async function shot(page: import('@playwright/test').Page, hash: string, name: string) {
   await page.goto(`${BASE}${hash}`, { waitUntil: 'domcontentloaded', timeout: 60_000 });
-  await page.waitForSelector('.app-shell, .designer-workspace-v2, .app-review-panel', { timeout: 30_000 });
-  await page.waitForTimeout(400);
+  await page.waitForSelector('.app-shell, .flow-map-workspace, .app-review-panel', { timeout: 30_000 });
+  await page.waitForTimeout(500);
   await page.screenshot({
     path: path.join(ARTIFACTS, name),
     fullPage: true,
@@ -21,16 +21,37 @@ test.describe('Product marketing screenshots', () => {
     await shot(page, 'pricing', 'product-pricing.png');
 
     await page.goto(`${BASE}demo/journey-review`, { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.designer-workspace-v2--compact', { timeout: 30_000 });
-    await page.getByText('Hookoh', { exact: false }).first().waitFor({ timeout: 15_000 });
-    await page.locator('.canvas-frame-wrap').first().waitFor({ timeout: 15_000 });
-    await page.waitForTimeout(600);
+    await page.waitForSelector('[data-testid="flow-map-workspace"]', { timeout: 30_000 });
+    await page.waitForSelector('.flow-map-card', { timeout: 15_000 });
+    await page.waitForTimeout(800);
+    await page.screenshot({
+      path: path.join(ARTIFACTS, 'product-flow-map.png'),
+      fullPage: false,
+    });
     await page.screenshot({
       path: path.join(ARTIFACTS, 'product-app-review-callouts.png'),
       fullPage: false,
     });
 
     await shot(page, 'app', 'product-app-hub.png');
+
+    await page.getByRole('button', { name: 'Import from Figma' }).first().click();
+    await page.waitForSelector('[data-testid="app-figma-url"]');
+    await page.screenshot({
+      path: path.join(ARTIFACTS, 'product-figma-import.png'),
+      fullPage: true,
+    });
+
+    await page.goto(`${BASE}demo/journey-review`, { waitUntil: 'domcontentloaded' });
+    await page.getByTestId('flow-mode-prototype').click();
+    await page.waitForSelector('[data-testid="prototype-player"]');
+    await page.waitForTimeout(600);
+    await page.screenshot({
+      path: path.join(ARTIFACTS, 'product-prototype-mode.png'),
+      fullPage: false,
+    });
+
+    await page.goto(`${BASE}app`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Import website' }).click();
     await page.waitForSelector('h1:has-text("Import a live URL")');
     await page.screenshot({

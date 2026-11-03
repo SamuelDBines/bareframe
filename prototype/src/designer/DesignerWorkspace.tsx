@@ -1,6 +1,7 @@
 import { AssistantFab } from './components/AssistantDrawer';
 import { CanvasToolbar } from './components/CanvasToolbar';
 import { InfiniteCanvas } from './components/InfiniteCanvas';
+import { FlowMapProjectWorkspace } from './flowmap/FlowMapProjectWorkspace';
 import { InspectorPanel } from './components/InspectorPanel';
 import { LibrarySidebar } from './components/LibrarySidebar';
 import { DesignerCloudSync } from './DesignerCloudSync';
@@ -9,16 +10,25 @@ import { useDesignerEditorChrome } from './useDesignerEditorChrome';
 import { AppCanvasChromeProvider, type AppCanvasChromeValue } from './AppCanvasChrome';
 import { DemoReviewCameraFit } from './DemoReviewCameraFit';
 
-function WorkspaceInner({ compactChrome }: { compactChrome?: boolean }) {
+function WorkspaceInner({
+	compactChrome,
+	flowMap,
+	readOnly,
+}: {
+	compactChrome?: boolean;
+	flowMap?: boolean;
+	readOnly?: boolean;
+}) {
 	const { state, dispatch } = useDesigner();
 	const { mobilePanel } = state.ui;
 	useDesignerEditorChrome();
+	const useFlowMap = flowMap ?? compactChrome;
 
 	return (
 		<div
 			className={`designer-workspace-v2${compactChrome ? ' designer-workspace-v2--compact' : ''}${
-				mobilePanel !== 'none' ? ' mobile-panel-open' : ''
-			}`}
+				useFlowMap ? ' designer-workspace-v2--flow-map' : ''
+			}${mobilePanel !== 'none' ? ' mobile-panel-open' : ''}`}
 			data-mobile-panel={mobilePanel}
 		>
 			{mobilePanel !== 'none' && (
@@ -31,8 +41,8 @@ function WorkspaceInner({ compactChrome }: { compactChrome?: boolean }) {
 			)}
 			{!compactChrome ? <LibrarySidebar /> : null}
 			<div className="designer-canvas-column">
-				<CanvasToolbar />
-				<InfiniteCanvas />
+				{useFlowMap ? null : <CanvasToolbar />}
+				{useFlowMap ? <FlowMapProjectWorkspace readOnly={readOnly} /> : <InfiniteCanvas />}
 				{!compactChrome ? <AssistantFab /> : null}
 			</div>
 			{!compactChrome ? <InspectorPanel /> : null}
@@ -72,7 +82,11 @@ export function DesignerWorkspace({
 					initialDocument={initialDocument}
 				/>
 				{demoReview ? <DemoReviewCameraFit /> : null}
-				<WorkspaceInner compactChrome={compactChrome ?? Boolean(demoReview)} />
+				<WorkspaceInner
+					compactChrome={compactChrome ?? Boolean(demoReview)}
+					flowMap={compactChrome ?? Boolean(demoReview)}
+					readOnly={readOnly ?? demoReview}
+				/>
 			</AppCanvasChromeProvider>
 		</DesignerProvider>
 	);

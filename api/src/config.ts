@@ -16,6 +16,7 @@ export type Config = {
 	packageRateLimitPerHour: number;
 	stripeSecretKey: string | null;
 	stripePriceId: string | null;
+	figmaAccessToken: string | null;
 };
 
 function required(name: string): string {
@@ -56,6 +57,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
 		packageRateLimitPerHour: Number(env.PACKAGE_RATE_LIMIT_PER_HOUR ?? 5),
 		stripeSecretKey: env.STRIPE_SECRET_KEY ?? null,
 		stripePriceId: env.STRIPE_PRICE_ID ?? null,
+		figmaAccessToken: env.FIGMA_ACCESS_TOKEN ?? null,
 	};
 }
 

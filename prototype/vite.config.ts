@@ -11,18 +11,51 @@ const reactPkg = path.join(repoRoot, 'packages/react');
 const themesSource = path.join(repoRoot, 'themes');
 const prototypePublicThemes = path.join(here, 'public', 'themes');
 
+function framePreviewStylesDir(): string {
+	if (designerBuild) {
+		return path.join(repoRoot, 'public', 'designer', 'assets', 'frame-preview');
+	}
+	return path.join(here, 'public', 'assets', 'frame-preview');
+}
+
+async function syncFramePreviewStyles(): Promise<void> {
+	const out = framePreviewStylesDir();
+	await fs.mkdir(out, { recursive: true });
+	await fs.copyFile(
+		path.join(reactPkg, 'src/styles/bareframe-ui.css'),
+		path.join(out, 'bareframe-ui.css'),
+	);
+	await fs.copyFile(path.join(reactPkg, 'src/styles/button.css'), path.join(out, 'button.css'));
+}
+
+function syncFramePreviewStylesPlugin(): Plugin {
+	return {
+		name: 'bareframe-copy-preview-styles',
+		async closeBundle() {
+			if (!designerBuild) {
+				await syncFramePreviewStyles();
+				return;
+			}
+			await syncFramePreviewStyles();
+		},
+	};
+}
+
 function syncThemesPlugin(): Plugin {
 	return {
 		name: 'bareframe-sync-themes',
 		async buildStart() {
-			await fs.mkdir(prototypePublicThemes, { recursive: true });
-			const entries = await fs.readdir(themesSource);
-			for (const name of entries) {
-				if (!name.endsWith('.css')) continue;
-				await fs.copyFile(
-					path.join(themesSource, name),
-					path.join(prototypePublicThemes, name),
-				);
+			const themeTargets = [prototypePublicThemes];
+			if (designerBuild) {
+				themeTargets.push(path.join(repoRoot, 'public', 'designer', 'themes'));
+			}
+			for (const dir of themeTargets) {
+				await fs.mkdir(dir, { recursive: true });
+				const entries = await fs.readdir(themesSource);
+				for (const name of entries) {
+					if (!name.endsWith('.css')) continue;
+					await fs.copyFile(path.join(themesSource, name), path.join(dir, name));
+				}
 			}
 		},
 	};
@@ -36,7 +69,7 @@ export default defineConfig({
 	// Docs site at bareframe.org uses absolute asset URLs; Designer uses relative paths
 	// so the same bundle works under /designer/ in CI and at / on designer.bareframe.org.
 	base: pagesRoot && !designerBuild ? '/' : './',
-	plugins: [react(), syncThemesPlugin()],
+	plugins: [react(), syncThemesPlugin(), syncFramePreviewStylesPlugin()],
 	resolve: {
 		alias: {
 			'@bareframe/react': path.join(reactPkg, 'src/index.ts'),

@@ -4,6 +4,23 @@ import { fileURLToPath } from 'node:url';
 
 let slugSet: Set<string> | null = null;
 
+const FALLBACK_SLUGS = [
+	'button',
+	'card',
+	'input',
+	'badge',
+	'alert',
+	'field',
+	'table',
+	'avatar',
+	'otp-input',
+	'stat-card',
+	'empty-state',
+	'textarea',
+	'switch',
+	'checkbox',
+];
+
 function loadSlugSet(): Set<string> {
 	if (slugSet) return slugSet;
 	const here = dirname(fileURLToPath(import.meta.url));
@@ -11,16 +28,18 @@ function loadSlugSet(): Set<string> {
 		join(here, '../../../dist/manifest.json'),
 		join(here, '../../../../dist/manifest.json'),
 	];
+	const merged = new Set(FALLBACK_SLUGS);
 	for (const path of candidates) {
 		if (!existsSync(path)) continue;
 		const manifest = JSON.parse(readFileSync(path, 'utf8')) as {
-			components?: { slug: string }[];
+			components?: { slug?: string }[];
 		};
-		const slugs = manifest.components?.map((c) => c.slug) ?? [];
-		slugSet = new Set(slugs);
-		return slugSet;
+		for (const slug of manifest.components?.map((c) => c.slug?.trim()).filter(Boolean) ?? []) {
+			merged.add(slug!);
+		}
+		break;
 	}
-	slugSet = new Set(['button', 'card', 'input', 'badge', 'alert']);
+	slugSet = merged;
 	return slugSet;
 }
 

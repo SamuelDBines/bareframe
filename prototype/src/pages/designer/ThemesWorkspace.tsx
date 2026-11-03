@@ -26,6 +26,7 @@ export function ThemesWorkspace() {
 			themeId: editingTheme,
 			tokenOverrides: overrides,
 			selectedNodeId: null,
+			assetBase: new URL(import.meta.env.BASE_URL, window.location.href).href,
 		});
 	}, [editingTheme, overrides]);
 

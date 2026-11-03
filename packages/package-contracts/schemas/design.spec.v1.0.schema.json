@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deliveryflow/contracts/design.spec.v1.0.schema.json",
+  "title": "DesignSpec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "version", "project", "summary", "screens", "components", "architecture"],
+  "properties": {
+    "contract": { "const": "design.spec" },
+    "version": { "const": "1.0" },
+    "project": { "type": "string" },
+    "summary": { "type": "string", "minLength": 1 },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["connector"],
+        "properties": {
+          "connector": { "type": "string" },
+          "tool": { "type": ["string", "null"] },
+          "ref": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "screens": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "purpose", "components", "story_ids"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "purpose": { "type": "string" },
+          "components": { "type": "array", "items": { "type": "string" } },
+          "story_ids": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "components": { "type": "array", "items": { "type": "string" } },
+    "architecture": { "type": "string" },
+    "design_tokens": { "type": "object" },
+    "data_entities": { "type": "array", "items": { "type": "string" } },
+    "api_contracts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["method", "path", "description"],
+        "properties": {
+          "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"] },
+          "path": { "type": "string" },
+          "description": { "type": "string" },
+          "request": { "type": "object" },
+          "response": { "type": "object" }
+        }
+      }
+    }
+  }
+}

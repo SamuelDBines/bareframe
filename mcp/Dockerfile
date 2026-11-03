@@ -14,6 +14,10 @@ COPY packages/react/src/styles/bareframe-ui.css ./packages/react/src/styles/bare
 COPY package.json ./package.json
 
 COPY mcp/package.json mcp/package-lock.json ./mcp/
+COPY packages/design-handoff/package.json packages/design-handoff/tsconfig.json ./packages/design-handoff/
+COPY packages/design-handoff/src ./packages/design-handoff/src
+WORKDIR /repo/packages/design-handoff
+RUN npm install && npm run build
 WORKDIR /repo/mcp
 RUN npm ci
 
@@ -28,6 +32,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 RUN groupadd -g 10001 bareframe && useradd -u 10001 -g 10001 -d /app bareframe
 
+COPY --from=build /repo/packages/design-handoff /packages/design-handoff
 COPY mcp/package.json mcp/package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 

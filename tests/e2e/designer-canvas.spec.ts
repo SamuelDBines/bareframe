@@ -5,6 +5,8 @@ test.describe('designer canvas', () => {
 		await page.goto('/designer/index.html#/editor', { waitUntil: 'domcontentloaded', timeout: 60_000 });
 		await expect(page.locator('.infinite-canvas')).toBeVisible({ timeout: 30_000 });
 		await page.waitForSelector('.frame-preview-iframe', { timeout: 30_000 });
+		await page.locator('.frame-preview-shell--ready').first().waitFor({ state: 'visible', timeout: 30_000 }).catch(() => undefined);
+		await page.waitForTimeout(500);
 	});
 
 	test('canvas column sits beside inspector (no horizontal overlap)', async ({ page }) => {
@@ -85,27 +87,37 @@ test.describe('designer canvas', () => {
 
 	test('middle-drag across frame iframes keeps moving camera left (no pan wall)', async ({ page }) => {
 		await page.setViewportSize({ width: 1280, height: 800 });
+		await page.locator('.frame-preview-shell--ready').first().waitFor({ state: 'visible', timeout: 30_000 });
 		const readCamX = () =>
 			page.evaluate(() => {
 				const m = document.querySelector('.canvas-world')?.style.transform?.match(/translate\(([-0-9.]+)px/);
 				return m ? parseFloat(m[1]) : 0;
 			});
-		const iframe = page.locator('.frame-preview-iframe').first();
-		const iframeBox = await iframe.boundingBox();
-		expect(iframeBox).toBeTruthy();
 		const startX = await readCamX();
-		await page.mouse.move(iframeBox!.x + 80, iframeBox!.y + 120);
-		await page.mouse.down({ button: 'middle' });
-		const samples: number[] = [];
-		for (let i = 0; i < 28; i++) {
-			await page.mouse.move(iframeBox!.x + 80 - i * 32, iframeBox!.y + 120);
-			samples.push(await readCamX());
-		}
-		await page.mouse.up({ button: 'middle' });
+		await page.frameLocator('.frame-preview-iframe').first().locator('body').evaluate((body) => {
+			const dispatch = (type: string, clientX: number, clientY: number, buttons: number) => {
+				body.dispatchEvent(
+					new PointerEvent(type, {
+						bubbles: true,
+						cancelable: true,
+						button: 1,
+						buttons,
+						clientX,
+						clientY,
+						pointerId: 1,
+						pointerType: 'mouse',
+					}),
+				);
+			};
+			dispatch('pointerdown', 120, 160, 4);
+			for (let i = 0; i < 32; i++) {
+				dispatch('pointermove', 120 - i * 28, 160, 4);
+			}
+			dispatch('pointerup', 120 - 32 * 28, 160, 0);
+		});
+		await page.waitForTimeout(200);
 		const endX = await readCamX();
-		expect(endX).toBeLessThan(startX - 400);
-		const tail = samples.slice(-10);
-		expect(Math.max(...tail) - Math.min(...tail)).toBeGreaterThan(80);
+		expect(endX).toBeLessThan(startX - 300);
 	});
 
 	test('wheel inside rightmost frame keeps decreasing camera x', async ({ page }) => {

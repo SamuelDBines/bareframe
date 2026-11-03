@@ -1,6 +1,7 @@
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import type { ThemeId } from '../../theme/themes';
 import { buildFramePreviewDoc } from '../framePreviewDoc';
+import { loadFramePreviewStyles } from '../framePreviewStyles';
 import type { Frame, Page, StyleTrial } from '../types';
 
 type Props = {
@@ -13,6 +14,10 @@ type Props = {
 	onSelectNode: (nodeId: string) => void;
 };
 
+function designerAssetBase(): string {
+	return new URL(import.meta.env.BASE_URL, window.location.href).href;
+}
+
 export const FramePreview = memo(function FramePreview({
 	frame,
 	page,
@@ -23,25 +28,40 @@ export const FramePreview = memo(function FramePreview({
 	onSelectNode,
 }: Props) {
 	const ref = useRef<HTMLIFrameElement>(null);
+	const [ready, setReady] = useState(false);
 
 	useEffect(() => {
 		const el = ref.current;
 		if (!el) return;
-		const doc = buildFramePreviewDoc({
-			page,
-			frameWidth: frame.width,
-			themeId,
-			tokenOverrides: customTokens,
-			trial,
-			selectedNodeId,
-		});
-		el.srcdoc = doc;
-	}, [page, frame.width, themeId, customTokens, trial, selectedNodeId]);
+		let cancelled = false;
+		setReady(false);
+
+		void (async () => {
+			const assetBase = designerAssetBase();
+			const previewCss = await loadFramePreviewStyles(assetBase, themeId);
+			if (cancelled) return;
+			el.srcdoc = buildFramePreviewDoc({
+				page,
+				frameWidth: frame.width,
+				themeId,
+				tokenOverrides: customTokens,
+				trial,
+				selectedNodeId,
+				assetBase,
+				previewCss,
+			});
+		})();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [page, frame.width, themeId, customTokens, trial, selectedNodeId, frame.height]);
 
 	useEffect(() => {
 		const el = ref.current;
 		if (!el) return;
 		const onLoad = () => {
+			setReady(true);
 			const win = el.contentWindow;
 			if (!win) return;
 			const handler = (e: MouseEvent) => {
@@ -60,18 +80,20 @@ export const FramePreview = memo(function FramePreview({
 	}, [onSelectNode, page, frame.width, themeId]);
 
 	return (
-		<iframe
-			ref={ref}
-			title={`Preview ${frame.name}`}
-			className="frame-preview-iframe"
-			style={{
-				width: frame.width,
-				height: frame.heightMode === 'hug' ? 'auto' : frame.height,
-				minHeight: frame.height,
-				border: 'none',
-				display: 'block',
-				background: 'var(--bf-theme-surface-1)',
-			}}
-		/>
+		<div className={`frame-preview-shell${ready ? ' frame-preview-shell--ready' : ''}`}>
+			<iframe
+				ref={ref}
+				title={`Preview ${frame.name}`}
+				className="frame-preview-iframe"
+				style={{
+					width: frame.width,
+					height: frame.heightMode === 'hug' ? 'auto' : frame.height,
+					minHeight: frame.height,
+					border: 'none',
+					display: 'block',
+					background: 'var(--bf-theme-surface-1, #fff)',
+				}}
+			/>
+		</div>
 	);
 });

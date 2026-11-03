@@ -16,6 +16,12 @@ export const testConfig: Config = {
 	port: 0,
 	nodeEnv: 'test',
 	renderWorkerSecret: 'test-render-worker-secret',
+	llmAdapter: 'fixture',
+	llmBaseUrl: null,
+	llmApiKey: null,
+	llmModel: null,
+	packageMonthlyLimit: 20,
+	packageRateLimitPerHour: 100,
 };
 
 export async function setupTestDb(pool: pg.Pool): Promise<void> {
@@ -29,6 +35,9 @@ export async function setupTestDb(pool: pg.Pool): Promise<void> {
 		await pool.query('DROP TABLE IF EXISTS project_api_tokens CASCADE');
 		await pool.query('DROP TABLE IF EXISTS project_assets CASCADE');
 		await pool.query('DROP TABLE IF EXISTS projects CASCADE');
+		await pool.query('DROP TABLE IF EXISTS package_generation_jobs CASCADE');
+		await pool.query('DROP TABLE IF EXISTS product_packages CASCADE');
+		await pool.query('DROP TABLE IF EXISTS user_package_usage CASCADE');
 		await pool.query('DROP TABLE IF EXISTS sessions CASCADE');
 		await pool.query('DROP TABLE IF EXISTS users CASCADE');
 		await pool.query('DROP TABLE IF EXISTS schema_migrations CASCADE');

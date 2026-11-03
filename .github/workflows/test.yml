@@ -52,6 +52,13 @@ jobs:
           npm install
           npm run build
 
+      - name: Build package contracts and generator
+        run: |
+          cd packages/package-contracts && npm install && npm run build
+          cd ../design-handoff && npm install && npm run build
+          node ../../mcp/scripts/bundle-catalog.mjs
+          cd ../package-generator && npm install && npm run build
+
       - name: Install API dependencies
         working-directory: api
         run: npm ci
@@ -70,6 +77,7 @@ jobs:
           DATABASE_URL: postgres://bareframe:bareframe@127.0.0.1:54329/bareframe
           RENDER_ALLOW_HOSTS: 127.0.0.1
           RENDER_INLINE: "1"
+          BAREFRAME_CATALOG_PATH: ${{ github.workspace }}/mcp/data/catalog.json
         run: npm test
 
       - name: Set up Docker Buildx
@@ -141,12 +149,22 @@ jobs:
         run: |
           pnpm run build:lib
           pnpm run generate:component-props
+          pnpm run build:react
+          node mcp/scripts/bundle-catalog.mjs
+
+      - name: Build design-handoff
+        run: |
+          cd packages/design-handoff && npm install && npm run build
 
       - name: Build designer-core and API (studio e2e)
         run: |
+          node mcp/scripts/bundle-catalog.mjs
+          cd "$GITHUB_WORKSPACE/packages/package-contracts" && npm install && npm run build
+          cd "$GITHUB_WORKSPACE/packages/design-handoff" && npm install && npm run build
           cd "$GITHUB_WORKSPACE/packages/designer-core" && npm install && npm run build
+          cd "$GITHUB_WORKSPACE/packages/package-generator" && npm install && npm run build
           cd "$GITHUB_WORKSPACE/packages/flow-map-engine" && npm install && npm run build
-          cd "$GITHUB_WORKSPACE/api" && npm install && npm run build
+          cd "$GITHUB_WORKSPACE/api" && npm ci && npm run build
 
       - name: MCP typecheck
         run: pnpm run mcp:typecheck

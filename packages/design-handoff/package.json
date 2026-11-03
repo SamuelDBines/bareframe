@@ -1,0 +1,22 @@
+{
+  "name": "@bareframe/design-handoff",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./dist/index.js",
+    "./scaffold-screen": "./dist/scaffold-screen.js",
+    "./design-tokens": "./dist/design-tokens.js",
+    "./catalog": "./dist/catalog.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}

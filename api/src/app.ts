@@ -26,6 +26,7 @@ import {
 import { createProjectsRouter } from './projects/routes.js';
 import { createFlowMapRouter } from './flow-map/routes.js';
 import { createInternalWorkerRouter } from './internal/routes.js';
+import { createPackagesRouter } from './packages/routes.js';
 
 export type AppDeps = {
 	config: Config;
@@ -113,6 +114,7 @@ export function createApp(deps: AppDeps): Hono {
 	app.route('/api', createInternalWorkerRouter(pool, config));
 	app.route('/api', createProjectsRouter(pool, config));
 	app.route('/api', createFlowMapRouter(pool, config));
+	app.route('/api', createPackagesRouter(pool, config));
 
 	return app;
 }

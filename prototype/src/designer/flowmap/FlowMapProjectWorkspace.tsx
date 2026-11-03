@@ -31,29 +31,31 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
         }}
         readOnly={readOnly}
       />
-      {mode === 'prototype' ? (
-        <PrototypePlayer />
-      ) : (
-        <FlowMapCanvas
-          connectMode={mode === 'edit' && connectMode && !readOnly}
-          connectFromFrameId={connectFrom}
-          onConnectFrameSelect={(frameId) => {
-            if (!connectFrom) {
-              setConnectFrom(frameId);
-              return;
-            }
-            if (connectFrom !== frameId) {
-              dispatch({
-                type: 'addConnector',
-                fromFrameId: connectFrom,
-                toFrameId: frameId,
-                label: 'Next',
-              });
-            }
-            setConnectFrom(null);
-          }}
-        />
-      )}
+      <div className="flow-map-stage">
+        {mode === 'prototype' ? (
+          <PrototypePlayer />
+        ) : (
+          <FlowMapCanvas
+            connectMode={mode === 'edit' && connectMode && !readOnly}
+            connectFromFrameId={connectFrom}
+            onConnectFrameSelect={(frameId) => {
+              if (!connectFrom) {
+                setConnectFrom(frameId);
+                return;
+              }
+              if (connectFrom !== frameId) {
+                dispatch({
+                  type: 'addConnector',
+                  fromFrameId: connectFrom,
+                  toFrameId: frameId,
+                  label: 'Next',
+                });
+              }
+              setConnectFrom(null);
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }

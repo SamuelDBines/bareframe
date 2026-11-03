@@ -1,7 +1,7 @@
 import type { ThemeId } from '../theme/themes';
 import { getHookohDemoPreview } from './demoHookohPreview';
-import { layoutFramesInFlowRow } from '@bareframe/designer-core';
 import type { DesignerProject } from './types';
+import { layoutFlowMapRow } from './flowmap/flowMapLayout';
 
 export const demoReviewProjectId = 'demo-journey-review';
 
@@ -45,11 +45,11 @@ export function buildDemoReviewProject(): DesignerProject {
   const home = getHookohDemoPreview('scr_home');
 
   const frames = [
-    { ...landing.frame, x: 80, y: 120 },
-    { ...code.frame, x: 400, y: 120 },
-    { ...home.frame, x: 720, y: 120 },
+    { ...landing.frame, x: 0, y: 0 },
+    { ...code.frame, x: 0, y: 0 },
+    { ...home.frame, x: 0, y: 0 },
   ];
-  layoutFramesInFlowRow(frames, 80, 120);
+  layoutFlowMapRow(frames);
 
   const landingId = frames[0]!.id;
   const codeId = frames[1]!.id;

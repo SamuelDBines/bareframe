@@ -587,7 +587,7 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 		}
 		if (!bounds) return;
 		const { w: viewW, h: viewH } = getCanvasViewport();
-		const cam = cameraToFitBounds(bounds, viewW, viewH, 40);
+		const cam = cameraToFitBounds(bounds, viewW, viewH, flowMap ? 80 : 40);
 		dispatch({ type: 'setCamera', patch: cam });
 	}, [state]);
 

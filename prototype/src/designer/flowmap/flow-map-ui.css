@@ -1,20 +1,34 @@
-.flow-map-viewport {
+.flow-map-workspace {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+}
+
+.flow-map-stage {
   position: relative;
   flex: 1;
-  min-height: 420px;
+  min-height: 0;
+  width: 100%;
+}
+
+.flow-map-viewport {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  border-radius: 12px;
-  background: #f1f5f9;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #f4f6f9;
 }
 
 .flow-map-grid {
   position: absolute;
   inset: 0;
   cursor: grab;
-  background-color: #f8fafc;
-  background-image: radial-gradient(circle, rgba(100, 116, 139, 0.35) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: #f4f6f9;
+  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.45) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 .flow-map-grid:active {
@@ -39,19 +53,25 @@
 
 .flow-map-edge {
   fill: none;
-  stroke: var(--flow-edge-color, #64748b);
-  stroke-width: 2.5;
+  stroke: #4f46e5;
+  stroke-width: 3.5;
   stroke-linecap: round;
+  filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.12));
 }
 
-.flow-map-edge-label {
-  fill: #334155;
+.flow-map-edge-pill {
+  fill: #fff;
+  stroke: #c7d2fe;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 4px 12px rgba(15, 23, 42, 0.1));
+}
+
+.flow-map-edge-pill-text {
+  fill: #312e81;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   text-anchor: middle;
-  paint-order: stroke;
-  stroke: #f8fafc;
-  stroke-width: 4px;
+  font-family: Inter, system-ui, sans-serif;
 }
 
 .flow-map-card {
@@ -59,60 +79,76 @@
   display: flex;
   flex-direction: column;
   background: #fff;
-  border-radius: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.06),
-    0 12px 32px rgba(15, 23, 42, 0.08);
-  overflow: hidden;
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 16px 40px rgba(15, 23, 42, 0.1);
+  overflow: visible;
   cursor: grab;
   z-index: 2;
 }
 
-.flow-map-card--connect-source {
-  outline: 2px dashed #6366f1;
-  outline-offset: 4px;
+.flow-map-card--selected {
+  border-color: #6366f1;
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.28),
+    0 20px 48px rgba(15, 23, 42, 0.12);
 }
 
-.flow-map-card__header {
-  padding: 0.55rem 0.75rem;
-  font-size: 0.8125rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+.flow-map-card--connect-source {
+  outline: 2px dashed #6366f1;
+  outline-offset: 5px;
+}
+
+.flow-map-card__thumb {
+  flex: 0 0 auto;
+  height: var(--flow-thumb-height, 392px);
+  background: #0f172a;
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  pointer-events: none;
+}
+
+.flow-map-card__thumb-inner {
+  width: 393px;
+  height: 520px;
+  transform-origin: top left;
+  transform: scale(var(--flow-thumb-scale, 0.692));
+}
+
+.flow-map-card__footer {
+  flex: 0 0 auto;
+  padding: 0.65rem 0.85rem 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0f172a;
   background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 0 0 16px 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.flow-map-card__thumb {
-  flex: 1;
-  min-height: 0;
-  background: #0f172a;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.flow-map-card__thumb .frame-preview-root {
-  transform: scale(0.62);
-  transform-origin: top left;
-}
-
 .flow-map-pin {
   position: absolute;
-  right: 8px;
-  top: 44px;
-  max-width: 140px;
+  right: 10px;
+  top: 12px;
+  max-width: 150px;
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  padding: 6px 8px;
-  border-radius: 8px;
-  background: rgba(254, 243, 199, 0.95);
+  padding: 7px 9px;
+  border-radius: 10px;
+  background: rgba(254, 243, 199, 0.97);
   border: 1px solid #fbbf24;
-  font-size: 0.65rem;
-  line-height: 1.25;
+  font-size: 0.68rem;
+  line-height: 1.3;
   z-index: 3;
   pointer-events: none;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
 }
 
 .flow-map-pin__dot {
@@ -131,62 +167,72 @@
 
 .flow-map-minimap {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  width: 120px;
-  height: 72px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  right: 16px;
+  bottom: 16px;
+  width: 96px;
+  height: 58px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
   overflow: hidden;
+  z-index: 18;
+  pointer-events: none;
 }
 
 .flow-map-minimap__frame {
   position: absolute;
   border: 2px solid #6366f1;
-  border-radius: 2px;
-  background: rgba(99, 102, 241, 0.12);
+  border-radius: 3px;
+  background: rgba(99, 102, 241, 0.15);
   box-sizing: border-box;
 }
 
 .flow-map-zoom-bar {
   position: absolute;
-  left: 12px;
-  bottom: 12px;
+  left: 16px;
+  bottom: 16px;
   display: flex;
-  gap: 6px;
+  gap: 8px;
+  z-index: 18;
 }
 
-.flow-map-workspace {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
+.flow-map-zoom-bar .btn {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 
 .flow-map-toolbar {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 130px;
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 0.75rem;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  background: #fff;
+  padding: 0.45rem 0.65rem;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.1);
 }
 
 .flow-map-mode-tabs {
   display: inline-flex;
   padding: 3px;
   border-radius: 999px;
-  background: #f1f5f9;
+  background: #eef2ff;
   gap: 2px;
 }
 
 .flow-map-mode-tabs button {
   border: none;
   background: transparent;
-  padding: 0.35rem 0.85rem;
+  padding: 0.38rem 0.9rem;
   border-radius: 999px;
   font-size: 0.8125rem;
   font-weight: 600;
@@ -196,8 +242,8 @@
 
 .flow-map-mode-tabs button[aria-pressed='true'] {
   background: #fff;
-  color: #0f172a;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+  color: #312e81;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
 }
 
 .flow-map-toolbar__actions {
@@ -266,15 +312,14 @@
 }
 
 .prototype-player {
-  flex: 1;
-  min-height: 420px;
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 1rem;
   background: #0f172a;
-  border-radius: 12px;
   padding: 1.5rem;
 }
 
@@ -309,6 +354,7 @@
 
 .designer-workspace-v2--flow-map .designer-canvas-column {
   min-height: 0;
+  height: 100%;
 }
 
 .designer-workspace-v2--flow-map .canvas-subtoolbar {

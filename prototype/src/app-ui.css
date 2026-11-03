@@ -55,10 +55,32 @@
   min-width: 0;
   overflow: hidden;
   border-right: 1px solid color-mix(in srgb, var(--bf-theme-text-2) 10%, transparent);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-project-canvas .designer-workspace-v2 {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  border-top: none;
+}
+
+.designer-workspace-v2--compact {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .designer-workspace-v2--compact .designer-canvas-column {
   min-width: 0;
+  grid-column: 1;
+  height: 100%;
+}
+
+.designer-workspace-v2--flow-map {
+  background: #eef2f6;
+  background-image: none;
 }
 
 .designer-workspace-v2--compact .infinite-canvas {

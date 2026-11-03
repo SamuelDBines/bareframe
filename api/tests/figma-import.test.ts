@@ -1,61 +1,46 @@
-import { describe, expect, it, beforeAll, afterAll, beforeEach } from 'vitest';
-import { serve } from '@hono/node-server';
-import type { Server } from 'node:http';
+import { describe, expect, it, beforeEach, afterAll } from 'vitest';
 import pg from 'pg';
-import { createApp } from '../src/app.js';
-import { setupTestDb, testConfig, mockGitHubUser } from '../src/test-utils.js';
+import { createTestApp, mockGitHubUser, setupTestDb, testConfig } from '../src/test-utils.js';
 import { cookieHeaderFromResponse } from './helpers.js';
 import type { GitHubClient } from '../src/auth/github.js';
 import { vi } from 'vitest';
 
 describe('figma import API', () => {
   const pool = new pg.Pool({ connectionString: testConfig.databaseUrl });
-  let baseUrl = '';
-  let server: Server;
   let sessionCookie = '';
-
-  beforeAll(async () => {
-    await setupTestDb(pool);
-    const github: GitHubClient = {
-      exchangeCode: vi.fn(async () => 'gh-token'),
-      fetchUser: vi.fn(async () => mockGitHubUser()),
-    };
-    const app = createApp({ config: testConfig, pool, github });
-    await new Promise<void>((resolve) => {
-      server = serve({ fetch: app.fetch, port: 0 }, (info) => {
-        baseUrl = `http://127.0.0.1:${info.port}`;
-        resolve();
-      });
-    });
-  });
+  const exchangeCode = vi.fn(async () => 'gh-token');
+  const fetchUser = vi.fn(async () => mockGitHubUser());
+  const github: GitHubClient = { exchangeCode, fetchUser };
 
   beforeEach(async () => {
     await setupTestDb(pool);
-    const start = await fetch(`${baseUrl}/api/auth/github?returnTo=/`);
+    const app = createTestApp(pool, github);
+    const start = await app.request('/api/auth/github?returnTo=/');
     const oauthCookie = cookieHeaderFromResponse(start);
-    const loc = start.headers.get('location')!;
-    const state = new URL(loc).searchParams.get('state')!;
-    const callback = await fetch(
-      `${baseUrl}/api/auth/github/callback?code=ok&state=${encodeURIComponent(state)}`,
+    const loc = start.headers.get('location');
+    expect(loc).toBeTruthy();
+    const state = new URL(loc!).searchParams.get('state')!;
+    const callback = await app.request(
+      `/api/auth/github/callback?code=ok&state=${encodeURIComponent(state)}`,
       { headers: { Cookie: oauthCookie } },
     );
     sessionCookie = cookieHeaderFromResponse(callback);
   });
 
   afterAll(async () => {
-    server?.close();
     await pool.end();
   });
 
   it('imports demo fixture frames and connectors', async () => {
-    const createRes = await fetch(`${baseUrl}/api/projects`, {
+    const app = createTestApp(pool, github);
+    const createRes = await app.request('/api/projects', {
       method: 'POST',
       headers: { Cookie: sessionCookie, 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'Import test' }),
     });
     expect(createRes.status).toBe(201);
     const created = (await createRes.json()) as { id: string };
-    const res = await fetch(`${baseUrl}/api/projects/${created.id}/figma-import`, {
+    const res = await app.request(`/api/projects/${created.id}/figma-import`, {
       method: 'POST',
       headers: { Cookie: sessionCookie, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -73,7 +58,7 @@ describe('figma import API', () => {
     expect(body.connectorsImported).toBe(2);
     expect(body.version).toBe(2);
 
-    const get = await fetch(`${baseUrl}/api/projects/${created.id}`, {
+    const get = await app.request(`/api/projects/${created.id}`, {
       headers: { Cookie: sessionCookie },
     });
     const project = (await get.json()) as {

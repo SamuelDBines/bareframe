@@ -28,6 +28,7 @@ import { createFlowMapRouter } from './flow-map/routes.js';
 import { createInternalWorkerRouter } from './internal/routes.js';
 import { createPackagesRouter } from './packages/routes.js';
 import { createReviewsRouter, createPublicShareRouter } from './reviews/routes.js';
+import { createBillingRouter } from './billing/routes.js';
 import { createFigmaRouter } from './figma/routes.js';
 import { createPublicToolsRouter } from './public/check-url.js';
 

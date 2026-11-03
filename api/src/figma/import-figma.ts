@@ -9,6 +9,12 @@ import { isValidComponentSlug } from '../catalog/components.js';
 import { fetchFile, type FigmaNode } from './client.js';
 import { parseFigmaDesignUrl } from './parse-url.js';
 
+function requireFrameId(effects: { frameId?: unknown }): string {
+  const id = effects.frameId;
+  if (typeof id !== 'string' || !id) throw new Error('add_screen did not return frameId');
+  return id;
+}
+
 export type FigmaImportResult = {
   framesImported: number;
   connectorsImported: number;
@@ -65,7 +71,7 @@ export function buildFixtureFigmaImport(
       ctx,
     );
     doc = applied.document;
-    const frameId = applied.effects.frameId!;
+    const frameId = requireFrameId(applied.effects);
     frameIds.push(frameId);
   }
   for (let i = 0; i < frameIds.length - 1; i++) {
@@ -122,7 +128,7 @@ export async function importFigmaIntoDocument(
       ctx,
     );
     doc = applied.document;
-    const frameId = applied.effects.frameId!;
+    const frameId = requireFrameId(applied.effects);
     figmaIdToFrameId.set(ff.id, frameId);
   }
 

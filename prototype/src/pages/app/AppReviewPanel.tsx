@@ -67,7 +67,11 @@ export function AppReviewPanel({
   }, [projectId, runId]);
 
   async function runReview() {
-    if (demoIssues) return;
+    if (demoIssues) {
+      setStatus('completed');
+      setError(null);
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -103,21 +107,27 @@ export function AppReviewPanel({
   const diff = summary?.diff;
 
   return (
-    <aside className="app-review-panel" aria-label="AI review">
+    <aside
+      className={`app-review-panel${demoIssues ? ' app-review-panel--demo' : ''}`}
+      aria-label="AI review"
+    >
       <header>
         <h2>AI review</h2>
-        <p className="ds-meta">UX, gaps, a11y, consistency, and suggested fixes.</p>
+        <p className="app-review-panel__intro">UX gaps, accessibility, consistency, and suggested fixes on your map.</p>
       </header>
-      <div className="app-actions">
+      <div className="app-form-actions">
         <Button variant="primary" isDisabled={busy} onPress={() => void runReview()}>
-          Run review pass
+          {busy ? 'Starting…' : demoIssues ? 'Replay sample review' : 'Run review pass'}
         </Button>
         {showUpgrade ? (
-          <button type="button" className="btn btn-secondary btn-sm" onClick={() => void upgrade()}>
+          <Button variant="secondary" size="sm" onPress={() => void upgrade()}>
             Pro · £20/mo
-          </button>
+          </Button>
         ) : null}
       </div>
+      {demoIssues ? (
+        <p className="app-review-panel__demo-hint">Interactive demo — sample issues are loaded below.</p>
+      ) : null}
       {checkoutMsg ? <p className="ds-meta">{checkoutMsg}</p> : null}
       {error ? <p className="app-error">{error}</p> : null}
       {status ? <p className="ds-meta">Status: {status}</p> : null}
@@ -140,7 +150,7 @@ export function AppReviewPanel({
       <ol className="app-review-issues">
         {issues.map((issue) => (
           <li key={issue.id} className={`app-review-issue severity-${issue.severity}`}>
-            <span className="badge-pill">{issue.category.replace(/_/g, ' ')}</span>
+            <span className="bf-badge bf-badge--outline">{issue.category.replace(/_/g, ' ')}</span>
             <strong>{issue.title}</strong>
             <p>{issue.explanation}</p>
             <p className="ds-meta">

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { githubSignInUrl, useAuth } from '../../auth/AuthContext';
 import { designerSiteUrl, githubAuthReturnTo } from '../../sites/urls';
+import { AppPageHeader, Button, Card } from '../../app/AppUi';
+import { Alert } from '@bareframe/react';
 
 export function SignInPage() {
 	const { status, user } = useAuth();
@@ -8,34 +10,36 @@ export function SignInPage() {
 
 	if (user) {
 		return (
-			<div style={{ maxWidth: 440, margin: '0 auto', textAlign: 'center' }}>
-				<p className="lead">Signed in as <strong>{user.login}</strong>.</p>
-				<a href={designerSiteUrl('/')} className="btn btn-primary">Open Designer</a>
+			<div className="app-auth-page">
+				<AppPageHeader title="You are signed in" lead={`Signed in as ${user.login}.`} />
+				<a href={designerSiteUrl('/')} className="app-hero-cta">
+					<Button variant="primary">Open app</Button>
+				</a>
 			</div>
 		);
 	}
 
 	return (
-		<div style={{ maxWidth: 440, margin: '0 auto' }}>
-			<div className="page-hero" style={{ textAlign: 'center' }}>
-				<h1>Welcome back</h1>
-				<p>Sign in with your GitHub account to open your Designer workspace.</p>
-			</div>
-			<div className="card form-stack" style={{ alignItems: 'stretch' }}>
+		<div className="app-auth-page">
+			<AppPageHeader
+				title="Welcome back"
+				lead="Sign in with GitHub to save journey projects and run AI review passes."
+			/>
+			<Card variant="elevated" className="app-auth-card">
 				{status === 'unavailable' ? (
-					<p className="auth-muted" role="status">
-						Sign-in API is not reachable (local dev without the API). Start the API or use the
-						production site.
-					</p>
+					<Alert variant="warning" title="Sign-in unavailable">
+						The auth API is not reachable in this environment. Use production at bareframe.org or start the API
+						locally.
+					</Alert>
 				) : (
-					<a className="btn btn-primary" href={githubSignInUrl(returnTo)}>
-						Sign in with GitHub
+					<a className="app-hero-cta" href={githubSignInUrl(returnTo)}>
+						<Button variant="primary">Sign in with GitHub</Button>
 					</a>
 				)}
-				<p style={{ margin: 0, fontSize: '0.875rem' }}>
+				<p className="app-muted-inline">
 					New here? <Link to="/sign-up">Create an account</Link>
 				</p>
-			</div>
+			</Card>
 		</div>
 	);
 }

@@ -11,14 +11,18 @@ export function AppShell() {
 		location.pathname.startsWith('/theme') ||
 		location.pathname.startsWith('/tokens') ||
 		location.pathname.startsWith('/app/project') ||
+		location.pathname.startsWith('/app/product/new') ||
 		location.pathname.startsWith('/share') ||
 		location.pathname.startsWith('/demo/journey-review') ||
+		location.pathname.startsWith('/demo/flow-map') ||
 		location.pathname.startsWith('/demo/share-canvas');
 
 	const fullBleed =
 		location.pathname.startsWith('/app/project') ||
+		location.pathname.startsWith('/app/product/new') ||
 		location.pathname.startsWith('/share') ||
 		location.pathname.startsWith('/demo/journey-review') ||
+		location.pathname.startsWith('/demo/flow-map') ||
 		location.pathname.startsWith('/demo/share-canvas');
 
 	const docs = location.pathname.startsWith('/components');

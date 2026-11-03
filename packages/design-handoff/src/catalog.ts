@@ -11,6 +11,8 @@ let cached: Catalog | null = null;
 function defaultCatalogPath(): string {
   if (process.env.BAREFRAME_CATALOG_PATH) return process.env.BAREFRAME_CATALOG_PATH;
   const candidates = [
+    path.join(process.cwd(), 'data', 'catalog.json'),
+    '/app/data/catalog.json',
     path.join(here, '..', 'data', 'catalog.json'),
     path.join(here, '..', '..', '..', 'mcp', 'data', 'catalog.json'),
   ];

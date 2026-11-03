@@ -10,8 +10,8 @@ import {
   autoLayoutFlowMap,
   boundsForFlowMapFrames,
   cardPosition,
-  connectorMidpoint,
   connectorPath,
+  connectorLabelPoint,
 } from './flowMapLayout';
 import { zoomCameraAroundPoint, type Camera } from '../camera';
 
@@ -32,13 +32,13 @@ function Pin({ annotation }: { annotation: Annotation }) {
 }
 
 function EdgeLabel({ x, y, text }: { x: number; y: number; text: string }) {
-  const label = text.length > 28 ? `${text.slice(0, 26)}…` : text;
-  const w = Math.min(220, Math.max(96, label.length * 7.5 + 28));
-  const h = 30;
+  const label = text.length > 22 ? `${text.slice(0, 20)}…` : text;
+  const w = Math.min(168, Math.max(72, label.length * 7.2 + 24));
+  const h = 28;
   return (
-    <g transform={`translate(${x - w / 2}, ${y - h / 2})`}>
+    <g transform={`translate(${x - w / 2}, ${y - h / 2})`} className="flow-map-edge-label">
       <rect width={w} height={h} rx={h / 2} className="flow-map-edge-pill" />
-      <text x={w / 2} y={h / 2 + 5} className="flow-map-edge-pill-text">
+      <text x={w / 2} y={h / 2 + 4} className="flow-map-edge-pill-text">
         {label}
       </text>
     </g>
@@ -260,11 +260,11 @@ export function FlowMapCanvas({
               const to = frames.find((f) => f.id === edge.toFrameId);
               if (!from || !to) return null;
               const d = connectorPath(from, to);
-              const mid = connectorMidpoint(from, to);
+              const labelPt = connectorLabelPoint(from, to);
               return (
                 <g key={edge.id}>
                   <path d={d} className="flow-map-edge" markerEnd="url(#flow-arrow)" />
-                  <EdgeLabel x={mid.x} y={mid.y} text={edge.label ?? edge.trigger ?? 'Next'} />
+                  <EdgeLabel x={labelPt.x} y={labelPt.y} text={edge.label ?? edge.trigger ?? 'Next'} />
                 </g>
               );
             })}

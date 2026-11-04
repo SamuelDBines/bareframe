@@ -15,6 +15,8 @@ import { PackageGeneratingPage } from './pages/designer/PackageGeneratingPage';
 import { PackageReviewPage } from './pages/designer/PackageReviewPage';
 import { SharePackagePage } from './pages/designer/SharePackagePage';
 import { FlowMapDemoPage } from './pages/designer/FlowMapDemoPage';
+import { DemoSaasOnboardingPage } from './pages/designer/DemoSaasOnboardingPage';
+import { DemoCommerceBookingPage } from './pages/designer/DemoCommerceBookingPage';
 
 export default function DesignerApp() {
 	return (

@@ -10,6 +10,20 @@ const EXAMPLES = [
     tag: 'Flow map + AI review',
   },
   {
+    title: 'Branching SaaS onboarding',
+    body: 'Welcome → signup → verify → dashboard, with forgot-password and error/retry paths laid out on the map.',
+    to: '/demo/saas-onboarding',
+    cta: 'Open example',
+    tag: 'Branching flow',
+  },
+  {
+    title: 'Studio booking journey',
+    body: 'Eight screens: guest vs account, payment, confirmation, and a loop when a time slot is taken.',
+    to: '/demo/commerce-booking',
+    cta: 'Open example',
+    tag: 'Commerce flow',
+  },
+  {
     title: 'Interactive sign-up flow',
     body: 'A six-screen sign-up and upgrade journey. Click a flag to see the finding, then add the missing screen.',
     to: '/demo/flow-map',

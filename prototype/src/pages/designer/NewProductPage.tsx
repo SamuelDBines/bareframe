@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/AuthContext';
 import { fetchPackageConfig, fetchPackageUsage, startPackageGeneration } from '../../designer/packageApi';
 import { DsCard, DsHero, DsPage } from '../../designer/DesignerUiPrimitives';
 import { designerPath } from '../../sites/urls';
+import { friendlyError } from '../../app/apiError';
 
 const QUESTION_IDS = [
   'q1_problem',
@@ -44,9 +45,7 @@ export function NewProductPage({ appMode }: { appMode?: boolean } = {}) {
       return;
     }
     if (config && !config.llmConfigured) {
-      setError(
-        'Generation is not available: the server LLM is not configured (LLM_API_BASE_URL, LLM_API_KEY, LLM_MODEL).',
-      );
+      setError('AI generation is taking a break right now. Your brief is safe here — try again later.');
       return;
     }
     setBusy(true);
@@ -70,7 +69,7 @@ export function NewProductPage({ appMode }: { appMode?: boolean } = {}) {
       });
       navigate(appMode ? `/app/product/generating/${jobId}` : designerPath(`/product/generating/${jobId}`));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not start generation');
+      setError(friendlyError(err, 'Could not start generation'));
     } finally {
       setBusy(false);
     }
@@ -79,21 +78,19 @@ export function NewProductPage({ appMode }: { appMode?: boolean } = {}) {
   return (
     <DsPage>
       <DsHero
-        eyebrow="Bareframe product"
-        title="New product"
-        lead={
-          <>
-            One brief in — a reviewable <code>bareframe.package</code> out: definition, brand, journeys, and a
-            playable prototype built from real @bareframe/react components.
-          </>
-        }
+        eyebrow="New project · Brief"
+        title="Start from a short brief"
+        lead="Describe what you’re building. We’ll draft the journeys and screens so you can map and review them." 
       />
 
       {config && !config.llmConfigured && (
-        <DsCard className="ds-alert">
-          <strong>LLM not configured.</strong> Generation is disabled until production secrets are set on the API. You
-          can still prepare a brief; submit will not run until the server is configured.
-        </DsCard>
+        <div className="bx-notice" role="status" style={{ marginBottom: '1rem' }}>
+          <span className="bx-notice__icon" aria-hidden>i</span>
+          <p>
+            <strong>AI generation is paused for now.</strong> You can still write your brief, or start from a Figma
+            file or a live URL from your <Link to="/app">projects</Link>.
+          </p>
+        </div>
       )}
 
       {usage && (
@@ -169,10 +166,10 @@ export function NewProductPage({ appMode }: { appMode?: boolean } = {}) {
           {error && <p className="ds-error">{error}</p>}
 
           <div className="ds-actions">
-            <button type="submit" className="btn btn-primary" disabled={busy}>
-              Generate package
+            <button type="submit" className="btn btn-primary" disabled={busy || (config ? !config.llmConfigured : false)}>
+              {busy ? 'Starting…' : 'Generate flow'}
             </button>
-            <Link to={designerPath('/')} className="btn btn-secondary">
+            <Link to={appMode ? '/app' : designerPath('/')} className="btn btn-secondary">
               Cancel
             </Link>
           </div>

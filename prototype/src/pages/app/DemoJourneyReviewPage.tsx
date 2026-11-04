@@ -1,24 +1,26 @@
 import { DesignerWorkspace } from '../../designer/DesignerWorkspace';
-import { AppReviewPanel } from './AppReviewPanel';
 import { demoReviewProjectId } from '../../designer/demoReviewProject';
+import { AppReviewPanel } from './AppReviewPanel';
 
-/** Static demo canvas with review callouts for marketing screenshots. */
+/** Example project with sample review findings — linked from the homepage and Examples. */
 export function DemoJourneyReviewPage() {
   return (
-    <div className="app-project-layout">
-      <div className="app-project-canvas">
-        <DesignerWorkspace projectId={demoReviewProjectId} demoReview />
-      </div>
-      <AppReviewPanel projectId={demoReviewProjectId} demoIssues />
-    </div>
+    <DesignerWorkspace
+      projectId={demoReviewProjectId}
+      demoReview
+      review={{ demo: true }}
+      aside={<AppReviewPanel />}
+    />
   );
 }
 
 export function DemoShareCanvasPage() {
   return (
     <div className="app-share-layout">
-      <DesignerWorkspace demoReview readOnly />
-      <footer className="app-share-footer">Reviewed with Bareframe</footer>
+      <DesignerWorkspace demoReview readOnly review={{ demo: true }} />
+      <footer className="app-share-footer">
+        Made with <a href="#/">Bareframe</a>
+      </footer>
     </div>
   );
 }

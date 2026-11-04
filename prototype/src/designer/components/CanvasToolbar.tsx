@@ -5,6 +5,7 @@ import { useDesigner } from '../store';
 import { useAppCanvasChrome } from '../AppCanvasChrome';
 import { createProjectShare, startProCheckout } from '../../app/reviewApi';
 import { useState } from 'react';
+import { friendlyError } from '../../app/apiError';
 
 function compareSelectValue(compare: ReturnType<typeof useDesigner>['state']['ui']['compare']): string {
 	if (!compare) return '';
@@ -39,7 +40,7 @@ export function CanvasToolbar() {
 			}
 			setToast(result.message ?? 'Checkout unavailable');
 		} catch (e) {
-			setToast(e instanceof Error ? e.message : 'Checkout failed');
+			setToast(friendlyError(e, 'Checkout failed'));
 		}
 	}
 

@@ -6,6 +6,7 @@ import {
 } from '../../app/reviewApi';
 import { fetchProject, fromProjectDocument } from '../projectApi';
 import { useDesigner } from '../store';
+import { friendlyError } from '../../app/apiError';
 
 type Props = {
   projectId: string;
@@ -43,7 +44,7 @@ export function FigmaImportDialog({ projectId, onClose }: Props) {
       setTokenHint(`Imported ${result.framesImported} screens · ${result.fileName}`);
       window.setTimeout(onClose, 600);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Import failed');
+      setError(friendlyError(e, 'Import failed'));
     } finally {
       setBusy(false);
     }

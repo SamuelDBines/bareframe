@@ -31,6 +31,8 @@ import { createReviewsRouter, createPublicShareRouter } from './reviews/routes.j
 import { createBillingRouter } from './billing/routes.js';
 import { createFigmaRouter } from './figma/routes.js';
 import { createPublicToolsRouter } from './public/check-url.js';
+import { createCaptureRouter } from './capture/routes.js';
+import { createSitemapRouter } from './sitemap/routes.js';
 
 export type AppDeps = {
 	config: Config;
@@ -124,6 +126,8 @@ export function createApp(deps: AppDeps): Hono {
 	app.route('/api', createReviewsRouter(pool, config));
 	app.route('/api', createBillingRouter(pool, config));
 	app.route('/api', createFigmaRouter(pool, config));
+	app.route('/api', createSitemapRouter(pool, config));
+	app.route('/api/v1', createCaptureRouter(pool, config));
 
 	return app;
 }

@@ -29,6 +29,8 @@ export const testConfig: Config = {
 
 export async function setupTestDb(pool: pg.Pool): Promise<void> {
 	const run = async () => {
+		await pool.query('DROP TABLE IF EXISTS capture_events CASCADE');
+		await pool.query('DROP TABLE IF EXISTS capture_flow_state CASCADE');
 		await pool.query('DROP TABLE IF EXISTS recording_steps CASCADE');
 		await pool.query('DROP TABLE IF EXISTS recordings CASCADE');
 		await pool.query('DROP TABLE IF EXISTS audit_findings CASCADE');

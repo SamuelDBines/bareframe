@@ -5,7 +5,7 @@ export const FLOW_CARD_WIDTH = 272;
 export const FLOW_THUMB_HEIGHT = 392;
 export const FLOW_LABEL_HEIGHT = 44;
 export const FLOW_CARD_HEIGHT = FLOW_THUMB_HEIGHT + FLOW_LABEL_HEIGHT;
-export const FLOW_CARD_GAP_X = 168;
+export const FLOW_CARD_GAP_X = 200;
 export const FLOW_CARD_GAP_Y = 96;
 
 /** Port spacing when several connectors leave or enter the same side of a card. */
@@ -182,7 +182,7 @@ export type RoutedConnector = {
 	id: string;
 	d: string;
 	label: { x: number; y: number; w: number; text: string };
-	kind: 'forward' | 'long' | 'back';
+	kind: 'forward' | 'long' | 'back' | 'down';
 };
 
 type Box = { x: number; y: number; w: number; h: number };
@@ -192,6 +192,14 @@ const overlaps = (a: Box, b: Box, pad = 6) =>
 
 export function labelWidth(text: string) {
 	return Math.min(220, Math.max(84, text.length * 7.4 + 30));
+}
+
+function fitLabel(full: string, maxW: number): { w: number; text: string } {
+	let text = truncateLabel(full);
+	if (labelWidth(text) <= maxW) return { w: labelWidth(text), text };
+	const chars = Math.max(4, Math.floor((maxW - 30) / 7.4) - 1);
+	text = `${full.slice(0, chars).trimEnd()}…`;
+	return { w: Math.min(labelWidth(text), Math.max(84, maxW)), text };
 }
 
 export function truncateLabel(text: string) {
@@ -229,7 +237,8 @@ export function routeConnectors(
 	for (const c of valid) {
 		const a = byId.get(c.fromFrameId)!;
 		const b = byId.get(c.toFrameId)!;
-		if (b.x <= a.x + FLOW_CARD_WIDTH / 2) kinds.set(c.id, 'back');
+		if (Math.abs(b.x - a.x) < FLOW_CARD_WIDTH / 2 && b.y > a.y + FLOW_CARD_HEIGHT) kinds.set(c.id, 'down');
+		else if (b.x <= a.x + FLOW_CARD_WIDTH / 2) kinds.set(c.id, 'back');
 		else {
 			const y1 = a.y + FLOW_THUMB_HEIGHT / 2;
 			const y2 = b.y + FLOW_THUMB_HEIGHT / 2;
@@ -256,8 +265,9 @@ export function routeConnectors(
 		});
 	};
 	for (const f of frames) {
-		spread(f.id, valid.filter((c) => c.fromFrameId === f.id && kinds.get(c.id) !== 'back'), 'out');
-		spread(f.id, valid.filter((c) => c.toFrameId === f.id && kinds.get(c.id) !== 'back'), 'in');
+		const sideways = (c: (typeof valid)[number]) => kinds.get(c.id) === 'forward' || kinds.get(c.id) === 'long';
+		spread(f.id, valid.filter((c) => c.fromFrameId === f.id && sideways(c)), 'out');
+		spread(f.id, valid.filter((c) => c.toFrameId === f.id && sideways(c)), 'in');
 	}
 
 	let longIndex = 0;
@@ -268,6 +278,16 @@ export function routeConnectors(
 		const kind = kinds.get(c.id)!;
 		const text = truncateLabel(c.label ?? c.trigger ?? 'Next');
 		const w = labelWidth(text);
+		if (kind === 'down') {
+			// Same column, straight down: bottom edge to top edge, label in the gap.
+			const sx = a.x + FLOW_CARD_WIDTH / 2;
+			const tx = b.x + FLOW_CARD_WIDTH / 2;
+			const sy = a.y + FLOW_CARD_HEIGHT;
+			const ty = b.y;
+			const midY = (sy + ty) / 2;
+			const d = `M ${sx} ${sy} C ${sx} ${midY}, ${tx} ${midY}, ${tx} ${ty - 4}`;
+			return { id: c.id, d, kind, label: { x: (sx + tx) / 2, y: midY, w, text } };
+		}
 		if (kind === 'back') {
 			const sx = a.x + FLOW_CARD_WIDTH / 2;
 			const tx = b.x + FLOW_CARD_WIDTH / 2;
@@ -288,7 +308,9 @@ export function routeConnectors(
 		}
 		const dx = Math.max(48, (x2 - x1) * 0.5);
 		const d = `M ${x1} ${p.out} C ${x1 + dx} ${p.out}, ${x2 - dx} ${p.in}, ${x2} ${p.in}`;
-		return { id: c.id, d, kind, label: { x: (x1 + x2) / 2, y: (p.out + p.in) / 2, w, text } };
+		// Keep the label inside the gap between the two cards so it stays on its line.
+		const fit = fitLabel(c.label ?? c.trigger ?? 'Next', x2 - x1 - 16);
+		return { id: c.id, d, kind, label: { x: (x1 + x2) / 2, y: (p.out + p.in) / 2, ...fit } };
 	});
 
 	// Nudge labels apart (and off cards) — alternate down/up until clear.

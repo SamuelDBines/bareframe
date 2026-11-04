@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useDesigner } from '../designer/store';
-import { DEMO_REVIEW_ISSUES } from '../designer/demoReviewProject';
+import { DEMO_REVIEW_ISSUES, demoReviewProjectId } from '../designer/demoReviewProject';
 import { FLOW_CARD_HEIGHT, FLOW_CARD_GAP_Y } from '../designer/flowmap/flowMapLayout';
 import { friendlyError, isAiUnavailable } from './apiError';
 import { getReviewRun, listReviewRuns, patchReviewIssue, startReview, type ReviewIssue } from './reviewApi';
@@ -68,7 +68,7 @@ export function ReviewProvider({
 
 	// Demo: attach the fixed sample issues to the demo screens once they load.
 	useEffect(() => {
-		if (!demo || frames.length === 0 || issues.length > 0) return;
+		if (!demo || state.project.id !== demoReviewProjectId || issues.length > 0) return;
 		const flowFrames = frames.filter((f) => !f.ghost);
 		setIssues(
 			DEMO_REVIEW_ISSUES.map((i) => ({
@@ -78,7 +78,7 @@ export function ReviewProvider({
 			})),
 		);
 		setStatus('ready');
-	}, [demo, frames, issues.length]);
+	}, [demo, frames, issues.length, state.project.id]);
 
 	// Real project: show the latest completed review on open.
 	useEffect(() => {

@@ -102,3 +102,16 @@ describe('routeConnectors', () => {
 		expect(back.label.y).toBeGreaterThan(FLOW_CARD_HEIGHT);
 	});
 });
+
+describe('routeConnectors — vertical', () => {
+	it('routes a screen added below its parent straight down, label between the cards', () => {
+		const frames = [
+			{ id: 'a', x: 0, y: 0 },
+			{ id: 'b', x: 0, y: FLOW_CARD_HEIGHT + 96 },
+		];
+		const [r] = routeConnectors(frames, [edge('1', 'a', 'b', 'Edge case')]);
+		expect(r!.kind).toBe('down');
+		expect(r!.label.y).toBeGreaterThan(FLOW_CARD_HEIGHT);
+		expect(r!.label.y).toBeLessThan(FLOW_CARD_HEIGHT + 96);
+	});
+});

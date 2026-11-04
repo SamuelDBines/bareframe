@@ -23,7 +23,13 @@ export function UserMenu({ designerApp = false, inApp = false }: Props) {
 						Open app
 					</Link>
 				)}
-				<img className="user-avatar" src={user.avatarUrl ?? ''} alt="" width={32} height={32} />
+				{user.avatarUrl ? (
+					<img className="user-avatar" src={user.avatarUrl} alt="" width={32} height={32} />
+				) : (
+					<span className="user-avatar user-avatar--initial" aria-hidden>
+						{user.login.slice(0, 1).toUpperCase()}
+					</span>
+				)}
 				<span className="user-login">{user.login}</span>
 				<button type="button" className="btn btn-ghost btn-sm" onClick={() => void signOut()}>
 					Sign out

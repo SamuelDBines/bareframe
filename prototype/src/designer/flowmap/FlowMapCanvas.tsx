@@ -424,7 +424,7 @@ export function FlowMapCanvas({
 		commitCamera({ zoom: z, x: viewport.w / 2 - wx * z, y: viewport.h / 2 - wy * z });
 	};
 
-	const selected = ui.selectedFrameId;
+	const selected = frames.some((f) => f.id === ui.selectedFrameId) ? ui.selectedFrameId : null;
 	const svgW = bounds.maxX + 400;
 	const svgH = bounds.maxY + 400;
 
@@ -483,6 +483,7 @@ export function FlowMapCanvas({
 										<text x={r.label.w / 2} y={FLOW_LABEL_BOX_HEIGHT / 2 + 5} className="flow-map-edge-pill-text">
 											{r.label.text}
 										</text>
+										<title>{c.label ?? c.trigger ?? 'Next'}</title>
 									</g>
 								</g>
 							);

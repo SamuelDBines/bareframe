@@ -790,3 +790,14 @@ a {
 		scroll-behavior: auto !important;
 	}
 }
+
+.user-avatar--initial {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	background: var(--bx-accent-soft);
+	color: var(--bx-accent);
+	font-weight: 700;
+	font-size: 0.85rem;
+}

@@ -741,3 +741,49 @@
 		display: none;
 	}
 }
+
+/* Brief intake / package pages rendered inside the app shell. */
+.app-main--app > .ds-page {
+	max-width: 880px;
+	margin: 0 auto;
+	padding: 3rem clamp(1rem, 3vw, 2rem) 5rem;
+}
+
+.app-main--app .ds-hero {
+	padding: 0 0 1.5rem;
+	background: none;
+	border: 0;
+}
+
+.app-main--app .ds-hero h1 {
+	font-family: var(--bx-font-display);
+	font-weight: 800;
+	font-size: 2.4rem;
+	letter-spacing: -0.03em;
+}
+
+.app-main--app .ds-card {
+	border-radius: var(--bx-radius-xl);
+	box-shadow: var(--bx-shadow-sm);
+}
+
+.app-main--app .ds-form-card label {
+	font-weight: 600;
+	color: var(--bx-text);
+}
+
+.app-main--app .ds-form-card input,
+.app-main--app .ds-form-card textarea {
+	border-radius: 12px;
+	border-color: var(--bx-border-strong);
+	padding: 0.7rem 0.9rem;
+	font: inherit;
+	font-size: 0.95rem;
+}
+
+.app-main--app .ds-form-card input:focus,
+.app-main--app .ds-form-card textarea:focus {
+	outline: none;
+	border-color: var(--bx-accent);
+	box-shadow: 0 0 0 4px var(--bx-accent-ring);
+}

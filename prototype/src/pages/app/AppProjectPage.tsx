@@ -11,23 +11,20 @@ export function AppProjectPage() {
   useEffect(() => {
     fetchPlan()
       .then((p) => setShowUpgrade(p.tier !== 'pro'))
-      .catch(() => setShowUpgrade(true));
+      .catch(() => setShowUpgrade(false));
   }, []);
 
   return (
-    <div className="app-project-layout">
-      <div className="app-project-canvas">
-        <DesignerWorkspace
-          projectId={projectId}
-          compactChrome
-          appChrome={{
-            projectId,
-            showShare: Boolean(projectId),
-            showUpgrade,
-          }}
-        />
-      </div>
-      {projectId ? <AppReviewPanel projectId={projectId} showUpgrade={showUpgrade} /> : null}
-    </div>
+    <DesignerWorkspace
+      projectId={projectId}
+      compactChrome
+      appChrome={{
+        projectId,
+        showShare: Boolean(projectId),
+        showUpgrade,
+      }}
+      review={{ projectId }}
+      aside={projectId ? <AppReviewPanel /> : undefined}
+    />
   );
 }

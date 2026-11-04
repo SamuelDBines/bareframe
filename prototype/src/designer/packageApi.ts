@@ -1,3 +1,5 @@
+import { apiFail } from '../app/apiError';
+
 const API = '/api';
 
 export type PackageSummary = {
@@ -17,7 +19,7 @@ export type PackageConfig = {
 
 export async function fetchPackageConfig(): Promise<PackageConfig> {
   const res = await fetch(`${API}/packages/config`, { credentials: 'include' });
-  if (!res.ok) throw new Error('Failed to load package config');
+  if (!res.ok) await apiFail(res, 'Failed to load package config');
   return res.json() as Promise<PackageConfig>;
 }
 
@@ -41,12 +43,8 @@ export async function startPackageGeneration(body: Record<string, unknown>): Pro
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const msg = (data as { message?: string }).message ?? (data as { error?: string }).error ?? 'Generation failed';
-    throw new Error(msg);
-  }
-  return data as { jobId: string };
+  if (!res.ok) await apiFail(res, 'Generation failed');
+  return res.json() as Promise<{ jobId: string }>;
 }
 
 export async function fetchPackageJob(jobId: string) {

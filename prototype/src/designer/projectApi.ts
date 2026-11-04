@@ -1,5 +1,6 @@
 import type { ProjectDocument } from '@bareframe/designer-core';
 import type { DesignerProject } from './types';
+import { apiFail } from '../app/apiError';
 import {
 	fromProjectDocument,
 	toProjectDocument,
@@ -26,9 +27,10 @@ export type RecordingRow = {
 };
 
 async function parseJson<T>(res: Response): Promise<T> {
-	if (!res.ok) {
-		const text = await res.text();
-		throw new Error(text || res.statusText);
+	if (!res.ok) await apiFail(res, 'Request failed');
+	if (!(res.headers.get('content-type') ?? '').includes('json')) {
+		// Static hosting without the API serves index.html for /api/*.
+		await apiFail(new Response(null, { status: 503 }), 'Workspace unavailable');
 	}
 	return (await res.json()) as T;
 }

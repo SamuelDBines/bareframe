@@ -7,6 +7,7 @@ import {
 	type ProjectTokenSummary,
 } from '../../designer/projectApi';
 import { designerPath } from '../../sites/urls';
+import { friendlyError } from '../../app/apiError';
 
 export function ProjectSettingsPage() {
 	const { projectId = '' } = useParams<{ projectId: string }>();
@@ -21,7 +22,7 @@ export function ProjectSettingsPage() {
 		if (!projectId) return;
 		listProjectTokens(projectId)
 			.then(setTokens)
-			.catch((err) => setError(err instanceof Error ? err.message : 'Failed to load tokens'));
+			.catch((err) => setError(friendlyError(err, 'Failed to load tokens')));
 	}, [projectId]);
 
 	async function mintToken() {
@@ -34,7 +35,7 @@ export function ProjectSettingsPage() {
 			const next = await listProjectTokens(projectId);
 			setTokens(next);
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Could not create token');
+			setError(friendlyError(err, 'Could not create token'));
 		} finally {
 			setBusy(false);
 		}
@@ -46,7 +47,7 @@ export function ProjectSettingsPage() {
 			await revokeProjectToken(projectId, tokenId);
 			setTokens(await listProjectTokens(projectId));
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Revoke failed');
+			setError(friendlyError(err, 'Revoke failed'));
 		} finally {
 			setBusy(false);
 		}

@@ -4,7 +4,9 @@ import App from './App';
 /* Docs site: component rules only. Button variant tokens ship in published @bareframe/react/styles.css. */
 import '../../packages/react/src/styles/bareframe-ui.css';
 import './index.css';
+import './designer/designer-ui.css';
 import './app-ui.css';
+import './styles/product.css';
 
 function initTelemetry() {
 	if (import.meta.env.VITE_TELEMETRY !== '1') return;

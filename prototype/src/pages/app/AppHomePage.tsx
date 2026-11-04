@@ -2,13 +2,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Button } from '@bareframe/react';
 import { createProject, listProjects } from '../../designer/projectApi';
-import { createFlowMap, fetchPlan, importFigmaDesign, startProCheckout } from '../../app/reviewApi';
+import { createFlowMap, fetchPlan, importFigmaDesign, importSitemap, startProCheckout } from '../../app/reviewApi';
 import { NewProductPage } from '../designer/NewProductPage';
 
 export function AppHomePage() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
-  const [mode, setMode] = useState<'hub' | 'brief' | 'url' | 'figma'>('hub');
+  const [mode, setMode] = useState<'hub' | 'brief' | 'url' | 'sitemap' | 'figma'>('hub');
   const [importUrl, setImportUrl] = useState('');
   const [figmaUrl, setFigmaUrl] = useState('https://www.figma.com/design/demo/Hookoh');
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +33,25 @@ export function AppHomePage() {
       navigate(`/app/project/${p.id}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create project');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function startSitemapImport() {
+    if (!importUrl.trim()) return;
+    if (planTier === 'free') {
+      setError('Sitemap import requires Bareframe Pro (£20/month).');
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const p = await createProject(`Sitemap: ${new URL(importUrl).hostname}`);
+      await importSitemap(p.id, importUrl.trim(), p.version);
+      navigate(`/app/project/${p.id}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Sitemap import failed');
     } finally {
       setBusy(false);
     }
@@ -113,6 +132,36 @@ export function AppHomePage() {
     );
   }
 
+  if (mode === 'sitemap') {
+    return (
+      <div className="app-shell-inner app-card">
+        <h1>Import from sitemap</h1>
+        <p className="lead">
+          Paste your site root or <code>sitemap.xml</code>. We map URLs to screens and link parent paths — no
+          screenshots, ready in seconds (Pro).
+        </p>
+        <label className="field">
+          <span>Website or sitemap URL</span>
+          <input
+            value={importUrl}
+            onChange={(e) => setImportUrl(e.target.value)}
+            placeholder="https://example.com or https://example.com/sitemap.xml"
+            data-testid="app-sitemap-url"
+          />
+        </label>
+        {error ? <p className="app-error">{error}</p> : null}
+        <div className="app-actions">
+          <Button variant="secondary" onPress={() => setMode('hub')}>
+            Cancel
+          </Button>
+          <Button variant="primary" isDisabled={busy} onPress={() => void startSitemapImport()}>
+            Import sitemap
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (mode === 'url') {
     return (
       <div className="app-shell-inner app-card">
@@ -140,7 +189,7 @@ export function AppHomePage() {
       <header className="app-hero">
         <p className="badge-pill success">Journey canvas</p>
         <h1>Map flows. Review with AI.</h1>
-        <p className="lead">Start from Figma, a product brief, a live site, or a blank flow map.</p>
+        <p className="lead">Start from Figma, a product brief, a live site, sitemap, or a blank flow map.</p>
       </header>
       <div className="grid-3">
         <article className="card app-start-card">
@@ -155,6 +204,13 @@ export function AppHomePage() {
           <p>Generate journeys and screens with the Bareframe package pipeline.</p>
           <Button variant="secondary" onPress={() => setMode('brief')}>
             Start from brief
+          </Button>
+        </article>
+        <article className="card app-start-card">
+          <h3>Sitemap import</h3>
+          <p>Fast structure-only map from sitemap.xml and site links (Pro).</p>
+          <Button variant="secondary" onPress={() => setMode('sitemap')}>
+            Import sitemap
           </Button>
         </article>
         <article className="card app-start-card">

@@ -97,7 +97,7 @@ export function DesignerWorkspace({
 					demoReview={demoReview}
 					initialDocument={initialDocument}
 				/>
-				{demoReview ? <DemoReviewCameraFit /> : null}
+				{demoReview ? <DemoReviewCameraFit useFlowMap={compactChrome ?? Boolean(demoReview)} /> : null}
 				{review ? (
 					<ReviewProvider projectId={review.projectId} demo={review.demo}>
 						{withAside(inner, aside)}

@@ -253,12 +253,16 @@ export function FlowMapCanvas({
 		window.requestAnimationFrame(() => fitAll());
 	}, [fitAll]);
 
+	const didInitialFit = useRef(false);
+
 	useEffect(() => {
+		if (frames.length === 0) return;
+		if (didInitialFit.current) return;
+		didInitialFit.current = true;
 		runFit();
 		const t = window.setTimeout(runFit, 180);
 		return () => window.clearTimeout(t);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [frames.length]);
+	}, [frames.length, runFit]);
 
 	useEffect(() => {
 		const el = containerRef.current;

@@ -116,10 +116,26 @@
 	box-shadow: var(--bx-shadow-lg);
 }
 
-.flow-map-card:focus-visible {
+.flow-map-card:focus-within {
 	box-shadow:
 		0 0 0 4px var(--bx-accent-ring),
 		var(--bx-shadow-lg);
+}
+
+.flow-map-card__hit {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	padding: 0;
+	border: 0;
+	border-radius: inherit;
+	background: transparent;
+	cursor: inherit;
+}
+
+.flow-map-card__hit:focus-visible {
+	outline: 3px solid var(--bx-accent);
+	outline-offset: 3px;
 }
 
 .flow-map-card--selected {

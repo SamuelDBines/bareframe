@@ -136,7 +136,8 @@
 }
 
 .live-demo__modes button[aria-selected='true'],
-.flow-seg button[aria-selected='true'] {
+.flow-seg button[aria-selected='true'],
+.flow-seg button[aria-checked='true'] {
 	background: var(--bx-surface);
 	color: var(--bx-text);
 	box-shadow: var(--bx-shadow-sm);

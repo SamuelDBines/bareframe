@@ -105,7 +105,6 @@ export function PricingPage() {
 							type="button"
 							role="radio"
 							aria-checked={billing === b}
-							aria-selected={billing === b}
 							onClick={() => setBilling(b)}
 						>
 							{b === 'monthly' ? 'Monthly' : 'Yearly'}

@@ -138,17 +138,6 @@ function FlowMapCard({
 				['--flow-thumb-height' as string]: `${FLOW_THUMB_HEIGHT}px`,
 				['--flow-thumb-scale' as string]: String(THUMB_SCALE),
 			}}
-			role="button"
-			tabIndex={0}
-			data-frame-id={frame.id}
-			aria-pressed={selected}
-			aria-label={`${frame.name}${openCount ? `, ${openCount} open finding${openCount === 1 ? '' : 's'}` : ''}`}
-			onKeyDown={(e) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault();
-					onSelect();
-				}
-			}}
 			onPointerDown={(e) => {
 				if (e.button !== 0) return;
 				e.stopPropagation();
@@ -170,6 +159,19 @@ function FlowMapCard({
 				window.addEventListener('pointerup', onUp);
 			}}
 		>
+			<button
+				type="button"
+				className="flow-map-card__hit"
+				data-frame-id={frame.id}
+				aria-pressed={selected}
+				aria-label={`${frame.name}${openCount ? `, ${openCount} open finding${openCount === 1 ? '' : 's'}` : ''}`}
+				onKeyDown={(e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						onSelect();
+					}
+				}}
+			/>
 			<div className="flow-map-card__thumb">
 				<div className="flow-map-card__thumb-inner" aria-hidden>
 					<FramePreview

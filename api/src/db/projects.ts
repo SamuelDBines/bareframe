@@ -149,6 +149,7 @@ function tokenHasScope(scopes: string[], required: string): boolean {
 	if (required === 'flowmap:write' && scopes.includes('flowmap:write')) return true;
 	if (required === 'render' && scopes.includes('render')) return true;
 	if (required === 'recordings:upload' && scopes.includes('recordings:upload')) return true;
+	if (required === 'capture:write' && scopes.includes('capture:write')) return true;
 	if (required === 'reviews:write' && scopes.includes('projects:write')) return true;
 	return scopes.includes(required);
 }
@@ -378,10 +379,10 @@ export async function createProjectToken(
 	const tokenHash = hashToken(plaintextToken);
 	const prefix = `${plaintextToken.slice(0, 16)}…`;
 	const { rows } = await pool.query<{ id: string }>(
-		`INSERT INTO project_api_tokens (project_id, name, token_prefix, token_hash, scopes)
-     VALUES ($1, $2, $3, $4, $5)
+		`INSERT INTO project_api_tokens (project_id, name, token_prefix, token_hash, scopes, created_by_user_id)
+     VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING id`,
-		[projectId, name, prefix, tokenHash, scopes],
+		[projectId, name, prefix, tokenHash, scopes, userId],
 	);
 	return rows[0]!.id;
 }

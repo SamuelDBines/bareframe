@@ -150,7 +150,7 @@ export function AppHomePage() {
 				<section className="app-empty app-empty--inline">
 					<EmptyMapArt />
 					<h2>Create your first flow map</h2>
-					<p>Start from a Figma file, a short brief or a live website.</p>
+					<p>Start from a Figma file, a short brief, a live website or a sitemap.</p>
 					<div className="start-quick">
 						<button type="button" className="start-quick__btn" onClick={() => setDialog('figma')}>
 							<span className="start-option__icon start-option__icon--figma" aria-hidden>
@@ -169,6 +169,12 @@ export function AppHomePage() {
 								↗
 							</span>
 							Import a website
+						</button>
+						<button type="button" className="start-quick__btn" onClick={() => setDialog('sitemap')} data-testid="import-sitemap">
+							<span className="start-option__icon start-option__icon--sitemap" aria-hidden>
+								☰
+							</span>
+							Import sitemap
 						</button>
 					</div>
 				</section>

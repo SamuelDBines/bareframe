@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { friendlyError, isAiUnavailable } from '../../app/apiError';
-import { createFlowMap, importFigmaDesign } from '../../app/reviewApi';
+import { createFlowMap, importFigmaDesign, importSitemap } from '../../app/reviewApi';
 import { fetchPackageConfig, startPackageGeneration } from '../../designer/packageApi';
 import { createProject } from '../../designer/projectApi';
 
-export type StartKind = 'brief' | 'figma' | 'url';
+export type StartKind = 'brief' | 'figma' | 'url' | 'sitemap';
 
 const STARTS: { id: StartKind; title: string; body: string; icon: string }[] = [
 	{ id: 'figma', title: 'Figma file', body: 'Frames become screens, prototype links become connectors.', icon: 'F' },
 	{ id: 'brief', title: 'Short brief', body: 'Describe the product and we draft the journey for you.', icon: '✎' },
 	{ id: 'url', title: 'Live website', body: 'We capture pages and the links between them.', icon: '↗' },
+	{ id: 'sitemap', title: 'Sitemap', body: 'Fast structure-only map from sitemap.xml (Pro).', icon: '☰' },
 ];
 
 type Props = {
@@ -56,6 +57,7 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 		!busy &&
 		((kind === 'figma' && /figma\.com\//.test(figmaUrl)) ||
 			(kind === 'url' && !urlLocked && /^https?:\/\/.+\..+/.test(siteUrl.trim())) ||
+			(kind === 'sitemap' && !urlLocked && /^https?:\/\/.+\..+/.test(siteUrl.trim())) ||
 			(kind === 'brief' && aiReady === true && idea.trim().length > 8));
 
 	async function submit(e: React.FormEvent) {
@@ -72,6 +74,11 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 				const url = siteUrl.trim();
 				const p = await createProject(new URL(url).hostname);
 				await createFlowMap(p.id, url, p.version);
+				navigate(`/app/project/${p.id}`);
+			} else if (kind === 'sitemap') {
+				const url = siteUrl.trim();
+				const p = await createProject(`Sitemap: ${new URL(url).hostname}`);
+				await importSitemap(p.id, url, p.version);
 				navigate(`/app/project/${p.id}`);
 			} else {
 				const { jobId } = await startPackageGeneration({
@@ -215,6 +222,37 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 								</div>
 							) : (
 								<p className="bx-hint">We follow links from this page to draft the journey.</p>
+							)}
+						</>
+					) : null}
+
+					{kind === 'sitemap' ? (
+						<>
+							<label className="field">
+								<span>Website or sitemap URL</span>
+								<input
+									value={siteUrl}
+									onChange={(e) => setSiteUrl(e.target.value)}
+									placeholder="https://example.com or https://example.com/sitemap.xml"
+									inputMode="url"
+									disabled={urlLocked}
+									data-testid="app-sitemap-url"
+								/>
+							</label>
+							{urlLocked ? (
+								<div className="bx-notice bx-notice--accent" role="status">
+									<span className="bx-notice__icon" aria-hidden>
+										★
+									</span>
+									<p>
+										<strong>Sitemap import is part of Pro.</strong> Start from Figma or a brief on the
+										free plan, or upgrade any time from your projects page.
+									</p>
+								</div>
+							) : (
+								<p className="bx-hint">
+									We map URLs to screens and link parent paths — structure only, no screenshots.
+								</p>
 							)}
 						</>
 					) : null}

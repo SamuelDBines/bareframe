@@ -122,13 +122,13 @@ export async function listProjectTokens(projectId: string) {
 	return data.tokens;
 }
 
-export async function createProjectToken(projectId: string, name: string) {
+export async function createProjectToken(projectId: string, name: string, scopes?: string[]) {
 	return parseJson<{ id: string; token: string; tokenPrefix: string; scopes: string[] }>(
 		await fetch(`/api/projects/${projectId}/tokens`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ name }),
+			body: JSON.stringify({ name, scopes }),
 		}),
 	);
 }

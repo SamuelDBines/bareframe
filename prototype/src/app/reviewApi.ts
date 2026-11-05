@@ -62,6 +62,25 @@ export async function patchReviewIssue(
   return res.json();
 }
 
+export async function importSitemap(projectId: string, url: string, baseVersion: number) {
+  const res = await fetch(`/api/projects/${projectId}/sitemap-import`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, baseVersion }),
+  });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { message?: string };
+    throw new Error(data.message ?? 'Sitemap import failed');
+  }
+  return res.json() as Promise<{
+    version: number;
+    pageId: string;
+    routeCount: number;
+    connectorCount: number;
+  }>;
+}
+
 export async function createFlowMap(projectId: string, url: string, baseVersion: number) {
   const res = await fetch(`/api/projects/${projectId}/flow-maps`, {
     method: 'POST',

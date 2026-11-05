@@ -1,9 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useRef, useState, type ButtonHTMLAttributes } from 'react';
 import { friendlyError } from '../../app/apiError';
 import { createProjectShare, startProCheckout } from '../../app/reviewApi';
 import { useAppCanvasChrome } from '../AppCanvasChrome';
 import { useDesigner } from '../store';
 import { FigmaImportDialog } from './FigmaImportDialog';
+import {
+	IconAddScreen,
+	IconConnect,
+	IconFigma,
+	IconHelp,
+	IconMore,
+	IconPlay,
+	IconShare,
+	IconTrash,
+	IconUpgrade,
+} from './FlowMapIcons';
 
 export type FlowWorkspaceMode = 'map' | 'edit' | 'prototype';
 
@@ -13,6 +24,7 @@ type Props = {
 	connectMode: boolean;
 	onConnectModeChange: (on: boolean) => void;
 	readOnly?: boolean;
+	onStartTour?: () => void;
 };
 
 export async function copyShareLink(projectId: string): Promise<string> {
@@ -25,11 +37,42 @@ export async function copyShareLink(projectId: string): Promise<string> {
 	}
 }
 
-export function FlowMapToolbar({ mode, onModeChange, connectMode, onConnectModeChange, readOnly }: Props) {
+function ToolbarIconButton({
+	label,
+	className = 'btn-secondary',
+	children,
+	pressed,
+	...rest
+}: ButtonHTMLAttributes<HTMLButtonElement> & { label: string; pressed?: boolean; className?: string }) {
+	return (
+		<button
+			type="button"
+			className={`btn btn-sm btn-icon ${className}`}
+			aria-label={label}
+			title={label}
+			aria-pressed={pressed}
+			{...rest}
+		>
+			{children}
+		</button>
+	);
+}
+
+export function FlowMapToolbar({
+	mode,
+	onModeChange,
+	connectMode,
+	onConnectModeChange,
+	readOnly,
+	onStartTour,
+}: Props) {
 	const { state, dispatch } = useDesigner();
 	const chrome = useAppCanvasChrome();
 	const [figmaOpen, setFigmaOpen] = useState(false);
+	const [moreOpen, setMoreOpen] = useState(false);
 	const [toast, setToast] = useState<string | null>(null);
+	const moreRef = useRef<HTMLDivElement>(null);
+	const moreMenuId = useId();
 	const screenCount = state.project.frames.filter((f) => !f.ghost).length;
 
 	useEffect(() => {
@@ -37,6 +80,23 @@ export function FlowMapToolbar({ mode, onModeChange, connectMode, onConnectModeC
 		const t = window.setTimeout(() => setToast(null), 3200);
 		return () => window.clearTimeout(t);
 	}, [toast]);
+
+	useEffect(() => {
+		if (!moreOpen) return;
+		const close = (e: MouseEvent) => {
+			if (moreRef.current?.contains(e.target as Node)) return;
+			setMoreOpen(false);
+		};
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') setMoreOpen(false);
+		};
+		document.addEventListener('mousedown', close);
+		document.addEventListener('keydown', onKey);
+		return () => {
+			document.removeEventListener('mousedown', close);
+			document.removeEventListener('keydown', onKey);
+		};
+	}, [moreOpen]);
 
 	async function handleShare() {
 		if (!chrome.projectId) return;
@@ -46,6 +106,10 @@ export function FlowMapToolbar({ mode, onModeChange, connectMode, onConnectModeC
 			setToast(friendlyError(e, 'We couldn’t create a share link. Please try again.'));
 		}
 	}
+
+	const showImport = !readOnly && Boolean(chrome.projectId);
+	const showUpgrade = !readOnly && chrome.showUpgrade;
+	const showDelete = mode === 'edit' && !readOnly && Boolean(state.ui.selectedFrameId);
 
 	return (
 		<>
@@ -75,30 +139,22 @@ export function FlowMapToolbar({ mode, onModeChange, connectMode, onConnectModeC
 					)}
 					{mode === 'edit' && !readOnly ? (
 						<div className="flow-map-toolbar__tools">
-							<button
-								type="button"
-								className="btn btn-secondary btn-sm"
+							<ToolbarIconButton
+								label="Add screen"
+								data-testid="flow-add-screen"
 								onClick={() => dispatch({ type: 'addFrame', presetId: 'iphone-15' })}
 							>
-								+ Screen
-							</button>
-							<button
-								type="button"
-								className={`btn btn-sm ${connectMode ? 'btn-dark' : 'btn-secondary'}`}
-								aria-pressed={connectMode}
+								<IconAddScreen />
+							</ToolbarIconButton>
+							<ToolbarIconButton
+								label={connectMode ? 'Done connecting' : 'Connect screens'}
+								data-testid="flow-connect-screens"
+								pressed={connectMode}
+								className={connectMode ? 'btn-dark' : 'btn-secondary'}
 								onClick={() => onConnectModeChange(!connectMode)}
 							>
-								{connectMode ? 'Done connecting' : 'Connect screens'}
-							</button>
-							{state.ui.selectedFrameId ? (
-								<button
-									type="button"
-									className="btn btn-ghost btn-sm"
-									onClick={() => dispatch({ type: 'deleteFrame', frameId: state.ui.selectedFrameId! })}
-								>
-									Delete screen
-								</button>
-							) : null}
+								<IconConnect />
+							</ToolbarIconButton>
 						</div>
 					) : null}
 				</div>
@@ -108,45 +164,91 @@ export function FlowMapToolbar({ mode, onModeChange, connectMode, onConnectModeC
 							{toast}
 						</span>
 					) : null}
-					{!readOnly && chrome.showUpgrade ? (
-						<button
-							type="button"
-							className="btn btn-ghost btn-sm"
-							onClick={() =>
-								void startProCheckout()
-									.then((r) => {
-										if (r.checkoutUrl) window.location.href = r.checkoutUrl;
-										else setToast(r.message ?? 'Upgrades open soon.');
-									})
-									.catch((e) => setToast(friendlyError(e, 'Checkout isn’t available right now.')))
-							}
-						>
-							Upgrade
-						</button>
+					{onStartTour ? (
+						<ToolbarIconButton label="Take a tour" data-testid="flow-tour-help" onClick={onStartTour}>
+							<IconHelp />
+						</ToolbarIconButton>
 					) : null}
-					{!readOnly && chrome.projectId ? (
-						<button
-							type="button"
-							className="btn btn-secondary btn-sm"
-							data-testid="figma-import-open"
-							onClick={() => setFigmaOpen(true)}
+					<div className="flow-toolbar-menu" ref={moreRef}>
+						<ToolbarIconButton
+							label="More actions"
+							data-testid="flow-more-menu"
+							aria-expanded={moreOpen}
+							aria-haspopup="menu"
+							aria-controls={moreMenuId}
+							onClick={() => setMoreOpen((o) => !o)}
 						>
-							Import Figma
-						</button>
-					) : null}
+							<IconMore />
+						</ToolbarIconButton>
+						{moreOpen ? (
+							<div className="flow-toolbar-menu__panel" role="menu" id={moreMenuId}>
+								{showDelete ? (
+									<button
+										type="button"
+										role="menuitem"
+										className="flow-toolbar-menu__item flow-toolbar-menu__item--danger"
+										onClick={() => {
+											const id = state.ui.selectedFrameId;
+											if (id) dispatch({ type: 'deleteFrame', frameId: id });
+											setMoreOpen(false);
+										}}
+									>
+										<IconTrash size={16} /> Delete selected screen
+									</button>
+								) : null}
+								{showUpgrade ? (
+									<button
+										type="button"
+										role="menuitem"
+										className="flow-toolbar-menu__item"
+										onClick={() => {
+											setMoreOpen(false);
+											void startProCheckout()
+												.then((r) => {
+													if (r.checkoutUrl) window.location.href = r.checkoutUrl;
+													else setToast(r.message ?? 'Upgrades open soon.');
+												})
+												.catch((e) => setToast(friendlyError(e, 'Checkout isn’t available right now.')));
+										}}
+									>
+										<IconUpgrade size={16} /> Upgrade
+									</button>
+								) : null}
+								{showImport ? (
+									<button
+										type="button"
+										role="menuitem"
+										className="flow-toolbar-menu__item"
+										data-testid="figma-import-open"
+										onClick={() => {
+											setFigmaOpen(true);
+											setMoreOpen(false);
+										}}
+									>
+										<IconFigma size={16} /> Import Figma
+									</button>
+								) : null}
+								{!showDelete && !showUpgrade && !showImport ? (
+									<p className="flow-toolbar-menu__empty">No extra actions</p>
+								) : null}
+							</div>
+						) : null}
+					</div>
 					{!readOnly && chrome.showShare && chrome.projectId ? (
-						<button type="button" className="btn btn-secondary btn-sm" onClick={() => void handleShare()}>
-							Share
-						</button>
+						<ToolbarIconButton label="Share project" onClick={() => void handleShare()}>
+							<IconShare />
+						</ToolbarIconButton>
 					) : null}
 					<button
 						type="button"
-						className="btn btn-primary btn-sm"
+						className="btn btn-primary btn-sm flow-toolbar-prototype"
 						data-testid="flow-mode-prototype"
+						title="Open prototype"
 						onClick={() => onModeChange('prototype')}
 						disabled={screenCount === 0}
 					>
-						<span aria-hidden>▶</span> Prototype
+						<IconPlay size={16} />
+						<span>Prototype</span>
 					</button>
 				</div>
 			</div>

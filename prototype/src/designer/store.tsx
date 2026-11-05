@@ -19,6 +19,7 @@ import {
 	relayoutFrameSet,
 } from './frameLayout';
 import { boundsForFlowMapFrames } from './flowmap/flowMapLayout';
+import { duplicatePageTree } from './flowmap/duplicatePage';
 import { createInitialProject, PAGE_ID } from './initialProject';
 import type {
 	Annotation,
@@ -69,6 +70,8 @@ type Action =
 			trigger?: string;
 	  }
 	| { type: 'deleteFrame'; frameId: string }
+	| { type: 'duplicateFrame'; frameId: string }
+	| { type: 'setPrototypeEntryFrame'; frameId: string | null }
 	| { type: 'renameFrame'; frameId: string; name: string }
 	| {
 			type: 'addScreen';
@@ -312,10 +315,42 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 				(c) => c.fromFrameId !== action.frameId && c.toFrameId !== action.frameId,
 			);
 			project.annotations = project.annotations.filter((a) => a.frameId !== action.frameId);
+			if (project.prototypeEntryFrameId === action.frameId) {
+				project.prototypeEntryFrameId = null;
+			}
 			if (ui.compare) {
 				/* exit compare if needed */
 			}
 			return commit(project, { ...ui, selectedFrameId: null });
+		}
+		case 'duplicateFrame': {
+			const source = project.frames.find((f) => f.id === action.frameId);
+			if (!source || source.readOnly) return state;
+			const page = project.pages.find((p) => p.id === source.pageId);
+			if (!page) return state;
+			const copyName = `${source.name} copy`;
+			const newPage = duplicatePageTree(page, copyName);
+			project.pages.push(newPage);
+			const newFrameId = newId('frame');
+			project.frames.push({
+				id: newFrameId,
+				name: copyName,
+				pageId: newPage.id,
+				x: source.x + 48,
+				y: source.y + 48,
+				width: source.width,
+				height: source.height,
+				devicePresetId: source.devicePresetId,
+				heightMode: source.heightMode,
+				themeId: source.themeId,
+				landscape: source.landscape,
+			});
+			return commit(project, { ...ui, selectedFrameId: newFrameId });
+		}
+		case 'setPrototypeEntryFrame': {
+			if (action.frameId && !project.frames.some((f) => f.id === action.frameId)) return state;
+			project.prototypeEntryFrameId = action.frameId;
+			return commit(project);
 		}
 		case 'duplicateFrameToDevices': {
 			const source = project.frames.find((f) => f.id === action.frameId);

@@ -147,6 +147,8 @@ export type DesignerProject = {
 	canvas: { x: number; y: number; zoom: number };
 	connectors: Connector[];
 	annotations: Annotation[];
+	/** When set, prototype player starts on this screen instead of inferring from connectors. */
+	prototypeEntryFrameId?: string | null;
 };
 
 export type EditScope = 'base' | 'breakpoint';

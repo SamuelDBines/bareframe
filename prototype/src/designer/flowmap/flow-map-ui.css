@@ -702,6 +702,164 @@
 	color: #b9b4d9;
 }
 
+.flow-map-toolbar__tools {
+	border-left: 1px solid var(--bx-border);
+	padding-left: 0.65rem;
+}
+
+.flow-toolbar-prototype {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.flow-toolbar-menu {
+	position: relative;
+}
+
+.flow-toolbar-menu__panel {
+	position: absolute;
+	top: calc(100% + 6px);
+	right: 0;
+	min-width: 200px;
+	padding: 0.35rem;
+	background: var(--bx-surface);
+	border: 1px solid var(--bx-border);
+	border-radius: 12px;
+	box-shadow: var(--bx-shadow-md, 0 12px 40px rgba(20, 16, 50, 0.12));
+	z-index: 20;
+}
+
+.flow-toolbar-menu__item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+	padding: 0.45rem 0.55rem;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	font: inherit;
+	font-size: 0.85rem;
+	color: var(--bx-text);
+	cursor: pointer;
+	text-align: left;
+}
+
+.flow-toolbar-menu__item:hover {
+	background: var(--bx-surface-2, rgba(0, 0, 0, 0.04));
+}
+
+.flow-toolbar-menu__item--danger {
+	color: var(--bx-danger, #b42318);
+}
+
+.flow-toolbar-menu__empty {
+	margin: 0.35rem 0.5rem;
+	font-size: 0.8rem;
+	color: var(--bx-text-2);
+}
+
+.flow-context-menu {
+	position: fixed;
+	z-index: 50;
+	min-width: 176px;
+	padding: 0.35rem;
+	background: var(--bx-surface);
+	border: 1px solid var(--bx-border);
+	border-radius: 12px;
+	box-shadow: var(--bx-shadow-md, 0 12px 40px rgba(20, 16, 50, 0.14));
+}
+
+.flow-context-menu__sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
+.flow-context-menu__item {
+	display: block;
+	width: 100%;
+	padding: 0.45rem 0.55rem;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	font: inherit;
+	font-size: 0.85rem;
+	color: var(--bx-text);
+	text-align: left;
+	cursor: pointer;
+}
+
+.flow-context-menu__item:hover:not(:disabled) {
+	background: var(--bx-surface-2, rgba(0, 0, 0, 0.04));
+}
+
+.flow-context-menu__item:disabled {
+	opacity: 0.55;
+	cursor: default;
+}
+
+.flow-context-menu__item--danger {
+	color: var(--bx-danger, #b42318);
+}
+
+.flow-tour {
+	position: fixed;
+	inset: 0;
+	z-index: 80;
+	pointer-events: none;
+}
+
+.flow-tour__shade--full {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 12, 35, 0.55);
+}
+
+.flow-tour__card {
+	position: fixed;
+	pointer-events: auto;
+	padding: 1rem 1.1rem;
+}
+
+.flow-tour__step {
+	margin: 0 0 0.35rem;
+	font-size: 0.75rem;
+	color: var(--bx-text-2);
+}
+
+.flow-tour__card h2 {
+	margin: 0 0 0.35rem;
+	font-size: 1.05rem;
+}
+
+.flow-tour__card p {
+	margin: 0 0 0.85rem;
+	font-size: 0.88rem;
+	color: var(--bx-text-2);
+	line-height: 1.45;
+}
+
+.flow-tour__actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.flow-tour__actions-right {
+	display: flex;
+	gap: 0.35rem;
+	margin-left: auto;
+}
+
 .designer-workspace-v2--flow-map .designer-canvas-column {
 	min-height: 0;
 	height: 100%;

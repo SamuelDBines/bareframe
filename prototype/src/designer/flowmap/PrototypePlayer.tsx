@@ -16,8 +16,11 @@ import { useDesigner } from '../store';
 import type { Connector, Frame } from '../types';
 import { copyShareLink } from './FlowMapToolbar';
 
-/** Entry screen: first screen nothing links to (falls back to the left-most). */
-function entryFrame(frames: Frame[], connectors: Connector[]) {
+/** Entry screen: explicit override, else first screen nothing links to (falls back to left-most). */
+function entryFrame(frames: Frame[], connectors: Connector[], explicitEntryFrameId?: string | null) {
+	if (explicitEntryFrameId && frames.some((f) => f.id === explicitEntryFrameId)) {
+		return frames.find((f) => f.id === explicitEntryFrameId)!;
+	}
 	const targets = new Set(connectors.map((c) => c.toFrameId));
 	const sorted = [...frames].sort((a, b) => a.x - b.x || a.y - b.y);
 	return sorted.find((f) => !targets.has(f.id)) ?? sorted[0];
@@ -35,7 +38,10 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 		() => project.frames.filter((f) => !f.ghost && project.pages.some((p) => p.id === f.pageId)),
 		[project.frames, project.pages],
 	);
-	const start = useMemo(() => entryFrame(frames, project.connectors), [frames, project.connectors]);
+	const start = useMemo(
+		() => entryFrame(frames, project.connectors, project.prototypeEntryFrameId),
+		[frames, project.connectors, project.prototypeEntryFrameId],
+	);
 	const [currentId, setCurrentId] = useState<string | null>(start?.id ?? null);
 	const [history, setHistory] = useState<string[]>([]);
 	const [toast, setToast] = useState<string | null>(null);
@@ -51,7 +57,7 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 	const outgoing = frame ? project.connectors.filter((c) => c.fromFrameId === frame.id && frames.some((f) => f.id === c.toFrameId)) : [];
 	const nameOf = (id: string) => frames.find((f) => f.id === id)?.name ?? 'Next';
 
-	const metrics = frame ? prototypeDeviceMetrics(viewportKind, frame) : null;
+	const metrics = frame && page ? prototypeDeviceMetrics(viewportKind, frame, page) : null;
 	const chromeStyle = PROTOTYPE_DEVICE_CHROME[viewportKind];
 
 	useEffect(() => {
@@ -199,19 +205,33 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 								<div
 									className="proto__screen-fit"
 									style={{
-										width: frame.width,
-										height: frame.height,
-										transform: `scale(${metrics.contentScale})`,
+										width: metrics.drawnW,
+										height: metrics.drawnH,
 									}}
+									data-testid="proto-screen-fit"
+									data-content-w={metrics.contentW}
+									data-content-h={metrics.contentH}
+									data-drawn-w={Math.round(metrics.drawnW * 100) / 100}
+									data-drawn-h={Math.round(metrics.drawnH * 100) / 100}
 								>
-									<FramePreview
-										frame={frame}
-										page={page}
-										themeId={themeId}
-										customTokens={project.customTokenOverrides}
-										selectedNodeId={null}
-										onSelectNode={() => undefined}
-									/>
+									<div
+										className="proto__screen-scale"
+										style={{
+											width: metrics.contentW,
+											height: metrics.contentH,
+											transform: `scale(${metrics.contentScale})`,
+										}}
+									>
+										<FramePreview
+											frame={frame}
+											page={page}
+											themeId={themeId}
+											customTokens={project.customTokenOverrides}
+											selectedNodeId={null}
+											onSelectNode={() => undefined}
+											lockDocumentHeight
+										/>
+									</div>
 								</div>
 							</div>
 						</div>

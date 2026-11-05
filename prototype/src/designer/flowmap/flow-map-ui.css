@@ -611,22 +611,19 @@
 
 .proto__screen {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	justify-content: center;
 	overflow: hidden;
 	background: #fff;
+	box-sizing: border-box;
 }
 
 .proto__screen-fit {
 	flex-shrink: 0;
 	overflow: hidden;
-	position: relative;
 }
 
 .proto__screen-scale {
-	position: absolute;
-	top: 0;
-	left: 0;
 	transform-origin: 0 0;
 	will-change: transform;
 }

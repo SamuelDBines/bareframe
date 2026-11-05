@@ -47,6 +47,7 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 	const [toast, setToast] = useState<string | null>(null);
 	const [viewportKind, setViewportKind] = useState<PrototypeViewportKind>('phone');
 	const [stageScale, setStageScale] = useState(1);
+	const [flowBlockHeight, setFlowBlockHeight] = useState(0);
 	const closeRef = useRef<HTMLButtonElement>(null);
 	const stageRef = useRef<HTMLDivElement>(null);
 	const flowRef = useRef<HTMLDivElement>(null);
@@ -85,6 +86,7 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 		const prev = document.activeElement as HTMLElement | null;
 		closeRef.current?.focus();
 		document.body.style.overflow = 'hidden';
+		stageRef.current?.scrollTo({ top: 0, left: 0 });
 		return () => {
 			document.body.style.overflow = '';
 			prev?.focus();
@@ -97,19 +99,20 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 		if (!stage) return;
 		const fit = () => {
 			const flowH = flowRef.current?.offsetHeight ?? 0;
+			setFlowBlockHeight(flowH);
 			const stageRect = stage.getBoundingClientRect();
 			const marginX = stageRect.width < 520 ? 16 : 48;
 			const marginY = stageRect.height < 640 ? 20 : 32;
-			setStageScale(
-				prototypeStageScale(
-					metrics.outerW,
-					metrics.outerH + flowH + 16,
-					stageRect.width,
-					stageRect.height,
-					marginX,
-					marginY,
-				),
+			const nextScale = prototypeStageScale(
+				metrics.outerW,
+				metrics.outerH + flowH + 16,
+				stageRect.width,
+				stageRect.height,
+				marginX,
+				marginY,
 			);
+			setStageScale(nextScale);
+			stage.scrollTo({ top: 0, left: 0 });
 		};
 		fit();
 		const ro = new ResizeObserver(fit);
@@ -193,6 +196,7 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 						className="proto__stage-slot"
 						style={{
 							width: metrics.outerW * stageScale,
+							height: (metrics.outerH + flowBlockHeight + 16) * stageScale,
 							maxWidth: '100%',
 						}}
 					>

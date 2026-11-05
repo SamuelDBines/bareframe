@@ -4,6 +4,7 @@ import {
 	useContext,
 	useMemo,
 	useReducer,
+	useRef,
 	type ReactNode,
 } from 'react';
 import type { ThemeId } from '../theme/themes';
@@ -640,6 +641,8 @@ const DesignerContext = createContext<DesignerContextValue | null>(null);
 
 export function DesignerProvider({ children }: { children: ReactNode }) {
 	const [state, dispatch] = useReducer(reducer, initialState);
+	const stateRef = useRef(state);
+	stateRef.current = state;
 
 	const getCanvasViewport = () => {
 		const flowEl = document.querySelector('.flow-map-viewport');
@@ -651,7 +654,7 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 	};
 
 	const fitAll = useCallback(() => {
-		const { ui, project } = state;
+		const { ui, project } = stateRef.current;
 		const flowMap = Boolean(document.querySelector('.flow-map-viewport'));
 		const frames = flowMap
 			? project.frames.filter((f) => !f.ghost && project.pages.some((p) => p.id === f.pageId))
@@ -678,10 +681,10 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 		const { w: viewW, h: viewH } = getCanvasViewport();
 		const cam = cameraToFitBounds(bounds, viewW, viewH, flowMap ? 80 : 40);
 		dispatch({ type: 'setCamera', patch: cam });
-	}, [state]);
+	}, []);
 
 	const fitSelection = useCallback(() => {
-		const f = state.project.frames.find((fr) => fr.id === state.ui.selectedFrameId);
+		const f = stateRef.current.project.frames.find((fr) => fr.id === stateRef.current.ui.selectedFrameId);
 		if (!f) {
 			fitAll();
 			return;
@@ -699,7 +702,7 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 			48,
 		);
 		dispatch({ type: 'setCamera', patch: cam });
-	}, [state, fitAll]);
+	}, [fitAll]);
 
 	const value = useMemo(
 		() => ({ state, dispatch, fitAll, fitSelection }),

@@ -26,6 +26,8 @@ import { NewProductPage } from './pages/designer/NewProductPage';
 import { PackageGeneratingPage } from './pages/designer/PackageGeneratingPage';
 import { PackageReviewPage } from './pages/designer/PackageReviewPage';
 import { FlowMapDemoPage } from './pages/designer/FlowMapDemoPage';
+import { DemoSaasOnboardingPage } from './pages/designer/DemoSaasOnboardingPage';
+import { DemoCommerceBookingPage } from './pages/designer/DemoCommerceBookingPage';
 
 function DocsRedirect() {
 	const { pathname } = useLocation();
@@ -73,6 +75,8 @@ export default function App() {
 						<Route path="demo/journey-review" element={<DemoJourneyReviewPage />} />
 						<Route path="demo/share-canvas" element={<DemoShareCanvasPage />} />
 						<Route path="demo/flow-map" element={<FlowMapDemoPage />} />
+						<Route path="demo/saas-onboarding" element={<DemoSaasOnboardingPage />} />
+						<Route path="demo/commerce-booking" element={<DemoCommerceBookingPage />} />
 
 						<Route path="designer/*" element={<Navigate to="/app" replace />} />
 

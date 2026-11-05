@@ -1487,6 +1487,20 @@
 	gap: 2rem;
 }
 
+.demo-flow-example__stage {
+	height: min(760px, calc(100vh - var(--bx-header-h, 64px) - 11rem));
+	min-height: 480px;
+	margin-top: 1.5rem;
+	border: 1px solid color-mix(in srgb, var(--bx-border, #d8d3ef) 80%, transparent);
+	border-radius: var(--bx-radius-lg, 16px);
+	overflow: hidden;
+	background: var(--bx-surface-2, #f6f4ff);
+}
+
+.demo-flow-example__stage .designer-workspace-v2 {
+	height: 100%;
+}
+
 @media (max-width: 1100px) {
 	.examples {
 		grid-template-columns: 1fr 1fr;

@@ -771,6 +771,72 @@ html.designer-app .frame-preview-shell--ready {
 	opacity: 1;
 }
 
+.device-viewport-switch {
+	display: inline-flex;
+	border-radius: var(--bx-pill);
+	border: 1px solid rgb(255 255 255 / 14%);
+	background: rgb(255 255 255 / 6%);
+	overflow: hidden;
+}
+
+.device-viewport-switch button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	border: none;
+	background: transparent;
+	color: rgb(255 255 255 / 72%);
+	font: 600 0.78rem var(--bx-font, system-ui, sans-serif);
+	padding: 0.45rem 0.65rem;
+	cursor: pointer;
+	transition:
+		background var(--bx-fast, 0.15s) ease,
+		color var(--bx-fast, 0.15s) ease;
+}
+
+.device-viewport-switch button:hover {
+	background: rgb(255 255 255 / 10%);
+	color: #fff;
+}
+
+.device-viewport-switch button.is-active {
+	background: rgb(255 255 255 / 16%);
+	color: #fff;
+}
+
+.device-viewport-switch button:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: -2px;
+}
+
+.device-viewport-switch--canvas {
+	border-color: var(--ds-border);
+	background: var(--ds-surface-2, rgb(255 255 255 / 92%));
+}
+
+.device-viewport-switch--canvas button {
+	color: var(--ds-text-2);
+}
+
+.device-viewport-switch--canvas button.is-active {
+	background: var(--ds-accent, #5b3df5);
+	color: #fff;
+}
+
+@media (max-width: 640px) {
+	.device-viewport-switch__label {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+	}
+}
+
+html.designer-app .canvas-subtoolbar .device-viewport-switch--canvas {
+	flex-shrink: 0;
+}
+
 .ds-review-body {
 	padding: 1.25rem 1.75rem 2rem;
 	display: flex;

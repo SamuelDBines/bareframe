@@ -1,6 +1,12 @@
 import { Select } from '../../components/Select';
 import { THEME_IDS, THEME_LABELS, type ThemeId } from '../../theme/themes';
 import { DEFAULT_DEVICE_PRESETS, DUPLICATE_TO_DEVICES_DEFAULT } from '../devicePresets';
+import {
+	presetIdForViewportKind,
+	prototypeViewportKindForFrame,
+	type PrototypeViewportKind,
+} from '../prototypeDeviceViewport';
+import { DeviceViewportSwitcher } from './DeviceViewportSwitcher';
 import { useDesigner } from '../store';
 import { useAppCanvasChrome } from '../AppCanvasChrome';
 import { createProjectShare, startProCheckout } from '../../app/reviewApi';
@@ -16,6 +22,9 @@ export function CanvasToolbar() {
 	const { state, dispatch } = useDesigner();
 	const { project, ui } = state;
 	const frame = project.frames.find((f) => f.id === ui.selectedFrameId);
+	const canvasViewportKind: PrototypeViewportKind = frame
+		? prototypeViewportKindForFrame(frame)
+		: 'phone';
 	const compareValue = compareSelectValue(ui.compare);
 	const chrome = useAppCanvasChrome();
 	const [toast, setToast] = useState<string | null>(null);
@@ -61,6 +70,15 @@ export function CanvasToolbar() {
 					{toast ? <span className="canvas-app-toast">{toast}</span> : null}
 				</div>
 			)}
+			<DeviceViewportSwitcher
+				className="device-viewport-switch--canvas"
+				value={canvasViewportKind}
+				aria-label="Frame device size"
+				onChange={(kind) => {
+					if (!frame) return;
+					dispatch({ type: 'setFrameDevice', frameId: frame.id, presetId: presetIdForViewportKind(kind) });
+				}}
+			/>
 			<div className="canvas-subtoolbar-mobile-toggles">
 				<button
 					type="button"

@@ -1,5 +1,9 @@
 import { getDevicePreset } from './devicePresets';
-import type { Frame } from './types';
+import { framePreviewContentDimensions } from './framePreviewContentBounds';
+import type { Frame, Page } from './types';
+
+/** Inset inside the shell so rounded corners do not crop edge labels. */
+export const PROTOTYPE_SHELL_SAFE_INSET = 2;
 
 export type PrototypeViewportKind = 'phone' | 'tablet' | 'desktop';
 
@@ -48,7 +52,11 @@ export type PrototypeDeviceMetrics = {
 	shellH: number;
 	outerW: number;
 	outerH: number;
+	contentW: number;
+	contentH: number;
 	contentScale: number;
+	drawnW: number;
+	drawnH: number;
 	contentOffsetX: number;
 	contentOffsetY: number;
 };
@@ -56,14 +64,19 @@ export type PrototypeDeviceMetrics = {
 export function prototypeDeviceMetrics(
 	viewportKind: PrototypeViewportKind,
 	frame: Frame,
+	page?: Page,
 ): PrototypeDeviceMetrics {
 	const shell = PROTOTYPE_VIEWPORT_PRESETS[viewportKind];
 	const chrome = PROTOTYPE_DEVICE_CHROME[viewportKind];
 	const shellW = shell.width;
 	const shellH = shell.height;
-	const contentScale = letterboxContentScale(shellW, shellH, frame.width, frame.height);
-	const drawnW = frame.width * contentScale;
-	const drawnH = frame.height * contentScale;
+	const { width: contentW, height: contentH } = framePreviewContentDimensions(frame, page);
+	const inset = PROTOTYPE_SHELL_SAFE_INSET;
+	const innerW = shellW - inset * 2;
+	const innerH = shellH - inset * 2;
+	const contentScale = letterboxContentScale(innerW, innerH, contentW, contentH);
+	const drawnW = contentW * contentScale;
+	const drawnH = contentH * contentScale;
 	const contentOffsetX = (shellW - drawnW) / 2;
 	const contentOffsetY = (shellH - drawnH) / 2;
 	const outerW = shellW + chrome.padding * 2;
@@ -73,7 +86,11 @@ export function prototypeDeviceMetrics(
 		shellH,
 		outerW,
 		outerH,
+		contentW,
+		contentH,
 		contentScale,
+		drawnW,
+		drawnH,
 		contentOffsetX,
 		contentOffsetY,
 	};

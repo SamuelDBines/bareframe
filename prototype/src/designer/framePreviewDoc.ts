@@ -91,6 +91,7 @@ function escapeHtml(s: string) {
 export function buildFramePreviewDoc(opts: {
 	page: Page;
 	frameWidth: number;
+	frameHeight?: number;
 	themeId: ThemeId;
 	tokenOverrides: Record<string, string>;
 	trial?: StyleTrial;
@@ -100,7 +101,7 @@ export function buildFramePreviewDoc(opts: {
 	/** @deprecated use previewCss */
 	themeCss?: string;
 }): string {
-	const { page, frameWidth, themeId, tokenOverrides, trial, selectedNodeId, previewCss, themeCss } = opts;
+	const { page, frameWidth, frameHeight, themeId, tokenOverrides, trial, selectedNodeId, previewCss, themeCss } = opts;
 	const root = page.nodes[page.rootNodeId];
 	const overrides = { ...tokenOverrides, ...(trial?.tokenOverrides ?? {}) };
 	const varBlock = Object.entries(overrides)
@@ -120,6 +121,11 @@ export function buildFramePreviewDoc(opts: {
 <link rel="stylesheet" href="assets/frame-preview/bareframe-ui.css" />
 <link rel="stylesheet" href="assets/frame-preview/button.css" />`;
 
+	const bodyHeight =
+		frameHeight != null
+			? `height:${frameHeight}px;overflow:hidden;`
+			: 'min-height:100%;';
+
 	return `<!DOCTYPE html>
 <html data-bf-theme="${themeId}">
 <head>
@@ -128,7 +134,7 @@ export function buildFramePreviewDoc(opts: {
 <meta name="viewport" content="width=${frameWidth}" />
 ${linkedStyles}
 <style>
-  html, body { margin:0; min-height:100%; font-family:var(--bf-theme-font-family, system-ui, sans-serif); font-size:16px; background:var(--bf-theme-surface-2); color:var(--bf-theme-text-1); touch-action:none; overscroll-behavior:none; -webkit-font-smoothing:antialiased; }
+  html, body { margin:0; ${bodyHeight} font-family:var(--bf-theme-font-family, system-ui, sans-serif); font-size:16px; background:var(--bf-theme-surface-2); color:var(--bf-theme-text-1); touch-action:none; overscroll-behavior:none; -webkit-font-smoothing:antialiased; box-sizing:border-box; }
   p { margin:0; color:var(--bf-theme-text-2); line-height:var(--bf-theme-typography-line-height, 1.45); }
   .bf-row, .bf-stack { width:100%; box-sizing:border-box; }
   .bf-section { background:var(--bf-theme-surface-1); border:1px solid var(--bf-theme-border-1); border-radius:var(--bf-theme-radius-md,8px); box-sizing:border-box; }

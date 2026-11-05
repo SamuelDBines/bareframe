@@ -615,7 +615,12 @@
 
 .proto__screen-fit {
 	flex-shrink: 0;
-	transform-origin: center center;
+	overflow: visible;
+}
+
+.proto__screen-scale {
+	transform-origin: 0 0;
+	will-change: transform;
 }
 
 .proto__screen-fit .frame-preview-shell {

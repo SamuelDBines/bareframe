@@ -3,13 +3,18 @@ import { createPortal } from 'react-dom';
 import { friendlyError } from '../../app/apiError';
 import type { ThemeId } from '../../theme/themes';
 import { useAppCanvasChrome } from '../AppCanvasChrome';
+import { DeviceViewportSwitcher } from '../components/DeviceViewportSwitcher';
 import { FramePreview } from '../components/FramePreview';
+import {
+	PROTOTYPE_DEVICE_CHROME,
+	type PrototypeViewportKind,
+	prototypeDeviceMetrics,
+	prototypeStageScale,
+	prototypeViewportKindForFrame,
+} from '../prototypeDeviceViewport';
 import { useDesigner } from '../store';
 import type { Connector, Frame } from '../types';
 import { copyShareLink } from './FlowMapToolbar';
-
-const DEVICE_W = 393;
-const DEVICE_H = 760;
 
 /** Entry screen: first screen nothing links to (falls back to the left-most). */
 function entryFrame(frames: Frame[], connectors: Connector[]) {
@@ -34,14 +39,25 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 	const [currentId, setCurrentId] = useState<string | null>(start?.id ?? null);
 	const [history, setHistory] = useState<string[]>([]);
 	const [toast, setToast] = useState<string | null>(null);
-	const [scale, setScale] = useState(1);
+	const [viewportKind, setViewportKind] = useState<PrototypeViewportKind>('phone');
+	const [stageScale, setStageScale] = useState(1);
 	const closeRef = useRef<HTMLButtonElement>(null);
+	const stageRef = useRef<HTMLDivElement>(null);
+	const flowRef = useRef<HTMLDivElement>(null);
 
 	const frame = frames.find((f) => f.id === currentId) ?? start;
 	const page = frame ? project.pages.find((p) => p.id === frame.pageId) : null;
 	const themeId = (frame?.themeId ?? project.defaultThemeId) as ThemeId;
 	const outgoing = frame ? project.connectors.filter((c) => c.fromFrameId === frame.id && frames.some((f) => f.id === c.toFrameId)) : [];
 	const nameOf = (id: string) => frames.find((f) => f.id === id)?.name ?? 'Next';
+
+	const metrics = frame ? prototypeDeviceMetrics(viewportKind, frame) : null;
+	const chromeStyle = PROTOTYPE_DEVICE_CHROME[viewportKind];
+
+	useEffect(() => {
+		if (!frame) return;
+		setViewportKind(prototypeViewportKindForFrame(frame));
+	}, [frame?.id]);
 
 	const go = (to: string) => {
 		if (!frame) return;
@@ -63,15 +79,33 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 		const prev = document.activeElement as HTMLElement | null;
 		closeRef.current?.focus();
 		document.body.style.overflow = 'hidden';
-		const fit = () => setScale(Math.min(1, (window.innerHeight - 170) / DEVICE_H, (window.innerWidth - 120) / DEVICE_W));
-		fit();
-		window.addEventListener('resize', fit);
 		return () => {
 			document.body.style.overflow = '';
-			window.removeEventListener('resize', fit);
 			prev?.focus();
 		};
 	}, []);
+
+	useEffect(() => {
+		if (!metrics) return;
+		const stage = stageRef.current;
+		if (!stage) return;
+		const fit = () => {
+			const flowH = flowRef.current?.offsetHeight ?? 0;
+			const stageRect = stage.getBoundingClientRect();
+			setStageScale(
+				prototypeStageScale(metrics.outerW, metrics.outerH + flowH + 16, stageRect.width, stageRect.height),
+			);
+		};
+		fit();
+		const ro = new ResizeObserver(fit);
+		ro.observe(stage);
+		if (flowRef.current) ro.observe(flowRef.current);
+		window.addEventListener('resize', fit);
+		return () => {
+			ro.disconnect();
+			window.removeEventListener('resize', fit);
+		};
+	}, [metrics?.outerW, metrics?.outerH, outgoing.length]);
 
 	useEffect(() => {
 		const onKey = (e: KeyboardEvent) => {
@@ -104,6 +138,9 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 						{frame?.name ?? 'No screens'} · step {step}
 					</span>
 				</div>
+				<div className="proto__bar-center">
+					<DeviceViewportSwitcher value={viewportKind} onChange={setViewportKind} className="device-viewport-switch--proto" />
+				</div>
 				<div className="proto__actions">
 					{toast ? (
 						<span className="proto__toast" role="status">
@@ -135,43 +172,72 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 				</div>
 			</header>
 
-			<div className="proto__stage">
-				{frame && page ? (
-					<div className="proto__device-wrap" style={{ width: DEVICE_W * scale, height: DEVICE_H * scale }}>
-						<div className="proto__device" style={{ width: DEVICE_W, height: DEVICE_H, transform: `scale(${scale})` }}>
-							<div className="proto__screen bx-reveal" key={frame.id}>
-								<FramePreview
-									frame={{ ...frame, width: DEVICE_W, height: DEVICE_H }}
-									page={page}
-									themeId={themeId}
-									customTokens={project.customTokenOverrides}
-									selectedNodeId={null}
-									onSelectNode={() => undefined}
-								/>
+			<div className="proto__stage" ref={stageRef}>
+				{frame && page && metrics ? (
+					<div
+						className="proto__device-stack"
+						style={{ transform: `scale(${stageScale})`, width: metrics.outerW, maxWidth: '100%' }}
+						data-viewport={viewportKind}
+					>
+						<div
+							className={`proto__device proto__device--${viewportKind}`}
+							style={{
+								width: metrics.outerW,
+								height: metrics.outerH,
+								padding: chromeStyle.padding,
+								borderRadius: chromeStyle.radius,
+							}}
+						>
+							<div
+								className="proto__screen"
+								style={{
+									width: metrics.shellW,
+									height: metrics.shellH,
+									borderRadius: chromeStyle.screenRadius,
+								}}
+							>
+								<div
+									className="proto__screen-fit"
+									style={{
+										width: frame.width,
+										height: frame.height,
+										transform: `scale(${metrics.contentScale})`,
+									}}
+								>
+									<FramePreview
+										frame={frame}
+										page={page}
+										themeId={themeId}
+										customTokens={project.customTokenOverrides}
+										selectedNodeId={null}
+										onSelectNode={() => undefined}
+									/>
+								</div>
 							</div>
-							<div className="proto__hotspots">
-								{outgoing.map((c, i) => (
-									<button
-										key={c.id}
-										type="button"
-										className="proto-hotspot"
-										onClick={() => go(c.toFrameId)}
-										aria-label={`${c.label ?? 'Next'}: go to ${nameOf(c.toFrameId)} (key ${i + 1})`}
-									>
-										<kbd>{i + 1}</kbd>
-										<span>{c.label ?? 'Next'}</span>
-										<em>→ {nameOf(c.toFrameId)}</em>
+						</div>
+
+						<div className="proto__flow" ref={flowRef}>
+							{outgoing.map((c, i) => (
+								<button
+									key={c.id}
+									type="button"
+									className="proto-hotspot"
+									onClick={() => go(c.toFrameId)}
+									aria-label={`${c.label ?? 'Next'}: go to ${nameOf(c.toFrameId)} (key ${i + 1})`}
+								>
+									<kbd>{i + 1}</kbd>
+									<span>{c.label ?? 'Next'}</span>
+									<em>→ {nameOf(c.toFrameId)}</em>
+								</button>
+							))}
+							{outgoing.length === 0 ? (
+								<div className="proto-end">
+									<strong>End of this path</strong>
+									<button type="button" className="proto__btn" onClick={restart}>
+										Start again
 									</button>
-								))}
-								{outgoing.length === 0 ? (
-									<div className="proto-end">
-										<strong>End of this path</strong>
-										<button type="button" className="proto__btn" onClick={restart}>
-											Start again
-										</button>
-									</div>
-								) : null}
-							</div>
+								</div>
+							) : null}
 						</div>
 					</div>
 				) : (

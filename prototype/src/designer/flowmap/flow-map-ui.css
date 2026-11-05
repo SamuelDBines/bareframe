@@ -490,11 +490,31 @@
 }
 
 .proto__bar {
-	display: flex;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
 	align-items: center;
-	justify-content: space-between;
-	gap: 1rem;
+	gap: 0.75rem;
 	padding: 0.85rem 1.25rem;
+}
+
+.proto__bar-center {
+	display: flex;
+	justify-content: center;
+}
+
+@media (max-width: 720px) {
+	.proto__bar {
+		grid-template-columns: 1fr;
+	}
+
+	.proto__bar-center {
+		order: 3;
+	}
+
+	.proto__actions {
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
 }
 
 .proto__title {
@@ -511,6 +531,7 @@
 .proto__actions {
 	display: flex;
 	align-items: center;
+	justify-content: flex-end;
 	gap: 0.5rem;
 }
 
@@ -556,35 +577,56 @@
 .proto__stage {
 	flex: 1;
 	min-height: 0;
-	display: grid;
-	place-items: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.5rem 1rem 0;
+	overflow: auto;
+}
+
+.proto__device-stack {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	transform-origin: top center;
 }
 
 .proto__device {
 	position: relative;
-	transform-origin: 0 0;
-	border-radius: 54px;
-	padding: 14px;
+	box-sizing: border-box;
 	background: #1b1838;
 	box-shadow:
 		0 0 0 2px rgb(255 255 255 / 8%),
 		0 40px 100px rgb(0 0 0 / 50%);
-	box-sizing: content-box;
+}
+
+.proto__device--desktop {
+	background: #252340;
 }
 
 .proto__screen {
-	width: 100%;
-	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	overflow: hidden;
-	border-radius: 40px;
 	background: #fff;
 }
 
-.proto__hotspots {
-	position: absolute;
-	left: 28px;
-	right: 28px;
-	bottom: 34px;
+.proto__screen-fit {
+	flex-shrink: 0;
+	transform-origin: center center;
+}
+
+.proto__screen-fit .frame-preview-shell {
+	width: 100%;
+	height: 100%;
+	border-radius: 0;
+	opacity: 1;
+}
+
+.proto__flow {
+	width: min(100%, 420px);
 	display: flex;
 	flex-direction: column;
 	gap: 8px;

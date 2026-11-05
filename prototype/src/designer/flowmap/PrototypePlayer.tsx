@@ -11,8 +11,11 @@ import { copyShareLink } from './FlowMapToolbar';
 const DEVICE_W = 393;
 const DEVICE_H = 760;
 
-/** Entry screen: first screen nothing links to (falls back to the left-most). */
-function entryFrame(frames: Frame[], connectors: Connector[]) {
+/** Entry screen: explicit override, else first screen nothing links to (falls back to left-most). */
+function entryFrame(frames: Frame[], connectors: Connector[], explicitEntryFrameId?: string | null) {
+	if (explicitEntryFrameId && frames.some((f) => f.id === explicitEntryFrameId)) {
+		return frames.find((f) => f.id === explicitEntryFrameId)!;
+	}
 	const targets = new Set(connectors.map((c) => c.toFrameId));
 	const sorted = [...frames].sort((a, b) => a.x - b.x || a.y - b.y);
 	return sorted.find((f) => !targets.has(f.id)) ?? sorted[0];
@@ -30,7 +33,10 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 		() => project.frames.filter((f) => !f.ghost && project.pages.some((p) => p.id === f.pageId)),
 		[project.frames, project.pages],
 	);
-	const start = useMemo(() => entryFrame(frames, project.connectors), [frames, project.connectors]);
+	const start = useMemo(
+		() => entryFrame(frames, project.connectors, project.prototypeEntryFrameId),
+		[frames, project.connectors, project.prototypeEntryFrameId],
+	);
 	const [currentId, setCurrentId] = useState<string | null>(start?.id ?? null);
 	const [history, setHistory] = useState<string[]>([]);
 	const [toast, setToast] = useState<string | null>(null);

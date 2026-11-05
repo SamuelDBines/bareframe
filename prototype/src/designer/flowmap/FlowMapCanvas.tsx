@@ -15,6 +15,7 @@ import {
 	routeConnectors,
 } from './flowMapLayout';
 import { panCamera, setCameraZoomAtScreenPoint, zoomCameraAroundPoint, type Camera } from '../camera';
+import type { ContextMenuState } from './FlowMapContextMenu';
 
 const THUMB_SCALE = FLOW_CARD_WIDTH / 393;
 const SEV_LABEL: Record<Severity, string> = { critical: 'Critical', major: 'Major', minor: 'Minor', info: 'Info' };
@@ -104,6 +105,8 @@ function FlowMapCard({
 	connectMode,
 	connectSource,
 	readOnly,
+	onContextMenu,
+	onMenuKey,
 }: {
 	frame: Frame;
 	page: Page;
@@ -119,6 +122,8 @@ function FlowMapCard({
 	connectMode?: boolean;
 	connectSource?: boolean;
 	readOnly?: boolean;
+	onContextMenu?: (e: React.MouseEvent, frame: Frame) => void;
+	onMenuKey?: (e: React.KeyboardEvent, frame: Frame) => void;
 }) {
 	const review = useReview();
 	const dragRef = useRef<{ x: number; y: number; ox: number; oy: number; moved: boolean } | null>(null);
@@ -158,17 +163,30 @@ function FlowMapCard({
 				window.addEventListener('pointermove', onMove);
 				window.addEventListener('pointerup', onUp);
 			}}
+			onContextMenu={(e) => {
+				if (readOnly) return;
+				e.preventDefault();
+				e.stopPropagation();
+				onContextMenu?.(e, frame);
+			}}
 		>
 			<button
 				type="button"
 				className="flow-map-card__hit"
 				data-frame-id={frame.id}
+				data-testid="flow-map-card-hit"
 				aria-pressed={selected}
+				aria-haspopup="menu"
 				aria-label={`${frame.name}${openCount ? `, ${openCount} open finding${openCount === 1 ? '' : 's'}` : ''}`}
 				onKeyDown={(e) => {
 					if (e.key === 'Enter' || e.key === ' ') {
 						e.preventDefault();
 						onSelect();
+						return;
+					}
+					if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
+						e.preventDefault();
+						onMenuKey?.(e, frame);
 					}
 				}}
 			/>
@@ -211,11 +229,16 @@ export function FlowMapCanvas({
 	connectFromFrameId,
 	onConnectFrameSelect,
 	readOnly,
+	onContextMenuChange,
 }: {
 	connectMode?: boolean;
 	connectFromFrameId?: string | null;
 	onConnectFrameSelect?: (frameId: string) => void;
 	readOnly?: boolean;
+	onContextMenuChange?: (menu: ContextMenuState) => void;
+	onRenameFrame?: (frameId: string, currentName: string) => void;
+	onRequestDeleteFrame?: (frame: Frame, connectorCount: number) => void;
+	onAddScreenFromMenu?: () => void;
 }) {
 	const { state, dispatch, fitAll } = useDesigner();
 	const review = useReview();
@@ -434,6 +457,15 @@ export function FlowMapCanvas({
 	const svgW = bounds.maxX + 400;
 	const svgH = bounds.maxY + 400;
 
+	const openContextMenu = (clientX: number, clientY: number, frame: Frame) => {
+		dispatch({ type: 'selectFrame', frameId: frame.id });
+		onContextMenuChange?.({ kind: 'frame', frame, x: clientX, y: clientY });
+	};
+
+	const openCanvasMenu = (clientX: number, clientY: number) => {
+		onContextMenuChange?.({ kind: 'canvas', x: clientX, y: clientY });
+	};
+
 	return (
 		<div
 			className={`flow-map-viewport${connectMode ? ' is-connecting' : ''}`}
@@ -448,6 +480,11 @@ export function FlowMapCanvas({
 		>
 			<div
 				className="flow-map-grid"
+				onContextMenu={(e) => {
+					if (readOnly || e.target !== e.currentTarget) return;
+					e.preventDefault();
+					openCanvasMenu(e.clientX, e.clientY);
+				}}
 				onPointerDown={(e) => {
 					if (e.target !== e.currentTarget) return;
 					dispatch({ type: 'selectFrame', frameId: null });
@@ -528,6 +565,11 @@ export function FlowMapCanvas({
 								connectMode={connectMode}
 								connectSource={connectFromFrameId === frame.id}
 								readOnly={readOnly}
+								onContextMenu={(e, fr) => openContextMenu(e.clientX, e.clientY, fr)}
+								onMenuKey={(e, fr) => {
+									const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+									openContextMenu(rect.left + rect.width / 2, rect.top + 8, fr);
+								}}
 							/>
 						);
 					})}

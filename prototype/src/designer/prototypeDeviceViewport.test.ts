@@ -6,6 +6,7 @@ import {
 	letterboxContentScale,
 	prototypeDeviceMetrics,
 	prototypeStageScale,
+	prototypeStageSlotWidth,
 	prototypeViewportKindForFrame,
 } from './prototypeDeviceViewport';
 import type { Frame } from './types';
@@ -62,6 +63,11 @@ describe('prototypeDeviceViewport', () => {
 		const innerW = 390 - PROTOTYPE_SHELL_SAFE_INSET * 2;
 		const innerH = 844 - PROTOTYPE_SHELL_SAFE_INSET * 2;
 		expect(letterboxContentScale(innerW, innerH, 393, 852)).toBeCloseTo(Math.min(innerW / 393, innerH / 852), 5);
+	});
+
+	it('reserves layout width for stage transform scale', () => {
+		expect(prototypeStageSlotWidth(418, 0.5, 900)).toBe(209);
+		expect(prototypeStageSlotWidth(418, 0.5, 180)).toBe(180);
 	});
 });
 

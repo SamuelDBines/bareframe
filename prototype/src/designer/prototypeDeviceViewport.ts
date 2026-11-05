@@ -109,3 +109,8 @@ export function prototypeStageScale(
 	const availH = Math.max(160, stageH - marginY);
 	return Math.min(1, availW / outerW, availH / outerH);
 }
+
+/** Layout width reserved for a scaled stack (transform does not affect layout). */
+export function prototypeStageSlotWidth(outerW: number, stageScale: number, stageWidth: number): number {
+	return Math.min(outerW * stageScale, stageWidth);
+}

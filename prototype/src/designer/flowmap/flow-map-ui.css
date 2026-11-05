@@ -584,6 +584,10 @@
 	overflow: auto;
 }
 
+.proto__stage-slot {
+	margin-inline: auto;
+}
+
 .proto__device-stack {
 	display: flex;
 	flex-direction: column;
@@ -615,10 +619,14 @@
 
 .proto__screen-fit {
 	flex-shrink: 0;
-	overflow: visible;
+	overflow: hidden;
+	position: relative;
 }
 
 .proto__screen-scale {
+	position: absolute;
+	top: 0;
+	left: 0;
 	transform-origin: 0 0;
 	will-change: transform;
 }

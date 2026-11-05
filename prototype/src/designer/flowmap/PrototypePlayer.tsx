@@ -98,8 +98,17 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 		const fit = () => {
 			const flowH = flowRef.current?.offsetHeight ?? 0;
 			const stageRect = stage.getBoundingClientRect();
+			const marginX = stageRect.width < 520 ? 16 : 48;
+			const marginY = stageRect.height < 640 ? 20 : 32;
 			setStageScale(
-				prototypeStageScale(metrics.outerW, metrics.outerH + flowH + 16, stageRect.width, stageRect.height),
+				prototypeStageScale(
+					metrics.outerW,
+					metrics.outerH + flowH + 16,
+					stageRect.width,
+					stageRect.height,
+					marginX,
+					marginY,
+				),
 			);
 		};
 		fit();
@@ -181,10 +190,22 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 			<div className="proto__stage" ref={stageRef}>
 				{frame && page && metrics ? (
 					<div
-						className="proto__device-stack"
-						style={{ transform: `scale(${stageScale})`, width: metrics.outerW, maxWidth: '100%' }}
-						data-viewport={viewportKind}
+						className="proto__stage-slot"
+						style={{
+							width: metrics.outerW * stageScale,
+							maxWidth: '100%',
+						}}
 					>
+						<div
+							className="proto__device-stack"
+							style={{
+								width: metrics.outerW,
+								transform: `scale(${stageScale})`,
+								transformOrigin: 'top center',
+							}}
+							data-viewport={viewportKind}
+							data-stage-scale={Math.round(stageScale * 1000) / 1000}
+						>
 						<div
 							className={`proto__device proto__device--${viewportKind}`}
 							style={{
@@ -259,6 +280,7 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 								</div>
 							) : null}
 						</div>
+					</div>
 					</div>
 				) : (
 					<p className="proto__empty">Add screens to the map to preview the flow.</p>

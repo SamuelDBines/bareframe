@@ -6,6 +6,7 @@ import {
 } from '../../app/reviewApi';
 import { fetchProject, fromProjectDocument } from '../projectApi';
 import { useDesigner } from '../store';
+import { friendlyError } from '../../app/apiError';
 
 type Props = {
   projectId: string;
@@ -14,7 +15,7 @@ type Props = {
 
 export function FigmaImportDialog({ projectId, onClose }: Props) {
   const { dispatch } = useDesigner();
-  const [url, setUrl] = useState('https://www.figma.com/design/demo/Hookoh');
+  const [url, setUrl] = useState('');
   const [token, setToken] = useState('');
   const [saveToken, setSaveTokenFlag] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -43,17 +44,17 @@ export function FigmaImportDialog({ projectId, onClose }: Props) {
       setTokenHint(`Imported ${result.framesImported} screens · ${result.fileName}`);
       window.setTimeout(onClose, 600);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Import failed');
+      setError(friendlyError(e, 'Import failed'));
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="flow-map-dialog-backdrop" role="dialog" aria-labelledby="figma-import-title">
-      <div className="flow-map-dialog">
+    <div className="bx-dialog-backdrop">
+      <div className="bx-dialog flow-map-dialog" role="dialog" aria-modal="true" aria-labelledby="figma-import-title">
         <h2 id="figma-import-title">Import from Figma</h2>
-        <p className="flow-map-dialog__hint">
+        <p className="bx-hint">
           Paste a Figma design or frame URL. Frames become screens; prototype links become connectors.
         </p>
         <label className="field">
@@ -79,13 +80,18 @@ export function FigmaImportDialog({ projectId, onClose }: Props) {
           <input type="checkbox" checked={saveToken} onChange={(e) => setSaveTokenFlag(e.target.checked)} />
           <span>Save token to my account</span>
         </label>
-        {tokenHint ? <p className="flow-map-dialog__hint">{tokenHint}</p> : null}
-        {error ? <p className="app-error">{error}</p> : null}
-        <div className="flow-map-dialog__actions">
+        {tokenHint ? <p className="bx-hint">{tokenHint}</p> : null}
+        {error ? (
+          <div className="bx-notice bx-notice--warn" role="alert">
+            <span className="bx-notice__icon" aria-hidden>!</span>
+            <p>{error}</p>
+          </div>
+        ) : null}
+        <div className="bx-dialog__actions">
           <button type="button" className="btn btn-ghost" onClick={onClose} disabled={busy}>
             Cancel
           </button>
-          <button type="button" className="btn btn-primary" onClick={() => void submit()} disabled={busy}>
+          <button type="button" className="btn btn-primary" onClick={() => void submit()} disabled={busy || !/figma\.com\//.test(url)}>
             {busy ? 'Importing…' : 'Import frames'}
           </button>
         </div>

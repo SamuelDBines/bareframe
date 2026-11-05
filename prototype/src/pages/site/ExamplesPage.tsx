@@ -1,43 +1,71 @@
 import { Link } from 'react-router-dom';
+import '../../marketing/marketing.css';
 
 const EXAMPLES = [
   {
-    title: 'Barber booking journey',
-    body: 'Package-generated flows with sign-in, queue, and booking screens — ready for an AI review pass.',
+    title: 'Social queue sign-in',
+    body: 'Three screens from landing to queue, with AI findings pinned to the map. Try “Apply fix” and the prototype.',
     to: '/demo/journey-review',
+    cta: 'Open project',
+    tag: 'Flow map + AI review',
   },
   {
-    title: 'Flow map from URLs',
-    body: 'See how screens and connectors compose a multi-step journey on the canvas.',
+    title: 'Branching SaaS onboarding',
+    body: 'Welcome → signup → verify → dashboard, with forgot-password and error/retry paths laid out on the map.',
+    to: '/demo/saas-onboarding',
+    cta: 'Open example',
+    tag: 'Branching flow',
+  },
+  {
+    title: 'Studio booking journey',
+    body: 'Eight screens: guest vs account, payment, confirmation, and a loop when a time slot is taken.',
+    to: '/demo/commerce-booking',
+    cta: 'Open example',
+    tag: 'Commerce flow',
+  },
+  {
+    title: 'Interactive sign-up flow',
+    body: 'A six-screen sign-up and upgrade journey. Click a flag to see the finding, then add the missing screen.',
     to: '/demo/flow-map',
+    cta: 'Open demo',
+    tag: 'Live demo',
   },
   {
-    title: 'Shared review canvas',
-    body: 'Read-only share link with callouts and a “Reviewed with Bareframe” footer.',
+    title: 'Shared prototype link',
+    body: 'What a stakeholder sees when you send a share link: the read-only map and click-through prototype.',
     to: '/demo/share-canvas',
+    cta: 'Open share view',
+    tag: 'Share link',
   },
 ];
 
 export function ExamplesPage() {
   return (
-    <>
-      <div className="page-hero">
-        <h1>Examples</h1>
-        <p className="lead">
-          Explore journey maps and AI review callouts without connecting your own product yet.
-        </p>
-      </div>
-      <div className="grid-3">
+    <div className="bx-page">
+      <header className="bx-page-head">
+        <span className="bx-kicker">Examples</span>
+        <h1>See Bareframe on a real flow</h1>
+        <p className="bx-lead">Sample projects you can click through without an account.</p>
+      </header>
+      <ul className="examples">
         {EXAMPLES.map((ex) => (
-          <article key={ex.to} className="card app-start-card">
-            <h3>{ex.title}</h3>
-            <p>{ex.body}</p>
-            <Link to={ex.to} className="btn btn-secondary">
-              Open example
+          <li key={ex.to}>
+            <Link to={ex.to} className="example-card">
+              <span className="example-card__art" aria-hidden>
+                <i />
+                <span />
+                <i className="is-flag" />
+                <span />
+                <i />
+              </span>
+              <span className="bx-chip">{ex.tag}</span>
+              <h2>{ex.title}</h2>
+              <p>{ex.body}</p>
+              <span className="example-card__cta">{ex.cta} →</span>
             </Link>
-          </article>
+          </li>
         ))}
-      </div>
-    </>
+      </ul>
+    </div>
   );
 }

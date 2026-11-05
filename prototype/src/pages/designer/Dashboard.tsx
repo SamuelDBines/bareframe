@@ -13,6 +13,7 @@ import { fromProjectDocument } from '../../designer/localProject';
 import { createInitialProject } from '../../designer/initialProject';
 import { designerPath } from '../../sites/urls';
 import { DsCard, DsHero, DsPage } from '../../designer/DesignerUiPrimitives';
+import { friendlyError } from '../../app/apiError';
 
 export function DesignerDashboard() {
   const { status } = useAuth();
@@ -26,7 +27,7 @@ export function DesignerDashboard() {
     if (status !== 'authenticated') return;
     listProjects()
       .then(setProjects)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load projects'));
+      .catch((err) => setError(friendlyError(err, 'Failed to load projects')));
     listProductPackages()
       .then(setPackages)
       .catch(() => setPackages([]));
@@ -39,7 +40,7 @@ export function DesignerDashboard() {
       const created = await createProject('Untitled project');
       navigate(designerPath(`/editor/${created.id}`));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not create project');
+      setError(friendlyError(err, 'Could not create project'));
     } finally {
       setBusy(false);
     }
@@ -53,7 +54,7 @@ export function DesignerDashboard() {
       const migrated = await migrateLocalProjectToServer(project);
       navigate(designerPath(`/editor/${migrated.id}`));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Migration failed');
+      setError(friendlyError(err, 'Migration failed'));
     } finally {
       setBusy(false);
     }

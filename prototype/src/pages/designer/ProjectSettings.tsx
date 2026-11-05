@@ -7,6 +7,7 @@ import {
 	type ProjectTokenSummary,
 } from '../../designer/projectApi';
 import { designerPath } from '../../sites/urls';
+import { friendlyError } from '../../app/apiError';
 
 const CAPTURE_SCOPES = ['capture:write', 'assets:upload', 'projects:read'];
 
@@ -26,7 +27,7 @@ export function ProjectSettingsPage() {
 		if (!projectId) return;
 		listProjectTokens(projectId)
 			.then(setTokens)
-			.catch((err) => setError(err instanceof Error ? err.message : 'Failed to load tokens'));
+			.catch((err) => setError(friendlyError(err, 'Failed to load tokens')));
 	}, [projectId]);
 
 	async function mintMcpToken() {
@@ -38,7 +39,7 @@ export function ProjectSettingsPage() {
 			setMintedMcpToken(created.token);
 			setTokens(await listProjectTokens(projectId));
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Could not create token');
+			setError(friendlyError(err, 'Could not create token'));
 		} finally {
 			setBusy(false);
 		}
@@ -65,7 +66,7 @@ export function ProjectSettingsPage() {
 			await revokeProjectToken(projectId, tokenId);
 			setTokens(await listProjectTokens(projectId));
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Revoke failed');
+			setError(friendlyError(err, 'Revoke failed'));
 		} finally {
 			setBusy(false);
 		}

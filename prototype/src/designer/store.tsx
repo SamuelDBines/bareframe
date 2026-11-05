@@ -4,6 +4,7 @@ import {
 	useContext,
 	useMemo,
 	useReducer,
+	useRef,
 	type ReactNode,
 } from 'react';
 import type { ThemeId } from '../theme/themes';
@@ -20,6 +21,7 @@ import {
 import { boundsForFlowMapFrames } from './flowmap/flowMapLayout';
 import { createInitialProject, PAGE_ID } from './initialProject';
 import type {
+	Annotation,
 	CompareMode,
 	DesignerProject,
 	DesignerState,
@@ -67,6 +69,20 @@ type Action =
 			trigger?: string;
 	  }
 	| { type: 'deleteFrame'; frameId: string }
+	| { type: 'renameFrame'; frameId: string; name: string }
+	| {
+			type: 'addScreen';
+			frameId: string;
+			name: string;
+			heading: string;
+			body?: string;
+			x: number;
+			y: number;
+			connectFrom?: { frameId: string; label: string };
+	  }
+	| { type: 'addAnnotation'; annotation: Omit<Annotation, 'id'> & { id?: string } }
+	| { type: 'deleteConnector'; connectorId: string }
+	| { type: 'setConnectorLabel'; connectorId: string; label: string }
 	| { type: 'setDefaultTheme'; themeId: ThemeId }
 	| { type: 'updateNodeLayout'; nodeId: string; layout: Partial<LayoutModel> }
 	| { type: 'updateNodeContent'; nodeId: string; text: string }
@@ -220,8 +236,82 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 			});
 			return commit(project);
 		}
+		case 'renameFrame': {
+			const f = project.frames.find((x) => x.id === action.frameId);
+			if (!f || f.readOnly) return state;
+			f.name = action.name;
+			return commit(project);
+		}
+		case 'addScreen': {
+			const pageId = newId('page');
+			const rootId = newId('node');
+			const headingId = newId('node');
+			const bodyId = newId('node');
+			const stack = {
+				mode: 'stack' as const,
+				gap: 12,
+				padding: [32, 24, 32, 24] as [number, number, number, number],
+				align: 'stretch' as const,
+				justify: 'start' as const,
+				widthMode: 'fill' as const,
+				heightMode: 'hug' as const,
+			};
+			const textLayout = { ...stack, padding: [0, 0, 0, 0] as [number, number, number, number] };
+			project.pages.push({
+				id: pageId,
+				name: action.name,
+				routePath: `/${action.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+				rootNodeId: rootId,
+				nodes: {
+					[rootId]: { id: rootId, name: 'Page root', type: 'stack', parentId: null, children: [headingId, bodyId], layout: stack },
+					[headingId]: { id: headingId, name: 'Heading', type: 'text', parentId: rootId, children: [], content: { text: action.heading, textTag: 'h2' }, layout: textLayout },
+					[bodyId]: { id: bodyId, name: 'Body', type: 'text', parentId: rootId, children: [], content: { text: action.body ?? '', textTag: 'p' }, layout: textLayout },
+				},
+			});
+			const preset = getDevicePreset('iphone-15')!;
+			const dim = deviceDimensions(preset);
+			project.frames.push({
+				id: action.frameId,
+				name: action.name,
+				pageId,
+				x: action.x,
+				y: action.y,
+				width: dim.width,
+				height: dim.height,
+				devicePresetId: preset.id,
+				heightMode: 'fixed',
+			});
+			if (action.connectFrom) {
+				project.connectors.push({
+					id: newId('conn'),
+					fromFrameId: action.connectFrom.frameId,
+					toFrameId: action.frameId,
+					label: action.connectFrom.label,
+					trigger: 'tap',
+				});
+			}
+			return commit(project, { ...ui, selectedFrameId: action.frameId });
+		}
+		case 'addAnnotation': {
+			project.annotations.push({ ...action.annotation, id: action.annotation.id ?? newId('anno') });
+			return commit(project);
+		}
+		case 'deleteConnector': {
+			project.connectors = project.connectors.filter((c) => c.id !== action.connectorId);
+			return commit(project);
+		}
+		case 'setConnectorLabel': {
+			const c = project.connectors.find((x) => x.id === action.connectorId);
+			if (!c) return state;
+			c.label = action.label;
+			return commit(project);
+		}
 		case 'deleteFrame': {
 			project.frames = project.frames.filter((f) => f.id !== action.frameId);
+			project.connectors = project.connectors.filter(
+				(c) => c.fromFrameId !== action.frameId && c.toFrameId !== action.frameId,
+			);
+			project.annotations = project.annotations.filter((a) => a.frameId !== action.frameId);
 			if (ui.compare) {
 				/* exit compare if needed */
 			}
@@ -551,6 +641,8 @@ const DesignerContext = createContext<DesignerContextValue | null>(null);
 
 export function DesignerProvider({ children }: { children: ReactNode }) {
 	const [state, dispatch] = useReducer(reducer, initialState);
+	const stateRef = useRef(state);
+	stateRef.current = state;
 
 	const getCanvasViewport = () => {
 		const flowEl = document.querySelector('.flow-map-viewport');
@@ -562,7 +654,7 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 	};
 
 	const fitAll = useCallback(() => {
-		const { ui, project } = state;
+		const { ui, project } = stateRef.current;
 		const flowMap = Boolean(document.querySelector('.flow-map-viewport'));
 		const frames = flowMap
 			? project.frames.filter((f) => !f.ghost && project.pages.some((p) => p.id === f.pageId))
@@ -589,10 +681,10 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 		const { w: viewW, h: viewH } = getCanvasViewport();
 		const cam = cameraToFitBounds(bounds, viewW, viewH, flowMap ? 80 : 40);
 		dispatch({ type: 'setCamera', patch: cam });
-	}, [state]);
+	}, []);
 
 	const fitSelection = useCallback(() => {
-		const f = state.project.frames.find((fr) => fr.id === state.ui.selectedFrameId);
+		const f = stateRef.current.project.frames.find((fr) => fr.id === stateRef.current.ui.selectedFrameId);
 		if (!f) {
 			fitAll();
 			return;
@@ -610,7 +702,7 @@ export function DesignerProvider({ children }: { children: ReactNode }) {
 			48,
 		);
 		dispatch({ type: 'setCamera', patch: cam });
-	}, [state, fitAll]);
+	}, [fitAll]);
 
 	const value = useMemo(
 		() => ({ state, dispatch, fitAll, fitSelection }),

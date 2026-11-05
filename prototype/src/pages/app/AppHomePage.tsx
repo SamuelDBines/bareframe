@@ -1,258 +1,212 @@
-import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Button } from '@bareframe/react';
-import { createProject, listProjects } from '../../designer/projectApi';
-import { createFlowMap, fetchPlan, importFigmaDesign, importSitemap, startProCheckout } from '../../app/reviewApi';
-import { NewProductPage } from '../designer/NewProductPage';
+import { Link } from 'react-router-dom';
+import { friendlyError } from '../../app/apiError';
+import { fetchPlan, startProCheckout } from '../../app/reviewApi';
+import { githubSignInUrl, useAuth } from '../../auth/AuthContext';
+import { listProjects, type ApiProjectSummary } from '../../designer/projectApi';
+import { githubAuthReturnTo } from '../../sites/urls';
+import { NewProjectDialog, type StartKind } from './NewProjectDialog';
+
+function EmptyMapArt() {
+	return (
+		<div className="empty-art" aria-hidden>
+			<i className="empty-art__card" />
+			<span className="empty-art__line" />
+			<i className="empty-art__card empty-art__card--accent">
+				<b>+</b>
+			</i>
+			<span className="empty-art__line" />
+			<i className="empty-art__card empty-art__card--ghost" />
+		</div>
+	);
+}
+
+function formatUpdated(iso?: string) {
+	if (!iso) return null;
+	const d = new Date(iso);
+	if (Number.isNaN(d.getTime())) return null;
+	return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+}
 
 export function AppHomePage() {
-  const navigate = useNavigate();
-  const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
-  const [mode, setMode] = useState<'hub' | 'brief' | 'url' | 'sitemap' | 'figma'>('hub');
-  const [importUrl, setImportUrl] = useState('');
-  const [figmaUrl, setFigmaUrl] = useState('https://www.figma.com/design/demo/Hookoh');
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+	const { status } = useAuth();
+	const [projects, setProjects] = useState<ApiProjectSummary[] | null>(null);
+	const [loadError, setLoadError] = useState<string | null>(null);
+	const [planTier, setPlanTier] = useState<'free' | 'pro' | null>(null);
+	const [dialog, setDialog] = useState<StartKind | null>(null);
+	const [notice, setNotice] = useState<string | null>(null);
 
-  const [planTier, setPlanTier] = useState<'free' | 'pro' | null>(null);
+	useEffect(() => {
+		if (status !== 'authenticated') return;
+		listProjects()
+			.then((rows) => setProjects(rows))
+			.catch((e) => {
+				setProjects([]);
+				setLoadError(friendlyError(e, 'We couldn’t load your projects.'));
+			});
+		fetchPlan()
+			.then((p) => setPlanTier(p.tier === 'pro' ? 'pro' : 'free'))
+			.catch(() => setPlanTier(null));
+	}, [status]);
 
-  useEffect(() => {
-    listProjects()
-      .then((rows) => setProjects(rows))
-      .catch(() => setProjects([]));
-    fetchPlan()
-      .then((p) => setPlanTier(p.tier === 'pro' ? 'pro' : 'free'))
-      .catch(() => setPlanTier(null));
-  }, []);
+	async function upgrade() {
+		try {
+			const r = await startProCheckout();
+			if (r.checkoutUrl) window.location.href = r.checkoutUrl;
+			else setNotice(r.message ?? 'Upgrades open soon.');
+		} catch (e) {
+			setNotice(friendlyError(e, 'Checkout isn’t available right now.'));
+		}
+	}
 
-  async function startBlank() {
-    setBusy(true);
-    setError(null);
-    try {
-      const p = await createProject('Untitled journey');
-      navigate(`/app/project/${p.id}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not create project');
-    } finally {
-      setBusy(false);
-    }
-  }
+	if (status === 'loading') {
+		return (
+			<div className="bx-page app-home" aria-busy="true">
+				<div className="app-home__skeleton" />
+			</div>
+		);
+	}
 
-  async function startSitemapImport() {
-    if (!importUrl.trim()) return;
-    if (planTier === 'free') {
-      setError('Sitemap import requires Bareframe Pro (£20/month).');
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      const p = await createProject(`Sitemap: ${new URL(importUrl).hostname}`);
-      await importSitemap(p.id, importUrl.trim(), p.version);
-      navigate(`/app/project/${p.id}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Sitemap import failed');
-    } finally {
-      setBusy(false);
-    }
-  }
+	if (status !== 'authenticated') {
+		return (
+			<div className="bx-page app-home">
+				<section className="app-empty" data-testid="app-signed-out">
+					<EmptyMapArt />
+					<h1>Map your first user flow</h1>
+					<p>
+						Sign in to save projects, import from Figma and run AI reviews. Or look around the example project
+						first — no account needed.
+					</p>
+					<div className="app-empty__actions">
+						{status === 'unavailable' ? (
+							<button type="button" className="btn btn-primary btn-lg" disabled aria-describedby="signin-paused">
+								Sign in with GitHub
+							</button>
+						) : (
+							<a className="btn btn-primary btn-lg" href={githubSignInUrl(githubAuthReturnTo('/app'))}>
+								Sign in with GitHub
+							</a>
+						)}
+						<Link to="/demo/journey-review" className="btn btn-secondary btn-lg">
+							Explore the example
+						</Link>
+					</div>
+					{status === 'unavailable' ? (
+						<p id="signin-paused" className="bx-hint app-empty__hint">
+							Sign-in is unavailable right now. Please try again in a few minutes.
+						</p>
+					) : null}
+				</section>
+			</div>
+		);
+	}
 
-  async function startUrlImport() {
-    if (!importUrl.trim()) return;
-    if (planTier === 'free') {
-      setError('URL import requires Bareframe Pro (£20/month).');
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      const p = await createProject(`Import: ${new URL(importUrl).hostname}`);
-      await createFlowMap(p.id, importUrl.trim(), p.version);
-      navigate(`/app/project/${p.id}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Import failed');
-    } finally {
-      setBusy(false);
-    }
-  }
+	const list = projects ?? [];
 
-  if (mode === 'brief') {
-    return (
-      <div className="app-shell-inner">
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setMode('hub')}>
-          ← Back
-        </button>
-        <NewProductPage appMode />
-      </div>
-    );
-  }
+	return (
+		<div className="bx-page app-home">
+			<header className="app-home__head">
+				<div>
+					<h1>Projects</h1>
+					<p>One canvas per project. Map the flow, review it, share it.</p>
+				</div>
+				<div className="app-home__actions">
+					{planTier === 'free' ? (
+						<button type="button" className="btn btn-secondary" onClick={() => void upgrade()}>
+							Upgrade to Pro
+						</button>
+					) : null}
+					<button type="button" className="btn btn-primary" onClick={() => setDialog('figma')} data-testid="new-project">
+						New project
+					</button>
+				</div>
+			</header>
 
-  async function startFigmaImport() {
-    if (!figmaUrl.trim()) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const p = await createProject('Figma import');
-      await importFigmaDesign(p.id, figmaUrl.trim(), p.version);
-      navigate(`/app/project/${p.id}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Figma import failed');
-    } finally {
-      setBusy(false);
-    }
-  }
+			{notice ? (
+				<div className="bx-notice" role="status" style={{ marginBottom: '1.5rem' }}>
+					<span className="bx-notice__icon" aria-hidden>
+						i
+					</span>
+					<p>{notice}</p>
+				</div>
+			) : null}
 
-  if (mode === 'figma') {
-    return (
-      <div className="app-shell-inner app-card">
-        <h1>Import from Figma</h1>
-        <p className="lead">
-          Paste a Figma file or frame URL. We pull frames as screens and prototype links as flow connectors.
-        </p>
-        <label className="field">
-          <span>Figma design URL</span>
-          <input
-            value={figmaUrl}
-            onChange={(e) => setFigmaUrl(e.target.value)}
-            placeholder="https://www.figma.com/design/…"
-            data-testid="app-figma-url"
-          />
-        </label>
-        <p className="ds-meta">Use a personal access token in project settings, or set FIGMA_ACCESS_TOKEN on the server.</p>
-        {error ? <p className="app-error">{error}</p> : null}
-        <div className="app-actions">
-          <Button variant="secondary" onPress={() => setMode('hub')}>
-            Cancel
-          </Button>
-          <Button variant="primary" isDisabled={busy} onPress={() => void startFigmaImport()}>
-            Import from Figma
-          </Button>
-        </div>
-      </div>
-    );
-  }
+			{loadError ? (
+				<div className="bx-notice bx-notice--warn" role="alert" style={{ marginBottom: '1.5rem' }}>
+					<span className="bx-notice__icon" aria-hidden>
+						!
+					</span>
+					<p>{loadError}</p>
+				</div>
+			) : null}
 
-  if (mode === 'sitemap') {
-    return (
-      <div className="app-shell-inner app-card">
-        <h1>Import from sitemap</h1>
-        <p className="lead">
-          Paste your site root or <code>sitemap.xml</code>. We map URLs to screens and link parent paths — no
-          screenshots, ready in seconds (Pro).
-        </p>
-        <label className="field">
-          <span>Website or sitemap URL</span>
-          <input
-            value={importUrl}
-            onChange={(e) => setImportUrl(e.target.value)}
-            placeholder="https://example.com or https://example.com/sitemap.xml"
-            data-testid="app-sitemap-url"
-          />
-        </label>
-        {error ? <p className="app-error">{error}</p> : null}
-        <div className="app-actions">
-          <Button variant="secondary" onPress={() => setMode('hub')}>
-            Cancel
-          </Button>
-          <Button variant="primary" isDisabled={busy} onPress={() => void startSitemapImport()}>
-            Import sitemap
-          </Button>
-        </div>
-      </div>
-    );
-  }
+			{projects === null ? (
+				<div className="project-grid" aria-busy="true">
+					<div className="project-card project-card--skeleton" />
+					<div className="project-card project-card--skeleton" />
+					<div className="project-card project-card--skeleton" />
+				</div>
+			) : list.length === 0 ? (
+				<section className="app-empty app-empty--inline">
+					<EmptyMapArt />
+					<h2>Create your first flow map</h2>
+					<p>Start from a Figma file, a short brief, a live website or a sitemap.</p>
+					<div className="start-quick">
+						<button type="button" className="start-quick__btn" onClick={() => setDialog('figma')}>
+							<span className="start-option__icon start-option__icon--figma" aria-hidden>
+								F
+							</span>
+							Import from Figma
+						</button>
+						<button type="button" className="start-quick__btn" onClick={() => setDialog('brief')}>
+							<span className="start-option__icon start-option__icon--brief" aria-hidden>
+								✎
+							</span>
+							Start from a brief
+						</button>
+						<button type="button" className="start-quick__btn" onClick={() => setDialog('url')}>
+							<span className="start-option__icon start-option__icon--url" aria-hidden>
+								↗
+							</span>
+							Import a website
+						</button>
+						<button type="button" className="start-quick__btn" onClick={() => setDialog('sitemap')} data-testid="import-sitemap">
+							<span className="start-option__icon start-option__icon--sitemap" aria-hidden>
+								☰
+							</span>
+							Import sitemap
+						</button>
+					</div>
+				</section>
+			) : (
+				<ul className="project-grid">
+					{list.map((p) => (
+						<li key={p.id}>
+							<Link to={`/app/project/${p.id}`} className="project-card">
+								<span className="project-card__thumb" aria-hidden>
+									<i />
+									<span />
+									<i />
+									<span />
+									<i />
+								</span>
+								<span className="project-card__name">{p.name}</span>
+								{formatUpdated(p.updatedAt) ? (
+									<span className="project-card__meta">Edited {formatUpdated(p.updatedAt)}</span>
+								) : null}
+							</Link>
+						</li>
+					))}
+					<li>
+						<button type="button" className="project-card project-card--new" onClick={() => setDialog('figma')}>
+							<span aria-hidden>+</span>
+							New project
+						</button>
+					</li>
+				</ul>
+			)}
 
-  if (mode === 'url') {
-    return (
-      <div className="app-shell-inner app-card">
-        <h1>Import a live URL</h1>
-        <p className="lead">We screenshot pages and follow links to draft a journey map on your canvas.</p>
-        <label className="field">
-          <span>Website URL</span>
-          <input value={importUrl} onChange={(e) => setImportUrl(e.target.value)} placeholder="https://example.com" />
-        </label>
-        {error ? <p className="app-error">{error}</p> : null}
-        <div className="app-actions">
-          <Button variant="secondary" onPress={() => setMode('hub')}>
-            Cancel
-          </Button>
-          <Button variant="primary" isDisabled={busy} onPress={() => void startUrlImport()}>
-            Import journey
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="app-shell-inner">
-      <header className="app-hero">
-        <p className="badge-pill success">Journey canvas</p>
-        <h1>Map flows. Review with AI.</h1>
-        <p className="lead">Start from Figma, a product brief, a live site, sitemap, or a blank flow map.</p>
-      </header>
-      <div className="grid-3">
-        <article className="card app-start-card">
-          <h3>Import Figma</h3>
-          <p>Bring real frames and prototype links into a polished journey map.</p>
-          <Button variant="primary" onPress={() => setMode('figma')}>
-            Import from Figma
-          </Button>
-        </article>
-        <article className="card app-start-card">
-          <h3>Product brief</h3>
-          <p>Generate journeys and screens with the Bareframe package pipeline.</p>
-          <Button variant="secondary" onPress={() => setMode('brief')}>
-            Start from brief
-          </Button>
-        </article>
-        <article className="card app-start-card">
-          <h3>Sitemap import</h3>
-          <p>Fast structure-only map from sitemap.xml and site links (Pro).</p>
-          <Button variant="secondary" onPress={() => setMode('sitemap')}>
-            Import sitemap
-          </Button>
-        </article>
-        <article className="card app-start-card">
-          <h3>Import URL</h3>
-          <p>Screenshot pages and link them into a draft map (Pro).</p>
-          <Button variant="ghost" onPress={() => setMode('url')}>
-            Import website
-          </Button>
-        </article>
-      </div>
-      <div className="grid-3" style={{ marginTop: '1rem' }}>
-        <article className="card app-start-card">
-          <h3>Blank flow map</h3>
-          <p>Place screens, draw connectors, and prototype click-throughs yourself.</p>
-          <Button variant="ghost" isDisabled={busy} onPress={() => void startBlank()}>
-            New blank project
-          </Button>
-        </article>
-      </div>
-      {error ? <p className="app-error">{error}</p> : null}
-      {projects.length > 0 ? (
-        <section className="app-card" style={{ marginTop: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-            <h2 style={{ margin: 0 }}>Your projects</h2>
-            {planTier === 'free' ? (
-              <button type="button" className="btn btn-secondary btn-sm" onClick={() => void startProCheckout().then((r) => {
-                if (r.checkoutUrl) window.location.href = r.checkoutUrl;
-                else setError(r.message ?? 'Checkout unavailable');
-              })}>
-                Upgrade · £20/mo
-              </button>
-            ) : null}
-          </div>
-          <ul className="app-project-list">
-            {projects.map((p) => (
-              <li key={p.id}>
-                <Link to={`/app/project/${p.id}`}>{p.name}</Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-    </div>
-  );
+			{dialog ? <NewProjectDialog initial={dialog} planTier={planTier} onClose={() => setDialog(null)} /> : null}
+		</div>
+	);
 }

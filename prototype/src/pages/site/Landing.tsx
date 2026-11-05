@@ -1,90 +1,171 @@
 import { Link } from 'react-router-dom';
+import { LiveFlowDemo } from '../../marketing/LiveFlowDemo';
+import { LogoStrip } from '../../marketing/LogoStrip';
+import '../../marketing/marketing.css';
+
+const STEPS = [
+	{
+		n: '01',
+		title: 'Import from Figma',
+		body: 'Paste a Figma link. Frames become screens and prototype links become connectors. No redrawing.',
+		art: 'import',
+	},
+	{
+		n: '02',
+		title: 'Map & review',
+		body: 'See the whole journey on one canvas. AI flags missing screens, drop-off risk and accessibility issues right where they happen.',
+		art: 'review',
+	},
+	{
+		n: '03',
+		title: 'Share a prototype',
+		body: 'One click turns the map into a click-through prototype. Send the link to stakeholders or test it with users.',
+		art: 'share',
+	},
+] as const;
+
+const CATCHES = [
+	{ sev: 'critical', label: 'Missing screens', body: 'Error, empty and edge-case states nobody designed yet.' },
+	{ sev: 'major', label: 'Drop-off risk', body: 'Steps where people are likely to give up, with an estimate and a reason.' },
+	{ sev: 'minor', label: 'Accessibility', body: 'Contrast, focus order and labelling checked against WCAG 2.2 AA.' },
+	{ sev: 'info', label: 'UX friction', body: 'Competing calls to action, extra steps and confusing copy.' },
+] as const;
+
+function StepArt({ kind }: { kind: (typeof STEPS)[number]['art'] }) {
+	if (kind === 'import') {
+		return (
+			<div className="step-art step-art--import" aria-hidden>
+				<div className="sa-figma">
+					<span className="sa-figma__logo" />
+					<span className="sa-url">figma.com/design/…</span>
+				</div>
+				<div className="sa-frames">
+					<i />
+					<i />
+					<i />
+				</div>
+			</div>
+		);
+	}
+	if (kind === 'review') {
+		return (
+			<div className="step-art step-art--review" aria-hidden>
+				<i className="sa-node" />
+				<span className="sa-line" />
+				<i className="sa-node sa-node--flag">
+					<b>!</b>
+				</i>
+				<span className="sa-line" />
+				<i className="sa-node sa-node--ghost" />
+			</div>
+		);
+	}
+	return (
+		<div className="step-art step-art--share" aria-hidden>
+			<div className="sa-phone">
+				<span className="sa-hotspot" />
+			</div>
+			<div className="sa-link">
+				<span>bareframe.org/share/…</span>
+				<b>Copied</b>
+			</div>
+		</div>
+	);
+}
 
 export function LandingPage() {
 	return (
-		<>
-			<section className="page-hero landing-hero">
-				<p className="badge-pill success">Journey review</p>
-				<h1>Map journeys and designs. AI shows where people get stuck.</h1>
-				<p className="lead">
-					Bareframe is one calm workspace for user flows, screen maps, and AI review callouts —
-					what&apos;s confusing, what&apos;s missing, likely drop-offs (estimates), accessibility, and
-					suggested fixes built from @bareframe/react. <strong>£20/month</strong> for Pro.
+		<div className="landing">
+			<section className="hero bx-container">
+				<p className="bx-eyebrow bx-reveal">
+					<span className="bx-eyebrow__tag">New</span>
+					AI review, pinned to your flow map
 				</p>
-				<div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '1.25rem' }}>
-					<Link to="/app" className="btn btn-primary">
-						Open app
-					</Link>
-					<Link to="/pricing" className="btn btn-secondary">
-						See pricing
-					</Link>
-					<Link to="/examples" className="btn btn-ghost">
-						Examples
-					</Link>
-				</div>
-			</section>
-
-			<section style={{ marginTop: '2.5rem' }}>
-				<h2>Three ways to start</h2>
-				<div className="grid-3" style={{ marginTop: '1rem' }}>
-					<article className="card product-card">
-						<h3>Product brief</h3>
-						<p>Describe your idea — we generate journeys, screens, and a canvas you can review.</p>
-						<Link to="/app">Start from brief →</Link>
-					</article>
-					<article className="card product-card">
-						<h3>Import a live URL</h3>
-						<p>Screenshot pages and link them into a draft journey map (Pro).</p>
-						<Link to="/app">Import website →</Link>
-					</article>
-					<article className="card product-card">
-						<h3>Blank canvas</h3>
-						<p>Place screens, connectors, and flows yourself, then run an AI review pass.</p>
-						<Link to="/app">New project →</Link>
-					</article>
-				</div>
-			</section>
-
-			<section style={{ marginTop: '2.5rem' }}>
-				<h2>Review categories agents understand</h2>
-				<div className="grid-2" style={{ marginTop: '1rem' }}>
-					<div className="card">
-						<h3>UX &amp; gaps</h3>
-						<p>
-							Confusing steps, missing empty/error/loading states, and estimated drop-off points pinned on
-							the map.
-						</p>
-					</div>
-					<div className="card">
-						<h3>A11y &amp; consistency</h3>
-						<p>
-							WCAG 2.2 AA signals from the render worker plus design consistency against Bareframe
-							components — with alternative fixes and previews.
-						</p>
-						<Link to="/components/mcp">MCP tools →</Link>
-					</div>
-				</div>
-			</section>
-
-			<section
-				className="card"
-				style={{
-					marginTop: '2.5rem',
-					textAlign: 'center',
-					padding: '2rem',
-					background:
-						'linear-gradient(135deg, color-mix(in srgb, var(--bf-theme-button-primary-bg) 12%, var(--bf-theme-surface-1)), var(--bf-theme-surface-1))',
-				}}
-			>
-				<h2>Start free, upgrade when you ship</h2>
-				<p style={{ margin: '0 auto 1rem', maxWidth: '44ch' }}>
-					Free includes one project and three AI reviews a month. Pro unlocks URL import, private canvases,
-					export, and studio MCP tools.
+				<h1 className="hero__title bx-reveal">
+					See your whole user journey.
+					<br />
+					<span>Fix it before people drop off.</span>
+				</h1>
+				<p className="hero__lead bx-reveal">
+					Bring your screens in from Figma, map how they connect, and let AI flag missing screens, drop-off
+					risks and accessibility issues right on the map. Then share it as a click-through prototype.
 				</p>
-				<Link to="/sign-up" className="btn btn-primary">
-					Create account
-				</Link>
+				<div className="hero__cta bx-reveal">
+					<Link to="/app" className="btn btn-primary btn-lg">
+						Start free
+					</Link>
+					<span className="hero__note">Free plan · 1 project · 3 AI reviews a month</span>
+				</div>
+				<div className="hero__demo bx-reveal">
+					<LiveFlowDemo />
+				</div>
 			</section>
-		</>
+
+			<LogoStrip />
+
+			<section className="bx-section" aria-labelledby="how-title">
+				<div className="bx-container">
+					<div className="bx-section-head">
+						<span className="bx-kicker">How it works</span>
+						<h2 id="how-title">From Figma file to shareable prototype in three steps</h2>
+						<p>Bareframe is built around flows, not pixels. Keep designing in Figma; use Bareframe to see, review and share the journey.</p>
+					</div>
+					<ol className="steps">
+						{STEPS.map((s) => (
+							<li key={s.n} className="step">
+								<StepArt kind={s.art} />
+								<span className="step__n">{s.n}</span>
+								<h3>{s.title}</h3>
+								<p>{s.body}</p>
+							</li>
+						))}
+					</ol>
+				</div>
+			</section>
+
+			<section className="bx-section bx-section--tint" aria-labelledby="catch-title">
+				<div className="bx-container catch">
+					<div className="catch__copy">
+						<span className="bx-kicker">AI review</span>
+						<h2 id="catch-title">Every finding lives on the screen it’s about</h2>
+						<p>
+							No separate report to cross-reference. Each flag sits on the map with a severity, a short
+							reason and a suggested fix you can apply in one click.
+						</p>
+						<Link to="/demo/journey-review" className="btn btn-secondary">
+							Open the example project
+						</Link>
+					</div>
+					<ul className="catch__list">
+						{CATCHES.map((c) => (
+							<li key={c.label} className="catch__item">
+								<span className={`bx-sev bx-sev--${c.sev}`}>{c.sev}</span>
+								<div>
+									<h3>{c.label}</h3>
+									<p>{c.body}</p>
+								</div>
+							</li>
+						))}
+					</ul>
+				</div>
+			</section>
+
+			<section className="bx-section">
+				<div className="bx-container">
+					<div className="cta-band">
+						<h2>Map your first flow today</h2>
+						<p>Start on the free plan. Upgrade when your team needs more projects and reviews.</p>
+						<div className="cta-band__actions">
+							<Link to="/app" className="btn btn-lg cta-band__primary">
+								Start free
+							</Link>
+							<Link to="/pricing" className="cta-band__link">
+								Compare plans →
+							</Link>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
 	);
 }

@@ -12,6 +12,8 @@ type Props = {
 	trial?: StyleTrial;
 	selectedNodeId: string | null;
 	onSelectNode: (nodeId: string) => void;
+	/** Lock iframe document to frame height (prototype player — avoids iframe clipping tall trees). */
+	lockDocumentHeight?: boolean;
 };
 
 function designerAssetBase(): string {
@@ -26,6 +28,7 @@ export const FramePreview = memo(function FramePreview({
 	trial,
 	selectedNodeId,
 	onSelectNode,
+	lockDocumentHeight,
 }: Props) {
 	const ref = useRef<HTMLIFrameElement>(null);
 	const [ready, setReady] = useState(false);
@@ -43,6 +46,7 @@ export const FramePreview = memo(function FramePreview({
 			el.srcdoc = buildFramePreviewDoc({
 				page,
 				frameWidth: frame.width,
+				frameHeight: lockDocumentHeight ? frame.height : undefined,
 				themeId,
 				tokenOverrides: customTokens,
 				trial,
@@ -55,7 +59,7 @@ export const FramePreview = memo(function FramePreview({
 		return () => {
 			cancelled = true;
 		};
-	}, [page, frame.width, themeId, customTokens, trial, selectedNodeId, frame.height]);
+	}, [page, frame.width, frame.height, themeId, customTokens, trial, selectedNodeId, lockDocumentHeight]);
 
 	useEffect(() => {
 		const el = ref.current;

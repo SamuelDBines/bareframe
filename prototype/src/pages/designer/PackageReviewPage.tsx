@@ -18,6 +18,7 @@ import { FramePreview } from '../../designer/components/FramePreview';
 import type { ThemeId } from '../../theme/themes';
 import { designerPath } from '../../sites/urls';
 import type { Frame, Page } from '../../designer/types';
+import { friendlyError } from '../../app/apiError';
 
 const TABS = [
   { id: 'product', label: 'Product' },
@@ -57,7 +58,7 @@ export function PackageReviewPage({ demo, appMode }: { demo?: boolean; appMode?:
         const journeys = (res.document as { journeys?: { id: string }[] }).journeys;
         if (journeys?.[0]) setPlayJourneyId(journeys[0].id);
       })
-      .catch((e) => setError(e instanceof Error ? e.message : 'Load failed'));
+      .catch((e) => setError(friendlyError(e, 'Load failed')));
   }, [packageId, demo]);
 
   const journeys = (doc?.journeys ?? []) as {

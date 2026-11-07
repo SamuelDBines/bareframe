@@ -1,29 +1,25 @@
 import { Link } from 'react-router-dom';
-import { DesignerWorkspace } from '../../designer/DesignerWorkspace';
-import { AppReviewPanel } from '../app/AppReviewPanel';
-import { demoReviewProjectId } from '../../designer/demoReviewProject';
-import { Button } from '@bareframe/react';
+import { LiveFlowDemo } from '../../marketing/LiveFlowDemo';
+import '../../marketing/marketing.css';
 
-/** Public demo: real flow-map canvas (cards, connectors, minimap) + sample review callouts. */
+/** Standalone page for the interactive sample flow map (also embedded on the homepage). */
 export function FlowMapDemoPage() {
-  return (
-    <div className="app-project-layout app-project-layout--demo">
-      <div className="app-demo-banner">
-        <p>
-          <strong>Live demo</strong> — Hookoh-style journey with connectors and AI review callouts. No sign-in required.
-        </p>
-        <Link to="/app">
-          <Button variant="secondary" size="sm">
-            Open app hub
-          </Button>
-        </Link>
-      </div>
-      <div className="app-project-layout__body">
-        <div className="app-project-canvas">
-          <DesignerWorkspace projectId={demoReviewProjectId} demoReview />
-        </div>
-        <AppReviewPanel projectId={demoReviewProjectId} demoIssues />
-      </div>
-    </div>
-  );
+	return (
+		<div className="bx-page">
+			<header className="bx-page-head demo-head">
+				<div>
+					<span className="bx-kicker">Live demo</span>
+					<h1>A flow map, reviewed</h1>
+					<p className="bx-lead">
+						Click a flag to read the finding, apply the suggested fix, then switch to Prototype to click
+						through. This is a sample project — nothing here is saved.
+					</p>
+				</div>
+				<Link to="/app" className="btn btn-primary">
+					Map your own flow
+				</Link>
+			</header>
+			<LiveFlowDemo />
+		</div>
+	);
 }

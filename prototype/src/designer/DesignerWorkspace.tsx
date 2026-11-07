@@ -9,6 +9,8 @@ import { DesignerProvider, useDesigner } from './store';
 import { useDesignerEditorChrome } from './useDesignerEditorChrome';
 import { AppCanvasChromeProvider, type AppCanvasChromeValue } from './AppCanvasChrome';
 import { DemoReviewCameraFit } from './DemoReviewCameraFit';
+import { ReviewProvider } from '../app/ReviewContext';
+import type { ReactNode } from 'react';
 
 function WorkspaceInner({
 	compactChrome,
@@ -57,6 +59,10 @@ type DesignerWorkspaceProps = {
 	compactChrome?: boolean;
 	appChrome?: AppCanvasChromeValue;
 	initialDocument?: import('@bareframe/designer-core').ProjectDocument | null;
+	/** Enables AI review flags on the map (shared with `aside`). */
+	review?: { projectId?: string; demo?: boolean };
+	/** Side panel rendered inside the designer providers, beside the canvas. */
+	aside?: ReactNode;
 };
 
 export function DesignerWorkspace({
@@ -66,11 +72,21 @@ export function DesignerWorkspace({
 	compactChrome,
 	appChrome,
 	initialDocument,
+	review,
+	aside,
 }: DesignerWorkspaceProps) {
 	const chrome: AppCanvasChromeValue = {
 		...appChrome,
 		projectId: appChrome?.projectId ?? projectId,
 	};
+
+	const inner = (
+		<WorkspaceInner
+			compactChrome={compactChrome ?? Boolean(demoReview)}
+			flowMap={compactChrome ?? Boolean(demoReview)}
+			readOnly={readOnly ?? demoReview}
+		/>
+	);
 
 	return (
 		<DesignerProvider>
@@ -81,13 +97,25 @@ export function DesignerWorkspace({
 					demoReview={demoReview}
 					initialDocument={initialDocument}
 				/>
-				{demoReview ? <DemoReviewCameraFit /> : null}
-				<WorkspaceInner
-					compactChrome={compactChrome ?? Boolean(demoReview)}
-					flowMap={compactChrome ?? Boolean(demoReview)}
-					readOnly={readOnly ?? demoReview}
-				/>
+				{demoReview ? <DemoReviewCameraFit useFlowMap={compactChrome ?? Boolean(demoReview)} /> : null}
+				{review ? (
+					<ReviewProvider projectId={review.projectId} demo={review.demo}>
+						{withAside(inner, aside)}
+					</ReviewProvider>
+				) : (
+					withAside(inner, aside)
+				)}
 			</AppCanvasChromeProvider>
 		</DesignerProvider>
+	);
+}
+
+function withAside(canvas: ReactNode, aside?: ReactNode) {
+	if (!aside) return canvas;
+	return (
+		<div className="app-project-layout">
+			<div className="app-project-canvas">{canvas}</div>
+			{aside}
+		</div>
 	);
 }

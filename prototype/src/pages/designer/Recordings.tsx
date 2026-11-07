@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { fetchProject, listRecordings, type RecordingRow } from '../../designer/projectApi';
 import { DsCard, DsHero, DsPage } from '../../designer/DesignerUiPrimitives';
 import { designerPath } from '../../sites/urls';
+import { friendlyError } from '../../app/apiError';
 
 export function RecordingsPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -19,7 +20,7 @@ export function RecordingsPage() {
         const list = await listRecordings(projectId);
         setRows(list);
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load recordings');
+        setError(friendlyError(e, 'Failed to load recordings'));
       }
     })();
   }, [projectId]);

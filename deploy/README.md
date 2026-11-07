@@ -97,6 +97,27 @@ docker compose up --build
 
 For the Vite prototype, `pnpm dev` proxies `/api` to `http://127.0.0.1:8080` (override with `BAREFRAME_API_PROXY`).
 
+### Fast import: app capture + sitemap
+
+**App capture (MVP)** — project settings → **Create capture token** (scopes `capture:write`, `assets:upload`). Add the snippet to your product:
+
+```html
+<script
+  src="https://bareframe.org/bareframe-capture.js"
+  data-token="bf_proj_…"
+  data-endpoint="https://bareframe.org/api/v1/capture/events"
+  async
+></script>
+```
+
+The script batches navigation events to `POST /api/v1/capture/events` (Bearer token, CORS enabled) and syncs an **App capture** canvas on the project. Plaintext tokens are returned once at creation; only a SHA-256 hash is stored.
+
+**Sitemap import (Pro)** — from the journey app home, choose **Import sitemap**, or call:
+
+`POST /api/projects/:projectId/sitemap-import` with `{ "url": "https://example.com", "baseVersion": 1 }`.
+
+Resolves `robots.txt`, `sitemap.xml`, and sitemap indexes (SSRF-safe, size limits), creates screens from URLs, and links parent paths. For full-page screenshots and audits, use **Import URL** (`POST …/flow-maps`).
+
 ## MCP (agents)
 
 The `mcp/` service exposes a **public read-only** MCP server at **`https://bareframe.org/mcp`**. Image: `ghcr.io/samueldbines/bareframe/mcp`.

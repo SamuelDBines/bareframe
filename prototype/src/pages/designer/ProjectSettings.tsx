@@ -7,34 +7,54 @@ import {
 	type ProjectTokenSummary,
 } from '../../designer/projectApi';
 import { designerPath } from '../../sites/urls';
+import { friendlyError } from '../../app/apiError';
+
+const CAPTURE_SCOPES = ['capture:write', 'assets:upload', 'projects:read'];
 
 export function ProjectSettingsPage() {
 	const { projectId = '' } = useParams<{ projectId: string }>();
 	const [tokens, setTokens] = useState<ProjectTokenSummary[]>([]);
-	const [mintedToken, setMintedToken] = useState<string | null>(null);
+	const [mintedMcpToken, setMintedMcpToken] = useState<string | null>(null);
+	const [mintedCaptureToken, setMintedCaptureToken] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [busy, setBusy] = useState(false);
 
 	const studioUrl = 'https://bareframe.org/mcp/studio';
+	const captureScriptOrigin =
+		typeof window !== 'undefined' ? window.location.origin : 'https://bareframe.org';
 
 	useEffect(() => {
 		if (!projectId) return;
 		listProjectTokens(projectId)
 			.then(setTokens)
-			.catch((err) => setError(err instanceof Error ? err.message : 'Failed to load tokens'));
+			.catch((err) => setError(friendlyError(err, 'Failed to load tokens')));
 	}, [projectId]);
 
-	async function mintToken() {
+	async function mintMcpToken() {
 		setBusy(true);
 		setError(null);
-		setMintedToken(null);
+		setMintedMcpToken(null);
 		try {
 			const created = await createProjectToken(projectId, 'MCP assistant');
-			setMintedToken(created.token);
-			const next = await listProjectTokens(projectId);
-			setTokens(next);
+			setMintedMcpToken(created.token);
+			setTokens(await listProjectTokens(projectId));
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Could not create token');
+			setError(friendlyError(err, 'Could not create token'));
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	async function mintCaptureToken() {
+		setBusy(true);
+		setError(null);
+		setMintedCaptureToken(null);
+		try {
+			const created = await createProjectToken(projectId, 'App capture', CAPTURE_SCOPES);
+			setMintedCaptureToken(created.token);
+			setTokens(await listProjectTokens(projectId));
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Could not create capture token');
 		} finally {
 			setBusy(false);
 		}
@@ -46,19 +66,19 @@ export function ProjectSettingsPage() {
 			await revokeProjectToken(projectId, tokenId);
 			setTokens(await listProjectTokens(projectId));
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Revoke failed');
+			setError(friendlyError(err, 'Revoke failed'));
 		} finally {
 			setBusy(false);
 		}
 	}
 
-	const snippet = mintedToken
+	const mcpSnippet = mintedMcpToken
 		? `{
   "mcpServers": {
     "bareframe-studio": {
       "url": "${studioUrl}",
       "headers": {
-        "Authorization": "Bearer ${mintedToken}"
+        "Authorization": "Bearer ${mintedMcpToken}"
       }
     }
   }
@@ -68,19 +88,27 @@ export function ProjectSettingsPage() {
     "bareframe-studio": {
       "url": "${studioUrl}",
       "headers": {
-        "Authorization": "Bearer bf_proj_<paste token from Create token>"
+        "Authorization": "Bearer bf_proj_<paste MCP token>"
       }
     }
   }
 }`;
+
+	const captureTokenForSnippet = mintedCaptureToken ?? 'bf_proj_<paste capture token>';
+	const captureSnippet = `<script
+  src="${captureScriptOrigin}/bareframe-capture.js"
+  data-token="${captureTokenForSnippet}"
+  data-endpoint="${captureScriptOrigin}/api/v1/capture/events"
+  async
+></script>`;
 
 	return (
 		<>
 			<div className="page-hero">
 				<h1>Project settings</h1>
 				<p className="lead">
-					Project-scoped tokens (<code>bf_proj_…</code>) let an MCP assistant edit this canvas only.
-					Public read tools stay at <code>/mcp</code>; writes use <code>/mcp/studio</code>.
+					Project-scoped tokens (<code>bf_proj_…</code>) power MCP assistants and in-app capture. Each
+					token is shown once — store it in your secrets manager.
 				</p>
 				<p>
 					<Link to={designerPath('/')}>← All projects</Link>
@@ -89,11 +117,20 @@ export function ProjectSettingsPage() {
 			{error && <p className="card">{error}</p>}
 			<div className="card" style={{ maxWidth: 720 }}>
 				<h3>API tokens</h3>
-				<p>Create a token for Cursor, Claude, or another MCP client. It is shown once — store it in your secrets manager.</p>
-				<button type="button" className="btn btn-primary" disabled={busy || !projectId} onClick={mintToken}>
-					Create token
-				</button>
-				{mintedToken && (
+				<div className="app-actions" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
+					<button type="button" className="btn btn-primary" disabled={busy || !projectId} onClick={mintMcpToken}>
+						Create MCP token
+					</button>
+					<button
+						type="button"
+						className="btn btn-secondary"
+						disabled={busy || !projectId}
+						onClick={mintCaptureToken}
+					>
+						Create capture token
+					</button>
+				</div>
+				{(mintedMcpToken || mintedCaptureToken) && (
 					<p style={{ marginTop: '1rem', fontSize: '0.9rem' }}>
 						<strong>Token minted.</strong> Copy it now — it will not be shown again.
 					</p>
@@ -102,6 +139,7 @@ export function ProjectSettingsPage() {
 					{tokens.map((t) => (
 						<li key={t.id} style={{ marginBottom: '0.5rem' }}>
 							<code>{t.token_prefix}</code> · {t.name}
+							{t.scopes?.includes('capture:write') ? ' · capture' : ''}
 							{t.revoked_at ? ' (revoked)' : ''}
 							{!t.revoked_at && (
 								<button
@@ -119,13 +157,24 @@ export function ProjectSettingsPage() {
 				</ul>
 			</div>
 			<div className="card" style={{ maxWidth: 720, marginTop: '1rem' }}>
-				<h3>MCP connection snippet</h3>
-				<pre style={{ overflow: 'auto', fontSize: '0.85rem' }}>{snippet}</pre>
+				<h3>App capture snippet</h3>
+				<p>
+					Drop this script into your product (staging or production). It posts navigation events to{' '}
+					<code>/api/v1/capture/events</code> and refreshes the <strong>App capture</strong> canvas on this
+					project.
+				</p>
+				<pre style={{ overflow: 'auto', fontSize: '0.85rem' }}>{captureSnippet}</pre>
 				<p style={{ fontSize: '0.85rem', color: 'var(--bf-theme-text-2)' }}>
-					Tools: list_projects, get_project, create_canvas, add_screen, add_component, add_connector,
-					add_annotation, update_node, delete_node, import_screenshots, get_upload_url,
-					create_flow_map, screenshot_url, render_frame, list_recordings, build_flow_from_recording.
-					Scopes: <code>flowmap:write</code>, <code>render</code>, <code>recordings:upload</code> for those features.
+					Scopes: <code>capture:write</code>, <code>assets:upload</code>. Optional screenshots can be added
+					later via the same API batch payload.
+				</p>
+			</div>
+			<div className="card" style={{ maxWidth: 720, marginTop: '1rem' }}>
+				<h3>MCP connection snippet</h3>
+				<pre style={{ overflow: 'auto', fontSize: '0.85rem' }}>{mcpSnippet}</pre>
+				<p style={{ fontSize: '0.85rem', color: 'var(--bf-theme-text-2)' }}>
+					Public read tools stay at <code>/mcp</code>; writes use <code>/mcp/studio</code>. Additional scopes:{' '}
+					<code>flowmap:write</code>, <code>render</code>, <code>recordings:upload</code>.
 				</p>
 			</div>
 		</>

@@ -1,42 +1,71 @@
 import { Link } from 'react-router-dom';
-import { Button, Card } from '@bareframe/react';
-import { AppPage, AppPageHeader } from '../../app/AppUi';
+import '../../marketing/marketing.css';
 
 const EXAMPLES = [
   {
-    title: 'Flow map demo',
-    body: 'Cards, connectors, minimap, and sample AI callouts — no sign-in required.',
-    to: '/demo/flow-map',
-  },
-  {
-    title: 'Journey + review panel',
-    body: 'Full canvas with the AI review sidebar pinned beside the map.',
+    title: 'Social queue sign-in',
+    body: 'Three screens from landing to queue, with AI findings pinned to the map. Try “Apply fix” and the prototype.',
     to: '/demo/journey-review',
+    cta: 'Open project',
+    tag: 'Flow map + AI review',
   },
   {
-    title: 'Shared review canvas',
-    body: 'Read-only share link with callouts and a “Reviewed with Bareframe” footer.',
+    title: 'Branching SaaS onboarding',
+    body: 'Welcome → signup → verify → dashboard, with forgot-password and error/retry paths laid out on the map.',
+    to: '/demo/saas-onboarding',
+    cta: 'Open example',
+    tag: 'Branching flow',
+  },
+  {
+    title: 'Studio booking journey',
+    body: 'Eight screens: guest vs account, payment, confirmation, and a loop when a time slot is taken.',
+    to: '/demo/commerce-booking',
+    cta: 'Open example',
+    tag: 'Commerce flow',
+  },
+  {
+    title: 'Interactive sign-up flow',
+    body: 'A six-screen sign-up and upgrade journey. Click a flag to see the finding, then add the missing screen.',
+    to: '/demo/flow-map',
+    cta: 'Open demo',
+    tag: 'Live demo',
+  },
+  {
+    title: 'Shared prototype link',
+    body: 'What a stakeholder sees when you send a share link: the read-only map and click-through prototype.',
     to: '/demo/share-canvas',
+    cta: 'Open share view',
+    tag: 'Share link',
   },
 ];
 
 export function ExamplesPage() {
   return (
-    <AppPage>
-      <AppPageHeader
-        title="Examples"
-        lead="Explore journey maps and AI review callouts before you connect your own product."
-      />
-      <div className="app-example-grid">
+    <div className="bx-page">
+      <header className="bx-page-head">
+        <span className="bx-kicker">Examples</span>
+        <h1>See Bareframe on a real flow</h1>
+        <p className="bx-lead">Sample projects you can click through without an account.</p>
+      </header>
+      <ul className="examples">
         {EXAMPLES.map((ex) => (
-          <Card key={ex.to} variant="outlined" title={ex.title} className="app-start-card">
-            <p>{ex.body}</p>
-            <Link to={ex.to} className="app-hero-cta">
-              <Button variant="secondary">Open example</Button>
+          <li key={ex.to}>
+            <Link to={ex.to} className="example-card">
+              <span className="example-card__art" aria-hidden>
+                <i />
+                <span />
+                <i className="is-flag" />
+                <span />
+                <i />
+              </span>
+              <span className="bx-chip">{ex.tag}</span>
+              <h2>{ex.title}</h2>
+              <p>{ex.body}</p>
+              <span className="example-card__cta">{ex.cta} →</span>
             </Link>
-          </Card>
+          </li>
         ))}
-      </div>
-    </AppPage>
+      </ul>
+    </div>
   );
 }

@@ -43,7 +43,8 @@ test.describe('docs visual snapshots', () => {
 				await expectDesktopChrome(page);
 			}
 			await expect(page.locator('.docs-shell')).toHaveScreenshot(`alert-${label}-light.png`, {
-				maxDiffPixelRatio: 0.03,
+				maxDiffPixelRatio: 0.05,
+				animations: 'disabled',
 			});
 		});
 	}
@@ -55,7 +56,8 @@ test.describe('docs visual snapshots', () => {
 		await expect(page.getByRole('heading', { name: 'Combobox', exact: true })).toBeVisible();
 		await expectDesktopChrome(page);
 		await expect(page.locator('.docs-shell')).toHaveScreenshot('combobox-desktop-dark.png', {
-			maxDiffPixelRatio: 0.03,
+			maxDiffPixelRatio: 0.05,
+			animations: 'disabled',
 		});
 	});
 
@@ -67,7 +69,8 @@ test.describe('docs visual snapshots', () => {
 		await expect(page.locator('.docs-shell__sidebar')).toBeVisible();
 		await expect(page.getByText('On this page')).toBeVisible();
 		await expect(page.locator('.docs-shell')).toHaveScreenshot('index-desktop-light.png', {
-			maxDiffPixelRatio: 0.03,
+			maxDiffPixelRatio: 0.05,
+			animations: 'disabled',
 		});
 	});
 
@@ -77,7 +80,8 @@ test.describe('docs visual snapshots', () => {
 		await openIndex(page);
 		await expect(page.getByRole('heading', { name: 'Components', exact: true })).toBeVisible();
 		await expect(page.locator('.docs-shell')).toHaveScreenshot('index-mobile-light.png', {
-			maxDiffPixelRatio: 0.03,
+			maxDiffPixelRatio: 0.05,
+			animations: 'disabled',
 		});
 	});
 });

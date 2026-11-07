@@ -33,16 +33,9 @@ async function visitDemoReview(page: Page) {
 }
 
 test.describe('flow map UX', () => {
-	test('screen context menu opens and delete confirms', async ({ page }, testInfo) => {
-		test.skip(
-			testInfo.project.name.includes('mobile'),
-			'Desktop-only: flow cards are off-viewport on narrow layouts until #34 lands',
-		);
+	test('screen context menu opens and delete confirms', async ({ page }) => {
 		await visitEditableFlowMap(page);
-		await page.getByRole('button', { name: 'Fit', exact: true }).click();
-		await page.waitForTimeout(400);
 		const card = page.locator('.flow-map-card').first();
-		await card.scrollIntoViewIfNeeded();
 		await card.click({ button: 'right' });
 		await expect(page.locator('.flow-context-menu')).toBeVisible();
 		await page.getByRole('menuitem', { name: 'Delete screen' }).click();
@@ -50,11 +43,7 @@ test.describe('flow map UX', () => {
 		await page.getByRole('button', { name: 'Cancel' }).click();
 	});
 
-	test('toolbar exposes icon actions and tour replay', async ({ page }, testInfo) => {
-		test.skip(
-			testInfo.project.name.includes('mobile'),
-			'Desktop-only: toolbar tour overlay clipped on mobile until #34 lands',
-		);
+	test('toolbar exposes icon actions and tour replay', async ({ page }) => {
 		await visitEditableFlowMap(page);
 		await expect(page.getByTestId('flow-add-screen')).toBeVisible();
 		await expect(page.getByTestId('flow-connect-screens')).toBeVisible();

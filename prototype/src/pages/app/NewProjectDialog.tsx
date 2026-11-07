@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { friendlyError, isAiUnavailable } from '../../app/apiError';
-import { createFlowMap, importFigmaDesign, importSitemap } from '../../app/reviewApi';
+import { importFigmaDesign, importSitemap } from '../../app/reviewApi';
 import { fetchPackageConfig, startPackageGeneration } from '../../designer/packageApi';
 import { createProject } from '../../designer/projectApi';
 import { looksLikeWebsiteUrl, websiteHostname } from './websiteImportUtils';

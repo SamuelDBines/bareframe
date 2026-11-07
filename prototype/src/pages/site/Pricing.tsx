@@ -31,6 +31,7 @@ const PLANS: Plan[] = [
 			'1 project, up to 10 screens',
 			'3 AI reviews a month',
 			'Import from Figma',
+			'Installed website capture (script on your site)',
 			'Click-through prototype link',
 			'Bareframe badge on shared prototypes',
 		],
@@ -46,7 +47,7 @@ const PLANS: Plan[] = [
 		features: [
 			'Unlimited projects and screens',
 			'50 AI reviews a month',
-			'Import from a live URL',
+			'Server-side URL crawl and sitemap import',
 			'Private canvases, no badge',
 			'Export and MCP tools for agents',
 		],

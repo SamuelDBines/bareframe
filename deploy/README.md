@@ -69,6 +69,8 @@ kubectl create secret generic bareframe-api-env -n bareframe \
 
 Checkout (`POST /api/billing/checkout`) is enabled when `STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID` are set. **Plan upgrades are applied by webhooks**, not at checkout time in the browser.
 
+When **`STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID` are both unset**, `GET /api/billing/config` returns `stripeEnabled: false` and `POST /api/billing/checkout` responds **503**. **Installed website capture stays on the free plan**; only **server URL crawl** and **sitemap import** require Pro (enforced by plan limits).
+
 In the [Stripe Dashboard](https://dashboard.stripe.com/webhooks), add an endpoint:
 
 | Field | Value |

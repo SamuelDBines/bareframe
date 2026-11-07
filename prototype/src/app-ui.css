@@ -743,6 +743,22 @@
 	gap: 0.75rem;
 }
 
+@media (max-width: 720px) {
+	.start-options {
+		grid-template-columns: 1fr;
+	}
+
+	.new-project .start-option {
+		flex-direction: row;
+		align-items: center;
+		gap: 0.65rem;
+	}
+
+	.new-project .start-option strong {
+		margin-top: 0;
+	}
+}
+
 .start-option {
 	display: flex;
 	flex-direction: column;

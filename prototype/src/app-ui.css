@@ -781,6 +781,25 @@
 	}
 }
 
+@media (max-width: 720px) {
+	.app-project-layout {
+		grid-template-columns: 1fr;
+		grid-template-rows: minmax(0, 1fr) min(38vh, 300px);
+		height: calc(100dvh - var(--bx-header-h, 56px));
+		min-height: 0;
+	}
+
+	.app-project-canvas {
+		min-height: 0;
+	}
+
+	.side-panel {
+		border-left: 0;
+		border-top: 1px solid var(--bx-border);
+		min-height: 0;
+	}
+}
+
 /* Brief intake / package pages rendered inside the app shell. */
 .app-main--app > .ds-page {
 	max-width: 880px;

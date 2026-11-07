@@ -717,6 +717,72 @@
 	padding-left: 0.65rem;
 }
 
+@media (max-width: 720px) {
+	.flow-map-toolbar {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-areas:
+			'modes modes'
+			'tools actions';
+		align-items: center;
+		gap: 0.45rem 0.65rem;
+		padding: 0.5rem 0.65rem;
+	}
+
+	.flow-map-toolbar__left {
+		display: contents;
+	}
+
+	.flow-map-toolbar__title {
+		display: none;
+	}
+
+	.flow-seg {
+		grid-area: modes;
+		justify-self: start;
+		position: relative;
+		z-index: 2;
+		flex-shrink: 0;
+	}
+
+	.flow-map-toolbar__tools {
+		grid-area: tools;
+		border-left: 0;
+		padding-left: 0;
+		flex-wrap: wrap;
+	}
+
+	.flow-map-toolbar__actions {
+		grid-area: actions;
+		justify-self: end;
+		align-self: center;
+		flex-shrink: 0;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		max-width: 100%;
+		gap: 0.35rem;
+		position: relative;
+		z-index: 1;
+	}
+
+	.flow-toolbar-prototype span {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.flow-toolbar-prototype {
+		padding-left: 0.55rem;
+		padding-right: 0.55rem;
+	}
+}
+
 .flow-toolbar-prototype {
 	display: inline-flex;
 	align-items: center;

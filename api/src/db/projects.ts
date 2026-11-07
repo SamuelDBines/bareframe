@@ -30,6 +30,7 @@ export type ProjectTokenRow = {
 	token_prefix: string;
 	token_hash: string;
 	scopes: string[];
+	allowed_origins: string[];
 	created_at: Date;
 	revoked_at: Date | null;
 	last_used_at: Date | null;
@@ -371,6 +372,7 @@ export async function createProjectToken(
 	name: string,
 	scopes: string[],
 	plaintextToken: string,
+	allowedOrigins: string[] = [],
 ) {
 	const project = await getProjectById(pool, projectId);
 	if (!project || project.owner_user_id !== normalizeUserId(userId)) {
@@ -379,10 +381,10 @@ export async function createProjectToken(
 	const tokenHash = hashToken(plaintextToken);
 	const prefix = `${plaintextToken.slice(0, 16)}…`;
 	const { rows } = await pool.query<{ id: string }>(
-		`INSERT INTO project_api_tokens (project_id, name, token_prefix, token_hash, scopes, created_by_user_id)
-     VALUES ($1, $2, $3, $4, $5, $6)
+		`INSERT INTO project_api_tokens (project_id, name, token_prefix, token_hash, scopes, created_by_user_id, allowed_origins)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING id`,
-		[projectId, name, prefix, tokenHash, scopes, userId],
+		[projectId, name, prefix, tokenHash, scopes, userId, allowedOrigins],
 	);
 	return rows[0]!.id;
 }

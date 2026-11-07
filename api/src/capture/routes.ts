@@ -8,7 +8,7 @@ import { publishProjectUpdate } from '../projects/events.js';
 import { handleProjectError } from '../projects/auth.js';
 import { ingestAndSyncCaptureEvents, type CaptureEventInput } from './ingest.js';
 
-type CaptureTokenActor = Extract<AuthActor, { kind: 'token' }>;
+type CaptureTokenActor = Extract<AuthActor, { kind: 'token' }> & { allowedOrigins: string[] };
 
 function getCaptureActor(c: Context): CaptureTokenActor {
 	return c.get('captureActor') as CaptureTokenActor;
@@ -38,6 +38,7 @@ function createCaptureBearerMiddleware(pool: pg.Pool) {
 			tokenId: row.id,
 			projectId: row.project_id,
 			scopes: row.scopes ?? [],
+			allowedOrigins: row.allowed_origins ?? [],
 		};
 		c.set('captureActor', actor);
 		return next();
@@ -60,15 +61,23 @@ export function createCaptureRouter(pool: pg.Pool, config: Config) {
 
 	router.post('/capture/events', bearer, async (c) => {
 		try {
+			const len = Number(c.req.header('content-length') ?? 0);
+			if (len > 6 * 1024 * 1024) {
+				return c.json({ error: 'payload_too_large', message: 'Max request body is 6MB' }, 413);
+			}
 			const actor = getCaptureActor(c);
 			const body = await c.req.json<{ events?: CaptureEventInput[]; sync?: boolean }>();
 			const events = Array.isArray(body.events) ? body.events : [];
+			if (events.length > 50) {
+				return c.json({ error: 'bad_request', message: 'Max 50 events per batch' }, 400);
+			}
 			const result = await ingestAndSyncCaptureEvents(
 				pool,
 				actor.projectId,
 				events,
 				actor,
 				body.sync !== false,
+				actor.allowedOrigins,
 			);
 			if (result.synced && result.version != null) {
 				publishProjectUpdate(actor.projectId, result.version);

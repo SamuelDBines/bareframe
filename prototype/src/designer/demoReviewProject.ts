@@ -68,7 +68,7 @@ export function buildDemoReviewProject(): DesignerProject {
         id: 'conn-landing-code',
         fromFrameId: landingId,
         toFrameId: codeId,
-        label: 'Email me a sign-in code',
+        label: 'Sign-in code',
         trigger: 'tap',
       },
       {

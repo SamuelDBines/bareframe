@@ -1,24 +1,22 @@
+import { Card } from '@bareframe/react';
+import { AppPage, AppPageHeader } from '../../app/AppUi';
+
 export function AgentSettingsPage() {
 	return (
-		<>
-			<div className="page-hero">
-				<h1>Agent & MCP connections</h1>
-				<p className="lead">
-					Public catalog tools live at <code>https://bareframe.org/mcp</code> (read-only). Canvas writes use{' '}
-					<code>https://bareframe.org/mcp/studio</code> with a project token from project settings.
-				</p>
-			</div>
-			<div className="card" style={{ maxWidth: 560 }}>
-				<h3>Hosted servers</h3>
+		<AppPage narrow>
+			<AppPageHeader
+				title="Agent & MCP"
+				lead="Connect AI assistants to Bareframe’s public catalog and your project canvas."
+			/>
+			<Card variant="outlined" title="Hosted servers">
 				<p>
-					See <a href="#/components/mcp">Connect agent</a> for the public MCP snippet, tool list, and rate-limit
-					notes.
+					Public read-only tools live at <code>https://bareframe.org/mcp</code>. Canvas writes use the studio
+					endpoint with a project token from project settings.
 				</p>
-				<p style={{ marginTop: '1rem' }}>
-					Open a cloud project and choose <strong>Project settings</strong> to mint a <code>bf_proj_…</code> token and
-					copy the studio MCP config.
+				<p className="app-muted-inline">
+					See <a href="#/components/mcp">Connect agent</a> for snippets, tool list, and rate limits.
 				</p>
-			</div>
-		</>
+			</Card>
+		</AppPage>
 	);
 }

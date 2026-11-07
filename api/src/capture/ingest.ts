@@ -1,7 +1,8 @@
 import type pg from 'pg';
-import { insertProjectAsset, type AuthActor } from '../db/projects.js';
+import { insertProjectAsset, ProjectAccessError, type AuthActor } from '../db/projects.js';
 import { isAllowedPublicUrl } from '../render/ssrf.js';
 import { syncCaptureFlowMap } from './sync-flow.js';
+import { eventUrlAllowed } from './domain.js';
 
 export type CaptureEventInput = {
 	sessionId: string;
@@ -56,8 +57,9 @@ export async function ingestCaptureEvents(
 	pool: pg.Pool,
 	projectId: string,
 	events: CaptureEventInput[],
-): Promise<{ accepted: number; synced: boolean; version?: number }> {
-	if (events.length === 0) return { accepted: 0, synced: false };
+	allowedOrigins: string[] = [],
+): Promise<{ accepted: number; rejectedOrigin: number; synced: boolean; version?: number }> {
+	if (events.length === 0) return { accepted: 0, rejectedOrigin: 0, synced: false };
 	if (events.length > MAX_BATCH) {
 		throw new Error(`Too many events (max ${MAX_BATCH})`);
 	}
@@ -72,8 +74,13 @@ export async function ingestCaptureEvents(
 	}
 
 	let accepted = 0;
+	let rejectedOrigin = 0;
 	for (const ev of events) {
 		if (!ev.sessionId?.trim() || !ev.url?.trim()) continue;
+		if (allowedOrigins.length && !eventUrlAllowed(ev.url, allowedOrigins)) {
+			rejectedOrigin += 1;
+			continue;
+		}
 		const capturedAt =
 			ev.ts != null
 				? new Date(typeof ev.ts === 'number' ? ev.ts : Date.parse(String(ev.ts)))
@@ -98,7 +105,11 @@ export async function ingestCaptureEvents(
 		accepted += 1;
 	}
 
-	return { accepted, synced: false };
+	if (accepted === 0 && rejectedOrigin > 0) {
+		throw new ProjectAccessError('Event URLs do not match the allowed website origin for this token', 403);
+	}
+
+	return { accepted, rejectedOrigin, synced: false };
 }
 
 export async function ingestAndSyncCaptureEvents(
@@ -107,8 +118,15 @@ export async function ingestAndSyncCaptureEvents(
 	events: CaptureEventInput[],
 	actor: AuthActor,
 	sync: boolean,
-): Promise<{ accepted: number; synced: boolean; version?: number; pageId?: string }> {
-	const ingested = await ingestCaptureEvents(pool, projectId, events);
+	allowedOrigins: string[] = [],
+): Promise<{
+	accepted: number;
+	rejectedOrigin: number;
+	synced: boolean;
+	version?: number;
+	pageId?: string;
+}> {
+	const ingested = await ingestCaptureEvents(pool, projectId, events, allowedOrigins);
 	if (!sync || ingested.accepted === 0) return ingested;
 	try {
 		const result = await syncCaptureFlowMap(pool, projectId, actor);

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { friendlyError, isAiUnavailable } from '../../app/apiError';
-import { createFlowMap, importFigmaDesign, importSitemap } from '../../app/reviewApi';
+import { importFigmaDesign, importSitemap } from '../../app/reviewApi';
 import { fetchPackageConfig, startPackageGeneration } from '../../designer/packageApi';
 import { createProject } from '../../designer/projectApi';
+import { looksLikeWebsiteUrl, websiteHostname } from './websiteImportUtils';
 
 export type StartKind = 'brief' | 'figma' | 'url' | 'sitemap';
 
@@ -52,12 +53,13 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 		};
 	}, [busy, onClose]);
 
-	const urlLocked = planTier === 'free';
+	const siteUrlValid = looksLikeWebsiteUrl(siteUrl);
+	const sitemapRequiresPro = planTier === 'free';
 	const canSubmit =
 		!busy &&
 		((kind === 'figma' && /figma\.com\//.test(figmaUrl)) ||
-			(kind === 'url' && !urlLocked && /^https?:\/\/.+\..+/.test(siteUrl.trim())) ||
-			(kind === 'sitemap' && !urlLocked && /^https?:\/\/.+\..+/.test(siteUrl.trim())) ||
+			(kind === 'url' && siteUrlValid) ||
+			(kind === 'sitemap' && !sitemapRequiresPro && siteUrlValid) ||
 			(kind === 'brief' && aiReady === true && idea.trim().length > 8));
 
 	async function submit(e: React.FormEvent) {
@@ -72,9 +74,8 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 				navigate(`/app/project/${p.id}`);
 			} else if (kind === 'url') {
 				const url = siteUrl.trim();
-				const p = await createProject(new URL(url).hostname);
-				await createFlowMap(p.id, url, p.version);
-				navigate(`/app/project/${p.id}`);
+				const p = await createProject(websiteHostname(url));
+				navigate(`/app/project/${p.id}/website-setup?url=${encodeURIComponent(url)}`);
 			} else if (kind === 'sitemap') {
 				const url = siteUrl.trim();
 				const p = await createProject(`Sitemap: ${new URL(url).hostname}`);
@@ -207,21 +208,29 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 									onChange={(e) => setSiteUrl(e.target.value)}
 									placeholder="https://yourproduct.com"
 									inputMode="url"
-									disabled={urlLocked}
+									data-testid="app-website-url"
 								/>
 							</label>
-							{urlLocked ? (
+							{siteUrl.trim() && !siteUrlValid ? (
+								<p className="bx-hint" role="status">
+									Enter a full address starting with https://
+								</p>
+							) : null}
+							{planTier === 'free' ? (
 								<div className="bx-notice bx-notice--accent" role="status">
 									<span className="bx-notice__icon" aria-hidden>
 										★
 									</span>
 									<p>
-										<strong>Website import is part of Pro.</strong> Start from Figma or a brief on the
-										free plan, or upgrade any time from your projects page.
+										<strong>Public crawl (server screenshots) is Pro.</strong> You can still set up{' '}
+										<strong>installed capture</strong> on the free plan — add our script to your site and
+										pages flow onto the canvas as you navigate.
 									</p>
 								</div>
 							) : (
-								<p className="bx-hint">We follow links from this page to draft the journey.</p>
+								<p className="bx-hint">
+									Next: choose installed capture or a Pro server crawl from the setup page.
+								</p>
 							)}
 						</>
 					) : null}
@@ -235,11 +244,10 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 									onChange={(e) => setSiteUrl(e.target.value)}
 									placeholder="https://example.com or https://example.com/sitemap.xml"
 									inputMode="url"
-									disabled={urlLocked}
 									data-testid="app-sitemap-url"
 								/>
 							</label>
-							{urlLocked ? (
+							{sitemapRequiresPro ? (
 								<div className="bx-notice bx-notice--accent" role="status">
 									<span className="bx-notice__icon" aria-hidden>
 										★
@@ -308,7 +316,13 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 							Or start with a blank map
 						</button>
 						<button type="submit" className="btn btn-primary" disabled={!canSubmit}>
-							{busy ? 'Setting up…' : kind === 'brief' ? 'Draft my flow' : 'Create flow map'}
+							{busy
+								? 'Setting up…'
+								: kind === 'brief'
+									? 'Draft my flow'
+									: kind === 'url'
+										? 'Continue to website setup'
+										: 'Create flow map'}
 						</button>
 					</div>
 				</form>

@@ -32,6 +32,7 @@ import { createBillingRouter } from './billing/routes.js';
 import { createFigmaRouter } from './figma/routes.js';
 import { createPublicToolsRouter } from './public/check-url.js';
 import { createCaptureRouter } from './capture/routes.js';
+import { createWebsiteCaptureRouter } from './capture/setup-routes.js';
 import { createSitemapRouter } from './sitemap/routes.js';
 
 export type AppDeps = {
@@ -128,6 +129,7 @@ export function createApp(deps: AppDeps): Hono {
 	app.route('/api', createFigmaRouter(pool, config));
 	app.route('/api', createSitemapRouter(pool, config));
 	app.route('/api/v1', createCaptureRouter(pool, config));
+	app.route('/api', createWebsiteCaptureRouter(pool, config));
 
 	return app;
 }

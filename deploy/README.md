@@ -99,6 +99,8 @@ For the Vite prototype, `pnpm dev` proxies `/api` to `http://127.0.0.1:8080` (ov
 
 ### Fast import: app capture + sitemap
 
+**New project → Live website** — free users can always type a URL. **Continue to website setup** mints a domain-bound capture token (ingestion-only, not a GitHub secret). Optional `data-screenshots="1"` on the script enables JPEG captures with password/payment fields redacted.
+
 **App capture (MVP)** — project settings → **Create capture token** (scopes `capture:write`, `assets:upload`). Add the snippet to your product:
 
 ```html

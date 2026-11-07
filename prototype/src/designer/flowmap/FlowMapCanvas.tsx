@@ -178,6 +178,12 @@ function FlowMapCard({
 				aria-pressed={selected}
 				aria-haspopup="menu"
 				aria-label={`${frame.name}${openCount ? `, ${openCount} open finding${openCount === 1 ? '' : 's'}` : ''}`}
+				onContextMenu={(e) => {
+					if (readOnly) return;
+					e.preventDefault();
+					e.stopPropagation();
+					onContextMenu?.(e, frame);
+				}}
 				onKeyDown={(e) => {
 					if (e.key === 'Enter' || e.key === ' ') {
 						e.preventDefault();
@@ -276,16 +282,16 @@ export function FlowMapCanvas({
 		window.requestAnimationFrame(() => fitAll());
 	}, [fitAll]);
 
-	const didInitialFit = useRef(false);
-
 	useEffect(() => {
 		if (frames.length === 0) return;
-		if (didInitialFit.current) return;
-		didInitialFit.current = true;
 		runFit();
-		const t = window.setTimeout(runFit, 180);
-		return () => window.clearTimeout(t);
-	}, [frames.length, runFit]);
+		const t1 = window.setTimeout(runFit, 180);
+		const t2 = window.setTimeout(runFit, 480);
+		return () => {
+			window.clearTimeout(t1);
+			window.clearTimeout(t2);
+		};
+	}, [frames.length, viewport.w, viewport.h, runFit]);
 
 	useEffect(() => {
 		const el = containerRef.current;

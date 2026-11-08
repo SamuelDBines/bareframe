@@ -18,6 +18,7 @@ import { SignUpPage } from './pages/site/SignUp';
 import { AuthProvider } from './auth/AuthContext';
 import { ThemeProvider } from './theme/ThemeContext';
 import { LegacyDesignerRedirect } from './LegacyDesignerRedirect';
+import { AccountSettingsPage } from './pages/app/AccountSettingsPage';
 import { AppHomePage } from './pages/app/AppHomePage';
 import { AppProjectPage } from './pages/app/AppProjectPage';
 import { WebsiteCaptureSetupPage } from './pages/app/WebsiteCaptureSetupPage';
@@ -66,6 +67,7 @@ export default function App() {
 							} />
 						</Route>
 
+						<Route path="app/settings" element={<AccountSettingsPage />} />
 						<Route path="app" element={<AppHomePage />} />
 						<Route path="app/project/:projectId" element={<AppProjectPage />} />
 						<Route path="app/project/:projectId/website-setup" element={<WebsiteCaptureSetupPage />} />

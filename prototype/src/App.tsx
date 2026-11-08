@@ -29,6 +29,9 @@ import { PackageReviewPage } from './pages/designer/PackageReviewPage';
 import { FlowMapDemoPage } from './pages/designer/FlowMapDemoPage';
 import { DemoSaasOnboardingPage } from './pages/designer/DemoSaasOnboardingPage';
 import { DemoCommerceBookingPage } from './pages/designer/DemoCommerceBookingPage';
+import { DemoB2bWorkspacePage } from './pages/designer/DemoB2bWorkspacePage';
+import { DemoMarketplaceFulfilmentPage } from './pages/designer/DemoMarketplaceFulfilmentPage';
+import { DemoMedSchedulePage } from './pages/designer/DemoMedSchedulePage';
 
 function DocsRedirect() {
 	const { pathname } = useLocation();
@@ -79,6 +82,9 @@ export default function App() {
 						<Route path="demo/flow-map" element={<FlowMapDemoPage />} />
 						<Route path="demo/saas-onboarding" element={<DemoSaasOnboardingPage />} />
 						<Route path="demo/commerce-booking" element={<DemoCommerceBookingPage />} />
+						<Route path="demo/b2b-workspace" element={<DemoB2bWorkspacePage />} />
+						<Route path="demo/marketplace-fulfilment" element={<DemoMarketplaceFulfilmentPage />} />
+						<Route path="demo/med-schedule" element={<DemoMedSchedulePage />} />
 
 						<Route path="designer/*" element={<Navigate to="/app" replace />} />
 

@@ -70,7 +70,11 @@ export type DemoScreenSpec = {
 	body: string;
 	primaryCta?: string;
 	secondaryCta?: string;
+	tertiaryCta?: string;
 	fieldPlaceholder?: string;
+	extraFieldPlaceholders?: string[];
+	/** Shown under the nav on every demo screen (defaults to a generic sample label). */
+	sampleBanner?: string | null;
 };
 
 /** Minimal phone screen for public flow-map examples (consistent with Hookoh previews). */
@@ -78,13 +82,21 @@ export function createDemoFlowScreen(spec: DemoScreenSpec): { page: Page; frame:
 	const pageId = `page-${spec.key}`;
 	const frameId = `frame-${spec.key}`;
 	const rootId = `${spec.key}-root`;
+	const showBanner = spec.sampleBanner !== null;
+	const bannerText =
+		spec.sampleBanner === undefined ? 'Sample data · demo workspace only' : spec.sampleBanner ?? '';
+	const rootChildren = showBanner ? ['banner', 'nav', 'hero', 'actions'] : ['nav', 'hero', 'actions'];
+	const fieldIds: string[] = [];
+	if (spec.fieldPlaceholder) fieldIds.push('field');
+	spec.extraFieldPlaceholders?.forEach((_, i) => fieldIds.push(`field-extra-${i}`));
+
 	const nodes: Record<string, Page['nodes'][string]> = {
 		[rootId]: {
 			id: rootId,
 			name: 'Root',
 			type: 'stack',
 			parentId: null,
-			children: ['nav', 'hero', 'actions'],
+			children: rootChildren,
 			layout: stackLayout(18, [0, 0, 28, 0]),
 		},
 		nav: {
@@ -96,6 +108,11 @@ export function createDemoFlowScreen(spec: DemoScreenSpec): { page: Page; frame:
 			layout: { ...stackLayout(8, [12, 16, 8, 16]), mode: 'row', justify: 'space-between', widthMode: 'fill' },
 		},
 		logo: textNode('logo', 'nav', spec.productName, 'h3'),
+		...(showBanner
+			? {
+					banner: textNode('banner', rootId, bannerText, 'p'),
+				}
+			: {}),
 		hero: {
 			id: 'hero',
 			name: 'Hero',
@@ -112,9 +129,10 @@ export function createDemoFlowScreen(spec: DemoScreenSpec): { page: Page; frame:
 			type: 'stack',
 			parentId: rootId,
 			children: [
-				...(spec.fieldPlaceholder ? ['field'] : []),
+				...fieldIds,
 				...(spec.primaryCta ? ['primary'] : []),
 				...(spec.secondaryCta ? ['secondary'] : []),
+				...(spec.tertiaryCta ? ['tertiary'] : []),
 			],
 			layout: stackLayout(10, [0, 20, 0, 20]),
 		},
@@ -122,11 +140,17 @@ export function createDemoFlowScreen(spec: DemoScreenSpec): { page: Page; frame:
 	if (spec.fieldPlaceholder) {
 		nodes.field = inputNode('field', 'actions', spec.fieldPlaceholder);
 	}
+	spec.extraFieldPlaceholders?.forEach((ph, i) => {
+		nodes[`field-extra-${i}`] = inputNode(`field-extra-${i}`, 'actions', ph);
+	});
 	if (spec.primaryCta) {
 		nodes.primary = buttonNode('primary', 'actions', spec.primaryCta, 'primary');
 	}
 	if (spec.secondaryCta) {
 		nodes.secondary = buttonNode('secondary', 'actions', spec.secondaryCta, 'ghost');
+	}
+	if (spec.tertiaryCta) {
+		nodes.tertiary = buttonNode('tertiary', 'actions', spec.tertiaryCta, 'secondary');
 	}
 
 	const page: Page = {

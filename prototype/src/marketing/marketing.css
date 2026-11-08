@@ -1385,6 +1385,26 @@
 
 /* ---------- Examples ---------- */
 
+.examples-section {
+	margin-top: 2.5rem;
+}
+
+.examples-section__title {
+	margin: 0 0 0.35rem;
+	font-size: 1.35rem;
+}
+
+.examples-section__lead {
+	margin: 0 0 1.25rem;
+	max-width: 52rem;
+	color: var(--bx-text-2);
+	font-size: 0.98rem;
+}
+
+.examples--complex .example-card--complex {
+	border-color: color-mix(in srgb, var(--bx-accent) 28%, var(--bx-border));
+}
+
 .examples {
 	list-style: none;
 	margin: 0;

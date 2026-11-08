@@ -4,8 +4,8 @@ import { DemoFlowMapExamplePage } from './DemoFlowMapExamplePage';
 export function DemoMedSchedulePage() {
 	return (
 		<DemoFlowMapExamplePage
-			title="Healthcare scheduling"
-			lead="Twenty-one screens: in-person vs video, insurance verify/error/manual recovery, slot conflict, pre-visit forms, reschedule, cancel policy, waitlist offer, and check-in — demo patients only."
+			title="MedSchedule appointments"
+			lead="In-person vs video paths, insurance recovery, scheduling conflicts, reschedule and cancel policy, waitlist offers, and check-in — demo patients only."
 			buildProject={buildDemoMedScheduleProject}
 		/>
 	);

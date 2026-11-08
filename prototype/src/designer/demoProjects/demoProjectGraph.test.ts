@@ -52,7 +52,7 @@ export function assertDemoGraphIntegrity(project: DesignerProject, opts?: { minS
 	}
 }
 
-describe('complex public demo graphs', () => {
+describe('public journey demo graphs', () => {
 	const builders = [
 		{ name: 'B2B workspace', build: buildDemoB2bWorkspaceProject },
 		{ name: 'marketplace fulfilment', build: buildDemoMarketplaceFulfilmentProject },

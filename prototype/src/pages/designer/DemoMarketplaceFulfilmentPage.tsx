@@ -4,8 +4,8 @@ import { DemoFlowMapExamplePage } from './DemoFlowMapExamplePage';
 export function DemoMarketplaceFulfilmentPage() {
 	return (
 		<DemoFlowMapExamplePage
-			title="Marketplace purchase → return"
-			lead="Twenty-one screens from browse through payment decline/retry, seller fulfilment, delivery issue, return label, refund, and seller closure — fictional Arbor Market listings."
+			title="Arbor Market purchase to return"
+			lead="Browse through payment recovery, seller fulfilment, delivery issues, returns, and refunds — fictional Arbor Market listings only."
 			buildProject={buildDemoMarketplaceFulfilmentProject}
 		/>
 	);

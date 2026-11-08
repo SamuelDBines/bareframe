@@ -1,28 +1,31 @@
 import { test, expect } from '@playwright/test';
 
-const COMPLEX_ROUTES = [
-	{ path: '/#/examples', heading: /See Bareframe on a real flow/i },
-	{ path: '/#/demo/b2b-workspace', workspace: 'flow-map-workspace', minCards: 15 },
-	{ path: '/#/demo/marketplace-fulfilment', workspace: 'flow-map-workspace', minCards: 15 },
-	{ path: '/#/demo/med-schedule', workspace: 'flow-map-workspace', minCards: 15 },
+const JOURNEY_MAP_ROUTES = [
+	{ path: '/#/demo/b2b-workspace', minCards: 15 },
+	{ path: '/#/demo/marketplace-fulfilment', minCards: 15 },
+	{ path: '/#/demo/med-schedule', minCards: 15 },
 ] as const;
 
-test.describe('complex public examples', () => {
-	test('examples gallery lists complex journeys', async ({ page }) => {
+test.describe('public journey examples', () => {
+	test('examples gallery lists all journey demos in one grid', async ({ page }) => {
 		await page.goto('/#/examples');
-		await expect(page.getByRole('heading', { name: /Complex journeys/i })).toBeVisible();
-		await expect(page.getByRole('link', { name: /B2B workspace/i })).toBeVisible();
-		await expect(page.getByRole('link', { name: /Marketplace purchase/i })).toBeVisible();
-		await expect(page.getByRole('link', { name: /Book, reschedule/i })).toBeVisible();
+		await expect(page.getByRole('heading', { name: /See Bareframe on a real flow/i })).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Complex journeys' })).toHaveCount(0);
+		const cards = page.locator('.example-card');
+		expect(await cards.count()).toBe(8);
+		await expect(page.getByRole('link', { name: /LatticeDesk workspace/i })).toBeVisible();
+		await expect(page.getByRole('link', { name: /Arbor Market/i })).toBeVisible();
+		await expect(page.getByRole('link', { name: /MedSchedule appointments/i })).toBeVisible();
+		await expect(page.locator('.example-card__cta').first()).toHaveText('Open example →');
 	});
 
-	for (const route of COMPLEX_ROUTES.slice(1)) {
+	for (const route of JOURNEY_MAP_ROUTES) {
 		test(`smoke: ${route.path} map loads`, async ({ page }) => {
 			await page.goto(route.path);
 			await expect(page.getByTestId('flow-map-workspace')).toBeVisible({ timeout: 30_000 });
-			const cards = page.locator('.flow-map-card');
-			await expect(cards.first()).toBeVisible();
-			expect(await cards.count()).toBeGreaterThanOrEqual(route.minCards);
+			const mapCards = page.locator('.flow-map-card');
+			await expect(mapCards.first()).toBeVisible();
+			expect(await mapCards.count()).toBeGreaterThanOrEqual(route.minCards);
 		});
 	}
 

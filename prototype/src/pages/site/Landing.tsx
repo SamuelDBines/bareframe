@@ -1,34 +1,40 @@
 import { Link } from 'react-router-dom';
 import { LiveFlowDemo } from '../../marketing/LiveFlowDemo';
 import { LogoStrip } from '../../marketing/LogoStrip';
+import {
+	ACCESSIBILITY_DISCLAIMER,
+	HERO_HEADLINE,
+	HERO_SUBHEAD,
+	PRO_PRICE_LABEL,
+} from '../../marketing/offer';
 import '../../marketing/marketing.css';
 
 const STEPS = [
 	{
 		n: '01',
-		title: 'Import from Figma',
-		body: 'Paste a Figma link. Frames become screens and prototype links become connectors. No redrawing.',
+		title: 'Map the journey',
+		body: 'Import from Figma or start on a blank canvas. Screens and connectors show the path users take.',
 		art: 'import',
 	},
 	{
 		n: '02',
-		title: 'Map & review',
-		body: 'See the whole journey on one canvas. AI flags missing screens, drop-off risk and accessibility issues right where they happen.',
+		title: 'Review on the map',
+		body: 'Run AI review on the whole flow. Flags sit on the screens they refer to — missing steps, drop-off risk and accessibility issues.',
 		art: 'review',
 	},
 	{
 		n: '03',
-		title: 'Share a prototype',
-		body: 'One click turns the map into a click-through prototype. Send the link to stakeholders or test it with users.',
+		title: 'Share with stakeholders',
+		body: 'Turn the map into a click-through prototype when you are ready. One link for feedback or user tests.',
 		art: 'share',
 	},
 ] as const;
 
 const CATCHES = [
-	{ sev: 'critical', label: 'Missing screens', body: 'Error, empty and edge-case states nobody designed yet.' },
-	{ sev: 'major', label: 'Drop-off risk', body: 'Steps where people are likely to give up, with an estimate and a reason.' },
-	{ sev: 'minor', label: 'Accessibility', body: 'Contrast, focus order and labelling checked against WCAG 2.2 AA.' },
-	{ sev: 'info', label: 'UX friction', body: 'Competing calls to action, extra steps and confusing copy.' },
+	{ sev: 'critical', label: 'Missing steps', body: 'Screens and states the journey needs but does not show yet.' },
+	{ sev: 'major', label: 'Drop-off risk', body: 'Steps where people are likely to give up, with a short reason.' },
+	{ sev: 'minor', label: 'Accessibility', body: 'Contrast, focus order and labelling checked against WCAG 2.2 AA guidance.' },
+	{ sev: 'info', label: 'UX friction', body: 'Competing calls to action, extra steps and unclear copy.' },
 ] as const;
 
 function StepArt({ kind }: { kind: (typeof STEPS)[number]['art'] }) {
@@ -77,24 +83,14 @@ export function LandingPage() {
 	return (
 		<div className="landing">
 			<section className="hero bx-container">
-				<p className="bx-eyebrow bx-reveal">
-					<span className="bx-eyebrow__tag">New</span>
-					AI review, pinned to your flow map
-				</p>
-				<h1 className="hero__title bx-reveal">
-					See your whole user journey.
-					<br />
-					<span>Fix it before people drop off.</span>
-				</h1>
-				<p className="hero__lead bx-reveal">
-					Bring your screens in from Figma, map how they connect, and let AI flag missing screens, drop-off
-					risks and accessibility issues right on the map. Then share it as a click-through prototype.
-				</p>
+				<p className="bx-eyebrow bx-reveal">Flow map · AI review</p>
+				<h1 className="hero__title bx-reveal">{HERO_HEADLINE}</h1>
+				<p className="hero__lead bx-reveal">{HERO_SUBHEAD}</p>
 				<div className="hero__cta bx-reveal">
 					<Link to="/app" className="btn btn-primary btn-lg">
 						Start free
 					</Link>
-					<span className="hero__note">Free plan · 1 project · 3 AI reviews a month</span>
+					<span className="hero__note">Free · your first flow · 3 AI reviews a month · Pro {PRO_PRICE_LABEL}</span>
 				</div>
 				<div className="hero__demo bx-reveal">
 					<LiveFlowDemo />
@@ -107,8 +103,8 @@ export function LandingPage() {
 				<div className="bx-container">
 					<div className="bx-section-head">
 						<span className="bx-kicker">How it works</span>
-						<h2 id="how-title">From Figma file to shareable prototype in three steps</h2>
-						<p>Bareframe is built around flows, not pixels. Keep designing in Figma; use Bareframe to see, review and share the journey.</p>
+						<h2 id="how-title">One canvas for the whole journey</h2>
+						<p>Map the flow, review it on the map, then share a prototype when you need feedback.</p>
 					</div>
 					<ol className="steps">
 						{STEPS.map((s) => (
@@ -127,10 +123,10 @@ export function LandingPage() {
 				<div className="bx-container catch">
 					<div className="catch__copy">
 						<span className="bx-kicker">AI review</span>
-						<h2 id="catch-title">Every finding lives on the screen it’s about</h2>
+						<h2 id="catch-title">Findings stay on the screen they refer to</h2>
 						<p>
-							No separate report to cross-reference. Each flag sits on the map with a severity, a short
-							reason and a suggested fix you can apply in one click.
+							No separate report to cross-reference. Each flag has a severity, a short explanation and a
+							suggested fix you can track on the map.
 						</p>
 						<Link to="/demo/journey-review" className="btn btn-secondary">
 							Open the example project
@@ -147,6 +143,23 @@ export function LandingPage() {
 							</li>
 						))}
 					</ul>
+					<p className="bx-hint catch__disclaimer">{ACCESSIBILITY_DISCLAIMER}</p>
+				</div>
+			</section>
+
+			<section className="bx-section bx-section--tint" aria-labelledby="extras-title">
+				<div className="bx-container">
+					<div className="bx-section-head">
+						<span className="bx-kicker">Also</span>
+						<h2 id="extras-title">Component library &amp; agent docs</h2>
+						<p>
+							Bareframe includes a React component gallery and MCP docs for agents — useful once your flow is
+							mapped, but not part of the core offer.
+						</p>
+						<Link to="/components" className="btn btn-secondary">
+							Browse components
+						</Link>
+					</div>
 				</div>
 			</section>
 
@@ -154,13 +167,13 @@ export function LandingPage() {
 				<div className="bx-container">
 					<div className="cta-band">
 						<h2>Map your first flow today</h2>
-						<p>Start on the free plan. Upgrade when your team needs more projects and reviews.</p>
+						<p>Start free. Upgrade to Pro ({PRO_PRICE_LABEL}) when you need more projects and server imports.</p>
 						<div className="cta-band__actions">
 							<Link to="/app" className="btn btn-lg cta-band__primary">
 								Start free
 							</Link>
 							<Link to="/pricing" className="cta-band__link">
-								Compare plans →
+								See pricing →
 							</Link>
 						</div>
 					</div>

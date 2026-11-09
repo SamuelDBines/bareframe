@@ -218,13 +218,14 @@ test.describe('Route screenshots (1440×900)', () => {
 		await expect(page.locator('.flow-map-card--selected')).toHaveCount(0);
 	});
 
-	test('pricing toggle switches Pro between monthly and yearly', async ({ page }) => {
+	test('pricing shows single Pro price in GBP', async ({ page }) => {
 		await mockApi(page, 'offline');
 		await visit(page, 'pricing', '.plan--popular');
 		const pro = page.locator('.plan--popular');
-		await expect(pro.locator('.plan__amount')).toHaveText('$29');
-		await page.getByRole('radio', { name: 'Monthly' }).click();
-		await expect(pro.locator('.plan__amount')).toHaveText('$39');
+		await expect(pro.locator('.plan__amount')).toHaveText('£20');
+		await expect(page.getByTestId('plan-pro-amount')).toHaveText('£20');
+		await expect(page.getByText('Free to start. One Pro price.')).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Team' })).toHaveCount(0);
 	});
 
 	for (const c of CASES.filter((x) =>

@@ -757,6 +757,13 @@
 	box-shadow: inset 0 0 0 5px #fff, inset 0 0 0 11px var(--bx-text-2);
 }
 
+.logo-mark--share {
+	border-radius: 4px;
+	background: transparent;
+	border: 2px solid var(--bx-text-2);
+	box-shadow: inset 6px 0 0 var(--bx-text-2);
+}
+
 /* ---------- Steps ---------- */
 
 .steps {
@@ -1039,6 +1046,12 @@
 	line-height: 1.55;
 }
 
+.catch__disclaimer {
+	grid-column: 1 / -1;
+	margin: 1.25rem 0 0;
+	max-width: 52ch;
+}
+
 /* ---------- CTA band ---------- */
 
 .cta-band {
@@ -1181,6 +1194,19 @@
 	grid-template-columns: repeat(4, minmax(0, 1fr));
 	gap: 1rem;
 	align-items: stretch;
+}
+
+.plans--two {
+	max-width: 820px;
+	margin: 0 auto;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pricing__enterprise {
+	max-width: 720px;
+	margin: 2rem auto 0;
+	text-align: center;
+	font-size: 0.92rem;
 }
 
 .plan {

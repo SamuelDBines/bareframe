@@ -12,7 +12,7 @@ const publicDir = path.join(root, 'public');
 const legacyDir = path.join(publicDir, 'legacy');
 const prototypeDir = path.join(publicDir, 'prototype');
 
-const SKIP_MOVE = new Set(['legacy', 'prototype', 'designer', 'CNAME', '.nojekyll']);
+const SKIP_MOVE = new Set(['legacy', 'prototype', 'designer', 'e2e-fixtures', 'CNAME', '.nojekyll']);
 
 /** Depth from the HTML file to `public/legacy/` (dist + themes live alongside demos there). */
 function assetPrefixForLegacyHtmlDir(dirInsideLegacy) {

@@ -26,7 +26,7 @@ export function AppShell() {
 	const [scrolled, setScrolled] = useState(false);
 
 	const fullBleed =
-		pathname.startsWith('/app/project') ||
+		(pathname.startsWith('/app/project') && !pathname.includes('/website-setup')) ||
 		pathname.startsWith('/share') ||
 		pathname.startsWith('/demo/journey-review') ||
 		pathname.startsWith('/demo/share-canvas');

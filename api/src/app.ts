@@ -13,7 +13,12 @@ import {
 	setSessionCookie,
 } from './auth/cookies.js';
 import { randomToken, hashToken } from './auth/crypto.js';
-import { githubAuthorizeUrl } from './auth/github.js';
+import {
+	githubAuthorizeUrl,
+	GITHUB_INSTALL_LIST_SCOPES,
+	GITHUB_SIGNIN_SCOPES,
+} from './auth/github.js';
+import { createGitHubInstallRouter } from './github/routes.js';
 import { isSafeReturnTo, normalizeReturnTo, resolvePostAuthRedirect } from './auth/returnTo.js';
 import {
 	createSession,
@@ -51,10 +56,24 @@ export function createApp(deps: AppDeps): Hono {
 	app.get('/api/auth/github', (c) => {
 		const returnTo = normalizeReturnTo(c.req.query('returnTo'), config.designerPublicUrl);
 		const state = randomToken(16);
-		setOAuthStateCookie(c, { state, returnTo }, config.sessionSecret, cookieSettings);
+		setOAuthStateCookie(c, { state, returnTo, purpose: 'signin' }, config.sessionSecret, cookieSettings);
 
 		const redirectUri = `${config.publicUrl}/api/auth/github/callback`;
-		const url = githubAuthorizeUrl(config.githubClientId, redirectUri, state);
+		const url = githubAuthorizeUrl(config.githubClientId, redirectUri, state, GITHUB_SIGNIN_SCOPES);
+		return c.redirect(url, 302);
+	});
+
+	app.get('/api/auth/github/install', (c) => {
+		const returnTo = normalizeReturnTo(c.req.query('returnTo'), config.designerPublicUrl);
+		const state = randomToken(16);
+		setOAuthStateCookie(c, { state, returnTo, purpose: 'install' }, config.sessionSecret, cookieSettings);
+		const redirectUri = `${config.publicUrl}/api/auth/github/callback`;
+		const url = githubAuthorizeUrl(
+			config.githubClientId,
+			redirectUri,
+			state,
+			GITHUB_INSTALL_LIST_SCOPES,
+		);
 		return c.redirect(url, 302);
 	});
 
@@ -84,6 +103,13 @@ export function createApp(deps: AppDeps): Hono {
 				avatarUrl: ghUser.avatar_url,
 				email: ghUser.email,
 			});
+
+			if (stored.purpose === 'install') {
+				await pool.query(
+					`UPDATE users SET github_oauth_access_token = $2, github_oauth_scopes = $3, github_oauth_updated_at = NOW() WHERE id = $1`,
+					[user.id, accessToken, GITHUB_INSTALL_LIST_SCOPES],
+				);
+			}
 
 			const sessionToken = randomToken(32);
 			const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -130,6 +156,7 @@ export function createApp(deps: AppDeps): Hono {
 	app.route('/api', createSitemapRouter(pool, config));
 	app.route('/api/v1', createCaptureRouter(pool, config));
 	app.route('/api', createWebsiteCaptureRouter(pool, config));
+	app.route('/api', createGitHubInstallRouter(pool, config));
 
 	return app;
 }

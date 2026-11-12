@@ -61,12 +61,15 @@ export function createWebsiteCaptureRouter(pool: pg.Pool, config: Config) {
 			if (!body.repo || !body.branch || !body.snippetHtml) {
 				return c.json({ error: 'bad_request', message: 'repo, branch, and snippetHtml are required' }, 400);
 			}
-			const preview = buildInstallPrPreview({
-				repo: body.repo,
-				branch: body.branch,
-				filePath: body.filePath,
-				snippetHtml: body.snippetHtml,
-			});
+			const preview = buildInstallPrPreview(
+				{
+					repo: body.repo,
+					branch: body.branch,
+					filePath: body.filePath,
+					snippetHtml: body.snippetHtml,
+				},
+				{ githubAppConnected: Boolean(config.githubInstallAppSlug) },
+			);
 			return c.json(preview);
 		} catch (err) {
 			return handleProjectError(c, err);

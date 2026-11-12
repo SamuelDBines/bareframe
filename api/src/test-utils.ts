@@ -25,6 +25,7 @@ export const testConfig: Config = {
 	stripeSecretKey: null,
 	stripePriceId: null,
 	figmaAccessToken: null,
+	githubInstallAppSlug: null,
 };
 
 export async function setupTestDb(pool: pg.Pool): Promise<void> {

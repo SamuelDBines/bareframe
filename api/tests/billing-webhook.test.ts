@@ -6,7 +6,7 @@ import { createTestApp, setupTestDb, testConfig } from '../src/test-utils.js';
 import { upsertUser } from '../src/db/index.js';
 import { signStripeWebhookPayload } from '../src/billing/signature.js';
 
-const WEBHOOK_SECRET = 'unit_test_webhook_signing_secret________';
+const WEBHOOK_SECRET = 'whsec_integrationTestWebhookSigningSecret';
 
 function checkoutCompletedEvent(userId: number, customerId: string, subId: string, eventId = 'evt_checkout_1') {
 	return {

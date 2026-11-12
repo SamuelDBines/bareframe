@@ -16,6 +16,7 @@ export type Config = {
 	packageRateLimitPerHour: number;
 	stripeSecretKey: string | null;
 	stripePriceId: string | null;
+	stripeWebhookSecret: string | null;
 	figmaAccessToken: string | null;
 };
 
@@ -57,6 +58,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
 		packageRateLimitPerHour: Number(env.PACKAGE_RATE_LIMIT_PER_HOUR ?? 5),
 		stripeSecretKey: env.STRIPE_SECRET_KEY ?? null,
 		stripePriceId: env.STRIPE_PRICE_ID ?? null,
+		stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET ?? null,
 		figmaAccessToken: env.FIGMA_ACCESS_TOKEN ?? null,
 	};
 }

@@ -4,7 +4,12 @@ export function stripeConfigured(config: Config): boolean {
   return Boolean(config.stripeSecretKey && config.stripePriceId);
 }
 
-export async function createCheckoutSession(config: Config, userId: number, email: string | null) {
+export async function createCheckoutSession(
+  config: Config,
+  userId: number,
+  email: string | null,
+  existingStripeCustomerId?: string | null,
+) {
   if (!stripeConfigured(config)) {
     return { disabled: true as const, message: 'Stripe is not configured on this deployment.' };
   }
@@ -18,8 +23,13 @@ export async function createCheckoutSession(config: Config, userId: number, emai
     'line_items[0][price]': config.stripePriceId!,
     'line_items[0][quantity]': '1',
     client_reference_id: String(userId),
+    'metadata[user_id]': String(userId),
   });
-  if (email) params.set('customer_email', email);
+  if (existingStripeCustomerId) {
+    params.set('customer', existingStripeCustomerId);
+  } else if (email) {
+    params.set('customer_email', email);
+  }
 
   const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
@@ -47,4 +57,37 @@ export async function createCheckoutSession(config: Config, userId: number, emai
     successUrl,
     cancelUrl,
   };
+}
+
+export async function createBillingPortalSession(config: Config, stripeCustomerId: string) {
+  if (!stripeConfigured(config)) {
+    return { disabled: true as const, message: 'Stripe is not configured on this deployment.' };
+  }
+  const returnUrl = `${config.publicUrl}/#/app`;
+
+  const params = new URLSearchParams({
+    customer: stripeCustomerId,
+    return_url: returnUrl,
+  });
+
+  const res = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${config.stripeSecretKey}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params,
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    return {
+      disabled: true as const,
+      message: `Stripe portal failed (${res.status}): ${text.slice(0, 240)}`,
+    };
+  }
+  const session = JSON.parse(text) as { url?: string };
+  if (!session.url) {
+    return { disabled: true as const, message: 'Stripe did not return a portal URL.' };
+  }
+  return { disabled: false as const, portalUrl: session.url };
 }

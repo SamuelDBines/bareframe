@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { friendlyError } from '../../app/apiError';
-import { fetchPlan, startProCheckout } from '../../app/reviewApi';
+import { fetchPlan, openBillingPortal, startProCheckout } from '../../app/reviewApi';
 import { githubSignInUrl, useAuth } from '../../auth/AuthContext';
 import { listProjects, type ApiProjectSummary } from '../../designer/projectApi';
 import { githubAuthReturnTo } from '../../sites/urls';
@@ -59,6 +59,16 @@ export function AppHomePage() {
 		}
 	}
 
+	async function manageBilling() {
+		try {
+			const r = await openBillingPortal();
+			if (r.portalUrl) window.location.href = r.portalUrl;
+			else setNotice(r.message ?? 'Billing portal isn’t available right now.');
+		} catch (e) {
+			setNotice(friendlyError(e, 'Billing portal isn’t available right now.'));
+		}
+	}
+
 	if (status === 'loading') {
 		return (
 			<div className="bx-page app-home" aria-busy="true">
@@ -113,7 +123,16 @@ export function AppHomePage() {
 				<div className="app-home__actions">
 					{planTier === 'free' ? (
 						<button type="button" className="btn btn-secondary" onClick={() => void upgrade()}>
-							Upgrade to Pro
+							Upgrade to Pro · £20/mo
+						</button>
+					) : planTier === 'pro' ? (
+						<button
+							type="button"
+							className="btn btn-secondary"
+							onClick={() => void manageBilling()}
+							data-testid="manage-billing"
+						>
+							Manage billing
 						</button>
 					) : null}
 					<button type="button" className="btn btn-primary" onClick={() => setDialog('figma')} data-testid="new-project">

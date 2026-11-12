@@ -24,6 +24,7 @@ export const testConfig: Config = {
 	packageRateLimitPerHour: 100,
 	stripeSecretKey: null,
 	stripePriceId: null,
+	stripeWebhookSecret: null,
 	figmaAccessToken: null,
 };
 

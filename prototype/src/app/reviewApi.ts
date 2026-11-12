@@ -158,6 +158,23 @@ export async function startProCheckout(): Promise<{
   return res.json();
 }
 
+export async function openBillingPortal(): Promise<{
+  portalUrl?: string;
+  message?: string;
+  disabled?: boolean;
+}> {
+  const res = await fetch('/api/billing/portal', { method: 'POST', credentials: 'include' });
+  if (res.status === 503) {
+    return { disabled: true, message: 'Billing portal is not available on this deployment.' };
+  }
+  if (res.status === 400) {
+    const body = (await res.json()) as { message?: string };
+    return { disabled: true, message: body.message ?? 'No Stripe billing profile for this account.' };
+  }
+  if (!res.ok) await apiFail(res, 'Billing portal failed');
+  return res.json();
+}
+
 export async function listReviewRuns(projectId: string) {
   const res = await fetch(`/api/projects/${projectId}/reviews`, { credentials: 'include' });
   if (!res.ok) await apiFail(res, 'Failed to list reviews');

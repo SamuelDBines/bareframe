@@ -59,8 +59,28 @@ kubectl create secret generic bareframe-api-env -n bareframe \
 | `GITHUB_CLIENT_SECRET` | OAuth App client secret |
 | `SESSION_SECRET` | Random string (32+ chars) for signing session and OAuth state cookies |
 | `DATABASE_URL` | Postgres URL for the dedicated `bareframe` role/database |
+| `STRIPE_SECRET_KEY` | (Optional) Stripe secret key for Pro Checkout and Customer Portal |
+| `STRIPE_PRICE_ID` | (Optional) Stripe Price id for **Bareframe Pro at £20/month (GBP)** |
+| `STRIPE_WEBHOOK_SECRET` | (Optional) Signing secret for `POST /api/billing/webhook` (starts with `whsec_`) |
 
 `PUBLIC_URL` and `DESIGNER_PUBLIC_URL` are set on the Deployment manifest (`https://bareframe.org` and `https://designer.bareframe.org`), not in the secret.
+
+### Stripe billing (Pro subscriptions)
+
+Checkout (`POST /api/billing/checkout`) is enabled when `STRIPE_SECRET_KEY` and `STRIPE_PRICE_ID` are set. **Plan upgrades are applied by webhooks**, not at checkout time in the browser.
+
+In the [Stripe Dashboard](https://dashboard.stripe.com/webhooks), add an endpoint:
+
+| Field | Value |
+|-------|--------|
+| URL | `https://bareframe.org/api/billing/webhook` |
+| Events | `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed` |
+
+Paste the endpoint’s **Signing secret** into `STRIPE_WEBHOOK_SECRET` on the API Deployment. The API verifies the `Stripe-Signature` header against the **raw** request body.
+
+Customer self-service cancellation and payment methods use `POST /api/billing/portal` (Stripe Customer Portal). Pro users see **Manage billing** on the projects page when they have a `stripe_customer_id`.
+
+Manual Pro grants (no Stripe subscription on the user row) are **not** downgraded by subscription webhooks.
 
 ### Postgres
 

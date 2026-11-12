@@ -24,7 +24,12 @@ test.describe('website import stepper', () => {
 			await page.getByTestId('import-next').click();
 			await expect(page.getByTestId('import-step-2')).toBeVisible();
 
-			await expect(page.locator('.website-import')).toHaveScreenshot(
+			await page.addStyleTag({
+				content:
+					'*, *::before, *::after { font-family: Arial, Helvetica, sans-serif !important; -webkit-font-smoothing: antialiased; }',
+			});
+
+			await expect(page.getByTestId('import-step-visual')).toHaveScreenshot(
 				`website-import-step-2-${project}.png`,
 				{ maxDiffPixelRatio: 0.03, animations: 'disabled' },
 			);

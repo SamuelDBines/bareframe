@@ -1,16 +1,12 @@
-import { createHmac } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { serve } from '@hono/node-server';
+import type { Server } from 'node:http';
 import type pg from 'pg';
 import { createTestApp, setupTestDb, testConfig } from '../src/test-utils.js';
 import { upsertUser } from '../src/db/index.js';
+import { signStripeWebhookPayload } from '../src/billing/signature.js';
 
-const WEBHOOK_SECRET = 'whsec_test_webhook_secret_for_unit_tests';
-
-function signStripePayload(payload: string, secret: string, timestamp = Math.floor(Date.now() / 1000)) {
-	const signed = `${timestamp}.${payload}`;
-	const v1 = createHmac('sha256', secret).update(signed, 'utf8').digest('hex');
-	return `t=${timestamp},v1=${v1}`;
-}
+const WEBHOOK_SECRET = 'unit_test_webhook_signing_secret________';
 
 function checkoutCompletedEvent(userId: number, customerId: string, subId: string, eventId = 'evt_checkout_1') {
 	return {
@@ -50,12 +46,21 @@ function subscriptionEvent(
 
 describe('Stripe billing webhooks', () => {
 	let pool: pg.Pool;
+	let baseUrl = '';
+	let server: Server;
 	const config = { ...testConfig, stripeWebhookSecret: WEBHOOK_SECRET };
 
 	beforeAll(async () => {
 		const pgMod = await import('pg');
 		pool = new pgMod.default.Pool({ connectionString: testConfig.databaseUrl });
 		await setupTestDb(pool);
+		const app = createTestApp(pool, {} as never, config);
+		await new Promise<void>((resolve) => {
+			server = serve({ fetch: app.fetch, port: 0 }, (info) => {
+				baseUrl = `http://127.0.0.1:${info.port}`;
+				resolve();
+			});
+		});
 	});
 
 	beforeEach(async () => {
@@ -63,6 +68,7 @@ describe('Stripe billing webhooks', () => {
 	});
 
 	afterAll(async () => {
+		server?.close();
 		await pool.end();
 	});
 
@@ -75,7 +81,6 @@ describe('Stripe billing webhooks', () => {
 	}
 
 	async function postWebhook(body: unknown, signature?: string) {
-		const app = createTestApp(pool, {} as never, config);
 		const payload = JSON.stringify(body);
 		const headers: Record<string, string> = {
 			'Content-Type': 'application/json',
@@ -83,11 +88,7 @@ describe('Stripe billing webhooks', () => {
 		if (signature !== undefined) {
 			headers['stripe-signature'] = signature;
 		}
-		return app.request('/api/billing/webhook', {
-			method: 'POST',
-			headers,
-			body: payload,
-		});
+		return fetch(`${baseUrl}/api/billing/webhook`, { method: 'POST', headers, body: payload });
 	}
 
 	it('rejects webhooks with an invalid signature', async () => {
@@ -98,8 +99,8 @@ describe('Stripe billing webhooks', () => {
 			avatarUrl: null,
 			email: 'buyer@test',
 		});
-		const payload = JSON.stringify(checkoutCompletedEvent(user.id, 'cus_x', 'sub_x'));
-		const res = await postWebhook(JSON.parse(payload), 't=1,v1=deadbeef');
+		const body = checkoutCompletedEvent(user.id, 'cus_x', 'sub_x');
+		const res = await postWebhook(body, 't=1,v1=deadbeef');
 		expect(res.status).toBe(400);
 	});
 
@@ -113,7 +114,7 @@ describe('Stripe billing webhooks', () => {
 		});
 		const body = checkoutCompletedEvent(user.id, 'cus_checkout', 'sub_checkout');
 		const payload = JSON.stringify(body);
-		const res = await postWebhook(body, signStripePayload(payload, WEBHOOK_SECRET));
+		const res = await postWebhook(body, signStripeWebhookPayload(payload, WEBHOOK_SECRET));
 		expect(res.status).toBe(200);
 		const plan = await userPlan(user.id);
 		expect(plan.plan_tier).toBe('pro');
@@ -137,10 +138,9 @@ describe('Stripe billing webhooks', () => {
 		});
 		await pool.query(`UPDATE users SET plan_tier = 'pro' WHERE id = $1`, [manual.id]);
 
-		const checkoutPayload = JSON.stringify(
-			checkoutCompletedEvent(paying.id, 'cus_paying', 'sub_paying', 'evt_co_pay'),
-		);
-		await postWebhook(JSON.parse(checkoutPayload), signStripePayload(checkoutPayload, WEBHOOK_SECRET));
+		const checkoutBody = checkoutCompletedEvent(paying.id, 'cus_paying', 'sub_paying', 'evt_co_pay');
+		const checkoutPayload = JSON.stringify(checkoutBody);
+		await postWebhook(checkoutBody, signStripeWebhookPayload(checkoutPayload, WEBHOOK_SECRET));
 
 		const deleted = subscriptionEvent(
 			'customer.subscription.deleted',
@@ -150,7 +150,7 @@ describe('Stripe billing webhooks', () => {
 			'evt_sub_del',
 		);
 		const delPayload = JSON.stringify(deleted);
-		const res = await postWebhook(deleted, signStripePayload(delPayload, WEBHOOK_SECRET));
+		const res = await postWebhook(deleted, signStripeWebhookPayload(delPayload, WEBHOOK_SECRET));
 		expect(res.status).toBe(200);
 
 		expect((await userPlan(paying.id)).plan_tier).toBe('free');
@@ -168,7 +168,7 @@ describe('Stripe billing webhooks', () => {
 		});
 		const body = checkoutCompletedEvent(user.id, 'cus_dupe', 'sub_dupe', 'evt_same_id');
 		const payload = JSON.stringify(body);
-		const sig = signStripePayload(payload, WEBHOOK_SECRET);
+		const sig = signStripeWebhookPayload(payload, WEBHOOK_SECRET);
 		const first = await postWebhook(body, sig);
 		const second = await postWebhook(body, sig);
 		expect(first.status).toBe(200);

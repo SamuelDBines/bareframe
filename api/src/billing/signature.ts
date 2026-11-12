@@ -1,5 +1,25 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
+/** Stripe `whsec_…` secrets use the base64 payload after the prefix as the HMAC key. */
+export function stripeWebhookSigningKey(webhookSecret: string): string | Buffer {
+	if (webhookSecret.startsWith('whsec_')) {
+		return Buffer.from(webhookSecret.slice('whsec_'.length), 'base64');
+	}
+	return webhookSecret;
+}
+
+export function signStripeWebhookPayload(
+	rawBody: string,
+	webhookSecret: string,
+	timestamp = Math.floor(Date.now() / 1000),
+): string {
+	const signedPayload = `${timestamp}.${rawBody}`;
+	const v1 = createHmac('sha256', stripeWebhookSigningKey(webhookSecret))
+		.update(signedPayload, 'utf8')
+		.digest('hex');
+	return `t=${timestamp},v1=${v1}`;
+}
+
 /**
  * Verifies a Stripe webhook signature (t=...,v1=...) against the raw request body.
  * @see https://docs.stripe.com/webhooks/signatures
@@ -29,7 +49,9 @@ export function verifyStripeWebhookSignature(
 	}
 
 	const signedPayload = `${timestamp}.${rawBody}`;
-	const expected = createHmac('sha256', webhookSecret).update(signedPayload, 'utf8').digest('hex');
+	const expected = createHmac('sha256', stripeWebhookSigningKey(webhookSecret))
+		.update(signedPayload, 'utf8')
+		.digest('hex');
 
 	const expectedBuf = Buffer.from(expected, 'hex');
 	for (const sig of v1Signatures) {

@@ -59,12 +59,15 @@ export function createBillingRouter(pool: pg.Pool, config: Config) {
     return c.json(portal);
   });
 
-  router.post('/billing/webhook', async (c) => {
+  return router;
+}
+
+/** Mount on the root app so Stripe hits a public route (no session middleware). */
+export function registerStripeWebhookRoute(app: import('hono').Hono, pool: pg.Pool, config: Config) {
+  app.post('/api/billing/webhook', async (c) => {
     const rawBody = await c.req.text();
     const signature = c.req.header('stripe-signature');
     const result = await handleStripeWebhook(pool, config, rawBody, signature);
     return c.json(result.body, result.status as 200 | 400 | 500 | 503);
   });
-
-  return router;
 }

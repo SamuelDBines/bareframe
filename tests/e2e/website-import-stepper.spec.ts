@@ -24,12 +24,10 @@ test.describe('website import stepper', () => {
 			await page.getByTestId('import-next').click();
 			await expect(page.getByTestId('import-step-2')).toBeVisible();
 
-			if (project === 'chromium-desktop' || project === 'chromium-mobile') {
-				await expect(page.locator('.website-import')).toHaveScreenshot(
-					`website-import-step-2-${project}.png`,
-					{ maxDiffPixelRatio: 0.03, animations: 'disabled' },
-				);
-			}
+			await expect(page.locator('.website-import')).toHaveScreenshot(
+				`website-import-step-2-${project}.png`,
+				{ maxDiffPixelRatio: 0.03, animations: 'disabled' },
+			);
 		});
 	}
 });

@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type ButtonHTMLAttributes } from 'react';
 import { friendlyError } from '../../app/apiError';
-import { createProjectShare, startProCheckout } from '../../app/reviewApi';
+import { beginProCheckout } from '../../app/billingUi';
+import { createProjectShare } from '../../app/reviewApi';
 import { useAppCanvasChrome } from '../AppCanvasChrome';
 import { useDesigner } from '../store';
 import { FigmaImportDialog } from './FigmaImportDialog';
@@ -203,10 +204,9 @@ export function FlowMapToolbar({
 										className="flow-toolbar-menu__item"
 										onClick={() => {
 											setMoreOpen(false);
-											void startProCheckout()
-												.then((r) => {
-													if (r.checkoutUrl) window.location.href = r.checkoutUrl;
-													else setToast(r.message ?? 'Upgrades open soon.');
+											void beginProCheckout()
+												.then((msg) => {
+													if (msg) setToast(msg);
 												})
 												.catch((e) => setToast(friendlyError(e, 'Checkout isn’t available right now.')));
 										}}

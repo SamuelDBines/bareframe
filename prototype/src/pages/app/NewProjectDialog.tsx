@@ -11,7 +11,12 @@ export type StartKind = 'brief' | 'figma' | 'url' | 'sitemap';
 const STARTS: { id: StartKind; title: string; body: string; icon: string }[] = [
 	{ id: 'figma', title: 'Figma file', body: 'Frames become screens, prototype links become connectors.', icon: 'F' },
 	{ id: 'brief', title: 'Short brief', body: 'Describe the product and we draft the journey for you.', icon: '✎' },
-	{ id: 'url', title: 'Live website', body: 'We capture pages and the links between them.', icon: '↗' },
+	{
+		id: 'url',
+		title: 'Live website',
+		body: 'Installed capture on your site (free) or server crawl (Pro).',
+		icon: '↗',
+	},
 	{ id: 'sitemap', title: 'Sitemap', body: 'Fast structure-only map from sitemap.xml (Pro).', icon: '☰' },
 ];
 
@@ -315,7 +320,12 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 						<button type="button" className="btn-link" onClick={() => void startBlank()} disabled={busy}>
 							Or start with a blank map
 						</button>
-						<button type="submit" className="btn btn-primary" disabled={!canSubmit}>
+						<button
+							type="submit"
+							className="btn btn-primary"
+							disabled={!canSubmit}
+							data-testid={kind === 'url' ? 'new-project-website-continue' : undefined}
+						>
 							{busy
 								? 'Setting up…'
 								: kind === 'brief'

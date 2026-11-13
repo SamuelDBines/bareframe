@@ -53,7 +53,7 @@ export function AppHomePage() {
 		try {
 			const r = await startProCheckout();
 			if (r.checkoutUrl) window.location.href = r.checkoutUrl;
-			else setNotice(r.message ?? 'Upgrades open soon.');
+			else setNotice(r.message ?? 'Checkout isn’t available right now.');
 		} catch (e) {
 			setNotice(friendlyError(e, 'Checkout isn’t available right now.'));
 		}
@@ -122,7 +122,12 @@ export function AppHomePage() {
 				</div>
 				<div className="app-home__actions">
 					{planTier === 'free' ? (
-						<button type="button" className="btn btn-secondary" onClick={() => void upgrade()}>
+						<button
+							type="button"
+							className="btn btn-secondary"
+							data-testid="app-upgrade-pro"
+							onClick={() => void upgrade()}
+						>
 							Upgrade to Pro · £20/mo
 						</button>
 					) : planTier === 'pro' ? (
@@ -141,8 +146,26 @@ export function AppHomePage() {
 				</div>
 			</header>
 
+			{planTier === 'free' ? (
+				<div
+					className="bx-notice bx-notice--accent"
+					role="status"
+					data-testid="free-plan-capabilities"
+					style={{ marginBottom: '1.25rem' }}
+				>
+					<span className="bx-notice__icon" aria-hidden>
+						↗
+					</span>
+					<p>
+						<strong>Live website import on Free:</strong> choose <strong>New project → Live website</strong>, then{' '}
+						<strong>installed capture</strong> (add our script to your site).{' '}
+						<strong>Public server crawl</strong> and <strong>sitemap import</strong> stay on Pro.
+					</p>
+				</div>
+			) : null}
+
 			{notice ? (
-				<div className="bx-notice" role="status" style={{ marginBottom: '1.5rem' }}>
+				<div className="bx-notice" role="status" data-testid="upgrade-unavailable-notice" style={{ marginBottom: '1.5rem' }}>
 					<span className="bx-notice__icon" aria-hidden>
 						i
 					</span>

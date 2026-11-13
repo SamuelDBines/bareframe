@@ -9,7 +9,8 @@ import {
 import { DeviceViewportSwitcher } from './DeviceViewportSwitcher';
 import { useDesigner } from '../store';
 import { useAppCanvasChrome } from '../AppCanvasChrome';
-import { createProjectShare, startProCheckout } from '../../app/reviewApi';
+import { beginProCheckout } from '../../app/billingUi';
+import { createProjectShare } from '../../app/reviewApi';
 import { useState } from 'react';
 import { friendlyError } from '../../app/apiError';
 
@@ -42,12 +43,8 @@ export function CanvasToolbar() {
 
 	async function handleUpgrade() {
 		try {
-			const result = await startProCheckout();
-			if (result.checkoutUrl) {
-				window.location.href = result.checkoutUrl;
-				return;
-			}
-			setToast(result.message ?? 'Checkout unavailable');
+			const msg = await beginProCheckout();
+			if (msg) setToast(msg);
 		} catch (e) {
 			setToast(friendlyError(e, 'Checkout failed'));
 		}

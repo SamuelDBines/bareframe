@@ -512,7 +512,25 @@
 
 .app-home__actions {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0.6rem;
+}
+
+@media (max-width: 720px) {
+	.app-home__head {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.app-home__actions {
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.app-home__actions .btn {
+		width: 100%;
+		justify-content: center;
+	}
 }
 
 .app-home__skeleton {
@@ -741,6 +759,22 @@
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 0.75rem;
+}
+
+@media (max-width: 720px) {
+	.start-options {
+		grid-template-columns: 1fr;
+	}
+
+	.new-project .start-option {
+		flex-direction: row;
+		align-items: center;
+		gap: 0.65rem;
+	}
+
+	.new-project .start-option strong {
+		margin-top: 0;
+	}
 }
 
 .start-option {

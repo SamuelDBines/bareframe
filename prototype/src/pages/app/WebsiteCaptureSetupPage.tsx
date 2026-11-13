@@ -391,6 +391,7 @@ export function WebsiteCaptureSetupPage() {
 							type="button"
 							className="btn btn-primary"
 							disabled={busy || wizard.tokenIssued}
+							data-testid="generate-capture-token"
 							onClick={() => void issueToken()}
 						>
 							{wizard.tokenIssued || setup ? 'Token issued' : 'Generate capture token & script'}

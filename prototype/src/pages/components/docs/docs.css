@@ -429,6 +429,9 @@
 	overflow: visible;
 	box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
 	position: relative;
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
 }
 
 .playground-frame__toolbar {
@@ -442,7 +445,7 @@
 }
 
 .playground-frame__toolbar--compact {
-	flex-wrap: nowrap;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: 0.65rem;
 	padding: 0.35rem 0.55rem;
@@ -462,17 +465,37 @@
 
 .playground-toolbar__segments {
 	display: flex;
-	flex: 1;
+	flex: 1 1 auto;
 	justify-content: flex-end;
 	align-items: center;
 	gap: 0.45rem;
-	min-width: 0;
-	flex-wrap: nowrap;
+	min-width: min(100%, 16rem);
+	flex-wrap: wrap;
 }
 
 .playground__segmented--compact button {
 	padding: 0.28rem 0.48rem;
 	font-size: 0.72rem;
+}
+
+.playground-frame[data-viewport='mobile'] .playground-frame__stage {
+	max-width: 375px;
+	margin-inline: auto;
+}
+
+.playground-frame[data-viewport='tablet'] .playground-frame__stage {
+	max-width: 768px;
+	margin-inline: auto;
+}
+
+.playground-frame[data-viewport='desktop'] .playground-frame__stage {
+	max-width: 100%;
+}
+
+.playground-frame__stage {
+	width: 100%;
+	box-sizing: border-box;
+	transition: max-width 0.2s ease;
 }
 
 .playground-frame__canvas {
@@ -481,9 +504,10 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: max-width 0.2s ease;
 	overflow: visible;
 	position: relative;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .playground-preview-content {

@@ -4,14 +4,12 @@ import { generateComponentSnippet } from '../../components/library/codegen';
 import type { ComponentRegistryEntry, PreviewInteractionState } from '../../components/library/types';
 import { PreviewCodeTabs } from './docs/PreviewCodeTabs';
 import { PlaygroundPortalProvider, PlaygroundOverlayLayer, PlaygroundFloatingPortalLayer } from './docs/PlaygroundPortal';
+import {
+	type PlaygroundViewportId,
+	PLAYGROUND_STAGE_MAX_WIDTH,
+} from './playgroundViewport';
 
-type ViewportId = 'mobile' | 'tablet' | 'desktop';
-
-const VIEWPORT_WIDTH: Record<ViewportId, string> = {
-	mobile: '375px',
-	tablet: '768px',
-	desktop: '100%',
-};
+type ViewportId = PlaygroundViewportId;
 
 type Props = {
 	entry: ComponentRegistryEntry;
@@ -173,13 +171,8 @@ export function ComponentPlayground({ entry }: Props) {
 	);
 
 	const activeVariant = typeof liveProps.variant === 'string' ? liveProps.variant : entry.variants[0];
-
 	const previewNode = (
-		<div
-			className="playground-frame"
-			data-bf-theme={effectiveTheme}
-			style={{ maxWidth: VIEWPORT_WIDTH[viewport], margin: viewport === 'desktop' ? undefined : '0 auto' }}
-		>
+		<div className="playground-frame" data-bf-theme={effectiveTheme} data-viewport={viewport}>
 			<div className="playground-frame__toolbar playground-frame__toolbar--compact">
 				<select
 					className="playground-toolbar__theme-select"
@@ -207,7 +200,7 @@ export function ComponentPlayground({ entry }: Props) {
 						))}
 					</div>
 					<div className="playground__segmented playground__segmented--compact" role="group" aria-label="Viewport width">
-						{(Object.keys(VIEWPORT_WIDTH) as ViewportId[]).map((vp) => (
+						{(Object.keys(PLAYGROUND_STAGE_MAX_WIDTH) as ViewportId[]).map((vp) => (
 							<button
 								key={vp}
 								type="button"
@@ -220,15 +213,17 @@ export function ComponentPlayground({ entry }: Props) {
 					</div>
 				</div>
 			</div>
-			<div
-				className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
-				data-testid="playground-preview"
-			>
-				<PlaygroundPortalProvider portalRoot={portalRoot} floatingPortalRoot={floatingPortalRoot}>
-					<PlaygroundOverlayLayer onPortalRootChange={setPortalRoot} />
-					<div className="playground-preview-content">{entry.render(previewProps)}</div>
-					<PlaygroundFloatingPortalLayer onPortalRootChange={setFloatingPortalRoot} />
-				</PlaygroundPortalProvider>
+			<div className="playground-frame__stage" data-testid="playground-stage">
+				<div
+					className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
+					data-testid="playground-preview"
+				>
+					<PlaygroundPortalProvider portalRoot={portalRoot} floatingPortalRoot={floatingPortalRoot}>
+						<PlaygroundOverlayLayer onPortalRootChange={setPortalRoot} />
+						<div className="playground-preview-content">{entry.render(previewProps)}</div>
+						<PlaygroundFloatingPortalLayer onPortalRootChange={setFloatingPortalRoot} />
+					</PlaygroundPortalProvider>
+				</div>
 			</div>
 		</div>
 	);

@@ -60,7 +60,7 @@ kubectl create secret generic bareframe-api-env -n bareframe \
 | `SESSION_SECRET` | Random string (32+ chars) for signing session and OAuth state cookies |
 | `DATABASE_URL` | Postgres URL for the dedicated `bareframe` role/database |
 | `STRIPE_SECRET_KEY` | (Optional) Stripe secret key for Pro Checkout and Customer Portal |
-| `STRIPE_PRICE_ID` | (Optional) Stripe Price id for **Bareframe Pro at £20/month (GBP)** |
+| `STRIPE_PRICE_ID` | (Optional) Stripe Price id for **Bareframe Pro at £20/month (GBP)** — must match customer-facing copy (`/api/billing/config` returns `£20/month`). Create the price in Stripe Dashboard; do not rely on legacy USD Team/Pro price ids. |
 | `STRIPE_WEBHOOK_SECRET` | (Optional) Signing secret for `POST /api/billing/webhook` (starts with `whsec_`) |
 
 `PUBLIC_URL` and `DESIGNER_PUBLIC_URL` are set on the Deployment manifest (`https://bareframe.org` and `https://designer.bareframe.org`), not in the secret.

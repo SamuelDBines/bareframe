@@ -6,9 +6,8 @@ const CUSTOMER_LOGOS: { name: string; src: string }[] = [];
 
 const WORKS_WITH = [
 	{ name: 'Figma', mark: 'figma' },
-	{ name: 'Any live URL', mark: 'url' },
-	{ name: 'MCP agents', mark: 'mcp' },
-	{ name: 'React components', mark: 'react' },
+	{ name: 'Live sites', mark: 'url' },
+	{ name: 'Share links', mark: 'share' },
 ] as const;
 
 export function LogoStrip() {

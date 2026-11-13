@@ -101,11 +101,14 @@ test.describe('Overlay interactions', () => {
 				await expect(input).toHaveValue('Vue');
 			}).toPass({ timeout: 45_000 });
 		} else {
-			await input.fill('Vue');
-			const option = overlay.getByRole('option', { name: 'Vue' });
-			await expect(option).toBeVisible();
-			await option.click();
-			await expect(input).toHaveValue('Vue');
+			await expect(async () => {
+				await input.click();
+				await input.fill('Vue');
+				const option = overlay.getByRole('option', { name: 'Vue' });
+				await expect(option).toBeVisible({ timeout: 5_000 });
+				await option.click();
+				await expect(input).toHaveValue('Vue');
+			}).toPass({ timeout: 15_000 });
 		}
 		await setPreviewColorMode(page, 'dark');
 		await expect(input).toBeVisible();

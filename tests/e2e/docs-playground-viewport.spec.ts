@@ -6,7 +6,8 @@ async function openButtonPlayground(page: import('@playwright/test').Page) {
 }
 
 test.describe('docs playground viewport chrome', () => {
-	test('mobile shrinks preview stage only, toolbar stays full width', async ({ page }) => {
+	test('mobile shrinks preview stage only, toolbar stays full width', async ({ browser }) => {
+		const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 		await openButtonPlayground(page);
 		const frame = page.locator('.playground-frame');
 		const toolbar = page.locator('.playground-frame__toolbar');
@@ -35,6 +36,7 @@ test.describe('docs playground viewport chrome', () => {
 
 		await expect(toolbar.getByRole('button', { name: 'Desktop', exact: true })).toBeVisible();
 		await expect(toolbar.getByRole('button', { name: 'Dark', exact: true })).toBeVisible();
+		await page.close();
 	});
 
 	test('toolbar controls stay visible on narrow host at mobile stage', async ({ browser }) => {

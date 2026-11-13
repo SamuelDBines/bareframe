@@ -1,0 +1,37 @@
+@import './layout.css';
+
+:root,
+[data-bf-theme='matrix'] {
+	color-scheme: dark;
+
+	--bf-theme-font-family: 'Courier New', 'Lucida Console', monospace;
+	--bf-theme-border-width: 1px;
+	--bf-theme-border-style: solid;
+	--bf-theme-radius-md: 4px;
+	--bf-theme-space-2: 0.5rem;
+	--bf-theme-space-3: 0.85rem;
+	--bf-theme-cursor-button: pointer;
+	--bf-theme-opacity-hover: 0.98;
+	--bf-theme-active-translate-y: 0;
+	--bf-theme-focus-ring-width: 2px;
+	--bf-theme-focus-ring-style: solid;
+	--bf-theme-focus-ring-color: #22c55e;
+	--bf-theme-focus-ring-offset: 2px;
+	--bf-theme-surface-1: #070c09;
+	--bf-theme-surface-2: #0e1712;
+	--bf-theme-text-1: #90f7b8;
+	--bf-theme-text-2: #56c27f;
+	--bf-theme-border-1: #1f6b3a;
+
+	--bf-theme-button-primary-bg: #2adb72;
+	--bf-theme-button-primary-color: #04120b;
+	--bf-theme-button-primary-border-color: #21b95f;
+	--bf-theme-button-secondary-bg: #0e1712;
+	--bf-theme-button-secondary-color: #90f7b8;
+	--bf-theme-button-secondary-border-color: #1f6b3a;
+
+	--bf-theme-accordion-trigger-bg: #102117;
+	--bf-theme-accordion-trigger-hover-bg: #153121;
+	--bf-theme-accordion-trigger-open-bg: #1b402a;
+	--bf-theme-accordion-chevron-color: #6df2a1;
+}

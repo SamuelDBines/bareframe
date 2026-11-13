@@ -33,7 +33,7 @@ import { createFlowMapRouter } from './flow-map/routes.js';
 import { createInternalWorkerRouter } from './internal/routes.js';
 import { createPackagesRouter } from './packages/routes.js';
 import { createReviewsRouter, createPublicShareRouter } from './reviews/routes.js';
-import { createBillingRouter } from './billing/routes.js';
+import { createBillingRouter, registerStripeWebhookRoute } from './billing/routes.js';
 import { createFigmaRouter } from './figma/routes.js';
 import { createPublicToolsRouter } from './public/check-url.js';
 import { createCaptureRouter } from './capture/routes.js';
@@ -52,6 +52,8 @@ export function createApp(deps: AppDeps): Hono {
 	const app = new Hono();
 
 	app.get('/api/healthz', (c) => c.text('ok'));
+
+	registerStripeWebhookRoute(app, pool, config);
 
 	app.get('/api/auth/github', (c) => {
 		const returnTo = normalizeReturnTo(c.req.query('returnTo'), config.designerPublicUrl);

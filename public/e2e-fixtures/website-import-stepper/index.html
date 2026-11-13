@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Website import stepper fixture</title>
+    <style>
+      body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f6f6fa; color: #111; }
+      .website-import__visual { display: flex; flex-direction: column; gap: 1rem; }
+      .bx-page { max-width: 760px; margin: 0 auto; padding: 2rem 1rem; }
+      .website-import__stepper ol { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; }
+      .website-import__check { display: flex; align-items: flex-start; gap: 0.65rem; }
+      .website-import__nav { display: flex; justify-content: space-between; margin-top: 1rem; }
+      .btn { padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+      .btn-primary { background: #5b4dff; color: #fff; border-color: #5b4dff; }
+      .card { border: 1px solid #e2e2ea; border-radius: 10px; padding: 1rem; background: #fff; }
+    </style>
+  </head>
+  <body>
+    <div class="bx-page bx-page--narrow website-import" data-testid="website-capture-setup">
+      <header class="website-import__head">
+        <p class="bx-eyebrow">Website import</p>
+        <h1>bareframe.org</h1>
+      </header>
+      <div class="website-import__visual" data-testid="import-step-visual">
+        <nav class="website-import__stepper" aria-label="Website import progress" data-testid="import-stepper">
+          <ol id="steps">
+            <li class="is-active" data-step="0"><span class="website-import__step-num">1</span><span class="website-import__step-label">Choose method</span></li>
+            <li data-step="1"><span class="website-import__step-num">2</span><span class="website-import__step-label">Configure</span></li>
+            <li data-step="2"><span class="website-import__step-num">3</span><span class="website-import__step-label">Install &amp; verify</span></li>
+            <li data-step="3"><span class="website-import__step-num">4</span><span class="website-import__step-label">Review</span></li>
+          </ol>
+        </nav>
+        <div class="card website-import__panel" data-testid="import-step-panel">
+          <div data-panel="0">
+            <h2>Choose how Bareframe learns your product</h2>
+            <label class="website-import__check">
+              <input type="checkbox" checked />
+              <span>Fixture checkbox aligns with label</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <footer class="website-import__nav">
+        <button type="button" class="btn btn-ghost" id="back" disabled>Back</button>
+        <button type="button" class="btn btn-primary" id="next" data-testid="import-next">Next</button>
+      </footer>
+    </div>
+    <script>
+      let step = 0;
+      const panels = ['Choose method', 'Configure', 'Install & verify', 'Review'];
+      const panelEl = document.querySelector('[data-testid="import-step-panel"]');
+      const next = document.getElementById('next');
+      const back = document.getElementById('back');
+      function render() {
+        document.querySelectorAll('#steps li').forEach((li) => {
+          const i = Number(li.getAttribute('data-step'));
+          li.classList.toggle('is-active', i === step);
+          li.classList.toggle('is-done', i < step);
+        });
+        panelEl.setAttribute('data-testid', 'import-step-' + step);
+        const check =
+          step === 0
+            ? '<label class="website-import__check"><input type="checkbox" checked /><span>Fixture checkbox aligns with label</span></label>'
+            : '';
+        panelEl.innerHTML = '<h2>' + panels[step] + '</h2><p>Step ' + (step + 1) + ' content</p>' + check;
+        back.disabled = step === 0;
+        next.disabled = step === 3;
+      }
+      next.addEventListener('click', () => { if (step < 3) { step++; render(); } });
+      back.addEventListener('click', () => { if (step > 0) { step--; render(); } });
+      render();
+    </script>
+  </body>
+</html>

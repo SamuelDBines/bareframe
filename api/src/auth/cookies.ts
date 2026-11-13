@@ -151,6 +151,8 @@ export function clearSessionCookie(
 export type OAuthStatePayload = {
 	state: string;
 	returnTo: string;
+	/** When `install`, the callback stores a repo-scoped token for repository pickers. */
+	purpose?: 'signin' | 'install';
 };
 
 export function setOAuthStateCookie(

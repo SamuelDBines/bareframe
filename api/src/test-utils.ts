@@ -26,6 +26,7 @@ export const testConfig: Config = {
 	stripePriceId: null,
 	stripeWebhookSecret: null,
 	figmaAccessToken: null,
+	githubInstallAppSlug: null,
 };
 
 export async function setupTestDb(pool: pg.Pool): Promise<void> {

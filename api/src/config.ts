@@ -18,6 +18,7 @@ export type Config = {
 	stripePriceId: string | null;
 	stripeWebhookSecret: string | null;
 	figmaAccessToken: string | null;
+	githubInstallAppSlug: string | null;
 };
 
 function required(name: string): string {
@@ -60,6 +61,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
 		stripePriceId: env.STRIPE_PRICE_ID ?? null,
 		stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET ?? null,
 		figmaAccessToken: env.FIGMA_ACCESS_TOKEN ?? null,
+		githubInstallAppSlug: env.GITHUB_INSTALL_APP_SLUG?.trim() ?? null,
 	};
 }
 

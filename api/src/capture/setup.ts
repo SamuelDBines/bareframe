@@ -117,7 +117,10 @@ export type InstallPrPreviewInput = {
 	snippetHtml: string;
 };
 
-export function buildInstallPrPreview(input: InstallPrPreviewInput) {
+export function buildInstallPrPreview(
+	input: InstallPrPreviewInput,
+	opts?: { githubAppConnected?: boolean },
+) {
 	const filePath = input.filePath?.trim() || 'index.html';
 	const repo = input.repo.trim();
 	const branch = input.branch.trim();
@@ -126,10 +129,13 @@ export function buildInstallPrPreview(input: InstallPrPreviewInput) {
 	}
 	if (!branch) throw new ProjectAccessError('Branch is required', 400);
 
+	const githubAppConnected = Boolean(opts?.githubAppConnected);
+
 	return {
-		simulated: true,
-		message:
-			'Preview only — Bareframe does not create GitHub pull requests yet. Connect the GitHub App with repository contents permission when it is available.',
+		simulated: !githubAppConnected,
+		message: githubAppConnected
+			? 'Pull request creation is available when the Bareframe GitHub App is installed on this repository with contents and pull request write access.'
+			: 'Preview only — listing repos uses GitHub OAuth (repo scope). Opening a real pull request needs the Bareframe GitHub App (contents:write, pull_requests:write) installed on the target repository.',
 		repo,
 		baseBranch: branch,
 		files: [
@@ -140,6 +146,6 @@ export function buildInstallPrPreview(input: InstallPrPreviewInput) {
 			},
 		],
 		requiredGitHubScopes: ['contents:write', 'pull_requests:write'],
-		githubAppConnected: false,
+		githubAppConnected,
 	};
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { looksLikeWebsiteUrl, buildCaptureSnippet } from './websiteImportUtils';
+import { looksLikeWebsiteUrl, buildCaptureSnippet, buildPrivacyNoticeSnippet } from './websiteImportUtils';
 
 describe('looksLikeWebsiteUrl', () => {
 	it('accepts https hostnames on the free plan flow', () => {
@@ -20,5 +20,15 @@ describe('buildCaptureSnippet', () => {
 		expect(html).toContain('data-screenshots="1"');
 		expect(html).toContain('data-redact="1"');
 		expect(html).not.toContain('GITHUB');
+		expect(html).toContain('data-consent-required="1"');
+		expect(html).toContain('data-retention-days="90"');
+	});
+});
+
+describe('buildPrivacyNoticeSnippet', () => {
+	it('mentions controller/processor roles without legal certainty', () => {
+		const text = buildPrivacyNoticeSnippet('shop.example.com');
+		expect(text).toContain('controller');
+		expect(text).toContain('not legal advice');
 	});
 });

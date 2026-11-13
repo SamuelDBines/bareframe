@@ -226,6 +226,14 @@ test.describe('Route screenshots (1440×900)', () => {
 		await expect(page.getByTestId('plan-pro-amount')).toHaveText('£20');
 		await expect(page.getByText('Free to start. One Pro price.')).toBeVisible();
 		await expect(page.getByRole('heading', { name: 'Team' })).toHaveCount(0);
+		await expect(page.getByRole('heading', { name: 'Enterprise' })).toHaveCount(0);
+		for (const line of [
+			'Unlimited projects and screens',
+			'50 AI reviews a month',
+			'Private canvases, no badge',
+		]) {
+			await expect(pro.getByRole('listitem').filter({ hasText: line })).toBeVisible();
+		}
 	});
 
 	for (const c of CASES.filter((x) =>

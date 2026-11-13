@@ -47,10 +47,10 @@ const PLANS: Plan[] = [
 		unit: '/mo',
 		note: 'Billed monthly in GBP',
 		features: [
-			'More projects and screens',
-			'More AI reviews each month',
+			'Unlimited projects and screens',
+			'50 AI reviews a month',
 			'Server-side URL crawl and sitemap import',
-			'Private canvases, no badge on shares',
+			'Private canvases, no badge',
 			'Export and MCP tools for agents',
 		],
 		cta: { label: `Get ${PRO_PLAN_NAME}`, to: '/app' },

@@ -85,6 +85,9 @@ test.describe('app website onboarding (free plan)', () => {
 
 	test('upgrade starts checkout when Stripe is configured', async ({ page }) => {
 		await mockSignedInAppApi(page, { checkoutWorks: true });
+		await page.route('https://checkout.stripe.test/**', (route) =>
+			route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Stripe checkout</title>' }),
+		);
 		await page.goto('/#/app');
 		await expect(page.getByTestId('app-upgrade-pro')).toBeVisible({ timeout: 30_000 });
 		await Promise.all([

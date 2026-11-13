@@ -512,7 +512,25 @@
 
 .app-home__actions {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0.6rem;
+}
+
+@media (max-width: 720px) {
+	.app-home__head {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.app-home__actions {
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.app-home__actions .btn {
+		width: 100%;
+		justify-content: center;
+	}
 }
 
 .app-home__skeleton {

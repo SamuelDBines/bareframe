@@ -35,9 +35,9 @@ async function visitDemoReview(page: Page) {
 test.describe('flow map UX', () => {
 	test('screen context menu opens and delete confirms', async ({ page }) => {
 		await visitEditableFlowMap(page);
-		const hit = page.getByTestId('flow-map-card-hit').first();
-		await hit.click();
-		await hit.press('Shift+F10');
+		// Card hits can sit under the zoom bar on mobile webkit; open the menu from the keyboard.
+		await page.getByTestId('flow-map-card-hit').first().focus();
+		await page.keyboard.press('Shift+F10');
 		await expect(page.locator('.flow-context-menu')).toBeVisible();
 		await page.getByRole('menuitem', { name: 'Delete screen' }).click();
 		await expect(page.getByRole('dialog', { name: /Delete/i })).toBeVisible();

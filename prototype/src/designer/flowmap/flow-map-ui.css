@@ -944,3 +944,268 @@
 .designer-workspace-v2--flow-map .canvas-subtoolbar {
 	display: none;
 }
+
+/* ---------- Describe your product → flow ---------- */
+
+.describe-panel {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(560px, calc(100% - 32px));
+	max-height: calc(100% - 32px);
+	overflow: auto;
+	padding: 1.5rem;
+	border-radius: var(--bx-radius-xl);
+	background: var(--bx-surface);
+	border: 1px solid var(--bx-border);
+	box-shadow: var(--bx-shadow-lg);
+	z-index: 5;
+}
+
+.describe-panel h2 {
+	margin: 0 0 0.35rem;
+	font-size: 1.35rem;
+	color: var(--bx-text);
+}
+
+.describe-panel > .bx-hint {
+	margin: 0 0 1.1rem;
+}
+
+.describe-panel__alt {
+	margin: 1rem 0 0;
+	font-size: 0.82rem;
+}
+
+.describe-panel__skeleton {
+	display: flex;
+	gap: 0.6rem;
+	margin-top: 1rem;
+}
+
+.describe-panel__skeleton span {
+	flex: 1;
+	height: 64px;
+	border-radius: var(--bx-radius);
+	background: linear-gradient(90deg, var(--bx-surface-2), var(--bx-surface-3), var(--bx-surface-2));
+	background-size: 200% 100%;
+	animation: describe-shimmer 1.4s linear infinite;
+}
+
+@keyframes describe-shimmer {
+	to {
+		background-position: -200% 0;
+	}
+}
+
+.describe-form {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.describe-form .bx-hint,
+.flow-map-dialog .bx-hint {
+	margin: 0;
+}
+
+.describe-form__text {
+	width: 100%;
+	font: inherit;
+	font-size: 0.95rem;
+	line-height: 1.45;
+	padding: 0.75rem 0.95rem;
+	border-radius: 12px;
+	border: 1px solid var(--bx-border-strong);
+	background: var(--bx-surface);
+	color: var(--bx-text);
+	resize: vertical;
+	min-height: 6rem;
+}
+
+.describe-form__text:focus-visible {
+	outline: 2px solid var(--bx-accent);
+	outline-offset: 2px;
+}
+
+.describe-form__text[aria-invalid='true'] {
+	border-color: var(--bx-critical);
+}
+
+.describe-form__field-error {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--bx-critical);
+}
+
+.describe-form__platforms {
+	border: 0;
+	margin: 0.4rem 0 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+}
+
+.describe-form__platforms legend {
+	padding: 0;
+	margin-bottom: 0.4rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--bx-text);
+}
+
+.describe-seg,
+.describe-tabs {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 2px;
+	padding: 3px;
+	border-radius: var(--bx-pill);
+	background: var(--bx-surface-2);
+	border: 1px solid var(--bx-border);
+	align-self: flex-start;
+}
+
+.describe-tabs {
+	margin: 0.4rem 0 1rem;
+}
+
+.describe-seg label,
+.describe-tabs button {
+	border: 0;
+	background: none;
+	font: inherit;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--bx-text-2);
+	padding: 0.45rem 0.95rem;
+	min-height: 36px;
+	display: inline-flex;
+	align-items: center;
+	border-radius: var(--bx-pill);
+	cursor: pointer;
+}
+
+.describe-seg label.is-active,
+.describe-tabs button[aria-checked='true'] {
+	background: var(--bx-surface);
+	color: var(--bx-text);
+	box-shadow: var(--bx-shadow-sm);
+}
+
+.describe-seg label:has(input:focus-visible),
+.describe-tabs button:focus-visible {
+	outline: 2px solid var(--bx-accent);
+	outline-offset: 2px;
+}
+
+.describe-form__platforms:disabled .describe-seg label {
+	cursor: default;
+	opacity: 0.6;
+}
+
+.flow-gen-toast {
+	position: absolute;
+	left: 50%;
+	bottom: 20px;
+	transform: translateX(-50%);
+	margin: 0;
+	max-width: calc(100% - 32px);
+	padding: 0.6rem 1rem;
+	border-radius: var(--bx-pill);
+	background: var(--bx-text);
+	color: var(--bx-surface);
+	font-size: 0.88rem;
+	box-shadow: var(--bx-shadow);
+	z-index: 6;
+	/* Status only: never block the canvas underneath. */
+	pointer-events: none;
+}
+
+@media (max-width: 640px) {
+	.describe-panel {
+		top: 16px;
+		transform: translateX(-50%);
+		padding: 1.1rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.describe-panel__skeleton span {
+		animation: none;
+	}
+}
+
+/* ---------- AI screen designs ---------- */
+
+.flow-map-card__footer--actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	text-align: start;
+}
+
+.flow-map-card__name {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.flow-map-card__design {
+	position: relative;
+	z-index: 2;
+	flex-shrink: 0;
+}
+
+.design-bar {
+	flex: 0 0 auto;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+	padding: 0.45rem 0.75rem;
+	background: var(--bx-surface);
+	border-bottom: 1px solid var(--bx-border);
+}
+
+.design-bar__progress {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.design-bar__progress p,
+.design-bar__result p {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--bx-text);
+}
+
+.design-bar__progress progress {
+	width: 96px;
+	accent-color: var(--bx-accent);
+}
+
+.design-bar__result {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	flex-basis: 100%;
+}
+
+.design-bar__result.is-error p {
+	color: var(--bx-critical);
+}
+
+@media (max-width: 640px) {
+	.flow-gen-toast {
+		bottom: 72px;
+	}
+
+	.design-bar__progress progress {
+		display: none;
+	}
+}

@@ -47,6 +47,8 @@ export async function setupTestDb(pool: pg.Pool): Promise<void> {
     await pool.query('DROP TABLE IF EXISTS url_check_log CASCADE');
     await pool.query('DROP TABLE IF EXISTS review_runs CASCADE');
     await pool.query('DROP TABLE IF EXISTS user_plan_usage CASCADE');
+    await pool.query('DROP TABLE IF EXISTS ai_generation_usage CASCADE');
+    await pool.query('DROP TABLE IF EXISTS screen_designs CASCADE');
 		await pool.query('DROP TABLE IF EXISTS sessions CASCADE');
 		await pool.query('DROP TABLE IF EXISTS users CASCADE');
 		await pool.query('DROP TABLE IF EXISTS schema_migrations CASCADE');

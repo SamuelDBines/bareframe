@@ -89,8 +89,14 @@ export function DesignerCloudSync({
 		});
 	}, [dispatch, mode, projectId, readOnly]);
 
+	// A document the server just wrote (AI flow generation) is already saved: adopt its version.
+	useEffect(() => {
+		if (state.remote && state.remote.version > versionRef.current) versionRef.current = state.remote.version;
+	}, [state.remote]);
+
 	useEffect(() => {
 		if (readOnly || demoReview || mode === 'static') return;
+		if (state.remote?.project === state.project) return;
 		const timer = window.setTimeout(async () => {
 			if (mode === 'cloud' && projectId) {
 				if (savingRef.current) return;
@@ -112,7 +118,7 @@ export function DesignerCloudSync({
 			saveLocalProject(toProjectDocument(state.project), versionRef.current);
 		}, 800);
 		return () => window.clearTimeout(timer);
-	}, [demoReview, mode, projectId, readOnly, state.project, state.historyIndex]);
+	}, [demoReview, mode, projectId, readOnly, state.project, state.historyIndex, state.remote]);
 
 	return null;
 }

@@ -15,6 +15,9 @@ type Props = {
 	onRename: (frameId: string, currentName: string) => void;
 	onRequestDelete: (frame: Frame, connectorCount: number) => void;
 	onAddScreen?: () => void;
+	/** AI design for this screen on the chosen device; absent when generation isn't available. */
+	onGenerateDesign?: (frame: Frame) => void;
+	designBusy?: boolean;
 };
 
 export function FlowMapContextMenu({
@@ -24,6 +27,8 @@ export function FlowMapContextMenu({
 	onRename,
 	onRequestDelete,
 	onAddScreen,
+	onGenerateDesign,
+	designBusy,
 }: Props) {
 	const { state, dispatch } = useDesigner();
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -71,7 +76,21 @@ export function FlowMapContextMenu({
 					const inferredStart =
 						!state.project.prototypeEntryFrameId &&
 						!state.project.connectors.some((c) => c.toFrameId === frame.id);
+					const page = state.project.pages.find((p) => p.id === frame.pageId);
+					const hasDesign = (page?.nodes[page.rootNodeId]?.children.length ?? 0) > 0;
 					return [
+						...(onGenerateDesign
+							? [
+									{
+										label: hasDesign ? 'Regenerate design' : 'Generate design',
+										disabled: designBusy,
+										action: () => {
+											onGenerateDesign(frame);
+											onClose();
+										},
+									},
+								]
+							: []),
 						{
 							label: 'Rename',
 							action: () => {

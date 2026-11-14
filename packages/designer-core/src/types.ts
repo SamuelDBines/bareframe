@@ -62,6 +62,22 @@ export type Page = {
 	routePath: string;
 	rootNodeId: string;
 	nodes: Record<string, DesignNode>;
+	/** What this screen is for, from "Describe your product" (or edited by hand). */
+	brief?: ScreenBrief;
+};
+
+export type ScreenBrief = {
+	/** Flow screen id; stays stable across regenerations so designs are kept. */
+	key: string;
+	purpose: string;
+	keyContent: string[];
+	states: ('default' | 'empty' | 'loading' | 'error' | 'success')[];
+};
+
+export type ProductBrief = {
+	description: string;
+	platform: 'mobile' | 'tablet' | 'desktop' | 'all';
+	updatedAt: string;
 };
 
 export type Frame = {
@@ -124,6 +140,10 @@ export type DesignerProject = {
 	canvas: { x: number; y: number; zoom: number };
 	connectors: Connector[];
 	annotations: Annotation[];
+	/** When set, prototype player starts on this screen instead of inferring from connectors. */
+	prototypeEntryFrameId?: string | null;
+	/** The description the flow was generated from. */
+	productBrief?: ProductBrief;
 };
 
 export type ProjectDocument = {

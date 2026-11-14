@@ -100,7 +100,7 @@ type Action =
 	| { type: 'setCustomToken'; token: string; value: string }
 	| { type: 'assistantOpen'; open: boolean }
 	| { type: 'applyAgentAction'; action: string; args?: Record<string, unknown> }
-	| { type: 'hydrateProject'; project: DesignerProject };
+	| { type: 'hydrateProject'; project: DesignerProject; remoteVersion?: number };
 
 function reducer(state: DesignerState, action: Action): DesignerState {
 	switch (action.type) {
@@ -144,6 +144,7 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 				project,
 				history: [project],
 				historyIndex: 0,
+				remote: action.remoteVersion != null ? { version: action.remoteVersion, project } : state.remote,
 				ui: {
 					...state.ui,
 					activePageId: project.pages[0]?.id ?? state.ui.activePageId,

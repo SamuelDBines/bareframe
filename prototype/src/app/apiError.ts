@@ -31,7 +31,13 @@ export function isAiUnavailable(e: unknown): boolean {
 	return e instanceof ApiError && (e.code === 'llm_not_configured' || (e.status === 503 && !e.code));
 }
 
-const PLAN_CODES = new Set(['project_limit', 'review_limit', 'upgrade_required']);
+const PLAN_CODES = new Set([
+	'project_limit',
+	'review_limit',
+	'upgrade_required',
+	'flow_generation_limit',
+	'screen_design_limit',
+]);
 
 /**
  * Copy people see when something fails. Raw server text, stack traces and config

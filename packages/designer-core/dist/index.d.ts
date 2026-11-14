@@ -54,6 +54,20 @@ type Page = {
     routePath: string;
     rootNodeId: string;
     nodes: Record<string, DesignNode>;
+    /** What this screen is for, from "Describe your product" (or edited by hand). */
+    brief?: ScreenBrief;
+};
+type ScreenBrief = {
+    /** Flow screen id; stays stable across regenerations so designs are kept. */
+    key: string;
+    purpose: string;
+    keyContent: string[];
+    states: ('default' | 'empty' | 'loading' | 'error' | 'success')[];
+};
+type ProductBrief = {
+    description: string;
+    platform: 'mobile' | 'tablet' | 'desktop' | 'all';
+    updatedAt: string;
 };
 type Frame = {
     id: string;
@@ -124,6 +138,10 @@ type DesignerProject = {
     };
     connectors: Connector[];
     annotations: Annotation[];
+    /** When set, prototype player starts on this screen instead of inferring from connectors. */
+    prototypeEntryFrameId?: string | null;
+    /** The description the flow was generated from. */
+    productBrief?: ProductBrief;
 };
 type ProjectDocument = {
     schemaVersion: 1;
@@ -477,7 +495,183 @@ declare function autoPlaceFrame(allFrames: Frame[], width: number, height: numbe
 /** Flow-map layout: place frames in a horizontal row with gaps. */
 declare function layoutFramesInFlowRow(frames: Frame[], startX?: number, startY?: number): void;
 
+/** Visible card width on the flow map (world units). */
+declare const FLOW_CARD_WIDTH = 272;
+declare const FLOW_THUMB_HEIGHT = 392;
+declare const FLOW_LABEL_HEIGHT = 44;
+declare const FLOW_CARD_HEIGHT: number;
+declare const FLOW_CARD_GAP_X = 200;
+declare const FLOW_CARD_GAP_Y = 96;
+declare const FLOW_ORIGIN_X = 96;
+declare const FLOW_ORIGIN_Y = 88;
+type Edge = {
+    fromFrameId: string;
+    toFrameId: string;
+};
+/**
+ * Layered (left-to-right) layout: each screen goes in the column after the
+ * furthest screen that links to it; rows inside a column follow the order of
+ * their parents so connectors cross as little as possible. Cycles are broken
+ * at the back edge, so "Try again" loops don't push screens rightwards.
+ */
+declare function layeredFlowLayout(frameIds: string[], edges: Edge[], startX?: number, startY?: number): Map<string, {
+    x: number;
+    y: number;
+}>;
+
+/**
+ * "Describe your product" → flow map. The AI returns a FlowSpec (screens and the links between
+ * them); `repairFlowSpec` turns whatever came back into a valid spec or rejects it, and
+ * `applyFlowSpec` writes it into a project document as pages, frames and connectors.
+ */
+declare const FLOW_PLATFORMS: readonly ["mobile", "tablet", "desktop", "all"];
+type FlowPlatform = (typeof FLOW_PLATFORMS)[number];
+/** Device preset used for flow-map frames; `all` maps screens on phone first. */
+declare const FLOW_PLATFORM_PRESET: Record<FlowPlatform, string>;
+declare const SCREEN_STATES: readonly ["default", "empty", "loading", "error", "success"];
+type ScreenState = (typeof SCREEN_STATES)[number];
+type FlowScreen = {
+    id: string;
+    name: string;
+    purpose: string;
+    keyContent: string[];
+    states: ScreenState[];
+};
+type FlowConnection = {
+    from: string;
+    to: string;
+    trigger: string;
+};
+type FlowSpec = {
+    screens: FlowScreen[];
+    connections: FlowConnection[];
+};
+declare const FLOW_LIMITS: {
+    readonly maxScreens: 24;
+    readonly maxConnections: 60;
+    readonly nameLength: 60;
+    readonly purposeLength: 280;
+    readonly keyContentItems: 8;
+    readonly keyContentLength: 120;
+    readonly triggerLength: 40;
+    readonly descriptionLength: 4000;
+    readonly instructionLength: 1000;
+};
+/** JSON shape shown to the model. */
+declare const FLOW_SPEC_SCHEMA_HINT = "{\n  \"screens\": [\n    {\n      \"id\": \"kebab-case-id\",\n      \"name\": \"Short screen name\",\n      \"purpose\": \"One sentence: what the user does here\",\n      \"keyContent\": [\"main content or controls on the screen\"],\n      \"states\": [\"default\", \"empty\", \"loading\", \"error\", \"success\"]\n    }\n  ],\n  \"connections\": [{ \"from\": \"screen-id\", \"to\": \"screen-id\", \"trigger\": \"Button or action label\" }]\n}";
+declare class FlowSpecError extends Error {
+    issues: string[];
+    constructor(message: string, issues: string[]);
+}
+declare function slugifyScreenId(value: string): string;
+/**
+ * Validate model output, repairing what can be repaired (missing ids, duplicate ids, unknown
+ * states, links to screens that don't exist, over-long text) and recording each repair.
+ * Throws FlowSpecError when nothing usable is left.
+ */
+declare function repairFlowSpec(raw: unknown): {
+    spec: FlowSpec;
+    repairs: string[];
+};
+/** Stable key linking a page to a flow screen id (pages added by hand use their page id). */
+declare function screenKeyForPage(page: Page): string;
+/** The current flow, in FlowSpec terms, for refine prompts. */
+declare function flowSpecFromDocument(document: ProjectDocument): FlowSpec;
+/** No real screens yet: no frames, or only untouched starter pages without content or links. */
+declare function isEmptyFlow(document: ProjectDocument): boolean;
+type ApplyFlowSpecOptions = {
+    platform: FlowPlatform;
+    description: string;
+    newId: (prefix: string) => string;
+    now?: () => Date;
+};
+/**
+ * Replace the project's flow with `spec`. Screens whose id matches an existing page (by brief key
+ * or page id) keep that page and its design nodes; everything not in the spec is removed, along
+ * with annotations on removed frames. Frames are laid out with the flow-map layered layout.
+ */
+declare function applyFlowSpec(document: ProjectDocument, spec: FlowSpec, options: ApplyFlowSpecOptions): {
+    document: ProjectDocument;
+    screenFrameIds: Record<string, string>;
+};
+
+/**
+ * AI screen designs. The model returns a tree that may only use the components below: the
+ * @bareframe/react components the canvas and prototype can render, plus layout containers and
+ * text. `repairDesignSpec` drops anything else (raw HTML, invented components) and records it;
+ * `designToNodes` turns the default state into page nodes.
+ */
+declare const DESIGN_DEVICES: readonly ["phone", "tablet", "desktop"];
+type DesignDevice = (typeof DESIGN_DEVICES)[number];
+/** Allowed components and their props (all strings). Keys match @bareframe/react component slugs. */
+declare const DESIGN_COMPONENTS: {
+    readonly button: {
+        readonly props: readonly ["label", "variant"];
+        readonly variants: readonly ["primary", "secondary", "ghost"];
+    };
+    readonly input: {
+        readonly props: readonly ["label", "placeholder"];
+        readonly variants: readonly [];
+    };
+    readonly card: {
+        readonly props: readonly ["title", "body", "variant"];
+        readonly variants: readonly ["outlined", "elevated", "ghost"];
+    };
+    readonly badge: {
+        readonly props: readonly ["label", "variant"];
+        readonly variants: readonly ["default", "success", "outline"];
+    };
+    readonly alert: {
+        readonly props: readonly ["text", "variant"];
+        readonly variants: readonly ["info", "success", "warning", "danger"];
+    };
+};
+type DesignComponent = keyof typeof DESIGN_COMPONENTS;
+declare const DESIGN_LAYOUTS: readonly ["stack", "row", "section"];
+type DesignLayout = (typeof DESIGN_LAYOUTS)[number];
+type DesignTreeNode = {
+    type: DesignLayout;
+    gap?: number;
+    padding?: number;
+    children: DesignTreeNode[];
+} | {
+    type: 'heading';
+    text: string;
+    level: 1 | 2 | 3;
+} | {
+    type: 'text';
+    text: string;
+} | {
+    type: DesignComponent;
+    props: Record<string, string>;
+};
+type DesignStateName = 'default' | 'empty' | 'loading' | 'error' | 'success';
+type DesignSpec = {
+    /** One tree per state; `default` is always present. */
+    states: Partial<Record<DesignStateName, DesignTreeNode>> & {
+        default: DesignTreeNode;
+    };
+};
+declare const DESIGN_LIMITS: {
+    readonly maxNodes: 80;
+    readonly maxDepth: 6;
+    readonly textLength: 240;
+    readonly maxChildren: 24;
+};
+declare const DESIGN_SPEC_SCHEMA_HINT = "{\n  \"states\": {\n    \"default\": { \"type\": \"stack\", \"gap\": 16, \"padding\": 24, \"children\": [\n      { \"type\": \"heading\", \"level\": 1, \"text\": \"Screen title\" },\n      { \"type\": \"text\", \"text\": \"Supporting copy\" },\n      { \"type\": \"input\", \"props\": { \"label\": \"Email\", \"placeholder\": \"you@example.com\" } },\n      { \"type\": \"button\", \"props\": { \"label\": \"Continue\", \"variant\": \"primary\" } }\n    ] },\n    \"empty\": { \"...\": \"same shape; include only states the screen has\" }\n  }\n}\nAllowed \"type\" values ONLY: stack, row, section (layout, with children), heading, text,\nbutton {label, variant: primary|secondary|ghost}, input {label, placeholder},\ncard {title, body, variant: outlined|elevated|ghost}, badge {label, variant: default|success|outline},\nalert {text, variant: info|success|warning|danger}. No HTML, no other components.";
+declare class DesignSpecError extends Error {
+    issues: string[];
+    constructor(message: string, issues: string[]);
+}
+declare function repairDesignSpec(raw: unknown, wantedStates?: DesignStateName[]): {
+    spec: DesignSpec;
+    repairs: string[];
+};
+/** Replace a page's nodes with a design tree (the screen's default state). */
+declare function designToNodes(page: Page, tree: DesignTreeNode, newId: (prefix: string) => string): Page;
+declare function countDesignNodes(tree: DesignTreeNode): number;
+
 declare function defaultNewId(prefix: string): string;
 declare function createDefaultCommandContext(isValidComponentSlug: (slug: string) => boolean): CommandContext;
 
-export { type Annotation, type AnnotationTarget, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, type DesignNode, type DesignerProject, type DevicePreset, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type LayoutMode, type LayoutModel, type Page, type ProjectCommand, type ProjectDocument, type SizingMode, type StyleModel, type StyleTrial, type ThemeId, applyImportScreenshots, applyProjectCommand, autoPlaceFrame, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, deviceDimensions, getDevicePreset, layoutFramesInFlowRow, parseProjectCommand, projectCommandSchema };
+export { type Annotation, type AnnotationTarget, type ApplyFlowSpecOptions, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, DESIGN_COMPONENTS, DESIGN_DEVICES, DESIGN_LAYOUTS, DESIGN_LIMITS, DESIGN_SPEC_SCHEMA_HINT, type DesignComponent, type DesignDevice, type DesignLayout, type DesignNode, type DesignSpec, DesignSpecError, type DesignStateName, type DesignTreeNode, type DesignerProject, type DevicePreset, FLOW_CARD_GAP_X, FLOW_CARD_GAP_Y, FLOW_CARD_HEIGHT, FLOW_CARD_WIDTH, FLOW_LABEL_HEIGHT, FLOW_LIMITS, FLOW_ORIGIN_X, FLOW_ORIGIN_Y, FLOW_PLATFORMS, FLOW_PLATFORM_PRESET, FLOW_SPEC_SCHEMA_HINT, FLOW_THUMB_HEIGHT, type FlowConnection, type FlowPlatform, type FlowScreen, type FlowSpec, FlowSpecError, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type LayoutMode, type LayoutModel, type Page, type ProductBrief, type ProjectCommand, type ProjectDocument, SCREEN_STATES, type ScreenBrief, type ScreenState, type SizingMode, type StyleModel, type StyleTrial, type ThemeId, applyFlowSpec, applyImportScreenshots, applyProjectCommand, autoPlaceFrame, countDesignNodes, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, designToNodes, deviceDimensions, flowSpecFromDocument, getDevicePreset, isEmptyFlow, layeredFlowLayout, layoutFramesInFlowRow, parseProjectCommand, projectCommandSchema, repairDesignSpec, repairFlowSpec, screenKeyForPage, slugifyScreenId };

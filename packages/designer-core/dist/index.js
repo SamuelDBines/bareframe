@@ -158,6 +158,7 @@ var CommandError = class extends Error {
     this.code = code;
     this.name = "CommandError";
   }
+  code;
 };
 function parseProjectCommand(input) {
   return projectCommandSchema.parse(input);
@@ -497,6 +498,392 @@ function applyImportScreenshots(document, shots, links, ctx, opts) {
   return { document: doc, effects: { frameIds: [...frameByAsset.values()] } };
 }
 
+// src/flowLayout.ts
+var FLOW_CARD_WIDTH = 272;
+var FLOW_THUMB_HEIGHT = 392;
+var FLOW_LABEL_HEIGHT = 44;
+var FLOW_CARD_HEIGHT = FLOW_THUMB_HEIGHT + FLOW_LABEL_HEIGHT;
+var FLOW_CARD_GAP_X = 200;
+var FLOW_CARD_GAP_Y = 96;
+var FLOW_ORIGIN_X = 96;
+var FLOW_ORIGIN_Y = 88;
+function layeredFlowLayout(frameIds, edges, startX = FLOW_ORIGIN_X, startY = FLOW_ORIGIN_Y) {
+  const ids = new Set(frameIds);
+  const out = /* @__PURE__ */ new Map();
+  for (const id of frameIds) out.set(id, []);
+  for (const e of edges) {
+    if (ids.has(e.fromFrameId) && ids.has(e.toFrameId) && e.fromFrameId !== e.toFrameId) {
+      out.get(e.fromFrameId).push(e.toFrameId);
+    }
+  }
+  const state = /* @__PURE__ */ new Map();
+  const dag = new Map(frameIds.map((id) => [id, []]));
+  const visit = (id) => {
+    state.set(id, 1);
+    for (const to of out.get(id)) {
+      const s = state.get(to) ?? 0;
+      if (s === 1) continue;
+      dag.get(id).push(to);
+      if (s === 0) visit(to);
+    }
+    state.set(id, 2);
+  };
+  const incoming = new Map(frameIds.map((id) => [id, 0]));
+  for (const e of edges) {
+    if (ids.has(e.toFrameId) && e.fromFrameId !== e.toFrameId && ids.has(e.fromFrameId)) {
+      incoming.set(e.toFrameId, (incoming.get(e.toFrameId) ?? 0) + 1);
+    }
+  }
+  for (const id of frameIds) if ((incoming.get(id) ?? 0) === 0 && !state.get(id)) visit(id);
+  for (const id of frameIds) if (!state.get(id)) visit(id);
+  const indeg = new Map(frameIds.map((id) => [id, 0]));
+  for (const tos of dag.values()) for (const to of tos) indeg.set(to, indeg.get(to) + 1);
+  const rank = new Map(frameIds.map((id) => [id, 0]));
+  const queue = frameIds.filter((id) => indeg.get(id) === 0);
+  while (queue.length) {
+    const id = queue.shift();
+    for (const to of dag.get(id)) {
+      rank.set(to, Math.max(rank.get(to), rank.get(id) + 1));
+      indeg.set(to, indeg.get(to) - 1);
+      if (indeg.get(to) === 0) queue.push(to);
+    }
+  }
+  const columns = [];
+  for (const id of frameIds) {
+    const r = rank.get(id);
+    (columns[r] ??= []).push(id);
+  }
+  const parents = new Map(frameIds.map((id) => [id, []]));
+  for (const [from, tos] of dag) for (const to of tos) parents.get(to).push(from);
+  const rowOf = /* @__PURE__ */ new Map();
+  columns.forEach((col) => col.forEach((id, i) => rowOf.set(id, i)));
+  for (let pass = 0; pass < 2; pass++) {
+    for (let c = 1; c < columns.length; c++) {
+      const col = columns[c] ?? [];
+      const score = (id) => {
+        const ps = parents.get(id);
+        if (ps.length === 0) return rowOf.get(id);
+        return ps.reduce((sum, p) => sum + rowOf.get(p), 0) / ps.length;
+      };
+      col.sort((a, b) => score(a) - score(b));
+      col.forEach((id, i) => rowOf.set(id, i));
+    }
+  }
+  const maxRows = Math.max(1, ...columns.map((c) => c?.length ?? 0));
+  const pitchY = FLOW_CARD_HEIGHT + FLOW_CARD_GAP_Y;
+  const positions = /* @__PURE__ */ new Map();
+  columns.forEach((col, c) => {
+    if (!col) return;
+    const offset = (maxRows - col.length) * pitchY / 2;
+    col.forEach((id, i) => {
+      positions.set(id, {
+        x: startX + c * (FLOW_CARD_WIDTH + FLOW_CARD_GAP_X),
+        y: startY + offset + i * pitchY
+      });
+    });
+  });
+  return positions;
+}
+
+// src/flowSpec.ts
+var FLOW_PLATFORMS = ["mobile", "tablet", "desktop", "all"];
+var FLOW_PLATFORM_PRESET = {
+  mobile: "mobile",
+  tablet: "tablet",
+  desktop: "desktop-1440",
+  all: "mobile"
+};
+var SCREEN_STATES = ["default", "empty", "loading", "error", "success"];
+var FLOW_LIMITS = {
+  maxScreens: 24,
+  maxConnections: 60,
+  nameLength: 60,
+  purposeLength: 280,
+  keyContentItems: 8,
+  keyContentLength: 120,
+  triggerLength: 40,
+  descriptionLength: 4e3,
+  instructionLength: 1e3
+};
+var FLOW_SPEC_SCHEMA_HINT = `{
+  "screens": [
+    {
+      "id": "kebab-case-id",
+      "name": "Short screen name",
+      "purpose": "One sentence: what the user does here",
+      "keyContent": ["main content or controls on the screen"],
+      "states": ["default", "empty", "loading", "error", "success"]
+    }
+  ],
+  "connections": [{ "from": "screen-id", "to": "screen-id", "trigger": "Button or action label" }]
+}`;
+var FlowSpecError = class extends Error {
+  constructor(message, issues) {
+    super(message);
+    this.issues = issues;
+    this.name = "FlowSpecError";
+  }
+  issues;
+};
+var STATE_ALIASES = {
+  default: "default",
+  normal: "default",
+  populated: "default",
+  ideal: "default",
+  empty: "empty",
+  "no data": "empty",
+  "no results": "empty",
+  "zero state": "empty",
+  loading: "loading",
+  skeleton: "loading",
+  pending: "loading",
+  error: "error",
+  failure: "error",
+  failed: "error",
+  offline: "error",
+  success: "success",
+  done: "success",
+  confirmation: "success",
+  complete: "success"
+};
+function isRecord(v) {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+function text(v, max) {
+  if (typeof v !== "string" && typeof v !== "number") return "";
+  return String(v).replace(/\s+/g, " ").trim().slice(0, max);
+}
+function slugifyScreenId(value) {
+  return value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "screen";
+}
+function repairFlowSpec(raw) {
+  const repairs = [];
+  if (!isRecord(raw)) throw new FlowSpecError("Response is not a JSON object", ["root: expected an object"]);
+  const rawScreens = raw.screens;
+  if (!Array.isArray(rawScreens)) {
+    throw new FlowSpecError("Response has no screens", ["screens: expected an array"]);
+  }
+  const screens = [];
+  const idMap = /* @__PURE__ */ new Map();
+  const used = /* @__PURE__ */ new Set();
+  rawScreens.forEach((item, index) => {
+    if (!isRecord(item)) {
+      repairs.push(`screens[${index}]: dropped (not an object)`);
+      return;
+    }
+    const name = text(item.name ?? item.title, FLOW_LIMITS.nameLength);
+    const rawId = text(item.id ?? item.key, 80);
+    if (!name && !rawId) {
+      repairs.push(`screens[${index}]: dropped (no id or name)`);
+      return;
+    }
+    if (screens.length >= FLOW_LIMITS.maxScreens) {
+      repairs.push(`screens[${index}]: dropped (more than ${FLOW_LIMITS.maxScreens} screens)`);
+      return;
+    }
+    let id = slugifyScreenId(rawId || name);
+    if (rawId && id !== rawId) repairs.push(`screens[${index}]: id "${rawId}" normalised to "${id}"`);
+    if (!rawId) repairs.push(`screens[${index}]: missing id, derived "${id}" from name`);
+    if (used.has(id)) {
+      let n = 2;
+      while (used.has(`${id}-${n}`)) n++;
+      repairs.push(`screens[${index}]: duplicate id "${id}" renamed to "${id}-${n}"`);
+      id = `${id}-${n}`;
+    }
+    used.add(id);
+    if (rawId && !idMap.has(rawId)) idMap.set(rawId, id);
+    if (!idMap.has(id)) idMap.set(id, id);
+    const rawContent = item.keyContent ?? item.key_content ?? item.content;
+    const keyContent = (Array.isArray(rawContent) ? rawContent : typeof rawContent === "string" ? [rawContent] : []).map((c) => text(c, FLOW_LIMITS.keyContentLength)).filter(Boolean).slice(0, FLOW_LIMITS.keyContentItems);
+    const states = /* @__PURE__ */ new Set(["default"]);
+    const rawStates = Array.isArray(item.states) ? item.states : [];
+    for (const s of rawStates) {
+      const mapped = STATE_ALIASES[text(s, 40).toLowerCase()];
+      if (mapped) states.add(mapped);
+      else repairs.push(`screens[${index}]: unknown state "${text(s, 40)}" dropped`);
+    }
+    screens.push({
+      id,
+      name: name || id.replace(/-/g, " ").replace(/^\w/, (c) => c.toUpperCase()),
+      purpose: text(item.purpose ?? item.description, FLOW_LIMITS.purposeLength),
+      keyContent,
+      states: SCREEN_STATES.filter((s) => states.has(s))
+    });
+  });
+  if (screens.length === 0) throw new FlowSpecError("Response has no usable screens", ["screens: empty"]);
+  const connections = [];
+  const seen = /* @__PURE__ */ new Set();
+  const rawConnections = Array.isArray(raw.connections) ? raw.connections : Array.isArray(raw.links) ? raw.links : [];
+  if (raw.connections !== void 0 && !Array.isArray(raw.connections)) repairs.push("connections: not an array, ignored");
+  rawConnections.forEach((item, index) => {
+    if (!isRecord(item)) {
+      repairs.push(`connections[${index}]: dropped (not an object)`);
+      return;
+    }
+    const fromRaw = text(item.from ?? item.source, 80);
+    const toRaw = text(item.to ?? item.target, 80);
+    const from = idMap.get(fromRaw) ?? (used.has(slugifyScreenId(fromRaw)) ? slugifyScreenId(fromRaw) : void 0);
+    const to = idMap.get(toRaw) ?? (used.has(slugifyScreenId(toRaw)) ? slugifyScreenId(toRaw) : void 0);
+    if (!from || !to) {
+      repairs.push(`connections[${index}]: dropped (unknown screen "${!from ? fromRaw : toRaw}")`);
+      return;
+    }
+    if (from === to) {
+      repairs.push(`connections[${index}]: dropped (links a screen to itself)`);
+      return;
+    }
+    const trigger = text(item.trigger ?? item.label, FLOW_LIMITS.triggerLength) || "Next";
+    const key = `${from}>${to}>${trigger.toLowerCase()}`;
+    if (seen.has(key)) {
+      repairs.push(`connections[${index}]: dropped (duplicate)`);
+      return;
+    }
+    if (connections.length >= FLOW_LIMITS.maxConnections) {
+      repairs.push(`connections[${index}]: dropped (more than ${FLOW_LIMITS.maxConnections} links)`);
+      return;
+    }
+    seen.add(key);
+    connections.push({ from, to, trigger });
+  });
+  return { spec: { screens, connections }, repairs };
+}
+function screenKeyForPage(page) {
+  return page.brief?.key ?? page.id;
+}
+function flowSpecFromDocument(document) {
+  const { project } = document;
+  const frames = project.frames.filter((f) => !f.ghost);
+  const pageByFrame = new Map(frames.map((f) => [f.id, project.pages.find((p) => p.id === f.pageId)]));
+  const screens = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const frame of [...frames].sort((a, b) => a.x - b.x || a.y - b.y)) {
+    const page = pageByFrame.get(frame.id);
+    if (!page) continue;
+    const key = screenKeyForPage(page);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    screens.push({
+      id: key,
+      name: page.name || frame.name,
+      purpose: page.brief?.purpose ?? "",
+      keyContent: page.brief?.keyContent ?? [],
+      states: page.brief?.states ?? ["default"]
+    });
+  }
+  const keyOfFrame = (id) => {
+    const page = pageByFrame.get(id);
+    return page ? screenKeyForPage(page) : void 0;
+  };
+  const connections = project.connectors.flatMap((c) => {
+    const from = keyOfFrame(c.fromFrameId);
+    const to = keyOfFrame(c.toFrameId);
+    return from && to && from !== to ? [{ from, to, trigger: c.label ?? c.trigger ?? "Next" }] : [];
+  });
+  return { screens, connections };
+}
+function isEmptyFlow(document) {
+  const { project } = document;
+  const frames = project.frames.filter((f) => !f.ghost);
+  if (frames.length === 0) return true;
+  if (project.connectors.length > 0 || frames.length > 1) return false;
+  return project.pages.every((p) => (p.nodes[p.rootNodeId]?.children.length ?? 0) === 0);
+}
+function rootNode(id) {
+  return {
+    id,
+    name: "Page root",
+    type: "stack",
+    parentId: null,
+    children: [],
+    layout: {
+      mode: "stack",
+      gap: 16,
+      padding: [0, 0, 0, 0],
+      align: "stretch",
+      justify: "start",
+      widthMode: "fill",
+      heightMode: "hug"
+    }
+  };
+}
+function applyFlowSpec(document, spec, options) {
+  const doc = JSON.parse(JSON.stringify(document));
+  const project = doc.project;
+  const presetId = FLOW_PLATFORM_PRESET[options.platform];
+  const preset = getDevicePreset(presetId);
+  const dim = deviceDimensions(preset);
+  const existingByKey = new Map(project.pages.map((p) => [screenKeyForPage(p), p]));
+  const pages = [];
+  const frames = [];
+  const screenFrameIds = {};
+  spec.screens.forEach((screen, index) => {
+    const brief = {
+      key: screen.id,
+      purpose: screen.purpose,
+      keyContent: screen.keyContent,
+      states: screen.states
+    };
+    let page = existingByKey.get(screen.id);
+    if (page) {
+      page.name = screen.name;
+      page.brief = brief;
+    } else {
+      const rootId = options.newId("node");
+      page = {
+        id: options.newId("page"),
+        name: screen.name,
+        routePath: index === 0 ? "/" : `/${screen.id}`,
+        rootNodeId: rootId,
+        nodes: { [rootId]: rootNode(rootId) },
+        brief
+      };
+    }
+    pages.push(page);
+    const pageId = page.id;
+    const existingFrame = project.frames.find((f) => !f.ghost && f.pageId === pageId && f.devicePresetId === presetId) ?? project.frames.find((f) => !f.ghost && f.pageId === pageId);
+    const frame = existingFrame ? { ...existingFrame, name: screen.name } : {
+      id: options.newId("frame"),
+      name: screen.name,
+      pageId,
+      x: 0,
+      y: 0,
+      width: dim.width,
+      height: dim.height,
+      devicePresetId: preset.id,
+      heightMode: "fixed"
+    };
+    frames.push(frame);
+    screenFrameIds[screen.id] = frame.id;
+  });
+  const connectors = spec.connections.map((c) => ({
+    id: options.newId("conn"),
+    fromFrameId: screenFrameIds[c.from],
+    toFrameId: screenFrameIds[c.to],
+    label: c.trigger,
+    trigger: "click"
+  }));
+  const positions = layeredFlowLayout(
+    frames.map((f) => f.id),
+    connectors
+  );
+  for (const f of frames) Object.assign(f, positions.get(f.id));
+  const frameIds = new Set(frames.map((f) => f.id));
+  project.pages = pages;
+  project.frames = frames;
+  project.connectors = connectors;
+  project.annotations = project.annotations.filter((a) => frameIds.has(a.frameId));
+  project.trials = project.trials.filter((t) => pages.some((p) => p.id === t.pageId));
+  if (project.prototypeEntryFrameId && !frameIds.has(project.prototypeEntryFrameId)) {
+    project.prototypeEntryFrameId = null;
+  }
+  project.productBrief = {
+    description: options.description,
+    platform: options.platform,
+    updatedAt: (options.now?.() ?? /* @__PURE__ */ new Date()).toISOString()
+  };
+  return { document: doc, screenFrameIds };
+}
+
 // src/index.ts
 function defaultNewId(prefix) {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
@@ -510,6 +897,21 @@ function createDefaultCommandContext(isValidComponentSlug) {
 export {
   CommandError,
   DEFAULT_DEVICE_PRESETS,
+  FLOW_CARD_GAP_X,
+  FLOW_CARD_GAP_Y,
+  FLOW_CARD_HEIGHT,
+  FLOW_CARD_WIDTH,
+  FLOW_LABEL_HEIGHT,
+  FLOW_LIMITS,
+  FLOW_ORIGIN_X,
+  FLOW_ORIGIN_Y,
+  FLOW_PLATFORMS,
+  FLOW_PLATFORM_PRESET,
+  FLOW_SPEC_SCHEMA_HINT,
+  FLOW_THUMB_HEIGHT,
+  FlowSpecError,
+  SCREEN_STATES,
+  applyFlowSpec,
   applyImportScreenshots,
   applyProjectCommand,
   autoPlaceFrame,
@@ -517,8 +919,14 @@ export {
   createEmptyProjectDocument,
   defaultNewId,
   deviceDimensions,
+  flowSpecFromDocument,
   getDevicePreset,
+  isEmptyFlow,
+  layeredFlowLayout,
   layoutFramesInFlowRow,
   parseProjectCommand,
-  projectCommandSchema
+  projectCommandSchema,
+  repairFlowSpec,
+  screenKeyForPage,
+  slugifyScreenId
 };

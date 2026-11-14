@@ -1,5 +1,8 @@
 import type { ThemeId } from '../theme/themes';
+import type { ProductBrief, ScreenBrief } from '@bareframe/designer-core';
 import type { MatrixLayout } from './frameLayout';
+
+export type { ProductBrief, ScreenBrief };
 
 export type BreakpointId = 'base' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -74,6 +77,8 @@ export type Page = {
 	routePath: string;
 	rootNodeId: string;
 	nodes: Record<string, DesignNode>;
+	/** What this screen is for, from "Describe your product". */
+	brief?: ScreenBrief;
 };
 
 export type Frame = {
@@ -149,6 +154,8 @@ export type DesignerProject = {
 	annotations: Annotation[];
 	/** When set, prototype player starts on this screen instead of inferring from connectors. */
 	prototypeEntryFrameId?: string | null;
+	/** The description the flow was generated from. */
+	productBrief?: ProductBrief;
 };
 
 export type EditScope = 'base' | 'breakpoint';

@@ -158,7 +158,6 @@ var CommandError = class extends Error {
     this.code = code;
     this.name = "CommandError";
   }
-  code;
 };
 function parseProjectCommand(input) {
   return projectCommandSchema.parse(input);
@@ -166,7 +165,7 @@ function parseProjectCommand(input) {
 function createEmptyProjectDocument(id, name, themeId = "light", ctx) {
   const pageId = ctx.newId("page");
   const rootId = ctx.newId("node");
-  const baseLayout = {
+  const baseLayout2 = {
     mode: "stack",
     gap: 16,
     padding: [0, 0, 0, 0],
@@ -194,7 +193,7 @@ function createEmptyProjectDocument(id, name, themeId = "light", ctx) {
               type: "stack",
               parentId: null,
               children: [],
-              layout: baseLayout
+              layout: baseLayout2
             }
           }
         }
@@ -623,7 +622,6 @@ var FlowSpecError = class extends Error {
     this.issues = issues;
     this.name = "FlowSpecError";
   }
-  issues;
 };
 var STATE_ALIASES = {
   default: "default",
@@ -884,6 +882,207 @@ function applyFlowSpec(document, spec, options) {
   return { document: doc, screenFrameIds };
 }
 
+// src/designSpec.ts
+var DESIGN_DEVICES = ["phone", "tablet", "desktop"];
+var DESIGN_COMPONENTS = {
+  button: { props: ["label", "variant"], variants: ["primary", "secondary", "ghost"] },
+  input: { props: ["label", "placeholder"], variants: [] },
+  card: { props: ["title", "body", "variant"], variants: ["outlined", "elevated", "ghost"] },
+  badge: { props: ["label", "variant"], variants: ["default", "success", "outline"] },
+  alert: { props: ["text", "variant"], variants: ["info", "success", "warning", "danger"] }
+};
+var DESIGN_LAYOUTS = ["stack", "row", "section"];
+var DESIGN_LIMITS = { maxNodes: 80, maxDepth: 6, textLength: 240, maxChildren: 24 };
+var DESIGN_SPEC_SCHEMA_HINT = `{
+  "states": {
+    "default": { "type": "stack", "gap": 16, "padding": 24, "children": [
+      { "type": "heading", "level": 1, "text": "Screen title" },
+      { "type": "text", "text": "Supporting copy" },
+      { "type": "input", "props": { "label": "Email", "placeholder": "you@example.com" } },
+      { "type": "button", "props": { "label": "Continue", "variant": "primary" } }
+    ] },
+    "empty": { "...": "same shape; include only states the screen has" }
+  }
+}
+Allowed "type" values ONLY: stack, row, section (layout, with children), heading, text,
+button {label, variant: primary|secondary|ghost}, input {label, placeholder},
+card {title, body, variant: outlined|elevated|ghost}, badge {label, variant: default|success|outline},
+alert {text, variant: info|success|warning|danger}. No HTML, no other components.`;
+var DesignSpecError = class extends Error {
+  constructor(message, issues) {
+    super(message);
+    this.issues = issues;
+    this.name = "DesignSpecError";
+  }
+};
+function isRecord2(v) {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+function clean(v, max = DESIGN_LIMITS.textLength) {
+  if (typeof v !== "string" && typeof v !== "number") return "";
+  return String(v).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, max);
+}
+function clampNumber(v, min, max, fallback) {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : fallback;
+}
+function repairTree(raw, path, repairs, budget, depth = 0) {
+  if (!isRecord2(raw)) {
+    repairs.push(`${path}: dropped (not an object)`);
+    return null;
+  }
+  if (budget.nodes >= DESIGN_LIMITS.maxNodes) {
+    repairs.push(`${path}: dropped (more than ${DESIGN_LIMITS.maxNodes} nodes)`);
+    return null;
+  }
+  const type = clean(raw.type ?? raw.component, 40).toLowerCase();
+  if (DESIGN_LAYOUTS.includes(type)) {
+    if (depth >= DESIGN_LIMITS.maxDepth) {
+      repairs.push(`${path}: dropped (nested deeper than ${DESIGN_LIMITS.maxDepth})`);
+      return null;
+    }
+    budget.nodes++;
+    const rawChildren = Array.isArray(raw.children) ? raw.children : [];
+    const children = rawChildren.slice(0, DESIGN_LIMITS.maxChildren).map((c, i) => repairTree(c, `${path}.children[${i}]`, repairs, budget, depth + 1)).filter((c) => c !== null);
+    if (rawChildren.length > DESIGN_LIMITS.maxChildren) repairs.push(`${path}: kept the first ${DESIGN_LIMITS.maxChildren} children`);
+    return {
+      type,
+      gap: clampNumber(raw.gap, 0, 64, 16),
+      padding: clampNumber(raw.padding, 0, 64, type === "row" ? 0 : 16),
+      children
+    };
+  }
+  if (type === "heading" || type === "text") {
+    const text2 = clean(raw.text ?? (isRecord2(raw.props) ? raw.props.text : void 0));
+    if (!text2) {
+      repairs.push(`${path}: dropped (empty ${type})`);
+      return null;
+    }
+    budget.nodes++;
+    if (type === "text") return { type, text: text2 };
+    return { type, text: text2, level: clampNumber(raw.level, 1, 3, 2) };
+  }
+  const def = DESIGN_COMPONENTS[type];
+  if (!def) {
+    repairs.push(`${path}: dropped "${type || "unknown"}" (not a Bareframe component)`);
+    return null;
+  }
+  const rawProps = isRecord2(raw.props) ? raw.props : raw;
+  const props = {};
+  for (const key of def.props) {
+    const value = clean(rawProps[key], key === "variant" ? 20 : DESIGN_LIMITS.textLength);
+    if (!value) continue;
+    if (key === "variant" && !def.variants.includes(value)) {
+      repairs.push(`${path}: unknown ${type} variant "${value}" dropped`);
+      continue;
+    }
+    props[key] = value;
+  }
+  const textKey = def.props.find((k) => k !== "variant" && k !== "placeholder") ?? "label";
+  if (!props[textKey] && type !== "input") {
+    repairs.push(`${path}: dropped ${type} without ${textKey}`);
+    return null;
+  }
+  budget.nodes++;
+  return { type, props };
+}
+function repairDesignSpec(raw, wantedStates = ["default"]) {
+  const repairs = [];
+  if (!isRecord2(raw)) throw new DesignSpecError("Response is not a JSON object", ["root: expected an object"]);
+  const rawStates = isRecord2(raw.states) ? raw.states : isRecord2(raw.root) || raw.type ? { default: raw.root ?? raw } : null;
+  if (!rawStates) throw new DesignSpecError("Response has no states", ["states: expected an object"]);
+  const states = {};
+  for (const name of ["default", "empty", "loading", "error", "success"]) {
+    if (rawStates[name] === void 0) continue;
+    const budget = { nodes: 0 };
+    const tree = repairTree(rawStates[name], `states.${name}`, repairs, budget);
+    if (tree) states[name] = wrapRoot(tree);
+  }
+  for (const extra of Object.keys(rawStates)) {
+    if (!["default", "empty", "loading", "error", "success"].includes(extra)) repairs.push(`states.${extra}: unknown state dropped`);
+  }
+  if (!states.default) throw new DesignSpecError("Response has no usable default state", ["states.default: missing or empty"]);
+  for (const name of wantedStates) {
+    if (!states[name]) repairs.push(`states.${name}: not designed`);
+  }
+  return { spec: { states }, repairs };
+}
+function wrapRoot(tree) {
+  return tree.type === "stack" ? tree : { type: "stack", gap: 16, padding: 16, children: [tree] };
+}
+function baseLayout(patch = {}) {
+  return {
+    mode: "stack",
+    gap: 0,
+    padding: [0, 0, 0, 0],
+    align: "stretch",
+    justify: "start",
+    widthMode: "fill",
+    heightMode: "hug",
+    ...patch
+  };
+}
+var PROP_FOR_RENDER = {
+  button: (p) => ({ variantKey: p.variant ?? "primary", props: { children: p.label } }),
+  input: (p) => ({ variantKey: "default", props: { placeholder: p.placeholder ?? p.label, label: p.label } }),
+  card: (p) => ({ variantKey: p.variant ?? "outlined", props: { title: p.title, children: p.body ?? "" } }),
+  badge: (p) => ({ variantKey: p.variant ?? "default", props: { children: p.label } }),
+  alert: (p) => ({ variantKey: p.variant ?? "info", props: { children: p.text } })
+};
+function designToNodes(page, tree, newId) {
+  const nodes = {};
+  const build = (node, parentId) => {
+    const id = parentId === null ? page.rootNodeId : newId("node");
+    if (node.type === "stack" || node.type === "row" || node.type === "section") {
+      const pad = node.padding ?? 0;
+      nodes[id] = {
+        id,
+        name: parentId === null ? "Page root" : node.type,
+        type: node.type,
+        parentId,
+        children: [],
+        layout: baseLayout({
+          mode: node.type === "row" ? "row" : "stack",
+          gap: node.gap ?? 16,
+          padding: [pad, pad, pad, pad],
+          align: node.type === "row" ? "center" : "stretch"
+        })
+      };
+      nodes[id].children = node.children.map((c) => build(c, id));
+      return id;
+    }
+    if (node.type === "heading" || node.type === "text") {
+      nodes[id] = {
+        id,
+        name: node.type === "heading" ? "Heading" : "Text",
+        type: "text",
+        parentId,
+        children: [],
+        content: { text: node.text, textTag: node.type === "heading" ? `h${node.level}` : "p" },
+        layout: baseLayout()
+      };
+      return id;
+    }
+    const comp = node;
+    const { variantKey, props } = PROP_FOR_RENDER[comp.type](comp.props);
+    nodes[id] = {
+      id,
+      name: comp.type,
+      type: "instance",
+      parentId,
+      children: [],
+      instance: { definitionId: comp.type, variantKey, props },
+      layout: baseLayout({ widthMode: comp.type === "button" || comp.type === "badge" ? "hug" : "fill" })
+    };
+    return id;
+  };
+  build(tree, null);
+  return { ...page, nodes };
+}
+function countDesignNodes(tree) {
+  return "children" in tree ? 1 + tree.children.reduce((n, c) => n + countDesignNodes(c), 0) : 1;
+}
+
 // src/index.ts
 function defaultNewId(prefix) {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
@@ -897,6 +1096,12 @@ function createDefaultCommandContext(isValidComponentSlug) {
 export {
   CommandError,
   DEFAULT_DEVICE_PRESETS,
+  DESIGN_COMPONENTS,
+  DESIGN_DEVICES,
+  DESIGN_LAYOUTS,
+  DESIGN_LIMITS,
+  DESIGN_SPEC_SCHEMA_HINT,
+  DesignSpecError,
   FLOW_CARD_GAP_X,
   FLOW_CARD_GAP_Y,
   FLOW_CARD_HEIGHT,
@@ -915,9 +1120,11 @@ export {
   applyImportScreenshots,
   applyProjectCommand,
   autoPlaceFrame,
+  countDesignNodes,
   createDefaultCommandContext,
   createEmptyProjectDocument,
   defaultNewId,
+  designToNodes,
   deviceDimensions,
   flowSpecFromDocument,
   getDevicePreset,
@@ -926,6 +1133,7 @@ export {
   layoutFramesInFlowRow,
   parseProjectCommand,
   projectCommandSchema,
+  repairDesignSpec,
   repairFlowSpec,
   screenKeyForPage,
   slugifyScreenId

@@ -17,6 +17,79 @@ const CLAUDE_SNIPPET = `{
   }
 }`;
 
+const STUDIO_SNIPPET = `{
+  "mcpServers": {
+    "bareframe-studio": {
+      "url": "https://bareframe.org/mcp/studio",
+      "headers": {
+        "Authorization": "Bearer bf_acc_<account token from App → Settings>"
+      }
+    }
+  }
+}`;
+
+const PUBLIC_TOOLS = [
+	['list_components', 'Catalog list with optional detail=full.'],
+	['get_component', 'Props and .example.tsx sources.'],
+	['list_themes', 'Built-in theme ids and CSS paths.'],
+	['get_design_tokens', 'Semantic tokens from themes/*.css.'],
+	['scaffold_screen', 'Generate a @bareframe/react page layout (TSX).'],
+	['export_tokens', 'Legacy flat token manifest.'],
+	['search_docs', 'Search guides and component reference.'],
+	['get_install_steps', 'Install and CSS import steps.'],
+	['get_migration_guide', 'Repkit → Bareframe migration guide.'],
+	['review_project', 'Hint to call studio review_project for canvas UX reviews.'],
+	['check_url', 'Screenshot metrics and flow-map audit for a public URL.'],
+] as const;
+
+const STUDIO_TOOLS = [
+	['create_project', 'Create a project (account token, projects:create).'],
+	['create_share_link', 'Mint share URL; play=true opens the prototype player.'],
+	['generate_flow', 'Describe → flow map (plan limits apply).'],
+	['generate_screen_design', 'AI screen design for one page/device.'],
+	['generate_all_designs', 'Design every screen on a device preset.'],
+	['create_click_through_prototype', 'One-shot project + flow + designs + play URL.'],
+	['list_projects', 'Projects visible to the token.'],
+	['get_project', 'Project document and version.'],
+	['add_screen', 'Add a device frame / screen.'],
+	['add_component', 'Insert catalog component instance.'],
+	['add_connector', 'Link screens (optional fromNodeId for button hotspots).'],
+	['add_annotation', 'Callouts and notes on frames.'],
+	['update_node', 'Patch node layout, content, variant.'],
+	['delete_node', 'Remove a node.'],
+	['import_screenshots', 'Build screens from uploaded PNGs.'],
+	['create_flow_map', 'Async flow-map job from recording or sitemap.'],
+	['render_frame', 'PNG render of a frame.'],
+	['screenshot_url', 'Capture a live URL to PNG.'],
+	['review_project', 'AI UX review (Pro).'],
+	['check_url', 'URL audit via studio credentials.'],
+] as const;
+
+function ToolTable({ rows }: { rows: readonly (readonly [string, string])[] }) {
+	return (
+		<div className="table-wrap" style={{ marginTop: '0.75rem' }}>
+			<table className="props-table">
+				<thead>
+					<tr>
+						<th>Tool</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					{rows.map(([name, description]) => (
+						<tr key={name}>
+							<td>
+								<code>{name}</code>
+							</td>
+							<td>{description}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	);
+}
+
 export function McpPage() {
 	return (
 		<>
@@ -46,7 +119,7 @@ export function McpPage() {
 			</div>
 
 			<section style={{ marginTop: '2rem' }}>
-				<h2>Endpoint</h2>
+				<h2>Public endpoint</h2>
 				<ul className="doc-prose">
 					<li>
 						MCP (Streamable HTTP): <code>https://bareframe.org/mcp</code>
@@ -54,71 +127,23 @@ export function McpPage() {
 					<li>
 						Health: <code>https://bareframe.org/mcp/healthz</code>
 					</li>
-					<li>Auth: none (public read-only; per-IP rate limits apply)</li>
+					<li>Auth: none (read-only; per-IP rate limits)</li>
 				</ul>
+				<h3 style={{ marginTop: '1.25rem' }}>Public tools</h3>
+				<ToolTable rows={PUBLIC_TOOLS} />
 			</section>
 
-			<section style={{ marginTop: '2rem' }}>
-				<h2>Tools</h2>
-				<div className="table-wrap" style={{ marginTop: '0.75rem' }}>
-					<table className="props-table">
-						<thead>
-							<tr>
-								<th>Tool</th>
-								<th>Description</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td><code>list_components</code></td>
-								<td>
-									Stability, description, category, React export, and compact props summaries (optional{' '}
-									<code>detail=full</code>).
-								</td>
-							</tr>
-							<tr>
-								<td><code>get_component</code></td>
-								<td>Props plus real <code>.example.tsx</code> sources from the docs app.</td>
-							</tr>
-							<tr>
-								<td><code>list_themes</code></td>
-								<td>Built-in theme ids and CSS import paths.</td>
-							</tr>
-							<tr>
-								<td><code>get_design_tokens</code></td>
-								<td>
-									Structured theme tokens (semantic colors, spacing, typography, radii, shadows) from{' '}
-									<code>themes/*.css</code>.
-								</td>
-							</tr>
-							<tr>
-								<td><code>scaffold_screen</code></td>
-								<td>
-									Generate a working <code>@bareframe/react</code> page layout (TSX) from intent and/or
-									component slugs.
-								</td>
-							</tr>
-							<tr>
-								<td><code>export_tokens</code></td>
-								<td>Legacy flat token manifest; prefer <code>get_design_tokens</code>.</td>
-							</tr>
-							<tr>
-								<td><code>search_docs</code></td>
-								<td>Search markdown guides and component reference text.</td>
-							</tr>
-							<tr>
-								<td><code>get_install_steps</code></td>
-								<td>Install and CSS import steps for @bareframe/react.</td>
-							</tr>
-							<tr>
-								<td><code>get_migration_guide</code></td>
-								<td>
-									Full &quot;Migrating to @bareframe/react&quot; guide (Repkit → Bareframe).
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+			<section style={{ marginTop: '2.5rem' }}>
+				<h2>Studio endpoint (canvas &amp; prototypes)</h2>
+				<p>
+					<code>https://bareframe.org/mcp/studio</code> accepts a Bearer token: account-level{' '}
+					<code>bf_acc_…</code> (create projects and playable links from{' '}
+					<Link to="/app/settings">Account settings</Link>) or project-scoped <code>bf_proj_…</code>{' '}
+					for a single project.
+				</p>
+				<pre className="code-block">{STUDIO_SNIPPET}</pre>
+				<h3 style={{ marginTop: '1.25rem' }}>Studio tools</h3>
+				<ToolTable rows={STUDIO_TOOLS} />
 			</section>
 
 			<p style={{ marginTop: '1.5rem' }}>

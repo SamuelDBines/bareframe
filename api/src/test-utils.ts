@@ -39,6 +39,7 @@ export async function setupTestDb(pool: pg.Pool): Promise<void> {
 		await pool.query('DROP TABLE IF EXISTS flow_map_jobs CASCADE');
 		await pool.query('DROP TABLE IF EXISTS render_jobs CASCADE');
 		await pool.query('DROP TABLE IF EXISTS project_revisions CASCADE');
+		await pool.query('DROP TABLE IF EXISTS user_api_tokens CASCADE');
 		await pool.query('DROP TABLE IF EXISTS project_api_tokens CASCADE');
 		await pool.query('DROP TABLE IF EXISTS project_assets CASCADE');
 		await pool.query('DROP TABLE IF EXISTS projects CASCADE');

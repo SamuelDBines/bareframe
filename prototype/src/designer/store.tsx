@@ -68,6 +68,7 @@ type Action =
 			toFrameId: string;
 			label?: string;
 			trigger?: string;
+			fromNodeId?: string;
 	  }
 	| { type: 'deleteFrame'; frameId: string }
 	| { type: 'duplicateFrame'; frameId: string }
@@ -86,6 +87,13 @@ type Action =
 	| { type: 'addAnnotation'; annotation: Omit<Annotation, 'id'> & { id?: string } }
 	| { type: 'deleteConnector'; connectorId: string }
 	| { type: 'setConnectorLabel'; connectorId: string; label: string }
+	| {
+			type: 'linkNodeToScreen';
+			fromFrameId: string;
+			fromNodeId: string;
+			toFrameId: string;
+			label?: string;
+	  }
 	| { type: 'setDefaultTheme'; themeId: ThemeId }
 	| { type: 'updateNodeLayout'; nodeId: string; layout: Partial<LayoutModel> }
 	| { type: 'updateNodeContent'; nodeId: string; text: string }
@@ -237,8 +245,39 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 				toFrameId: action.toFrameId,
 				label: action.label,
 				trigger: action.trigger ?? 'tap',
+				fromNodeId: action.fromNodeId,
 			});
 			return commit(project);
+		}
+		case 'linkNodeToScreen': {
+			if (action.fromFrameId === action.toFrameId) return state;
+			const existing = project.connectors.find(
+				(c) => c.fromFrameId === action.fromFrameId && c.toFrameId === action.toFrameId,
+			);
+			if (existing) {
+				existing.fromNodeId = action.fromNodeId;
+				if (action.label) existing.label = action.label;
+				project.connectors
+					.filter((c) => c.id !== existing.id && c.fromFrameId === action.fromFrameId && c.fromNodeId === action.fromNodeId)
+					.forEach((c) => {
+						delete c.fromNodeId;
+					});
+			} else {
+				project.connectors
+					.filter((c) => c.fromFrameId === action.fromFrameId && c.fromNodeId === action.fromNodeId)
+					.forEach((c) => {
+						delete c.fromNodeId;
+					});
+				project.connectors.push({
+					id: newId('conn'),
+					fromFrameId: action.fromFrameId,
+					toFrameId: action.toFrameId,
+					label: action.label ?? 'Next',
+					trigger: 'tap',
+					fromNodeId: action.fromNodeId,
+				});
+			}
+			return commit(project, { ...ui, selectedNodeId: action.fromNodeId });
 		}
 		case 'renameFrame': {
 			const f = project.frames.find((x) => x.id === action.frameId);

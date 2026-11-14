@@ -12,17 +12,20 @@ import { DesignBar } from './DesignBar';
 import { useDesignQueue } from './designGenApi';
 import type { DesignDevice } from '@bareframe/designer-core';
 import { PrototypePlayer } from './PrototypePlayer';
+import { FlowMapScreenLinkPanel } from './FlowMapScreenLinkPanel';
 import './flow-map-ui.css';
 
 type Props = {
 	readOnly?: boolean;
+	openPrototypeOnMount?: boolean;
+	prototypeStartFrameId?: string | null;
 };
 
-export function FlowMapProjectWorkspace({ readOnly }: Props) {
+export function FlowMapProjectWorkspace({ readOnly, openPrototypeOnMount, prototypeStartFrameId }: Props) {
 	const { state, dispatch } = useDesigner();
 	const chrome = useAppCanvasChrome();
 	const [mode, setMode] = useState<Exclude<FlowWorkspaceMode, 'prototype'>>('map');
-	const [playing, setPlaying] = useState(false);
+	const [playing, setPlaying] = useState(Boolean(openPrototypeOnMount));
 	const [connectMode, setConnectMode] = useState(false);
 	const [connectFrom, setConnectFrom] = useState<string | null>(null);
 	const [tourOpen, setTourOpen] = useState(false);
@@ -50,6 +53,12 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 	}, [state.project]);
 	const showDescribe = canGenerate && flowIsEmpty;
 	const tourAutoEligible = !readOnly && screenCount <= 1 && !showDescribe;
+
+	useEffect(() => {
+		if (prototypeStartFrameId) {
+			dispatch({ type: 'setPrototypeEntryFrame', frameId: prototypeStartFrameId });
+		}
+	}, [dispatch, prototypeStartFrameId]);
 
 	useEffect(() => {
 		if (!flowToast) return;
@@ -114,7 +123,8 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 					onDismiss={designs.dismiss}
 				/>
 			) : null}
-			<div className="flow-map-stage">
+			<div className={`flow-map-stage${mode === 'edit' && !connectMode ? ' flow-map-stage--with-link' : ''}`}>
+				{mode === 'edit' && !connectMode && !readOnly ? <FlowMapScreenLinkPanel /> : null}
 				<FlowMapCanvas
 					readOnly={readOnly}
 					hideEmptyState={showDescribe}

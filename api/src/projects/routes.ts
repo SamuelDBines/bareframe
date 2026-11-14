@@ -18,6 +18,7 @@ import {
 	replaceProjectDocument,
 	revokeProjectToken,
 	VersionConflictError,
+	actorCanCreateProject,
 } from '../db/projects.js';
 import { assertCanCreateProject, assertScreenCountForUser, PlanLimitError } from '../plans/limits.js';
 import type { ProjectDocument } from '@bareframe/designer-core';
@@ -52,7 +53,7 @@ export function createProjectsRouter(pool: pg.Pool, config: import('../config.js
 
 	router.post('/projects', async (c) => {
 		const actor = getActor(c);
-		if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
+		if (!actorCanCreateProject(actor)) return c.json({ error: 'Forbidden' }, 403);
 		try {
 			await assertCanCreateProject(pool, actor.userId);
 		} catch (err) {
@@ -294,18 +295,31 @@ export function createProjectsRouter(pool: pg.Pool, config: import('../config.js
 	router.post('/projects/:projectId/share', async (c) => {
 		try {
 			const actor = getActor(c);
-			if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
 			const projectId = c.req.param('projectId');
-			await assertProjectAccess(pool, projectId, actor, 'projects:write');
+			await assertProjectAccess(pool, projectId, actor, 'share:create');
+			const body = (await c.req
+				.json<{ play?: boolean; startFrameId?: string }>()
+				.catch(() => ({ play: undefined, startFrameId: undefined as string | undefined }))) as {
+				play?: boolean;
+				startFrameId?: string;
+			};
 			const token = randomToken(24);
 			await pool.query(
 				`UPDATE projects SET share_token_hash = $2, is_private = false, updated_at = NOW() WHERE id = $1`,
 				[projectId, hashToken(token)],
 			);
+			const query = new URLSearchParams();
+			if (body.play) query.set('play', '1');
+			if (body.startFrameId) query.set('start', body.startFrameId);
+			const qs = query.toString();
+			const sharePath = `/share/${token}${qs ? `?${qs}` : ''}`;
 			return c.json({
 				token,
-				sharePath: `/share/${token}`,
-				publicUrl: `${config.publicUrl}/#/share/${token}`,
+				sharePath,
+				publicUrl: `${config.publicUrl}/#${sharePath}`,
+				playUrl: body.play
+					? `${config.publicUrl}/#/share/${token}?play=1${body.startFrameId ? `&start=${encodeURIComponent(body.startFrameId)}` : ''}`
+					: undefined,
 			});
 		} catch (err) {
 			return handleProjectError(c, err);

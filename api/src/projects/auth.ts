@@ -4,6 +4,7 @@ import type { Config } from '../config.js';
 import { readSignedCookie, SESSION_COOKIE } from '../auth/cookies.js';
 import { hashToken } from '../auth/crypto.js';
 import { findUserBySessionToken } from '../db/index.js';
+import { findAccountToken, touchAccountToken } from '../db/accountTokens.js';
 import {
 	findProjectToken,
 	touchProjectToken,
@@ -21,6 +22,19 @@ export function createProjectAuthMiddleware(pool: pg.Pool, config: Config) {
 		const authHeader = c.req.header('authorization');
 		if (authHeader?.startsWith('Bearer ')) {
 			const token = authHeader.slice('Bearer '.length).trim();
+			if (token.startsWith('bf_acc_')) {
+				const row = await findAccountToken(pool, token);
+				if (!row) return c.json({ error: 'Invalid token' }, 401);
+				await touchAccountToken(pool, row.id);
+				const actor: AuthActor = {
+					kind: 'account_token',
+					userId: row.owner_user_id,
+					tokenId: row.id,
+					scopes: row.scopes ?? [],
+				};
+				c.set('actor', actor);
+				return next();
+			}
 			const row = await findProjectToken(pool, token);
 			if (!row) return c.json({ error: 'Invalid token' }, 401);
 			await touchProjectToken(pool, row.id);

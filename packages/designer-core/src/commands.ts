@@ -65,6 +65,14 @@ export const projectCommandSchema = z.discriminatedUnion('type', [
 		toFrameId: z.string(),
 		label: z.string().optional(),
 		trigger: z.string().optional(),
+		fromNodeId: z.string().optional(),
+	}),
+	z.object({
+		type: z.literal('update_connector'),
+		connectorId: z.string(),
+		label: z.string().optional(),
+		trigger: z.string().optional(),
+		fromNodeId: z.string().nullable().optional(),
 	}),
 	z.object({
 		type: z.literal('add_annotation'),
@@ -367,8 +375,19 @@ export function applyProjectCommand(
 				toFrameId: parsed.toFrameId,
 				label: parsed.label,
 				trigger: parsed.trigger,
+				fromNodeId: parsed.fromNodeId,
 			});
 			effects.connectorId = id;
+			return { document: doc, effects };
+		}
+		case 'update_connector': {
+			const conn = project.connectors.find((c) => c.id === parsed.connectorId);
+			if (!conn) throw new CommandError('Unknown connector', 'connector_not_found');
+			if (parsed.label !== undefined) conn.label = parsed.label;
+			if (parsed.trigger !== undefined) conn.trigger = parsed.trigger;
+			if (parsed.fromNodeId !== undefined) {
+				conn.fromNodeId = parsed.fromNodeId ?? undefined;
+			}
 			return { document: doc, effects };
 		}
 		case 'add_annotation': {

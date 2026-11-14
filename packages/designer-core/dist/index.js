@@ -123,7 +123,15 @@ var projectCommandSchema = z.discriminatedUnion("type", [
     fromFrameId: z.string(),
     toFrameId: z.string(),
     label: z.string().optional(),
-    trigger: z.string().optional()
+    trigger: z.string().optional(),
+    fromNodeId: z.string().optional()
+  }),
+  z.object({
+    type: z.literal("update_connector"),
+    connectorId: z.string(),
+    label: z.string().optional(),
+    trigger: z.string().optional(),
+    fromNodeId: z.string().nullable().optional()
   }),
   z.object({
     type: z.literal("add_annotation"),
@@ -390,9 +398,20 @@ function applyProjectCommand(document, command, ctx) {
         fromFrameId: parsed.fromFrameId,
         toFrameId: parsed.toFrameId,
         label: parsed.label,
-        trigger: parsed.trigger
+        trigger: parsed.trigger,
+        fromNodeId: parsed.fromNodeId
       });
       effects.connectorId = id;
+      return { document: doc, effects };
+    }
+    case "update_connector": {
+      const conn = project.connectors.find((c) => c.id === parsed.connectorId);
+      if (!conn) throw new CommandError("Unknown connector", "connector_not_found");
+      if (parsed.label !== void 0) conn.label = parsed.label;
+      if (parsed.trigger !== void 0) conn.trigger = parsed.trigger;
+      if (parsed.fromNodeId !== void 0) {
+        conn.fromNodeId = parsed.fromNodeId ?? void 0;
+      }
       return { document: doc, effects };
     }
     case "add_annotation": {
@@ -1083,6 +1102,44 @@ function countDesignNodes(tree) {
   return "children" in tree ? 1 + tree.children.reduce((n, c) => n + countDesignNodes(c), 0) : 1;
 }
 
+// src/connectorLinks.ts
+function normalizeLabel(value) {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
+function buttonLabel(node) {
+  if (node.type !== "instance" || node.instance?.definitionId !== "button") return null;
+  const label = String(node.instance.props?.children ?? "").trim();
+  return label || null;
+}
+function listPageButtons(page) {
+  const out = [];
+  for (const node of Object.values(page.nodes)) {
+    const label = buttonLabel(node);
+    if (label) out.push({ nodeId: node.id, label });
+  }
+  return out;
+}
+function attachConnectorButtonNodes(document, pageId, frameId) {
+  const notes = [];
+  const page = document.project.pages.find((p) => p.id === pageId);
+  if (!page) return notes;
+  const buttons = listPageButtons(page);
+  if (!buttons.length) return notes;
+  const connectors = document.project.connectors.filter(
+    (c) => c.fromFrameId === frameId && c.fromFrameId !== c.toFrameId
+  );
+  for (const conn of connectors) {
+    const target = normalizeLabel(conn.label ?? conn.trigger ?? "next");
+    if (!target) continue;
+    const match = buttons.find((b) => normalizeLabel(b.label) === target) ?? buttons.find((b) => target.includes(normalizeLabel(b.label)) || normalizeLabel(b.label).includes(target));
+    if (match) {
+      conn.fromNodeId = match.nodeId;
+      notes.push(`Linked button "${match.label}" to ${conn.label ?? "next screen"}`);
+    }
+  }
+  return notes;
+}
+
 // src/index.ts
 function defaultNewId(prefix) {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
@@ -1119,6 +1176,7 @@ export {
   applyFlowSpec,
   applyImportScreenshots,
   applyProjectCommand,
+  attachConnectorButtonNodes,
   autoPlaceFrame,
   countDesignNodes,
   createDefaultCommandContext,
@@ -1131,6 +1189,7 @@ export {
   isEmptyFlow,
   layeredFlowLayout,
   layoutFramesInFlowRow,
+  listPageButtons,
   parseProjectCommand,
   projectCommandSchema,
   repairDesignSpec,

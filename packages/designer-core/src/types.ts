@@ -114,6 +114,8 @@ export type Connector = {
 	toFrameId: string;
 	label?: string;
 	trigger?: string;
+	/** When set, prototype navigation is tied to this designed node (button, etc.). */
+	fromNodeId?: string;
 };
 
 export type AnnotationTarget =

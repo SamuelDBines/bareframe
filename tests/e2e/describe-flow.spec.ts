@@ -199,6 +199,11 @@ async function openProject(page: Page) {
 	await expect(page.getByTestId('describe-product-panel')).toBeVisible({ timeout: 30_000 });
 }
 
+async function expectFlowMapCards(page: Page, count: number) {
+	await expect(page.getByTestId('flow-gen-toast')).toContainText(/Mapped:|Updated the flow/, { timeout: 30_000 });
+	await expect(page.locator('.flow-map-card')).toHaveCount(count, { timeout: 30_000 });
+}
+
 test.describe('describe your product → flow map', () => {
 	test('maps a described product onto the canvas', async ({ page }) => {
 		const api = await mockApi(page, { generateDelayMs: 400 });
@@ -218,7 +223,7 @@ test.describe('describe your product → flow map', () => {
 		await panel.getByRole('button', { name: 'Map my flow' }).click();
 		await expect(panel.getByRole('button', { name: 'Mapping your screens…' })).toBeDisabled();
 
-		await expect(page.locator('.flow-map-card')).toHaveCount(4, { timeout: 15_000 });
+		await expectFlowMapCards(page, 4);
 		await expect(page.getByTestId('describe-product-panel')).toHaveCount(0);
 		await expect(page.getByTestId('flow-gen-toast')).toContainText('Mapped: 4 screens, 3 links');
 		await expect(page.locator('.flow-map-card__footer')).toContainText(['Welcome', 'Sign up', 'Home', 'Habit detail']);
@@ -254,7 +259,7 @@ test.describe('describe your product → flow map', () => {
 			.getByRole('textbox', { name: 'Describe your product' })
 			.fill('Habitual: a habit tracker for busy parents who want small daily routines.');
 		await page.getByRole('button', { name: 'Map my flow' }).click();
-		await expect(page.locator('.flow-map-card')).toHaveCount(4, { timeout: 15_000 });
+		await expectFlowMapCards(page, 4);
 
 		const open = page.getByTestId('flow-refine-open');
 		await open.click();
@@ -276,7 +281,7 @@ test.describe('describe your product → flow map', () => {
 			.getByRole('textbox', { name: 'Describe your product' })
 			.fill('Habitual: a habit tracker for busy parents who want small daily routines.');
 		await page.getByRole('button', { name: 'Map my flow' }).click();
-		await expect(page.locator('.flow-map-card')).toHaveCount(4, { timeout: 15_000 });
+		await expectFlowMapCards(page, 4);
 
 		await page.getByTestId('flow-refine-open').click();
 		const dialog = page.getByRole('dialog', { name: 'Refine flow' });
@@ -297,7 +302,7 @@ async function openMappedProject(page: Page, options: MockOptions = {}) {
 		.getByRole('textbox', { name: 'Describe your product' })
 		.fill('Habitual: a habit tracker for busy parents who want small daily routines.');
 	await page.getByRole('button', { name: 'Map my flow' }).click();
-	await expect(page.locator('.flow-map-card')).toHaveCount(4, { timeout: 15_000 });
+	await expectFlowMapCards(page, 4);
 	return api;
 }
 

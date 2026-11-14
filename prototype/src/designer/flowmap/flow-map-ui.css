@@ -1135,3 +1135,75 @@
 		animation: none;
 	}
 }
+
+/* ---------- AI screen designs ---------- */
+
+.flow-map-card__footer--actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	text-align: start;
+}
+
+.flow-map-card__name {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.flow-map-card__design {
+	position: relative;
+	z-index: 2;
+	flex-shrink: 0;
+}
+
+.design-bar {
+	flex: 0 0 auto;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+	padding: 0.45rem 0.75rem;
+	background: var(--bx-surface);
+	border-bottom: 1px solid var(--bx-border);
+}
+
+.design-bar__progress {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.design-bar__progress p,
+.design-bar__result p {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--bx-text);
+}
+
+.design-bar__progress progress {
+	width: 96px;
+	accent-color: var(--bx-accent);
+}
+
+.design-bar__result {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	flex-basis: 100%;
+}
+
+.design-bar__result.is-error p {
+	color: var(--bx-critical);
+}
+
+@media (max-width: 640px) {
+	.flow-gen-toast {
+		bottom: 72px;
+	}
+
+	.design-bar__progress progress {
+		display: none;
+	}
+}

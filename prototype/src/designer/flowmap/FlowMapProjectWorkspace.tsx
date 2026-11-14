@@ -8,6 +8,9 @@ import { FlowMapToolbar, type FlowWorkspaceMode } from './FlowMapToolbar';
 import { FlowMapTour } from './FlowMapTour';
 import { DescribeProductPanel } from './DescribeProductPanel';
 import { RefineFlowDialog } from './RefineFlowDialog';
+import { DesignBar } from './DesignBar';
+import { useDesignQueue } from './designGenApi';
+import type { DesignDevice } from '@bareframe/designer-core';
 import { PrototypePlayer } from './PrototypePlayer';
 import './flow-map-ui.css';
 
@@ -27,6 +30,11 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 	const [pendingDelete, setPendingDelete] = useState<{ frame: Frame; connectors: number } | null>(null);
 	const [refineOpen, setRefineOpen] = useState(false);
 	const [flowToast, setFlowToast] = useState<string | null>(null);
+	const [designDevice, setDesignDevice] = useState<DesignDevice>(() => {
+		const platform = state.project.productBrief?.platform;
+		return platform === 'tablet' ? 'tablet' : platform === 'desktop' ? 'desktop' : 'phone';
+	});
+	const designs = useDesignQueue(chrome.projectId);
 
 	const screenCount = useMemo(
 		() => state.project.frames.filter((f) => !f.ghost).length,
@@ -95,10 +103,24 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 				onStartTour={() => setTourOpen(true)}
 				onRefineFlow={canGenerate && !flowIsEmpty ? () => setRefineOpen(true) : undefined}
 			/>
+			{canGenerate && !flowIsEmpty ? (
+				<DesignBar
+					device={designDevice}
+					onDeviceChange={setDesignDevice}
+					queue={designs.queue}
+					screenCount={screenCount}
+					onGenerateAll={() => void designs.designAll(designDevice)}
+					onCancel={designs.cancel}
+					onDismiss={designs.dismiss}
+				/>
+			) : null}
 			<div className="flow-map-stage">
 				<FlowMapCanvas
 					readOnly={readOnly}
 					hideEmptyState={showDescribe}
+					onGenerateDesign={canGenerate && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
+					designingFrameId={designs.queue.currentFrameId}
+					designBusy={designs.queue.running}
 					connectMode={mode === 'edit' && connectMode && !readOnly}
 					connectFromFrameId={connectFrom}
 					onConnectFrameSelect={(frameId) => {
@@ -143,6 +165,8 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 				readOnly={readOnly}
 				onRename={promptRename}
 				onRequestDelete={(frame, connectorCount) => setPendingDelete({ frame, connectors: connectorCount })}
+				onGenerateDesign={canGenerate && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
+				designBusy={designs.queue.running}
 				onAddScreen={() => {
 					setMode('edit');
 					dispatch({ type: 'addFrame', presetId: 'iphone-15' });

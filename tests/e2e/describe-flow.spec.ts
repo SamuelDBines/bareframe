@@ -2,6 +2,8 @@ import { expect, test, type Page, type Route } from '@playwright/test';
 import {
 	applyFlowSpec,
 	createEmptyProjectDocument,
+	designToNodes,
+	repairDesignSpec,
 	flowSpecFromDocument,
 	repairFlowSpec,
 	type ProjectDocument,
@@ -30,7 +32,19 @@ const AI_FLOW = {
 	],
 };
 
-type MockOptions = { refineStatus?: number; generateDelayMs?: number };
+type MockOptions = {
+	refineStatus?: number;
+	generateDelayMs?: number;
+	designDelayMs?: number;
+	/** Screen designs allowed before the mock answers 429 (free plan: 3). */
+	designAllowance?: number;
+};
+
+const DESIGN_PRESET: Record<string, { id: string; width: number; height: number }> = {
+	phone: { id: 'mobile', width: 390, height: 844 },
+	tablet: { id: 'tablet', width: 768, height: 1024 },
+	desktop: { id: 'desktop-1440', width: 1440, height: 900 },
+};
 
 async function mockApi(page: Page, options: MockOptions = {}) {
 	let version = 1;
@@ -38,6 +52,8 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 	document.project.pages = [];
 	const generateBodies: Record<string, unknown>[] = [];
 	let conflicts = 0;
+	const designCalls: { pageId: string; device: string }[] = [];
+	let reviewsStarted = 0;
 
 	await page.route('**/api/**', async (route: Route) => {
 		const req = route.request();
@@ -50,7 +66,67 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 		}
 		if (p.endsWith('/api/plan')) return json({ tier: 'free', limits: {}, usage: {} });
 		if (p.endsWith('/api/billing/config')) return json({ stripeEnabled: false });
+		if (p.endsWith(`/api/projects/${PROJECT_ID}/reviews`) && req.method() === 'POST') {
+			reviewsStarted += 1;
+			return json({ runId: 'run-1', status: 'queued' }, 202);
+		}
+		if (p.endsWith(`/api/projects/${PROJECT_ID}/reviews/run-1`)) {
+			const first = document.project.frames[0];
+			return json({
+				id: 'run-1',
+				status: 'completed',
+				summary: {},
+				issues: [
+					{
+						id: 'iss-1',
+						category: 'missing_state',
+						severity: 'major',
+						title: 'Sign up has no password rules',
+						explanation: 'People find out the rules only after an error.',
+						fix: 'Show the rules under the field.',
+						frameId: first?.id,
+						status: 'open',
+					},
+				],
+			});
+		}
 		if (p.endsWith(`/api/projects/${PROJECT_ID}/reviews`)) return json({ runs: [] });
+		const designMatch = /\/api\/projects\/[^/]+\/screens\/([^/]+)\/design$/.exec(p);
+		if (designMatch) {
+			const pageId = decodeURIComponent(designMatch[1]!);
+			const body = req.postDataJSON() as { baseVersion: number; device: string };
+			designCalls.push({ pageId, device: body.device });
+			if (options.designDelayMs) await new Promise((r) => setTimeout(r, options.designDelayMs));
+			if (designCalls.length > (options.designAllowance ?? 99)) {
+				return json(
+					{ error: 'screen_design_limit', message: "The free plan includes 3 screen designs a month, and you've used them all. Upgrade to Bareframe Pro for more." },
+					429,
+				);
+			}
+			if (body.baseVersion !== version) return json({ error: 'Version conflict', currentVersion: version }, 409);
+			const pageIndex = document.project.pages.findIndex((pg) => pg.id === pageId);
+			const page = document.project.pages[pageIndex]!;
+			const actions = document.project.connectors
+				.filter((c) => document.project.frames.some((f) => f.id === c.fromFrameId && f.pageId === pageId))
+				.map((c) => ({ type: 'button', props: { label: c.label ?? 'Next', variant: 'primary' } }));
+			const { spec } = repairDesignSpec({
+				states: {
+					default: {
+						type: 'stack',
+						padding: 24,
+						children: [{ type: 'heading', level: 1, text: page.name }, { type: 'text', text: page.brief?.purpose ?? '' }, ...actions],
+					},
+				},
+			});
+			document = structuredClone(document);
+			document.project.pages[pageIndex] = designToNodes(page, spec.states.default, newId);
+			const preset = DESIGN_PRESET[body.device]!;
+			for (const f of document.project.frames) {
+				if (f.pageId === pageId) Object.assign(f, { devicePresetId: preset.id, width: preset.width, height: preset.height });
+			}
+			version += 1;
+			return json({ version, document, design: { device: body.device, states: ['default'], repairs: [] } });
+		}
 		if (p.endsWith(`/api/projects/${PROJECT_ID}/document`) && req.method() === 'PUT') {
 			const body = req.postDataJSON() as { document: ProjectDocument; baseVersion: number };
 			if (body.baseVersion !== version) {
@@ -107,7 +183,12 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 		if (p.endsWith('/events')) return route.fulfill({ status: 204, body: '' });
 		return json({ error: 'not_found' }, 404);
 	});
-	return { generateBodies, current: () => ({ version, document, conflicts }) };
+	return {
+		generateBodies,
+		designCalls,
+		reviews: () => reviewsStarted,
+		current: () => ({ version, document, conflicts }),
+	};
 }
 
 async function openProject(page: Page) {
@@ -203,5 +284,87 @@ test.describe('describe your product → flow map', () => {
 		await page.keyboard.press('Escape');
 		await expect(dialog).toHaveCount(0);
 		await expect(page.getByTestId('flow-refine-open')).toBeFocused();
+	});
+});
+
+async function openMappedProject(page: Page, options: MockOptions = {}) {
+	const api = await mockApi(page, options);
+	await openProject(page);
+	await page
+		.getByRole('textbox', { name: 'Describe your product' })
+		.fill('Habitual: a habit tracker for busy parents who want small daily routines.');
+	await page.getByRole('button', { name: 'Map my flow' }).click();
+	await expect(page.locator('.flow-map-card')).toHaveCount(4, { timeout: 15_000 });
+	return api;
+}
+
+test.describe('generate screen designs', () => {
+	test('each screen card has a Generate design button', async ({ page, isMobile }) => {
+		const api = await openMappedProject(page);
+		const button = page.getByRole('button', { name: 'Generate design for Welcome' });
+		await expect(button).toBeAttached();
+		if (!isMobile) {
+			await button.click();
+			await expect(page.getByRole('button', { name: 'Regenerate design for Welcome' })).toBeVisible({ timeout: 15_000 });
+			expect(api.designCalls[0]?.device).toBe('phone');
+		}
+	});
+
+	test('designs one screen for the chosen device, then runs the AI review', async ({ page }) => {
+		const api = await openMappedProject(page);
+		const bar = page.getByTestId('design-bar');
+		await bar.getByRole('button', { name: /Tablet/ }).click();
+		await expect(bar.getByRole('button', { name: /Tablet/ })).toHaveAttribute('aria-pressed', 'true');
+
+		// The screen's context menu works at any zoom (the card button can be tiny on a phone).
+		await page.getByRole('button', { name: 'Sign up', exact: true }).click({ button: 'right' });
+		await page.getByRole('menuitem', { name: 'Generate design' }).click();
+		await expect(page.getByRole('button', { name: 'Regenerate design for Sign up' })).toBeAttached({ timeout: 15_000 });
+		expect(api.designCalls).toEqual([{ pageId: expect.any(String), device: 'tablet' }]);
+
+		// The design is the screen's thumbnail on the map.
+		const thumb = page.frameLocator('iframe[title="Preview Sign up"]').first();
+		await expect(thumb.getByRole('heading', { name: 'Sign up' })).toBeVisible();
+		await expect(thumb.getByRole('button', { name: 'Create account' })).toBeVisible();
+		const signUp = api.current().document.project.frames.find((f) => f.name === 'Sign up')!;
+		expect(signUp.devicePresetId).toBe('tablet');
+
+		await expect(page.getByTestId('design-result')).toContainText('Designed 1 of 1 screen. Running a UX review.');
+		await expect.poll(() => api.reviews()).toBe(1);
+		await expect(page.getByText('Sign up has no password rules').first()).toBeVisible({ timeout: 15_000 });
+	});
+
+	test('generates all screens as a queue that can be cancelled', async ({ page }) => {
+		const api = await openMappedProject(page, { designDelayMs: 700 });
+		await page.getByTestId('design-all').click();
+		await expect(page.getByTestId('design-progress')).toContainText('Designing 1 of 4');
+		await expect(page.getByTestId('design-progress')).toContainText('Designing 2 of 4', { timeout: 10_000 });
+		await page.getByTestId('design-cancel').click();
+		await expect(page.getByTestId('design-result')).toContainText('Cancelled');
+		await expect(page.getByTestId('design-result')).toContainText('Designed 1 of 4 screens');
+		await page.waitForTimeout(1000);
+		expect(api.designCalls.length).toBe(2);
+		await expect(page.getByTestId('design-all')).toBeEnabled();
+	});
+
+	test('stops the queue at the plan limit and says why', async ({ page }) => {
+		const api = await openMappedProject(page, { designAllowance: 3 });
+		await page.getByTestId('design-all').click();
+		const result = page.getByTestId('design-result');
+		await expect(result).toContainText('Designed 3 of 4 screens', { timeout: 15_000 });
+		await expect(result).toContainText('free plan includes 3 screen designs');
+		await expect(result).toHaveAttribute('role', 'alert');
+		expect(api.designCalls).toHaveLength(4);
+	});
+
+	test('designed screens show in the click-through prototype', async ({ page }) => {
+		await openMappedProject(page);
+		await page.getByTestId('design-all').click();
+		await expect(page.getByTestId('design-result')).toContainText('Designed 4 of 4 screens', { timeout: 20_000 });
+		await page.getByTestId('flow-mode-prototype').click();
+		const screen = page.frameLocator('.proto-stage iframe, [class*="proto"] iframe').first();
+		await expect(screen.getByRole('heading', { name: 'Welcome' })).toBeVisible({ timeout: 15_000 });
+		await page.getByRole('button', { name: /Get started: go to Sign up/ }).click();
+		await expect(page.frameLocator('[class*="proto"] iframe').first().getByRole('heading', { name: 'Sign up' })).toBeVisible();
 	});
 });

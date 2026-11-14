@@ -107,6 +107,9 @@ function FlowMapCard({
 	readOnly,
 	onContextMenu,
 	onMenuKey,
+	onGenerateDesign,
+	designing,
+	designBusy,
 }: {
 	frame: Frame;
 	page: Page;
@@ -124,8 +127,13 @@ function FlowMapCard({
 	readOnly?: boolean;
 	onContextMenu?: (e: React.MouseEvent, frame: Frame) => void;
 	onMenuKey?: (e: React.KeyboardEvent, frame: Frame) => void;
+	/** Shows "Generate design" on the card. */
+	onGenerateDesign?: (frame: Frame) => void;
+	designing?: boolean;
+	designBusy?: boolean;
 }) {
 	const review = useReview();
+	const hasDesign = (page.nodes[page.rootNodeId]?.children.length ?? 0) > 0;
 	const dragRef = useRef<{ x: number; y: number; ox: number; oy: number; moved: boolean } | null>(null);
 	const notes = annotations.filter((a) => a.kind === 'note');
 	const openCount = issues?.filter((i) => i.status === 'open').length ?? 0;
@@ -213,7 +221,25 @@ function FlowMapCard({
 					</span>
 				) : null}
 			</div>
-			<footer className="flow-map-card__footer">{frame.name}</footer>
+			<footer className={`flow-map-card__footer${onGenerateDesign ? ' flow-map-card__footer--actions' : ''}`}>
+				<span className="flow-map-card__name">{frame.name}</span>
+				{onGenerateDesign ? (
+					<button
+						type="button"
+						className="btn btn-secondary btn-sm flow-map-card__design"
+						data-testid="card-generate-design"
+						aria-label={`${hasDesign ? 'Regenerate' : 'Generate'} design for ${frame.name}`}
+						disabled={designBusy}
+						onPointerDown={(e) => e.stopPropagation()}
+						onClick={(e) => {
+							e.stopPropagation();
+							onGenerateDesign(frame);
+						}}
+					>
+						{designing ? 'Designing…' : hasDesign ? 'Redesign' : 'Generate design'}
+					</button>
+				) : null}
+			</footer>
 			{issues && review ? (
 				<CardFlags
 					issues={issues}
@@ -237,8 +263,14 @@ export function FlowMapCanvas({
 	readOnly,
 	onContextMenuChange,
 	hideEmptyState,
+	onGenerateDesign,
+	designingFrameId,
+	designBusy,
 }: {
 	connectMode?: boolean;
+	onGenerateDesign?: (frame: Frame) => void;
+	designingFrameId?: string | null;
+	designBusy?: boolean;
 	/** The describe-your-product panel replaces the empty-map message. */
 	hideEmptyState?: boolean;
 	connectFromFrameId?: string | null;
@@ -574,6 +606,9 @@ export function FlowMapCanvas({
 								connectMode={connectMode}
 								connectSource={connectFromFrameId === frame.id}
 								readOnly={readOnly}
+								onGenerateDesign={connectMode ? undefined : onGenerateDesign}
+								designing={designingFrameId === frame.id}
+								designBusy={designBusy}
 								onContextMenu={(e, fr) => openContextMenu(e.clientX, e.clientY, fr)}
 								onMenuKey={(e, fr) => {
 									const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();

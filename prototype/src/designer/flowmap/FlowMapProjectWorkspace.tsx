@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useAppCanvasChrome } from '../AppCanvasChrome';
 import { useDesigner } from '../store';
 import type { Frame } from '../types';
 import { FlowMapCanvas } from './FlowMapCanvas';
 import { FlowMapContextMenu, FlowMapDeleteScreenDialog, type ContextMenuState } from './FlowMapContextMenu';
 import { FlowMapToolbar, type FlowWorkspaceMode } from './FlowMapToolbar';
 import { FlowMapTour } from './FlowMapTour';
+import { DescribeProductPanel } from './DescribeProductPanel';
+import { RefineFlowDialog } from './RefineFlowDialog';
+import { DesignBar } from './DesignBar';
+import { useDesignQueue } from './designGenApi';
+import type { DesignDevice } from '@bareframe/designer-core';
 import { PrototypePlayer } from './PrototypePlayer';
 import './flow-map-ui.css';
 
@@ -14,6 +20,7 @@ type Props = {
 
 export function FlowMapProjectWorkspace({ readOnly }: Props) {
 	const { state, dispatch } = useDesigner();
+	const chrome = useAppCanvasChrome();
 	const [mode, setMode] = useState<Exclude<FlowWorkspaceMode, 'prototype'>>('map');
 	const [playing, setPlaying] = useState(false);
 	const [connectMode, setConnectMode] = useState(false);
@@ -21,12 +28,34 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 	const [tourOpen, setTourOpen] = useState(false);
 	const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
 	const [pendingDelete, setPendingDelete] = useState<{ frame: Frame; connectors: number } | null>(null);
+	const [refineOpen, setRefineOpen] = useState(false);
+	const [flowToast, setFlowToast] = useState<string | null>(null);
+	const [designDevice, setDesignDevice] = useState<DesignDevice>(() => {
+		const platform = state.project.productBrief?.platform;
+		return platform === 'tablet' ? 'tablet' : platform === 'desktop' ? 'desktop' : 'phone';
+	});
+	const designs = useDesignQueue(chrome.projectId);
 
 	const screenCount = useMemo(
 		() => state.project.frames.filter((f) => !f.ghost).length,
 		[state.project.frames],
 	);
-	const tourAutoEligible = !readOnly && screenCount <= 1;
+	const canGenerate = !readOnly && Boolean(chrome.projectId);
+	// Empty project: no screens yet, or only the untouched starter screen.
+	const flowIsEmpty = useMemo(() => {
+		const frames = state.project.frames.filter((f) => !f.ghost);
+		if (frames.length === 0) return true;
+		if (frames.length > 1 || state.project.connectors.length > 0) return false;
+		return state.project.pages.every((p) => (p.nodes[p.rootNodeId]?.children.length ?? 0) === 0) && !state.project.productBrief;
+	}, [state.project]);
+	const showDescribe = canGenerate && flowIsEmpty;
+	const tourAutoEligible = !readOnly && screenCount <= 1 && !showDescribe;
+
+	useEffect(() => {
+		if (!flowToast) return;
+		const t = window.setTimeout(() => setFlowToast(null), 5000);
+		return () => window.clearTimeout(t);
+	}, [flowToast]);
 
 	useEffect(() => {
 		const onKey = (e: KeyboardEvent) => {
@@ -72,10 +101,26 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 				}}
 				readOnly={readOnly}
 				onStartTour={() => setTourOpen(true)}
+				onRefineFlow={canGenerate && !flowIsEmpty ? () => setRefineOpen(true) : undefined}
 			/>
+			{canGenerate && !flowIsEmpty ? (
+				<DesignBar
+					device={designDevice}
+					onDeviceChange={setDesignDevice}
+					queue={designs.queue}
+					screenCount={screenCount}
+					onGenerateAll={() => void designs.designAll(designDevice)}
+					onCancel={designs.cancel}
+					onDismiss={designs.dismiss}
+				/>
+			) : null}
 			<div className="flow-map-stage">
 				<FlowMapCanvas
 					readOnly={readOnly}
+					hideEmptyState={showDescribe}
+					onGenerateDesign={canGenerate && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
+					designingFrameId={designs.queue.currentFrameId}
+					designBusy={designs.queue.running}
 					connectMode={mode === 'edit' && connectMode && !readOnly}
 					connectFromFrameId={connectFrom}
 					onConnectFrameSelect={(frameId) => {
@@ -101,7 +146,18 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 						dispatch({ type: 'addFrame', presetId: 'iphone-15' });
 					}}
 				/>
+				{showDescribe && chrome.projectId ? (
+					<DescribeProductPanel projectId={chrome.projectId} onGenerated={setFlowToast} />
+				) : null}
+				{flowToast ? (
+					<p className="flow-gen-toast" role="status" data-testid="flow-gen-toast">
+						{flowToast}
+					</p>
+				) : null}
 			</div>
+			{refineOpen && chrome.projectId ? (
+				<RefineFlowDialog projectId={chrome.projectId} onClose={() => setRefineOpen(false)} onDone={setFlowToast} />
+			) : null}
 			{playing ? <PrototypePlayer onExit={() => setPlaying(false)} /> : null}
 			<FlowMapContextMenu
 				menu={contextMenu}
@@ -109,6 +165,8 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 				readOnly={readOnly}
 				onRename={promptRename}
 				onRequestDelete={(frame, connectorCount) => setPendingDelete({ frame, connectors: connectorCount })}
+				onGenerateDesign={canGenerate && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
+				designBusy={designs.queue.running}
 				onAddScreen={() => {
 					setMode('edit');
 					dispatch({ type: 'addFrame', presetId: 'iphone-15' });

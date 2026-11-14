@@ -7,6 +7,10 @@ export type PlanLimits = {
   maxProjects: number;
   maxScreensPerProject: number;
   maxAiReviewsPerMonth: number;
+  /** "Describe your product" flow generations, including regenerate and refine. */
+  maxFlowGenerationsPerMonth: number;
+  /** AI screen designs (one per screen and device). */
+  maxScreenDesignsPerMonth: number;
   urlImport: boolean;
   privateCanvases: boolean;
   exportEnabled: boolean;
@@ -18,6 +22,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     maxProjects: 1,
     maxScreensPerProject: 10,
     maxAiReviewsPerMonth: 3,
+    maxFlowGenerationsPerMonth: 1,
+    maxScreenDesignsPerMonth: 3,
     urlImport: false,
     privateCanvases: false,
     exportEnabled: false,
@@ -27,6 +33,8 @@ export const PLAN_LIMITS: Record<PlanTier, PlanLimits> = {
     maxProjects: Number.POSITIVE_INFINITY,
     maxScreensPerProject: Number.POSITIVE_INFINITY,
     maxAiReviewsPerMonth: 50,
+    maxFlowGenerationsPerMonth: 30,
+    maxScreenDesignsPerMonth: 300,
     urlImport: true,
     privateCanvases: true,
     exportEnabled: true,
@@ -126,6 +134,59 @@ export async function assertFeature(pool: pg.Pool, userId: number, feature: keyo
   }
 }
 
+export type GenerationKind = 'flow' | 'screen_design';
+
+const GENERATION_LIMIT: Record<GenerationKind, { key: keyof PlanLimits; code: string; noun: string }> = {
+  flow: { key: 'maxFlowGenerationsPerMonth', code: 'flow_generation_limit', noun: 'flow generation' },
+  screen_design: { key: 'maxScreenDesignsPerMonth', code: 'screen_design_limit', noun: 'screen design' },
+};
+
+export async function getGenerationUsage(pool: pg.Pool, userId: number): Promise<Record<GenerationKind, number>> {
+  const { rows } = await pool.query<{ kind: GenerationKind; count: number }>(
+    `SELECT kind, count FROM ai_generation_usage
+     WHERE user_id = $1 AND period_start = date_trunc('month', CURRENT_DATE)::date`,
+    [userId],
+  );
+  const usage: Record<GenerationKind, number> = { flow: 0, screen_design: 0 };
+  for (const row of rows) usage[row.kind] = row.count;
+  return usage;
+}
+
+/**
+ * Atomically take one generation from this month's allowance, or throw PlanLimitError.
+ * Call `refundGeneration` if the generation then fails, so failures don't use up the plan.
+ */
+export async function reserveGeneration(pool: pg.Pool, userId: number, kind: GenerationKind) {
+  const tier = await getUserPlanTier(pool, userId);
+  const meta = GENERATION_LIMIT[kind];
+  const limit = PLAN_LIMITS[tier][meta.key] as number;
+  const cap = Number.isFinite(limit) ? limit : 2_147_483_647;
+  const { rows } = await pool.query<{ count: number }>(
+    `INSERT INTO ai_generation_usage (user_id, kind, period_start, count)
+     SELECT $1, $2, date_trunc('month', CURRENT_DATE)::date, 1 WHERE $3::int > 0
+     ON CONFLICT (user_id, kind, period_start) DO UPDATE SET count = ai_generation_usage.count + 1
+       WHERE ai_generation_usage.count < $3::int
+     RETURNING count`,
+    [userId, kind, cap],
+  );
+  if (rows.length === 0) {
+    const plan = tier === 'pro' ? 'Bareframe Pro' : 'The free plan';
+    const upgrade = tier === 'pro' ? '' : ' Upgrade to Bareframe Pro for more.';
+    throw new PlanLimitError(
+      meta.code,
+      `${plan} includes ${limit} ${meta.noun}${limit === 1 ? '' : 's'} a month, and you've used ${limit === 1 ? 'it' : 'them all'}.${upgrade}`,
+    );
+  }
+}
+
+export async function refundGeneration(pool: pg.Pool, userId: number, kind: GenerationKind) {
+  await pool.query(
+    `UPDATE ai_generation_usage SET count = GREATEST(count - 1, 0)
+     WHERE user_id = $1 AND kind = $2 AND period_start = date_trunc('month', CURRENT_DATE)::date`,
+    [userId, kind],
+  );
+}
+
 export class PlanLimitError extends Error {
   constructor(
     public code: string,
@@ -146,12 +207,15 @@ export async function getPlanSummary(pool: pg.Pool, userId: number) {
   monthStart.setHours(0, 0, 0, 0);
   const reviewsUsed =
     usage && new Date(usage.period_start) >= monthStart ? usage.ai_reviews_this_month : 0;
+  const generations = await getGenerationUsage(pool, userId);
   return {
     tier,
     limits,
     usage: {
       projects,
       aiReviewsThisMonth: reviewsUsed,
+      flowGenerationsThisMonth: generations.flow,
+      screenDesignsThisMonth: generations.screen_design,
     },
   };
 }

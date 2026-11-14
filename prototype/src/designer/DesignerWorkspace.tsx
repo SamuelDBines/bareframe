@@ -16,10 +16,16 @@ function WorkspaceInner({
 	compactChrome,
 	flowMap,
 	readOnly,
+	openPrototypeOnMount,
+	prototypeStartFrameId,
+	prototypeOnly,
 }: {
 	compactChrome?: boolean;
 	flowMap?: boolean;
 	readOnly?: boolean;
+	openPrototypeOnMount?: boolean;
+	prototypeStartFrameId?: string | null;
+	prototypeOnly?: boolean;
 }) {
 	const { state, dispatch } = useDesigner();
 	const { mobilePanel } = state.ui;
@@ -44,7 +50,16 @@ function WorkspaceInner({
 			{!compactChrome ? <LibrarySidebar /> : null}
 			<div className="designer-canvas-column">
 				{useFlowMap ? null : <CanvasToolbar />}
-				{useFlowMap ? <FlowMapProjectWorkspace readOnly={readOnly} /> : <InfiniteCanvas />}
+				{useFlowMap ? (
+					<FlowMapProjectWorkspace
+						readOnly={readOnly}
+						openPrototypeOnMount={openPrototypeOnMount}
+						prototypeStartFrameId={prototypeStartFrameId}
+						prototypeOnly={prototypeOnly}
+					/>
+				) : (
+					<InfiniteCanvas />
+				)}
 				{!compactChrome ? <AssistantFab /> : null}
 			</div>
 			{!compactChrome ? <InspectorPanel /> : null}
@@ -63,6 +78,10 @@ type DesignerWorkspaceProps = {
 	review?: { projectId?: string; demo?: boolean };
 	/** Side panel rendered inside the designer providers, beside the canvas. */
 	aside?: ReactNode;
+	openPrototypeOnMount?: boolean;
+	prototypeStartFrameId?: string | null;
+	/** Shared playable link: skip flow map chrome and show the player only. */
+	prototypeOnly?: boolean;
 };
 
 export function DesignerWorkspace({
@@ -74,6 +93,9 @@ export function DesignerWorkspace({
 	initialDocument,
 	review,
 	aside,
+	openPrototypeOnMount,
+	prototypeStartFrameId,
+	prototypeOnly,
 }: DesignerWorkspaceProps) {
 	const chrome: AppCanvasChromeValue = {
 		...appChrome,
@@ -85,6 +107,9 @@ export function DesignerWorkspace({
 			compactChrome={compactChrome ?? Boolean(demoReview)}
 			flowMap={compactChrome ?? Boolean(demoReview)}
 			readOnly={readOnly ?? demoReview}
+			openPrototypeOnMount={openPrototypeOnMount}
+			prototypeStartFrameId={prototypeStartFrameId}
+			prototypeOnly={prototypeOnly}
 		/>
 	);
 

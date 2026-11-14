@@ -41,6 +41,7 @@ import { createPublicToolsRouter } from './public/check-url.js';
 import { createCaptureRouter } from './capture/routes.js';
 import { createWebsiteCaptureRouter } from './capture/setup-routes.js';
 import { createSitemapRouter } from './sitemap/routes.js';
+import { createAccountRouter } from './account/routes.js';
 
 export type AppDeps = {
 	config: Config;
@@ -151,6 +152,7 @@ export function createApp(deps: AppDeps): Hono {
 	app.route('/api', createPublicShareRouter(pool));
 	app.route('/api', createPublicToolsRouter(pool));
 	app.route('/api', createInternalWorkerRouter(pool, config));
+	app.route('/api', createAccountRouter(pool, config));
 	app.route('/api', createProjectsRouter(pool, config));
 	app.route('/api', createFlowMapRouter(pool, config));
 	app.route('/api', createPackagesRouter(pool, config));

@@ -104,6 +104,8 @@ type Connector = {
     toFrameId: string;
     label?: string;
     trigger?: string;
+    /** When set, prototype navigation is tied to this designed node (button, etc.). */
+    fromNodeId?: string;
 };
 type AnnotationTarget = {
     kind: 'node';
@@ -256,18 +258,39 @@ declare const projectCommandSchema: z.ZodDiscriminatedUnion<"type", [z.ZodObject
     toFrameId: z.ZodString;
     label: z.ZodOptional<z.ZodString>;
     trigger: z.ZodOptional<z.ZodString>;
+    fromNodeId: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     type: "add_connector";
     fromFrameId: string;
     toFrameId: string;
     label?: string | undefined;
     trigger?: string | undefined;
+    fromNodeId?: string | undefined;
 }, {
     type: "add_connector";
     fromFrameId: string;
     toFrameId: string;
     label?: string | undefined;
     trigger?: string | undefined;
+    fromNodeId?: string | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"update_connector">;
+    connectorId: z.ZodString;
+    label: z.ZodOptional<z.ZodString>;
+    trigger: z.ZodOptional<z.ZodString>;
+    fromNodeId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    type: "update_connector";
+    connectorId: string;
+    label?: string | undefined;
+    trigger?: string | undefined;
+    fromNodeId?: string | null | undefined;
+}, {
+    type: "update_connector";
+    connectorId: string;
+    label?: string | undefined;
+    trigger?: string | undefined;
+    fromNodeId?: string | null | undefined;
 }>, z.ZodObject<{
     type: z.ZodLiteral<"add_annotation">;
     frameId: z.ZodString;
@@ -671,7 +694,17 @@ declare function repairDesignSpec(raw: unknown, wantedStates?: DesignStateName[]
 declare function designToNodes(page: Page, tree: DesignTreeNode, newId: (prefix: string) => string): Page;
 declare function countDesignNodes(tree: DesignTreeNode): number;
 
+/** Collect actionable buttons on a page (for matching flow connector labels). */
+declare function listPageButtons(page: Page): {
+    nodeId: string;
+    label: string;
+}[];
+/**
+ * Set `fromNodeId` on outgoing connectors from a frame when a button label matches the connector label.
+ */
+declare function attachConnectorButtonNodes(document: ProjectDocument, pageId: string, frameId: string): string[];
+
 declare function defaultNewId(prefix: string): string;
 declare function createDefaultCommandContext(isValidComponentSlug: (slug: string) => boolean): CommandContext;
 
-export { type Annotation, type AnnotationTarget, type ApplyFlowSpecOptions, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, DESIGN_COMPONENTS, DESIGN_DEVICES, DESIGN_LAYOUTS, DESIGN_LIMITS, DESIGN_SPEC_SCHEMA_HINT, type DesignComponent, type DesignDevice, type DesignLayout, type DesignNode, type DesignSpec, DesignSpecError, type DesignStateName, type DesignTreeNode, type DesignerProject, type DevicePreset, FLOW_CARD_GAP_X, FLOW_CARD_GAP_Y, FLOW_CARD_HEIGHT, FLOW_CARD_WIDTH, FLOW_LABEL_HEIGHT, FLOW_LIMITS, FLOW_ORIGIN_X, FLOW_ORIGIN_Y, FLOW_PLATFORMS, FLOW_PLATFORM_PRESET, FLOW_SPEC_SCHEMA_HINT, FLOW_THUMB_HEIGHT, type FlowConnection, type FlowPlatform, type FlowScreen, type FlowSpec, FlowSpecError, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type LayoutMode, type LayoutModel, type Page, type ProductBrief, type ProjectCommand, type ProjectDocument, SCREEN_STATES, type ScreenBrief, type ScreenState, type SizingMode, type StyleModel, type StyleTrial, type ThemeId, applyFlowSpec, applyImportScreenshots, applyProjectCommand, autoPlaceFrame, countDesignNodes, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, designToNodes, deviceDimensions, flowSpecFromDocument, getDevicePreset, isEmptyFlow, layeredFlowLayout, layoutFramesInFlowRow, parseProjectCommand, projectCommandSchema, repairDesignSpec, repairFlowSpec, screenKeyForPage, slugifyScreenId };
+export { type Annotation, type AnnotationTarget, type ApplyFlowSpecOptions, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, DESIGN_COMPONENTS, DESIGN_DEVICES, DESIGN_LAYOUTS, DESIGN_LIMITS, DESIGN_SPEC_SCHEMA_HINT, type DesignComponent, type DesignDevice, type DesignLayout, type DesignNode, type DesignSpec, DesignSpecError, type DesignStateName, type DesignTreeNode, type DesignerProject, type DevicePreset, FLOW_CARD_GAP_X, FLOW_CARD_GAP_Y, FLOW_CARD_HEIGHT, FLOW_CARD_WIDTH, FLOW_LABEL_HEIGHT, FLOW_LIMITS, FLOW_ORIGIN_X, FLOW_ORIGIN_Y, FLOW_PLATFORMS, FLOW_PLATFORM_PRESET, FLOW_SPEC_SCHEMA_HINT, FLOW_THUMB_HEIGHT, type FlowConnection, type FlowPlatform, type FlowScreen, type FlowSpec, FlowSpecError, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type LayoutMode, type LayoutModel, type Page, type ProductBrief, type ProjectCommand, type ProjectDocument, SCREEN_STATES, type ScreenBrief, type ScreenState, type SizingMode, type StyleModel, type StyleTrial, type ThemeId, applyFlowSpec, applyImportScreenshots, applyProjectCommand, attachConnectorButtonNodes, autoPlaceFrame, countDesignNodes, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, designToNodes, deviceDimensions, flowSpecFromDocument, getDevicePreset, isEmptyFlow, layeredFlowLayout, layoutFramesInFlowRow, listPageButtons, parseProjectCommand, projectCommandSchema, repairDesignSpec, repairFlowSpec, screenKeyForPage, slugifyScreenId };

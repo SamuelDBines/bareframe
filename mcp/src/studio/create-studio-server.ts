@@ -6,6 +6,12 @@ import { createStudioApiClient, type StudioApiClient } from './api-client.js';
 export const STUDIO_TOOL_NAMES = [
 	'list_projects',
 	'get_project',
+	'create_project',
+	'create_share_link',
+	'generate_flow',
+	'generate_screen_design',
+	'generate_all_designs',
+	'create_click_through_prototype',
 	'create_canvas',
 	'add_screen',
 	'add_component',
@@ -41,7 +47,12 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 			id: string;
 			name: string;
 			version: number;
-			document: { project: { pages: { id: string; rootNodeId: string }[] } };
+			document: {
+				project: {
+					pages: { id: string; rootNodeId: string }[];
+					frames: { id: string; pageId: string; ghost?: boolean }[];
+				};
+			};
 		}>(`/api/projects/${projectId}`);
 	}
 
@@ -68,6 +79,213 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 		async ({ projectId }) => {
 			const data = await loadProject(projectId);
 			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'create_project',
+		{
+			description: 'Create a new Bareframe project (requires account token with projects:create).',
+			inputSchema: {
+				name: z.string().optional(),
+				themeId: z.string().optional(),
+			},
+		},
+		async (args) => {
+			const data = await api.request<{ id: string; name: string; version: number; document: unknown }>(
+				'/api/projects',
+				{
+					method: 'POST',
+					body: JSON.stringify({ name: args.name, themeId: args.themeId ?? 'light' }),
+				},
+			);
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'create_share_link',
+		{
+			description: 'Mint a public share link for a project. Set play=true for a prototype player URL.',
+			inputSchema: {
+				projectId: z.string(),
+				play: z.boolean().optional(),
+				startFrameId: z.string().optional(),
+			},
+		},
+		async (args) => {
+			const data = await api.request(`/api/projects/${args.projectId}/share`, {
+				method: 'POST',
+				body: JSON.stringify({ play: args.play ?? false, startFrameId: args.startFrameId }),
+			});
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'generate_flow',
+		{
+			description: 'Generate or refine the journey flow from a product description (uses plan limits).',
+			inputSchema: {
+				projectId: z.string(),
+				baseVersion: z.number().int().positive(),
+				description: z.string().min(10).optional(),
+				platform: z.enum(['mobile', 'tablet', 'desktop', 'all']).optional(),
+				instruction: z.string().min(3).optional(),
+			},
+		},
+		async (args) => {
+			const data = await api.request(`/api/projects/${args.projectId}/flow/generate`, {
+				method: 'POST',
+				body: JSON.stringify({
+					baseVersion: args.baseVersion,
+					description: args.description,
+					platform: args.platform,
+					instruction: args.instruction,
+				}),
+			});
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'generate_screen_design',
+		{
+			description: 'Generate UI design for one screen (page) on a device preset.',
+			inputSchema: {
+				projectId: z.string(),
+				baseVersion: z.number().int().positive(),
+				frameId: z.string().optional(),
+				pageId: z.string().optional(),
+				device: z.enum(['phone', 'tablet', 'desktop']),
+			},
+		},
+		async (args) => {
+			let pageId = args.pageId;
+			if (!pageId && args.frameId) {
+				const proj = await loadProject(args.projectId);
+				const frames = proj.document.project.frames;
+				pageId = frames.find((f) => f.id === args.frameId)?.pageId;
+			}
+			if (!pageId) {
+				return { isError: true, content: [{ type: 'text', text: 'Provide pageId or frameId' }] };
+			}
+			const data = await api.request(`/api/projects/${args.projectId}/screens/${pageId}/design`, {
+				method: 'POST',
+				body: JSON.stringify({ baseVersion: args.baseVersion, device: args.device }),
+			});
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'generate_all_designs',
+		{
+			description: 'Queue design generation for every non-ghost screen in the project.',
+			inputSchema: {
+				projectId: z.string(),
+				device: z.enum(['phone', 'tablet', 'desktop']),
+			},
+		},
+		async (args) => {
+			const proj = await loadProject(args.projectId);
+			type DocShape = {
+				version: number;
+				document: { project: { pages: { id: string }[]; frames: { id: string; pageId: string; ghost?: boolean }[] } };
+			};
+			const full = proj as unknown as DocShape;
+			let version = full.version;
+			const frames = full.document.project.frames.filter((f) => !f.ghost);
+			const pageIds = [...new Set(frames.map((f) => f.pageId))];
+			const results: unknown[] = [];
+			for (const pageId of pageIds) {
+				const data = await api.request(`/api/projects/${args.projectId}/screens/${pageId}/design`, {
+					method: 'POST',
+					body: JSON.stringify({ baseVersion: version, device: args.device }),
+				});
+				results.push({ pageId, ...(data as object) });
+				version = (data as { version: number }).version ?? version;
+			}
+			return { content: [{ type: 'text', text: JSON.stringify({ version, results }, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'create_click_through_prototype',
+		{
+			description:
+				'One-shot: create project, generate flow + designs for a device, mint playable share link.',
+			inputSchema: {
+				description: z.string().min(10),
+				platform: z.enum(['mobile', 'tablet', 'desktop', 'all']),
+				name: z.string().optional(),
+				device: z.enum(['phone', 'tablet', 'desktop']).optional(),
+			},
+		},
+		async (args) => {
+			const device =
+				args.device ??
+				(args.platform === 'tablet' ? 'tablet' : args.platform === 'desktop' ? 'desktop' : 'phone');
+			const created = await api.request<{ id: string; version: number }>('/api/projects', {
+				method: 'POST',
+				body: JSON.stringify({ name: args.name ?? 'Prototype', themeId: 'light' }),
+			});
+			const projectId = created.id;
+			let version = created.version;
+			const flow = await api.request<{ version: number }>(`/api/projects/${projectId}/flow/generate`, {
+				method: 'POST',
+				body: JSON.stringify({
+					baseVersion: version,
+					description: args.description,
+					platform: args.platform,
+				}),
+			});
+			version = flow.version;
+			const proj = await loadProject(projectId);
+			type DocShape = {
+				document: { project: { frames: { ghost?: boolean; pageId: string }[] } };
+			};
+			const pageIds = [
+				...new Set(
+					(proj as unknown as DocShape).document.project.frames
+						.filter((f) => !f.ghost)
+						.map((f) => f.pageId),
+				),
+			];
+			for (const pageId of pageIds) {
+				const design = await api.request<{ version: number }>(
+					`/api/projects/${projectId}/screens/${pageId}/design`,
+					{
+						method: 'POST',
+						body: JSON.stringify({ baseVersion: version, device }),
+					},
+				);
+				version = design.version;
+			}
+			const share = await api.request<{ playUrl?: string; publicUrl: string; token: string }>(
+				`/api/projects/${projectId}/share`,
+				{
+					method: 'POST',
+					body: JSON.stringify({ play: true }),
+				},
+			);
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify(
+							{
+								projectId,
+								version,
+								playUrl: share.playUrl ?? `${share.publicUrl}?play=1`,
+								shareToken: share.token,
+							},
+							null,
+							2,
+						),
+					},
+				],
+			};
 		},
 	);
 
@@ -183,6 +401,7 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 				toFrameId: z.string(),
 				label: z.string().optional(),
 				trigger: z.string().optional(),
+				fromNodeId: z.string().optional(),
 			},
 		},
 		async (args) => {
@@ -196,6 +415,7 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 						toFrameId: args.toFrameId,
 						label: args.label,
 						trigger: args.trigger,
+						fromNodeId: args.fromNodeId,
 					},
 				}),
 			});

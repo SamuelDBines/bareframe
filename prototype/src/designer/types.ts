@@ -128,6 +128,7 @@ export type Connector = {
 	toFrameId: string;
 	label?: string;
 	trigger?: string;
+	fromNodeId?: string;
 };
 
 export type Annotation = {

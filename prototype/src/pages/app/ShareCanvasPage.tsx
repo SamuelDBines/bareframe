@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import type { ProjectDocument } from '@bareframe/designer-core';
 import { fetchPublicShare } from '../../app/reviewApi';
@@ -7,6 +7,9 @@ import { DesignerWorkspace } from '../../designer/DesignerWorkspace';
 
 export function ShareCanvasPage() {
   const { token } = useParams<{ token: string }>();
+  const [searchParams] = useSearchParams();
+  const play = searchParams.get('play') === '1';
+  const startFrameId = searchParams.get('start') ?? undefined;
   const [document, setDocument] = useState<ProjectDocument | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,11 +54,20 @@ export function ShareCanvasPage() {
   }
 
   return (
-    <div className="app-share-layout">
-      <DesignerWorkspace readOnly initialDocument={document} />
-      <footer className="app-share-footer">
-        Made with <Link to="/">Bareframe</Link>
-      </footer>
+    <div className="app-share-layout" data-testid={play ? 'share-play-layout' : 'share-map-layout'}>
+      <DesignerWorkspace
+        readOnly
+        compactChrome
+        initialDocument={document}
+        openPrototypeOnMount={play}
+        prototypeStartFrameId={startFrameId}
+        prototypeOnly={play}
+      />
+      {!play ? (
+        <footer className="app-share-footer">
+          Made with <Link to="/">Bareframe</Link>
+        </footer>
+      ) : null}
     </div>
   );
 }

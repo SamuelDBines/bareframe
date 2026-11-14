@@ -47,7 +47,8 @@ export type ProjectAssetRow = {
 
 export type AuthActor =
 	| { kind: 'user'; userId: number }
-	| { kind: 'token'; userId: number; tokenId: string; projectId: string; scopes: string[] };
+	| { kind: 'token'; userId: number; tokenId: string; projectId: string; scopes: string[] }
+	| { kind: 'account_token'; userId: number; tokenId: string; scopes: string[] };
 
 const MAX_ASSET_BYTES = 5 * 1024 * 1024;
 
@@ -124,9 +125,12 @@ export async function assertProjectAccess(
 	const project = await getProjectById(pool, projectId);
 	if (!project) throw new ProjectAccessError('Project not found', 404);
 
-	if (actor.kind === 'user') {
+	if (actor.kind === 'user' || actor.kind === 'account_token') {
 		if (project.owner_user_id !== normalizeUserId(actor.userId)) {
 			throw new ProjectAccessError('Forbidden', 403);
+		}
+		if (actor.kind === 'account_token' && requiredScope && !tokenHasScope(actor.scopes, requiredScope)) {
+			throw new ProjectAccessError('Insufficient scope', 403);
 		}
 		return project;
 	}
@@ -143,9 +147,13 @@ export async function assertProjectAccess(
 	return project;
 }
 
-function tokenHasScope(scopes: string[], required: string): boolean {
+export function tokenHasScope(scopes: string[], required: string): boolean {
 	if (scopes.includes('projects:write')) return true;
 	if (required === 'projects:read' && scopes.includes('projects:read')) return true;
+	if (required === 'projects:create' && scopes.includes('projects:create')) return true;
+	if (required === 'share:create' && (scopes.includes('share:create') || scopes.includes('projects:write'))) {
+		return true;
+	}
 	if (required === 'assets:upload' && scopes.includes('assets:upload')) return true;
 	if (required === 'flowmap:write' && scopes.includes('flowmap:write')) return true;
 	if (required === 'render' && scopes.includes('render')) return true;
@@ -153,6 +161,12 @@ function tokenHasScope(scopes: string[], required: string): boolean {
 	if (required === 'capture:write' && scopes.includes('capture:write')) return true;
 	if (required === 'reviews:write' && scopes.includes('projects:write')) return true;
 	return scopes.includes(required);
+}
+
+export function actorCanCreateProject(actor: AuthActor): boolean {
+	if (actor.kind === 'user') return true;
+	if (actor.kind === 'account_token') return tokenHasScope(actor.scopes, 'projects:create');
+	return false;
 }
 
 export class ProjectAccessError extends Error {
@@ -214,8 +228,10 @@ export async function applyProjectCommandTx(pool: pg.Pool, input: ApplyCommandIn
 			`UPDATE projects SET document = $2, version = $3, updated_at = NOW() WHERE id = $1`,
 			[row.id, result.document, nextVersion],
 		);
-		const actorType = input.actor.kind === 'user' ? 'user' : 'token';
-		const actorRef = input.actor.kind === 'user' ? String(input.actor.userId) : input.actor.tokenId;
+		const actorType =
+			input.actor.kind === 'user' ? 'user' : input.actor.kind === 'account_token' ? 'account_token' : 'token';
+		const actorRef =
+			input.actor.kind === 'user' ? String(input.actor.userId) : input.actor.tokenId;
 		await client.query(
 			`INSERT INTO project_revisions (project_id, version, command, actor_type, actor_ref)
        VALUES ($1, $2, $3, $4, $5)`,

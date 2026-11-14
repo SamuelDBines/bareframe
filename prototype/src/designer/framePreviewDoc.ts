@@ -26,15 +26,17 @@ function renderNode(
 	frameWidth: number,
 	trial: StyleTrial | undefined,
 	selectedNodeId: string | null,
+	protoHotspotNodeIds?: Set<string>,
 ): string {
 	if (!isVisible(node, breakpointForWidth(frameWidth))) return '';
 
 	const layout = resolveLayout(node, breakpointForWidth(frameWidth));
 	const sel = selectedNodeId === node.id ? ' data-selected="true"' : '';
+	const hotspot = protoHotspotNodeIds?.has(node.id) ? ' data-proto-hotspot="true"' : '';
 
 	if (node.type === 'text') {
 		const tag = node.content?.textTag ?? 'p';
-		return `<${tag} class="bf-node" data-node-id="${node.id}"${sel} style="${layoutCss(layout)}margin:0;">${escapeHtml(node.content?.text ?? '')}</${tag}>`;
+		return `<${tag} class="bf-node" data-node-id="${node.id}"${sel}${hotspot} style="${layoutCss(layout)}margin:0;">${escapeHtml(node.content?.text ?? '')}</${tag}>`;
 	}
 
 	if (node.type === 'instance' && node.instance) {
@@ -44,7 +46,8 @@ function renderNode(
 		if (def === 'button') {
 			const mod =
 				variant === 'secondary' ? 'bf-btn--secondary' : variant === 'ghost' ? 'bf-btn--ghost' : 'bf-btn--primary';
-			return `<button type="button" class="bf-node btn bf-btn ${mod}" data-node-id="${node.id}"${sel} style="${layoutCss(layout)}">${escapeHtml(label)}</button>`;
+			const hotCls = protoHotspotNodeIds?.has(node.id) ? ' bf-proto-hotspot' : '';
+			return `<button type="button" class="bf-node btn bf-btn ${mod}${hotCls}" data-node-id="${node.id}"${sel}${hotspot} style="${layoutCss(layout)};cursor:pointer;">${escapeHtml(label)}</button>`;
 		}
 		if (def === 'card') {
 			const title = String(node.instance.props?.title ?? '');
@@ -68,7 +71,7 @@ function renderNode(
 	const childHtml = node.children
 		.map((cid) => {
 			const child = page.nodes[cid];
-			return child ? renderNode(child, page, frameWidth, trial, selectedNodeId) : '';
+			return child ? renderNode(child, page, frameWidth, trial, selectedNodeId, protoHotspotNodeIds) : '';
 		})
 		.join('');
 
@@ -96,19 +99,21 @@ export function buildFramePreviewDoc(opts: {
 	tokenOverrides: Record<string, string>;
 	trial?: StyleTrial;
 	selectedNodeId: string | null;
+	protoHotspotNodeIds?: string[];
 	assetBase: string;
 	previewCss?: string;
 	/** @deprecated use previewCss */
 	themeCss?: string;
 }): string {
 	const { page, frameWidth, frameHeight, themeId, tokenOverrides, trial, selectedNodeId, previewCss, themeCss } = opts;
+	const hotspotSet = opts.protoHotspotNodeIds?.length ? new Set(opts.protoHotspotNodeIds) : undefined;
 	const root = page.nodes[page.rootNodeId];
 	const overrides = { ...tokenOverrides, ...(trial?.tokenOverrides ?? {}) };
 	const varBlock = Object.entries(overrides)
 		.map(([k, v]) => `${k}:${v};`)
 		.join('');
 
-	const inner = root ? renderNode(root, page, frameWidth, trial, selectedNodeId) : '';
+	const inner = root ? renderNode(root, page, frameWidth, trial, selectedNodeId, hotspotSet) : '';
 
 	const styles =
 		previewCss ??
@@ -142,6 +147,7 @@ ${linkedStyles}
   [data-bf-theme="${themeId}"] { ${varBlock} }
   .bf-node.bf-input { box-sizing:border-box; }
   [data-selected="true"] { outline:2px solid var(--bf-theme-button-primary-bg); outline-offset:2px; }
+  .bf-proto-hotspot,[data-proto-hotspot="true"] { outline:2px dashed color-mix(in srgb, var(--bf-theme-button-primary-bg) 70%, transparent); outline-offset:3px; }
 </style>
 </head>
 <body>${inner}${framePreviewHostScript()}</body>

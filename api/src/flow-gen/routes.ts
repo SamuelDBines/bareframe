@@ -13,7 +13,7 @@ import {
 	type FlowSpec,
 } from '@bareframe/designer-core';
 import type { Config } from '../config.js';
-import { assertProjectAccess, replaceProjectDocument } from '../db/projects.js';
+import { assertProjectAccess, replaceProjectDocument, tokenHasScope } from '../db/projects.js';
 import { PLAN_LIMITS, getUserPlanTier, refundGeneration, reserveGeneration } from '../plans/limits.js';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from '../projects/auth.js';
 import { publishProjectUpdate } from '../projects/events.js';
@@ -55,11 +55,13 @@ export function createFlowGenerationRouter(pool: pg.Pool, config: Config) {
 	 */
 	router.post('/projects/:projectId/flow/generate', async (c) => {
 		const actor = getActor(c);
-		if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
+		if (actor.kind === 'token' && !tokenHasScope(actor.scopes, 'projects:write')) {
+			return c.json({ error: 'Forbidden' }, 403);
+		}
 		let reserved = false;
 		try {
 			const projectId = c.req.param('projectId');
-			const project = await assertProjectAccess(pool, projectId, actor);
+			const project = await assertProjectAccess(pool, projectId, actor, 'projects:write');
 			const parsed = generateBodySchema.safeParse(await c.req.json().catch(() => null));
 			if (!parsed.success) {
 				return c.json(

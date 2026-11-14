@@ -13,6 +13,7 @@ import {
 	IconMore,
 	IconPlay,
 	IconShare,
+	IconSparkle,
 	IconTrash,
 	IconUpgrade,
 } from './FlowMapIcons';
@@ -26,6 +27,8 @@ type Props = {
 	onConnectModeChange: (on: boolean) => void;
 	readOnly?: boolean;
 	onStartTour?: () => void;
+	/** Opens the refine/regenerate dialog for an AI-mapped flow. */
+	onRefineFlow?: () => void;
 };
 
 export async function copyShareLink(projectId: string): Promise<string> {
@@ -66,6 +69,7 @@ export function FlowMapToolbar({
 	onConnectModeChange,
 	readOnly,
 	onStartTour,
+	onRefineFlow,
 }: Props) {
 	const { state, dispatch } = useDesigner();
 	const chrome = useAppCanvasChrome();
@@ -164,6 +168,12 @@ export function FlowMapToolbar({
 						<span className="canvas-app-toast" role="status">
 							{toast}
 						</span>
+					) : null}
+					{onRefineFlow ? (
+						<button type="button" className="btn btn-secondary btn-sm" data-testid="flow-refine-open" onClick={onRefineFlow}>
+							<IconSparkle size={16} />
+							<span>Refine flow</span>
+						</button>
 					) : null}
 					{onStartTour ? (
 						<ToolbarIconButton label="Take a tour" data-testid="flow-tour-help" onClick={onStartTour}>

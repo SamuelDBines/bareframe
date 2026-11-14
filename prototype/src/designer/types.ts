@@ -178,4 +178,6 @@ export type DesignerState = {
 	ui: DesignerUiState;
 	history: DesignerProject[];
 	historyIndex: number;
+	/** Last project written by the server (e.g. an AI-generated flow) and its version, for cloud sync. */
+	remote?: { version: number; project: DesignerProject };
 };

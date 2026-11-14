@@ -236,8 +236,11 @@ export function FlowMapCanvas({
 	onConnectFrameSelect,
 	readOnly,
 	onContextMenuChange,
+	hideEmptyState,
 }: {
 	connectMode?: boolean;
+	/** The describe-your-product panel replaces the empty-map message. */
+	hideEmptyState?: boolean;
 	connectFromFrameId?: string | null;
 	onConnectFrameSelect?: (frameId: string) => void;
 	readOnly?: boolean;
@@ -582,7 +585,7 @@ export function FlowMapCanvas({
 				</div>
 			</div>
 
-			{frames.length === 0 ? (
+			{frames.length === 0 && !hideEmptyState ? (
 				<div className="flow-map-empty" role="status">
 					<strong>This map is empty</strong>
 					<span>

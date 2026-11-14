@@ -47,7 +47,12 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 			id: string;
 			name: string;
 			version: number;
-			document: { project: { pages: { id: string; rootNodeId: string }[] } };
+			document: {
+				project: {
+					pages: { id: string; rootNodeId: string }[];
+					frames: { id: string; pageId: string; ghost?: boolean }[];
+				};
+			};
 		}>(`/api/projects/${projectId}`);
 	}
 
@@ -159,7 +164,7 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 			let pageId = args.pageId;
 			if (!pageId && args.frameId) {
 				const proj = await loadProject(args.projectId);
-				const frames = (proj.document as { project: { frames: { id: string; pageId: string }[] } }).project.frames;
+				const frames = proj.document.project.frames;
 				pageId = frames.find((f) => f.id === args.frameId)?.pageId;
 			}
 			if (!pageId) {

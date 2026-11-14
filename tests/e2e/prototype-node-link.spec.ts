@@ -3,7 +3,7 @@ import {
 	applyFlowSpec,
 	createEmptyProjectDocument,
 	designToNodes,
-	repairDesignSpec,
+	repairFlowSpec,
 	type ProjectDocument,
 } from '../../packages/designer-core/dist/index.js';
 
@@ -61,6 +61,7 @@ test('linking a button navigates in prototype and share ?play=1 opens player', a
 	await expect(page.getByTestId('share-play-layout')).toBeVisible({ timeout: 15_000 });
 	await expect(page.getByTestId('prototype-player')).toBeVisible();
 	const iframe = page.frameLocator('.frame-preview-iframe');
+	await expect(iframe.getByRole('button', { name: 'Continue' })).toBeVisible({ timeout: 15_000 });
 	await iframe.getByRole('button', { name: 'Continue' }).click();
 	await expect(page.getByText(/Next · step 2/i)).toBeVisible({ timeout: 10_000 });
 });

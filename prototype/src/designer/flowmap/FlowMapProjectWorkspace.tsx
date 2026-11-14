@@ -44,6 +44,7 @@ export function FlowMapProjectWorkspace({ readOnly, openPrototypeOnMount, protot
 		[state.project.frames],
 	);
 	const canGenerate = !readOnly && Boolean(chrome.projectId);
+	const showLinkPanel = mode === 'edit' && !connectMode && !readOnly && Boolean(state.ui.selectedFrameId);
 	// Empty project: no screens yet, or only the untouched starter screen.
 	const flowIsEmpty = useMemo(() => {
 		const frames = state.project.frames.filter((f) => !f.ghost);
@@ -123,8 +124,8 @@ export function FlowMapProjectWorkspace({ readOnly, openPrototypeOnMount, protot
 					onDismiss={designs.dismiss}
 				/>
 			) : null}
-			<div className={`flow-map-stage${mode === 'edit' && !connectMode ? ' flow-map-stage--with-link' : ''}`}>
-				{mode === 'edit' && !connectMode && !readOnly ? <FlowMapScreenLinkPanel /> : null}
+			<div className={`flow-map-stage${showLinkPanel ? ' flow-map-stage--with-link' : ''}`}>
+				{showLinkPanel ? <FlowMapScreenLinkPanel /> : null}
 				<FlowMapCanvas
 					readOnly={readOnly}
 					hideEmptyState={showDescribe}

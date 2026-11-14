@@ -144,7 +144,7 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 				platform?: 'mobile' | 'tablet' | 'desktop' | 'all';
 				instruction?: string;
 			};
-			generateBodies.push(body);
+			generateBodies.push({ ...body, serverVersion: version });
 			if (options.generateDelayMs) await new Promise((r) => setTimeout(r, options.generateDelayMs));
 			if (body.instruction && options.refineStatus === 429) {
 				return json(
@@ -222,7 +222,10 @@ test.describe('describe your product → flow map', () => {
 		await expect(page.getByTestId('describe-product-panel')).toHaveCount(0);
 		await expect(page.getByTestId('flow-gen-toast')).toContainText('Mapped: 4 screens, 3 links');
 		await expect(page.locator('.flow-map-card__footer')).toContainText(['Welcome', 'Sign up', 'Home', 'Habit detail']);
-		expect(api.generateBodies[0]).toMatchObject({ platform: 'tablet', baseVersion: 1 });
+		// Generation is based on the server's current version (an autosave may have landed first).
+		const [first] = api.generateBodies;
+		expect(first).toMatchObject({ platform: 'tablet' });
+		expect(first.baseVersion).toBe(first.serverVersion);
 
 		// Generated screens sit left to right in flow order.
 		const xs = await page.locator('.flow-map-card').evaluateAll((cards) => cards.map((c) => c.getBoundingClientRect().x));
@@ -316,8 +319,10 @@ test.describe('generate screen designs', () => {
 		await bar.getByRole('button', { name: /Tablet/ }).click();
 		await expect(bar.getByRole('button', { name: /Tablet/ })).toHaveAttribute('aria-pressed', 'true');
 
-		// The screen's context menu works at any zoom (the card button can be tiny on a phone).
-		await page.getByRole('button', { name: 'Sign up', exact: true }).click({ button: 'right' });
+		// The screen's context menu works at any zoom (the card button can be tiny on a phone, and
+		// the card may sit under the zoom bar), so open it from the keyboard.
+		await page.getByRole('button', { name: 'Sign up', exact: true }).focus();
+		await page.keyboard.press('Shift+F10');
 		await page.getByRole('menuitem', { name: 'Generate design' }).click();
 		await expect(page.getByRole('button', { name: 'Regenerate design for Sign up' })).toBeAttached({ timeout: 15_000 });
 		expect(api.designCalls).toEqual([{ pageId: expect.any(String), device: 'tablet' }]);

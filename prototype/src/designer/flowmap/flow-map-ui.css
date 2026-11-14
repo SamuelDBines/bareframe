@@ -1120,6 +1120,8 @@
 	font-size: 0.88rem;
 	box-shadow: var(--bx-shadow);
 	z-index: 6;
+	/* Status only: never block the canvas underneath. */
+	pointer-events: none;
 }
 
 @media (max-width: 640px) {

@@ -170,7 +170,16 @@ export function FlowMapToolbar({
 						</span>
 					) : null}
 					{onRefineFlow ? (
-						<button type="button" className="btn btn-secondary btn-sm" data-testid="flow-refine-open" onClick={onRefineFlow}>
+						<button
+							type="button"
+							className="btn btn-secondary btn-sm"
+							data-testid="flow-refine-open"
+							onClick={(e) => {
+								// Safari doesn't focus buttons on click; the dialog returns focus to whatever had it.
+								e.currentTarget.focus();
+								onRefineFlow();
+							}}
+						>
 							<IconSparkle size={16} />
 							<span>Refine flow</span>
 						</button>

@@ -340,17 +340,15 @@ test.describe('generate screen designs', () => {
 	});
 
 	test('generates all screens as a queue that can be cancelled', async ({ page }) => {
-		const api = await openMappedProject(page, { designDelayMs: 2_000 });
+		const api = await openMappedProject(page, { designDelayMs: 700 });
 		await page.getByTestId('design-all').click();
 		await expect(page.getByTestId('design-progress')).toContainText('Designing 1 of 4');
-		const progress = page.getByTestId('design-progress');
-		await expect(progress).toContainText('Designing 2 of 4', { timeout: 15_000 });
+		await expect.poll(() => api.designCalls.length, { timeout: 15_000 }).toBe(2);
 		await page.getByTestId('design-cancel').click();
 		await expect(page.getByTestId('design-result')).toContainText('Cancelled');
 		await expect(page.getByTestId('design-result')).toContainText(/Designed [12] of 4 screens/);
 		await page.waitForTimeout(1000);
-		expect(api.designCalls.length).toBeGreaterThanOrEqual(1);
-		expect(api.designCalls.length).toBeLessThanOrEqual(2);
+		expect(api.designCalls.length).toBe(2);
 		await expect(page.getByTestId('design-all')).toBeEnabled();
 	});
 

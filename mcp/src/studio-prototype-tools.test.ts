@@ -27,6 +27,8 @@ describe.skipIf(!databaseUrl)('Studio MCP prototype tools', () => {
 		process.env.DATABASE_URL = databaseUrl;
 		process.env.SESSION_SECRET = 'test-session-secret-32chars!!!!';
 		process.env.PUBLIC_URL = 'http://127.0.0.1:8080';
+		process.env.GITHUB_CLIENT_ID = 'test';
+		process.env.GITHUB_CLIENT_SECRET = 'test';
 		process.env.LLM_ADAPTER = 'fixture';
 		const apiConfig = loadApiConfig();
 		const pool = createPool(apiConfig);
@@ -74,14 +76,24 @@ describe.skipIf(!databaseUrl)('Studio MCP prototype tools', () => {
 	});
 
 	it('create_project via account token', async () => {
-		const transport = new StreamableHTTPClientTransport(new URL(studioUrl), {
-			requestInit: { headers: { Authorization: `Bearer ${accountToken}` } },
-		});
+		const origFetch = globalThis.fetch;
+		globalThis.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+			const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+			if (url.startsWith(studioUrl)) {
+				const headers = new Headers(init?.headers);
+				headers.set('Authorization', `Bearer ${accountToken}`);
+				return origFetch(input, { ...init, headers });
+			}
+			return origFetch(input, init);
+		};
+		const transport = new StreamableHTTPClientTransport(new URL(studioUrl));
 		const client = new Client({ name: 'studio-acc', version: '1.0.0' });
 		await client.connect(transport);
 		const result = await client.callTool({ name: 'create_project', arguments: { name: 'MCP created' } });
 		const text = (result.content as { type: string; text: string }[])[0]?.text ?? '';
 		const data = JSON.parse(text) as { id: string };
 		expect(data.id).toBeTruthy();
+		await client.close();
+		globalThis.fetch = origFetch;
 	});
 });

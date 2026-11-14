@@ -61,6 +61,7 @@ export function ShareCanvasPage() {
         initialDocument={document}
         openPrototypeOnMount={play}
         prototypeStartFrameId={startFrameId}
+        prototypeOnly={play}
       />
       {!play ? (
         <footer className="app-share-footer">

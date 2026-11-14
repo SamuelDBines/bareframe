@@ -19,9 +19,15 @@ type Props = {
 	readOnly?: boolean;
 	openPrototypeOnMount?: boolean;
 	prototypeStartFrameId?: string | null;
+	prototypeOnly?: boolean;
 };
 
-export function FlowMapProjectWorkspace({ readOnly, openPrototypeOnMount, prototypeStartFrameId }: Props) {
+export function FlowMapProjectWorkspace({
+	readOnly,
+	openPrototypeOnMount,
+	prototypeStartFrameId,
+	prototypeOnly,
+}: Props) {
 	const { state, dispatch } = useDesigner();
 	const chrome = useAppCanvasChrome();
 	const [mode, setMode] = useState<Exclude<FlowWorkspaceMode, 'prototype'>>('map');
@@ -90,6 +96,16 @@ export function FlowMapProjectWorkspace({ readOnly, openPrototypeOnMount, protot
 		const trimmed = next.trim();
 		if (trimmed && trimmed !== currentName) dispatch({ type: 'renameFrame', frameId, name: trimmed });
 	};
+
+	if (prototypeOnly) {
+		return playing ? (
+			<PrototypePlayer onExit={() => setPlaying(false)} />
+		) : (
+			<div className="share-loading" role="status" data-testid="share-play-loading">
+				Opening prototype…
+			</div>
+		);
+	}
 
 	return (
 		<div className="flow-map-workspace" data-testid="flow-map-workspace">

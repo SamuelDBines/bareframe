@@ -18,12 +18,14 @@ function WorkspaceInner({
 	readOnly,
 	openPrototypeOnMount,
 	prototypeStartFrameId,
+	prototypeOnly,
 }: {
 	compactChrome?: boolean;
 	flowMap?: boolean;
 	readOnly?: boolean;
 	openPrototypeOnMount?: boolean;
 	prototypeStartFrameId?: string | null;
+	prototypeOnly?: boolean;
 }) {
 	const { state, dispatch } = useDesigner();
 	const { mobilePanel } = state.ui;
@@ -53,6 +55,7 @@ function WorkspaceInner({
 						readOnly={readOnly}
 						openPrototypeOnMount={openPrototypeOnMount}
 						prototypeStartFrameId={prototypeStartFrameId}
+						prototypeOnly={prototypeOnly}
 					/>
 				) : (
 					<InfiniteCanvas />
@@ -77,6 +80,8 @@ type DesignerWorkspaceProps = {
 	aside?: ReactNode;
 	openPrototypeOnMount?: boolean;
 	prototypeStartFrameId?: string | null;
+	/** Shared playable link: skip flow map chrome and show the player only. */
+	prototypeOnly?: boolean;
 };
 
 export function DesignerWorkspace({
@@ -90,6 +95,7 @@ export function DesignerWorkspace({
 	aside,
 	openPrototypeOnMount,
 	prototypeStartFrameId,
+	prototypeOnly,
 }: DesignerWorkspaceProps) {
 	const chrome: AppCanvasChromeValue = {
 		...appChrome,
@@ -103,6 +109,7 @@ export function DesignerWorkspace({
 			readOnly={readOnly ?? demoReview}
 			openPrototypeOnMount={openPrototypeOnMount}
 			prototypeStartFrameId={prototypeStartFrameId}
+			prototypeOnly={prototypeOnly}
 		/>
 	);
 

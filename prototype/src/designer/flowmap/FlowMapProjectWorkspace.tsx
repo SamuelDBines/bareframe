@@ -12,17 +12,26 @@ import { DesignBar } from './DesignBar';
 import { useDesignQueue } from './designGenApi';
 import type { DesignDevice } from '@bareframe/designer-core';
 import { PrototypePlayer } from './PrototypePlayer';
+import { FlowMapScreenLinkPanel } from './FlowMapScreenLinkPanel';
 import './flow-map-ui.css';
 
 type Props = {
 	readOnly?: boolean;
+	openPrototypeOnMount?: boolean;
+	prototypeStartFrameId?: string | null;
+	prototypeOnly?: boolean;
 };
 
-export function FlowMapProjectWorkspace({ readOnly }: Props) {
+export function FlowMapProjectWorkspace({
+	readOnly,
+	openPrototypeOnMount,
+	prototypeStartFrameId,
+	prototypeOnly,
+}: Props) {
 	const { state, dispatch } = useDesigner();
 	const chrome = useAppCanvasChrome();
 	const [mode, setMode] = useState<Exclude<FlowWorkspaceMode, 'prototype'>>('map');
-	const [playing, setPlaying] = useState(false);
+	const [playing, setPlaying] = useState(Boolean(openPrototypeOnMount));
 	const [connectMode, setConnectMode] = useState(false);
 	const [connectFrom, setConnectFrom] = useState<string | null>(null);
 	const [tourOpen, setTourOpen] = useState(false);
@@ -41,6 +50,7 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 		[state.project.frames],
 	);
 	const canGenerate = !readOnly && Boolean(chrome.projectId);
+	const showLinkPanel = mode === 'edit' && !connectMode && !readOnly && Boolean(state.ui.selectedFrameId);
 	// Empty project: no screens yet, or only the untouched starter screen.
 	const flowIsEmpty = useMemo(() => {
 		const frames = state.project.frames.filter((f) => !f.ghost);
@@ -50,6 +60,12 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 	}, [state.project]);
 	const showDescribe = canGenerate && flowIsEmpty;
 	const tourAutoEligible = !readOnly && screenCount <= 1 && !showDescribe;
+
+	useEffect(() => {
+		if (prototypeStartFrameId) {
+			dispatch({ type: 'setPrototypeEntryFrame', frameId: prototypeStartFrameId });
+		}
+	}, [dispatch, prototypeStartFrameId]);
 
 	useEffect(() => {
 		if (!flowToast) return;
@@ -80,6 +96,16 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 		const trimmed = next.trim();
 		if (trimmed && trimmed !== currentName) dispatch({ type: 'renameFrame', frameId, name: trimmed });
 	};
+
+	if (prototypeOnly) {
+		return playing ? (
+			<PrototypePlayer onExit={() => setPlaying(false)} />
+		) : (
+			<div className="share-loading" role="status" data-testid="share-play-loading">
+				Opening prototype…
+			</div>
+		);
+	}
 
 	return (
 		<div className="flow-map-workspace" data-testid="flow-map-workspace">
@@ -114,7 +140,8 @@ export function FlowMapProjectWorkspace({ readOnly }: Props) {
 					onDismiss={designs.dismiss}
 				/>
 			) : null}
-			<div className="flow-map-stage">
+			<div className={`flow-map-stage${showLinkPanel ? ' flow-map-stage--with-link' : ''}`}>
+				{showLinkPanel ? <FlowMapScreenLinkPanel /> : null}
 				<FlowMapCanvas
 					readOnly={readOnly}
 					hideEmptyState={showDescribe}

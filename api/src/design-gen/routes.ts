@@ -15,7 +15,8 @@ import {
 	type ScreenBrief,
 } from '@bareframe/designer-core';
 import type { Config } from '../config.js';
-import { assertProjectAccess, replaceProjectDocument } from '../db/projects.js';
+import { attachConnectorButtonNodes } from '@bareframe/designer-core';
+import { assertProjectAccess, replaceProjectDocument, tokenHasScope } from '../db/projects.js';
 import { refundGeneration, reserveGeneration } from '../plans/limits.js';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from '../projects/auth.js';
 import { publishProjectUpdate } from '../projects/events.js';
@@ -87,12 +88,14 @@ export function createDesignGenerationRouter(pool: pg.Pool, config: Config) {
 	 */
 	router.post('/projects/:projectId/screens/:pageId/design', async (c) => {
 		const actor = getActor(c);
-		if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
+		if (actor.kind === 'token' && !tokenHasScope(actor.scopes, 'projects:write')) {
+			return c.json({ error: 'Forbidden' }, 403);
+		}
 		let reserved = false;
 		try {
 			const projectId = c.req.param('projectId');
 			const pageId = c.req.param('pageId');
-			const project = await assertProjectAccess(pool, projectId, actor);
+			const project = await assertProjectAccess(pool, projectId, actor, 'projects:write');
 			const parsed = bodySchema.safeParse(await c.req.json().catch(() => null));
 			if (!parsed.success) {
 				return c.json({ error: 'invalid_request', issues: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`) }, 400);
@@ -146,6 +149,13 @@ export function createDesignGenerationRouter(pool: pg.Pool, config: Config) {
 				if (frameIds.has(frame.id)) Object.assign(frame, { devicePresetId: preset.id, width: dim.width, height: dim.height });
 			}
 
+			const linkNotes: string[] = [];
+			for (const frame of document.project.frames) {
+				if (frameIds.has(frame.id)) {
+					linkNotes.push(...attachConnectorButtonNodes(document, pageId, frame.id));
+				}
+			}
+
 			const version = await replaceProjectDocument(pool, projectId, actor.userId, document, baseVersion);
 			reserved = false;
 			await pool.query(
@@ -159,7 +169,13 @@ export function createDesignGenerationRouter(pool: pg.Pool, config: Config) {
 			return c.json({
 				version,
 				document,
-				design: { device, states: STATE_ORDER.filter((name) => name in result.spec.states), repairs: result.repairs, attempts: result.attempts },
+				design: {
+					device,
+					states: STATE_ORDER.filter((name) => name in result.spec.states),
+					repairs: result.repairs,
+					attempts: result.attempts,
+					connectorLinks: linkNotes,
+				},
 			});
 		} catch (err) {
 			return handleProjectError(c, err);

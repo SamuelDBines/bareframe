@@ -5,6 +5,7 @@ export * from './commands.js';
 export * from './flowLayout.js';
 export * from './flowSpec.js';
 export * from './designSpec.js';
+export * from './connectorLinks.js';
 
 export function defaultNewId(prefix: string): string {
 	return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;

@@ -86,7 +86,7 @@ export function createHttpApp(config: Config) {
 		if (!auth?.startsWith('Bearer ')) {
 			res.status(401).json({
 				jsonrpc: '2.0',
-				error: { code: -32001, message: 'Missing Bearer project token' },
+				error: { code: -32001, message: 'Missing Bearer token (bf_acc_… or bf_proj_…)' },
 				id: null,
 			});
 			return;

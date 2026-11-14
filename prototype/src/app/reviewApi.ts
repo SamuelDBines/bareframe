@@ -12,10 +12,15 @@ export type ReviewIssue = {
   annotationId?: string;
 };
 
-export async function createProjectShare(projectId: string) {
+export async function createProjectShare(
+  projectId: string,
+  opts?: { play?: boolean; startFrameId?: string },
+) {
   const res = await fetch(`/api/projects/${projectId}/share`, {
     method: 'POST',
     credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(opts ?? {}),
   });
   if (!res.ok) await apiFail(res, 'Could not create share link');
   return res.json() as Promise<{ token: string; sharePath: string; publicUrl: string }>;

@@ -12,6 +12,7 @@ type Props = {
 	trial?: StyleTrial;
 	selectedNodeId: string | null;
 	onSelectNode: (nodeId: string) => void;
+	protoHotspotNodeIds?: string[];
 	/** Lock iframe document to frame height (prototype player — avoids iframe clipping tall trees). */
 	lockDocumentHeight?: boolean;
 };
@@ -28,6 +29,7 @@ export const FramePreview = memo(function FramePreview({
 	trial,
 	selectedNodeId,
 	onSelectNode,
+	protoHotspotNodeIds,
 	lockDocumentHeight,
 }: Props) {
 	const ref = useRef<HTMLIFrameElement>(null);
@@ -51,6 +53,7 @@ export const FramePreview = memo(function FramePreview({
 				tokenOverrides: customTokens,
 				trial,
 				selectedNodeId,
+				protoHotspotNodeIds,
 				assetBase,
 				previewCss,
 			});
@@ -59,7 +62,7 @@ export const FramePreview = memo(function FramePreview({
 		return () => {
 			cancelled = true;
 		};
-	}, [page, frame.width, frame.height, themeId, customTokens, trial, selectedNodeId, lockDocumentHeight]);
+	}, [page, frame.width, frame.height, themeId, customTokens, trial, selectedNodeId, protoHotspotNodeIds, lockDocumentHeight]);
 
 	useEffect(() => {
 		const el = ref.current;

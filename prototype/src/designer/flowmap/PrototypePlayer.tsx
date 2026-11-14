@@ -57,6 +57,14 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 	const themeId = (frame?.themeId ?? project.defaultThemeId) as ThemeId;
 	const outgoing = frame ? project.connectors.filter((c) => c.fromFrameId === frame.id && frames.some((f) => f.id === c.toFrameId)) : [];
 	const nameOf = (id: string) => frames.find((f) => f.id === id)?.name ?? 'Next';
+	const nodeLinkTargets = useMemo(() => {
+		const m = new Map<string, string>();
+		for (const c of outgoing) {
+			if (c.fromNodeId) m.set(c.fromNodeId, c.toFrameId);
+		}
+		return m;
+	}, [outgoing]);
+	const protoHotspotNodeIds = useMemo(() => [...nodeLinkTargets.keys()], [nodeLinkTargets]);
 
 	const metrics = frame && page ? prototypeDeviceMetrics(viewportKind, frame, page) : null;
 	const chromeStyle = PROTOTYPE_DEVICE_CHROME[viewportKind];
@@ -253,7 +261,11 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 											themeId={themeId}
 											customTokens={project.customTokenOverrides}
 											selectedNodeId={null}
-											onSelectNode={() => undefined}
+											protoHotspotNodeIds={protoHotspotNodeIds}
+											onSelectNode={(nodeId) => {
+												const to = nodeLinkTargets.get(nodeId);
+												if (to) go(to);
+											}}
 											lockDocumentHeight
 										/>
 									</div>

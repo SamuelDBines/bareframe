@@ -61,7 +61,7 @@ export function ThemesWorkspace() {
 			</aside>
 			<div className="themes-editor">
 				<h2>Theme &amp; tokens</h2>
-				<p className="lead">Merged theme and token editor — edits restyle the live preview.</p>
+				<p className="lead">Merged theme and token editor, edits restyle the live preview.</p>
 				<div className="grid-2">
 					{TOKEN_FIELDS.map((f) => (
 						<div key={f.key} className="field">

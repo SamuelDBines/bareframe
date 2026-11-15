@@ -10,8 +10,8 @@ Record click-through journeys and upload them to a Bareframe project canvas.
 
 ## Usage
 
-- **Record** — starts capture on the active tab (red badge). Inputs are blurred before each screenshot.
-- **Pause / Stop** — Stop opens step review; uncheck steps to exclude before upload.
-- **Upload journey** — POSTs steps to `POST /api/projects/:id/recordings` with `build: true`.
+- **Record**: starts capture on the active tab (red badge). Inputs are blurred before each screenshot.
+- **Pause / Stop**, Stop opens step review; uncheck steps to exclude before upload.
+- **Upload journey**, POSTs steps to `POST /api/projects/:id/recordings` with `build: true`.
 
 Host permissions should be narrowed to your allow-listed domains in production builds.

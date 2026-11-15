@@ -1,6 +1,6 @@
-# bareframe site — Kubernetes (DigitalOcean)
+# bareframe site, Kubernetes (DigitalOcean)
 
-Static site image: multi-stage `Dockerfile` at the repo root (same assembly as the former GitHub Pages pipeline via `scripts/finalize-pages.mjs`). Manifests live in `deploy/k8s/` and are applied with Kustomize—no GitOps.
+Static site image: multi-stage `Dockerfile` at the repo root (same assembly as the former GitHub Pages pipeline via `scripts/finalize-pages.mjs`). Manifests live in `deploy/k8s/` and are applied with Kustomize, no GitOps.
 
 ## Cluster
 
@@ -33,7 +33,7 @@ Create a [GitHub OAuth App](https://github.com/settings/developers) (not a GitHu
 | Field | Value |
 |-------|--------|
 | Homepage URL | `https://bareframe.org` (unchanged) |
-| Authorization callback URL | `https://bareframe.org/api/auth/github/callback` (unchanged — do **not** add the Designer host) |
+| Authorization callback URL | `https://bareframe.org/api/auth/github/callback` (unchanged, do **not** add the Designer host) |
 
 Session cookies use `Domain=.bareframe.org`, so sign-in from `designer.bareframe.org` (which proxies `/api` to the same API service) shares the session with `bareframe.org`. OAuth `returnTo` may be an absolute `https://designer.bareframe.org/#/…` URL after deploy.
 
@@ -60,7 +60,7 @@ kubectl create secret generic bareframe-api-env -n bareframe \
 | `SESSION_SECRET` | Random string (32+ chars) for signing session and OAuth state cookies |
 | `DATABASE_URL` | Postgres URL for the dedicated `bareframe` role/database |
 | `STRIPE_SECRET_KEY` | (Optional) Stripe secret key for Pro Checkout and Customer Portal |
-| `STRIPE_PRICE_ID` | (Optional) Stripe Price id for **Bareframe Pro at £20/month (GBP)** — must match customer-facing copy (`/api/billing/config` returns `£20/month`). Create the price in Stripe Dashboard; do not rely on legacy USD Team/Pro price ids. |
+| `STRIPE_PRICE_ID` | (Optional) Stripe Price id for **Bareframe Pro at £20/month (GBP)**, must match customer-facing copy (`/api/billing/config` returns `£20/month`). Create the price in Stripe Dashboard; do not rely on legacy USD Team/Pro price ids. |
 | `STRIPE_WEBHOOK_SECRET` | (Optional) Signing secret for `POST /api/billing/webhook` (starts with `whsec_`) |
 
 `PUBLIC_URL` and `DESIGNER_PUBLIC_URL` are set on the Deployment manifest (`https://bareframe.org` and `https://designer.bareframe.org`), not in the secret.
@@ -114,16 +114,16 @@ Local/docker: `docker compose up` runs a `migrate` one-shot service before the A
 ```bash
 cd api
 docker compose up --build
-# API on http://localhost:8080 — health: curl -sf http://127.0.0.1:8080/api/healthz
+# API on http://localhost:8080, health: curl -sf http://127.0.0.1:8080/api/healthz
 ```
 
 For the Vite prototype, `pnpm dev` proxies `/api` to `http://127.0.0.1:8080` (override with `BAREFRAME_API_PROXY`).
 
 ### Fast import: app capture + sitemap
 
-**New project → Live website** — free users can always type a URL. **Continue to website setup** mints a domain-bound capture token (ingestion-only, not a GitHub secret). Optional `data-screenshots="1"` on the script enables JPEG captures with password/payment fields redacted.
+**New project → Live website**, free users can always type a URL. **Continue to website setup** mints a domain-bound capture token (ingestion-only, not a GitHub secret). Optional `data-screenshots="1"` on the script enables JPEG captures with password/payment fields redacted.
 
-**App capture (MVP)** — project settings → **Create capture token** (scopes `capture:write`, `assets:upload`). Add the snippet to your product:
+**App capture (MVP)**, project settings → **Create capture token** (scopes `capture:write`, `assets:upload`). Add the snippet to your product:
 
 ```html
 <script
@@ -136,7 +136,7 @@ For the Vite prototype, `pnpm dev` proxies `/api` to `http://127.0.0.1:8080` (ov
 
 The script batches navigation events to `POST /api/v1/capture/events` (Bearer token, CORS enabled) and syncs an **App capture** canvas on the project. Plaintext tokens are returned once at creation; only a SHA-256 hash is stored.
 
-**Sitemap import (Pro)** — from the journey app home, choose **Import sitemap**, or call:
+**Sitemap import (Pro)**, from the journey app home, choose **Import sitemap**, or call:
 
 `POST /api/projects/:projectId/sitemap-import` with `{ "url": "https://example.com", "baseVersion": 1 }`.
 

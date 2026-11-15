@@ -5,7 +5,7 @@ export function DemoB2bWorkspacePage() {
 	return (
 		<DemoFlowMapExamplePage
 			title="LatticeDesk workspace & approvals"
-			lead="Admin SSO through IT provisioning: invites, purchase requests, manager decisions, appeals, and provisioning — sample Acme Robotics data only."
+			lead="Admin SSO through IT provisioning: invites, purchase requests, manager decisions, appeals, and provisioning, sample Acme Robotics data only."
 			buildProject={buildDemoB2bWorkspaceProject}
 		/>
 	);

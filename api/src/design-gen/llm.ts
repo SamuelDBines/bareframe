@@ -6,6 +6,7 @@ import {
 	type ScreenBrief,
 } from '@bareframe/designer-core';
 import type { Config } from '../config.js';
+import { NO_EMDASH_INSTRUCTION } from '../llm/copy-style.js';
 
 export type DesignGenerationInput = {
 	productDescription: string;
@@ -26,7 +27,8 @@ Write real, specific copy for this product (no lorem ipsum). Keep it accessible:
 label, buttons say what they do, headings are in order (one level-1 heading).
 Design the default state, plus each extra state listed for the screen (empty, loading, error, success).
 Use the outgoing actions as button labels where they fit. Phone layouts are a single column; tablet
-and desktop may use "row" for side-by-side content.`;
+and desktop may use "row" for side-by-side content.
+${NO_EMDASH_INSTRUCTION}`;
 
 export function buildDesignUserPrompt(input: DesignGenerationInput): string {
 	const parts = [

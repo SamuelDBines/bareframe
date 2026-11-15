@@ -6,7 +6,7 @@ Reference: `DESIGNER_SPEC.md` (designer.io extraction). This prototype implement
 
 | Spec area | Implementation |
 |-----------|----------------|
-| Infinite canvas pan/zoom | World transform; Space+drag / wheel pan; Ctrl/Cmd+wheel zoom ~cursor; 25–250% clamp; Fit all; Shift+1/2/0 shortcuts |
+| Infinite canvas pan/zoom | World transform; Space+drag / wheel pan; Ctrl/Cmd+wheel zoom ~cursor; 25-250% clamp; Fit all; Shift+1/2/0 shortcuts |
 | Multiple frames per page | Initial Home frame set (iPhone 15, iPad Mini, Desktop 1440); add frame; drag to move |
 | Device presets | designer.io preset list in `designer/devicePresets.ts`; per-frame device dropdown |
 | One tree, many frames | `Page.nodes` shared; each frame iframe width = device width; flex reflow + breakpoint overrides (e.g. row→column on base) |
@@ -17,7 +17,7 @@ Reference: `DESIGNER_SPEC.md` (designer.io extraction). This prototype implement
 | Component palette | Add Button, Card, Input, Badge, Alert into selected parent |
 | Layers tree | Page structure with selection |
 | Inspector | Selection, Frame, Component (variant), Content, Layout, Responsive scope |
-| Themes workspace | Merged `/designer/themes` — token edits + live iframe preview |
+| Themes workspace | Merged `/designer/themes`, token edits + live iframe preview |
 | AI assistant | FAB drawer with example agent actions |
 | Designer sub-nav padding | `designer-subnav` margin/padding fix |
 

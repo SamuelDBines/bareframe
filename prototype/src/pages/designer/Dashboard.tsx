@@ -65,7 +65,7 @@ export function DesignerDashboard() {
       <DsHero
         eyebrow="Bareframe Designer"
         title="Prototype-first product design"
-        lead="Turn a brief into a reviewable package: journeys, playable screens, and handoff — built from real @bareframe/react components."
+        lead="Turn a brief into a reviewable package: journeys, playable screens, and handoff, built from real @bareframe/react components."
         actions={
           <>
             <Link to={designerPath('/product/new')} className="btn btn-primary">
@@ -148,7 +148,7 @@ export function DesignerDashboard() {
           {projects.length === 0 && status === 'authenticated' && (
             <DsCard>
               <p className="ds-meta" style={{ margin: 0 }}>
-                No cloud projects yet — start from the canvas or generate a product package.
+                No cloud projects yet, start from the canvas or generate a product package.
               </p>
             </DsCard>
           )}

@@ -43,7 +43,7 @@ const STEPS: FlowMapTourStep[] = [
 	{
 		id: 'review',
 		title: 'Run AI review',
-		body: 'AI findings flag problems on the map and in this panel — fix gaps before you ship.',
+		body: 'AI findings flag problems on the map and in this panel, fix gaps before you ship.',
 		target: '[data-testid="run-review"]',
 		placement: 'left',
 	},

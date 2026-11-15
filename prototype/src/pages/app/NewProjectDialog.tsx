@@ -228,7 +228,7 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 									</span>
 									<p>
 										<strong>Public crawl (server screenshots) is Pro.</strong> You can still set up{' '}
-										<strong>installed capture</strong> on the free plan — add our script to your site and
+										<strong>installed capture</strong> on the free plan, add our script to your site and
 										pages flow onto the canvas as you navigate.
 									</p>
 								</div>
@@ -264,7 +264,7 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 								</div>
 							) : (
 								<p className="bx-hint">
-									We map URLs to screens and link parent paths — structure only, no screenshots.
+									We map URLs to screens and link parent paths, structure only, no screenshots.
 								</p>
 							)}
 						</>

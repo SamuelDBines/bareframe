@@ -2,7 +2,7 @@ import { DesignerWorkspace } from '../../designer/DesignerWorkspace';
 import { demoReviewProjectId } from '../../designer/demoReviewProject';
 import { AppReviewPanel } from './AppReviewPanel';
 
-/** Example project with sample review findings — linked from the homepage and Examples. */
+/** Example project with sample review findings, linked from the homepage and Examples. */
 export function DemoJourneyReviewPage() {
   return (
     <DesignerWorkspace

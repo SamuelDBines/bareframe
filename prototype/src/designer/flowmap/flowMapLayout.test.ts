@@ -103,7 +103,7 @@ describe('routeConnectors', () => {
 	});
 });
 
-describe('routeConnectors — vertical', () => {
+describe('routeConnectors, vertical', () => {
 	it('routes a screen added below its parent straight down, label between the cards', () => {
 		const frames = [
 			{ id: 'a', x: 0, y: 0 },

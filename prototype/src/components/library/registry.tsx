@@ -21,7 +21,7 @@ export const COMPONENT_REGISTRY: ComponentRegistryEntry[] = [
 		slug: 'alert',
 		name: 'Alert',
 		overview:
-			'Alerts communicate important feedback inline — success, warnings, errors, or neutral info — without blocking the whole page.',
+			'Alerts communicate important feedback inline, success, warnings, errors, or neutral info, without blocking the whole page.',
 		description: 'Inline feedback for success, warning, and error states.',
 		whenToUse: 'Use for page-level or section-level status after an action. Prefer Toast for transient global notices.',
 		category: 'Feedback',

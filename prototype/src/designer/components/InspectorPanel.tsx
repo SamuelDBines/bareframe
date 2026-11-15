@@ -37,7 +37,7 @@ export function InspectorPanel() {
 			<Accordion title="Selection">
 				{frame && (
 					<p className="inspector-crumb">
-						{frame.name} › {node?.name ?? '—'}
+						{frame.name} › {node?.name ?? '-'}
 					</p>
 				)}
 				{node && (

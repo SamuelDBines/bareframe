@@ -9,7 +9,7 @@ export function ThemeEditorPage() {
 			<div className="designer-split-main">
 				<div className="page-hero">
 					<h1>Theme editor</h1>
-					<p className="lead">Adjust brand colors — preview updates instantly across Designer.</p>
+					<p className="lead">Adjust brand colors, preview updates instantly across Designer.</p>
 				</div>
 				<div className="card form-stack" style={{ maxWidth: 480 }}>
 					<div className="field">
@@ -43,7 +43,7 @@ export function ThemeEditorPage() {
 					Secondary
 				</button>
 				<div className="card" style={{ marginTop: '1rem' }}>
-					<p style={{ margin: 0 }}>Card on surface — reflects current CSS variables.</p>
+					<p style={{ margin: 0 }}>Card on surface, reflects current CSS variables.</p>
 				</div>
 			</div>
 		</div>

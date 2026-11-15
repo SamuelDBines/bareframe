@@ -98,7 +98,7 @@ export function McpPage() {
 				<p className="lead">
 					Bareframe hosts a public, read-only MCP server on the same origin as the docs. Agents can
 					list components, read real doc examples, search guides, and fetch the Repkit → Bareframe
-					migration guide — no HTML scraping and no API keys.
+					migration guide, no HTML scraping and no API keys.
 				</p>
 			</div>
 

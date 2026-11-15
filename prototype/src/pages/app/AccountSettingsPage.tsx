@@ -139,7 +139,7 @@ export function AccountSettingsPage() {
 					</button>
 					{mintedToken ? (
 						<p className="bx-notice" role="status">
-							Copy this token now — it won&apos;t be shown again: <code>{mintedToken}</code>
+							Copy this token now, it won&apos;t be shown again: <code>{mintedToken}</code>
 						</p>
 					) : null}
 					<h3 style={{ marginTop: '1rem' }}>Cursor / Claude studio config</h3>

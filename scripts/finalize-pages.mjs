@@ -127,7 +127,7 @@ async function main() {
 	}
 
 	if (!(await exists(prototypeDir))) {
-		throw new Error('Missing public/prototype — run prototype build first.');
+		throw new Error('Missing public/prototype, run prototype build first.');
 	}
 
 	await fs.mkdir(legacyDir, { recursive: true });

@@ -151,7 +151,7 @@ const landingNodes: Record<string, Page['nodes'][string]> = {
 	'landing-lead': textNode(
 		'landing-lead',
 		'landing-hero',
-		'Hookoh drafts, schedules, and learns your voice — so you post consistently without the grind.',
+		'Hookoh drafts, schedules, and learns your voice, so you post consistently without the grind.',
 		'p',
 	),
 	'landing-cta': {
@@ -256,7 +256,7 @@ const composeNodes: Record<string, Page['nodes'][string]> = {
 		'compose-editor',
 		composeRoot,
 		'AI draft',
-		'Just shipped our booking flow — barbers can finally ditch the phone tag. What would you post?',
+		'Just shipped our booking flow, barbers can finally ditch the phone tag. What would you post?',
 	),
 	'compose-actions': {
 		id: 'compose-actions',

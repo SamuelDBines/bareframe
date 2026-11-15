@@ -14,7 +14,7 @@ export function barberBookingArtifacts(intake: IntakePayload, projectName: strin
       { persona: 'Regular client', need: 'Book the same barber quickly on mobile.' },
       { persona: 'Shop owner', need: 'Fill chairs without answering the phone all day.' },
     ],
-    value_proposition: 'Book trusted local barbers in under a minute — pick service, barber, and pay a deposit.',
+    value_proposition: 'Book trusted local barbers in under a minute, pick service, barber, and pay a deposit.',
     core_features: [
       { id: 'f_book', name: 'Service & slot booking', story_ids: ['us_book'], description: 'Choose service, barber, date/time.' },
       { id: 'f_account', name: 'Account & history', story_ids: ['us_account'], description: 'Email sign-in and past visits.' },
@@ -207,7 +207,7 @@ export function barberBookingArtifacts(intake: IntakePayload, projectName: strin
     blocks: [
       { key: 'hero.heading', text: s.name },
       { key: 'cta.primary', text: s.id === 'scr_landing' ? 'Book now' : 'Continue' },
-      { key: 'body.lead', text: `Part of ${projectName} — ${intake.idea.slice(0, 80)}` },
+      { key: 'body.lead', text: `Part of ${projectName}, ${intake.idea.slice(0, 80)}` },
     ],
   }));
 

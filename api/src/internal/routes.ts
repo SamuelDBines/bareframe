@@ -4,7 +4,7 @@ import type { Config } from '../config.js';
 import { purgeExpiredRecordings } from '../db/recordings.js';
 import { verifyRenderWorkerSecret } from './worker-auth.js';
 
-/** Worker/cron routes — no session or project token auth. */
+/** Worker/cron routes, no session or project token auth. */
 export function createInternalWorkerRouter(pool: pg.Pool, config: Config): Hono {
 	const router = new Hono();
 

@@ -2,7 +2,7 @@
 
 Tiers prioritize **trust** without blocking all ~75 primitives on Day 1.
 
-## Tier A — Flagship
+## Tier A, Flagship
 
 **Expectation:** Stable API, demos with `data-demo-root`, Tier A CI coverage (presence + theme-matrix subset + axe on representative pages).
 
@@ -17,7 +17,7 @@ These align with MVP/Essentials in the Component Studio (see `ESSENTIAL_SLUGS` p
 
 Manual review of demos and the Studio **Customize** tab is tracked in [STUDIO-FIDELITY.md](./STUDIO-FIDELITY.md).
 
-## Tier B — Rich interaction
+## Tier B, Rich interaction
 
 **Expectation:** Documented APIs; expanding Playwright coverage for keyboard navigation and overlays.
 
@@ -25,7 +25,7 @@ Examples: `combobox`, `autocomplete`, `menu`, `dropdown`, `data-grid`, `date-pic
 
 Tier B inherits Tier A checklist but **interaction tests are required before declaring “production”** inside this tier.
 
-## Tier C — Labs / experimental
+## Tier C, Labs / experimental
 
 **Expectation:** Shipped tags may change; demos may lag; axe/theme-matrix skipped in default CI gates until promoted.
 

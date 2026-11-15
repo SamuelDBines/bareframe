@@ -1,4 +1,4 @@
-/** Tier A demo slugs — keep aligned with docs/TIERING.md (chart is Tier C; omitted from gate). */
+/** Tier A demo slugs, keep aligned with docs/TIERING.md (chart is Tier C; omitted from gate). */
 export const TIER_A_DEMO_SLUGS = [
 	'button',
 	'link',

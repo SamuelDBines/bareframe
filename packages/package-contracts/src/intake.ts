@@ -43,7 +43,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
   {
     id: 'q5_feel',
     label: 'How should it feel to use?',
-    defaultAnswer: 'Calm, confident, and modern — never cluttered or salesy.',
+    defaultAnswer: 'Calm, confident, and modern, never cluttered or salesy.',
     placeholder: 'Personality and emotional tone.',
   },
   {
@@ -61,7 +61,7 @@ export const INTAKE_QUESTIONS: IntakeQuestion[] = [
   {
     id: 'q8_existing_assets',
     label: 'Existing brand or assets?',
-    defaultAnswer: 'Starting fresh — no logo or domain locked in yet.',
+    defaultAnswer: 'Starting fresh, no logo or domain locked in yet.',
     placeholder: 'Logos, domains, design systems, or none.',
   },
 ];

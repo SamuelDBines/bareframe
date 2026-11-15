@@ -1,4 +1,9 @@
+import { NO_EMDASH_INSTRUCTION } from '../llm-copy-style.js';
 import type { GeneratorStage, LlmAdapter, PipelineArtifacts, PipelineContext } from '../types.js';
+
+function withCopyStyle(system: string): string {
+	return `${system} ${NO_EMDASH_INSTRUCTION}`;
+}
 
 export type DeliverableKey =
   | 'product'
@@ -58,7 +63,9 @@ export async function regenerateDeliverable(
       case 'definition': {
         const out = await llm.completeJson<{ product: Record<string, unknown> }>({
           stage,
-          system: 'Revise the product definition based on customer feedback. Output JSON with a product object.',
+          system: withCopyStyle(
+            'Revise the product definition based on customer feedback. Output JSON with a product object.',
+          ),
           user: baseUser,
           schemaHint: '{ "product": { ... } }',
         });
@@ -67,7 +74,7 @@ export async function regenerateDeliverable(
       case 'naming_branding': {
         const out = await llm.completeJson<{ naming: Record<string, unknown>; branding: Record<string, unknown> }>({
           stage,
-          system: 'Revise naming and/or branding based on customer feedback.',
+          system: withCopyStyle('Revise naming and/or branding based on customer feedback.'),
           user: baseUser,
           schemaHint: '{ "naming": {...}, "branding": {...} }',
         });
@@ -78,7 +85,7 @@ export async function regenerateDeliverable(
       case 'design_directions': {
         const out = await llm.completeJson<{ design_options: Record<string, unknown>[] }>({
           stage,
-          system: 'Revise design directions based on customer feedback.',
+          system: withCopyStyle('Revise design directions based on customer feedback.'),
           user: baseUser,
           schemaHint: '{ "design_options": [...] }',
         });
@@ -87,7 +94,7 @@ export async function regenerateDeliverable(
       case 'ia': {
         const out = await llm.completeJson<{ ia: Record<string, unknown> }>({
           stage,
-          system: 'Revise information architecture based on customer feedback.',
+          system: withCopyStyle('Revise information architecture based on customer feedback.'),
           user: baseUser,
           schemaHint: '{ "ia": {...} }',
         });
@@ -96,7 +103,7 @@ export async function regenerateDeliverable(
       case 'journeys': {
         const out = await llm.completeJson<{ journeys: PipelineArtifacts['journeys'] }>({
           stage,
-          system: 'Revise user journeys based on customer feedback.',
+          system: withCopyStyle('Revise user journeys based on customer feedback.'),
           user: baseUser,
           schemaHint: '{ "journeys": [...] }',
         });
@@ -108,7 +115,7 @@ export async function regenerateDeliverable(
           copy: Record<string, unknown>[];
         }>({
           stage,
-          system: 'Revise prototype screens and/or copy based on customer feedback.',
+          system: withCopyStyle('Revise prototype screens and/or copy based on customer feedback.'),
           user: baseUser,
           schemaHint: '{ "screens": [...], "copy": [...] }',
         });
@@ -119,7 +126,7 @@ export async function regenerateDeliverable(
       case 'handoff': {
         const out = await llm.completeJson<{ handoff: Record<string, unknown> }>({
           stage,
-          system: 'Revise technical handoff metadata based on customer feedback.',
+          system: withCopyStyle('Revise technical handoff metadata based on customer feedback.'),
           user: baseUser,
           schemaHint: '{ "handoff": {...} }',
         });

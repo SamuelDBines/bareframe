@@ -225,7 +225,7 @@ const EDGES = [
 export function buildDemoMedScheduleProject() {
 	return assembleDemoProject({
 		id: demoMedScheduleProjectId,
-		name: 'MedSchedule — book, reschedule, cancel',
+		name: 'MedSchedule, book, reschedule, cancel',
 		defaultThemeId: 'oceanic' as ThemeId,
 		productName: PRODUCT,
 		screens: [...SCREENS],

@@ -70,7 +70,7 @@ function pickComponents(catalog: Catalog, input: ScaffoldScreenInput): {
 			continue;
 		}
 		if (record.stability === 'experimental') {
-			notes.push(`Included experimental component "${slug}" — verify API before shipping.`);
+			notes.push(`Included experimental component "${slug}", verify API before shipping.`);
 		}
 		resolved.push(slug);
 	}
@@ -117,7 +117,7 @@ function blockFor(record: ComponentRecord, index: number): string {
       />`;
 		case 'alert':
 			return `      <Alert variant="info" title="Heads up">
-        This screen was scaffolded from MCP — replace copy and wire real data.
+        This screen was scaffolded from MCP, replace copy and wire real data.
       </Alert>`;
 		default:
 			return `      <${exportName}>${humanize(record.slug)} preview</${exportName}>`;
@@ -168,7 +168,7 @@ export default function ${toComponentName(title)}() {
           {${JSON.stringify(title)}}
         </h1>
         <p style={{ margin: '0.5rem 0 0', color: 'var(--bf-theme-text-2, #555)' }}>
-          Scaffolded layout — connect real data and routes in your app.
+          Scaffolded layout, connect real data and routes in your app.
         </p>
       </header>
       <section

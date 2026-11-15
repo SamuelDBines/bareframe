@@ -34,7 +34,7 @@ export function AuthCard({ mode }: { mode: 'sign-in' | 'sign-up' }) {
 						<h1>{signUp ? 'Create your account' : 'Welcome back'}</h1>
 						<p>
 							{signUp
-								? 'Start mapping and reviewing flows for free. No separate password — use GitHub.'
+								? 'Start mapping and reviewing flows for free. No separate password, use GitHub.'
 								: 'Sign in to open your projects.'}
 						</p>
 						{status === 'unavailable' ? (

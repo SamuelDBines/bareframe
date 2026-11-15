@@ -1,7 +1,7 @@
 :root {
 	color-scheme: dark;
 
-	/* Studio chrome — separate from Bareframe demos */
+	/* Studio chrome, separate from Bareframe demos */
 	--st-bg: #07080c;
 	--st-surface: rgba(18, 22, 31, 0.85);
 	--st-border: rgba(148, 163, 184, 0.14);

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Lists `part="…"` exports per component TSX — used by the library build's showcase-studio artifact.
+ * Lists `part="…"` exports per component TSX, used by the library build's showcase-studio artifact.
  */
 import { promises as fs } from 'node:fs';
 import path from 'node:path';

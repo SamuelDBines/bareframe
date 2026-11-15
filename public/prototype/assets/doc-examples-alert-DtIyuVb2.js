@@ -1,4 +1,4 @@
-import{n as e,r as t}from"./rolldown-runtime-XKyaHtl9.js";import{B as n,H as r,I as i,v as a,z as o}from"./component-registry-DE5BwGaH.js";var s=e({default:()=>u}),c=t(r(),1),l=n();function u(){let[e,t]=(0,c.useState)(!0);return e?(0,l.jsx)(o,{dismissible:!0,title:`Heads up`,onDismiss:()=>t(!1),children:`Your export finished — download it from the dashboard.`}):(0,l.jsx)(`p`,{className:`bf-muted`,children:`Alert dismissed.`})}var d=e({default:()=>f}),f=`import { useState } from 'react';
+import{n as e,r as t}from"./rolldown-runtime-XKyaHtl9.js";import{B as n,H as r,I as i,v as a,z as o}from"./component-registry-DE5BwGaH.js";var s=e({default:()=>u}),c=t(r(),1),l=n();function u(){let[e,t]=(0,c.useState)(!0);return e?(0,l.jsx)(o,{dismissible:!0,title:`Heads up`,onDismiss:()=>t(!1),children:`Your export finished, download it from the dashboard.`}):(0,l.jsx)(`p`,{className:`bf-muted`,children:`Alert dismissed.`})}var d=e({default:()=>f}),f=`import { useState } from 'react';
 import { Alert } from '@bareframe/react';
 
 export default function DismissibleAlertExample() {
@@ -6,7 +6,7 @@ export default function DismissibleAlertExample() {
 	if (!visible) return <p className="bf-muted">Alert dismissed.</p>;
 	return (
 		<Alert dismissible title="Heads up" onDismiss={() => setVisible(false)}>
-			Your export finished — download it from the dashboard.
+			Your export finished, download it from the dashboard.
 		</Alert>
 	);
 }

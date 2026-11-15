@@ -111,7 +111,7 @@ export function WebsiteCaptureSetupPage() {
 			const created = await setupWebsiteCapture(projectId, websiteUrl);
 			setSetup(created);
 			persistWizard({ ...wizard, tokenIssued: true });
-			setNotice('Capture token issued. Copy the script now — the token is shown once.');
+			setNotice('Capture token issued. Copy the script now, the token is shown once.');
 			await refreshStatus();
 		} catch (e) {
 			setError(friendlyError(e, 'Could not create capture token.'));
@@ -260,7 +260,7 @@ export function WebsiteCaptureSetupPage() {
 									onClick={() => selectMethod('github-pr')}
 								>
 									<strong>GitHub install PR</strong>
-									<span>Pick a repo, branch, and entry file — preview (or open) a script PR</span>
+									<span>Pick a repo, branch, and entry file, preview (or open) a script PR</span>
 								</button>
 							</li>
 							<li>
@@ -337,11 +337,11 @@ export function WebsiteCaptureSetupPage() {
 						<details className="website-import__privacy">
 							<summary>What we capture · privacy defaults</summary>
 							<ul>
-								<li>Route URL, document title, viewport, link clicks — no keystrokes</li>
+								<li>Route URL, document title, viewport, link clicks, no keystrokes</li>
 								<li>All form values masked; passwords and payment fields never captured</li>
 								<li>Script idle until <code>Bareframe.consent(true)</code>; honours DNT / GPC</li>
 								<li>No third-party cookies; pseudonymous session id; default 90-day retention</li>
-								<li>EU/UK processing on bareframe.org — you remain the controller</li>
+								<li>EU/UK processing on bareframe.org, you remain the controller</li>
 							</ul>
 							<pre className="website-import__snippet">{snippets.privacy}</pre>
 						</details>
@@ -475,7 +475,7 @@ export function WebsiteCaptureSetupPage() {
 									arrange screens and connectors.
 								</>
 							) : (
-								<>No pages yet — complete install or server import, then return here.</>
+								<>No pages yet, complete install or server import, then return here.</>
 							)}
 						</p>
 						<div className="website-import__review-actions">

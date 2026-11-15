@@ -85,7 +85,7 @@ export function AppHomePage() {
 					<h1>Map your first user flow</h1>
 					<p>
 						Sign in to save projects, import from Figma and run AI reviews. Or look around the example project
-						first — no account needed.
+						first, no account needed.
 					</p>
 					<div className="app-empty__actions">
 						{status === 'unavailable' ? (

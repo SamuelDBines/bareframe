@@ -30,7 +30,7 @@ This file includes component rules, **button variant styles** (`.bf-btn--*`), an
 
 ### 2. Theme tokens (required)
 
-Pick a built-in theme (tokens only — import **after** `styles.css`):
+Pick a built-in theme (tokens only, import **after** `styles.css`):
 
 ```tsx
 import '@bareframe/react/styles.css';
@@ -102,7 +102,7 @@ See the [Bareframe prototype](https://github.com/SamuelDBines/bareframe/tree/mai
 
 The package is not on the public registry until the `@bareframe` npm org is claimed and CI publishes with `NPM_TOKEN`. Until then, point your app at a built copy of this package.
 
-### Option A — `file:` tarball (closest to npm)
+### Option A, `file:` tarball (closest to npm)
 
 From your **bareframe** checkout:
 
@@ -130,7 +130,7 @@ import { Button } from '@bareframe/react';
 
 Re-run `pnpm pack` in bareframe after you pull library changes.
 
-### Option B — `pnpm link`
+### Option B, `pnpm link`
 
 ```bash
 # bareframe checkout
@@ -143,7 +143,7 @@ cd /path/to/niproround/frontend
 pnpm link --global @bareframe/react
 ```
 
-### Option C — path dependency
+### Option C, path dependency
 
 In niproround `package.json`:
 

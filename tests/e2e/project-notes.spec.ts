@@ -36,6 +36,7 @@ function notePayload(n: StoredNote) {
 
 async function mockNotesApi(page: Page) {
 	let noteSeq = 0;
+	let version = 1;
 	const notes: StoredNote[] = [];
 	let document = createEmptyProjectDocument(PROJECT_ID, 'Notes demo', 'light', { newId });
 	const frame = {
@@ -61,8 +62,18 @@ async function mockNotesApi(page: Page) {
 		}
 		if (p.endsWith('/api/plan')) return json({ tier: 'free' });
 		if (p === `/api/projects/${PROJECT_ID}`) {
-			return json({ id: PROJECT_ID, name: 'Notes demo', version: 1, document });
+			return json({ id: PROJECT_ID, name: 'Notes demo', version, document });
 		}
+		if (p === `/api/projects/${PROJECT_ID}/document` && req.method() === 'PUT') {
+			const body = (await req.postDataJSON()) as { baseVersion: number; document: typeof document };
+			if (body.baseVersion !== version) {
+				return json({ error: 'Version conflict', currentVersion: version }, 409);
+			}
+			document = body.document;
+			version += 1;
+			return json({ version });
+		}
+		if (p.endsWith('/events')) return route.fulfill({ status: 204, body: '' });
 		if (p === `/api/projects/${PROJECT_ID}/notes` && req.method() === 'GET') {
 			const url = new URL(req.url());
 			const status = url.searchParams.get('status');
@@ -131,7 +142,11 @@ test.describe('project notes panel', () => {
 
 		await page.getByTestId('project-notes-filter-open').click();
 		const notesPanel = page.getByTestId('project-notes-panel');
-		const markDone = notesPanel.getByTestId('project-note-toggle-done').first();
+		const notesList = notesPanel.getByTestId('project-notes-list');
+		await notesList.evaluate((el) => {
+			el.scrollTop = el.scrollHeight;
+		});
+		const markDone = notesPanel.getByRole('button', { name: 'Mark done' }).first();
 		await markDone.scrollIntoViewIfNeeded();
 		await markDone.click();
 		await page.getByTestId('project-notes-filter-done').click();

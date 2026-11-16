@@ -12,7 +12,7 @@ Each **production-ready** (`bf-*`) component should converge on this checklist i
 | **Events** | `CustomEvent`s with composed/bubbles contract (`bf-click`, `bf-close`, …). |
 | **Slots / children** | What projects into light DOM (`<slot>`). |
 | **A11y** | Role / `aria-*` / labeling strategy (native control vs delegated). |
-| **Tokens** | Main `--bf-theme-*` (or component-scoped) variables consulted in **`*.css`**. Short list is enough—full scan can follow. |
+| **Tokens** | Main `--bf-theme-*` (or component-scoped) variables consulted in **`*.css`**. Short list is enough, full scan can follow. |
 | **Demo** | `public/<slug>/index.html` (or generator output) with `data-demo-root` wrapper for automation. |
 
 ## Tiers vs this contract

@@ -80,7 +80,7 @@ export function PricingPage() {
 				<span className="bx-kicker">Pricing</span>
 				<h1>Free to start. One Pro price.</h1>
 				<p className="bx-lead">
-					Map and review your first flow for free. Pro is {PRO_PRICE_LABEL} — no separate Team tier.
+					Map and review your first flow for free. Pro is {PRO_PRICE_LABEL}, no separate Team tier.
 				</p>
 			</header>
 
@@ -129,7 +129,7 @@ export function PricingPage() {
 
 			<p className="pricing__enterprise bx-hint">
 				Need SSO, security review or a larger org rollout?{' '}
-				<a href={SALES_HREF}>Contact us</a> — we quote separately; there is no self-serve Team plan.
+				<a href={SALES_HREF}>Contact us</a>, we quote separately; there is no self-serve Team plan.
 			</p>
 
 			<section className="faq" aria-labelledby="faq-title">

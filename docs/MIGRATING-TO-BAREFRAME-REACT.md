@@ -1,6 +1,6 @@
 # Migrating to `@bareframe/react`
 
-Move React apps from **`@repkit/components`**, the **`repkit-components`** checkout, or vendored Repkit copies onto **`@bareframe/react`**. Bareframe ships the same React Aria–based primitives with **`--bf-theme-*`** tokens and optional **`--rk-theme-*`** aliases for legacy stylesheets.
+Move React apps from **`@repkit/components`**, the **`repkit-components`** checkout, or vendored Repkit copies onto **`@bareframe/react`**. Bareframe ships the same React Aria-based primitives with **`--bf-theme-*`** tokens and optional **`--rk-theme-*`** aliases for legacy stylesheets.
 
 Live docs: [bareframe.org](https://bareframe.org) · Component reference: `/components/*` · MCP: `https://bareframe.org/mcp`
 
@@ -11,7 +11,7 @@ Live docs: [bareframe.org](https://bareframe.org) · Component reference: `/comp
 | Before | After |
 | --- | --- |
 | `@repkit/components` | `@bareframe/react` |
-| `repkit-components` (local path / monorepo) | `@bareframe/react` (npm, tarball, or `file:` — see [install steps](#2-install)) |
+| `repkit-components` (local path / monorepo) | `@bareframe/react` (npm, tarball, or `file:`, see [install steps](#2-install)) |
 
 Remove Repkit from `package.json`, then install Bareframe (requires **React 18.3+ or 19**):
 
@@ -56,7 +56,7 @@ Run `pnpm --filter @bareframe/react build` in the bareframe checkout before star
 
 Repkit apps typically imported a global stylesheet and a theme. Bareframe splits the same concerns:
 
-### Required — component rules + Repkit token aliases
+### Required, component rules + Repkit token aliases
 
 ```tsx
 import '@bareframe/react/styles.css';
@@ -76,7 +76,7 @@ import '@bareframe/react/styles.css';
 
 You can **keep existing CSS that references `--rk-theme-*`** as long as you import `styles.css` and a theme (below).
 
-### Required — theme tokens
+### Required, theme tokens
 
 Pick one built-in theme (import **after** `styles.css`):
 
@@ -143,9 +143,9 @@ import { Button, Input, Modal } from '@bareframe/react';
 | `Accordion`, `Breadcrumbs`, `Pagination`, `Tabs` | `accordion`, `breadcrumbs`, … | |
 | `Combobox`, `MultiSelect`, `NativeSelect`, `Select` | `combobox`, `multiselect`, `select` | |
 | `DropdownMenu`, `Popover`, `PopoverPanel`, `Tooltip` | `dropdown-menu`, `popover`, `tooltip` | |
-| `cn` | — | Class name helper |
+| `cn` | - | Class name helper |
 
-Web-only Bareframe primitives (`bf-chart`, `bf-map`, …) remain **`bareframe`** custom elements — they are not part of `@bareframe/react` yet. Use the [component gallery](https://bareframe.org/components) or MCP `list_components` for the full ~74 slugs.
+Web-only Bareframe primitives (`bf-chart`, `bf-map`, …) remain **`bareframe`** custom elements, they are not part of `@bareframe/react` yet. Use the [component gallery](https://bareframe.org/components) or MCP `list_components` for the full ~74 slugs.
 
 ---
 
@@ -155,10 +155,10 @@ Props are documented from **`packages/react`** sources (see MCP **`get_component
 
 | Area | Guidance |
 | --- | --- |
-| **Button** | `variant`, `size`, `loading`, `disabled` — same mental model; classes are `.bf-btn--*`. |
+| **Button** | `variant`, `size`, `loading`, `disabled`, same mental model; classes are `.bf-btn--*`. |
 | **Input / Field** | Use `Field` + `Input` for labels and errors; `aria-label` when no visible label. |
-| **Select / Combobox** | `options: { value, label }[]`; Combobox adds filtering — check doc examples. |
-| **Modal / Drawer** | Contained overlays for docs/playgrounds vs portaled — see component pages. |
+| **Select / Combobox** | `options: { value, label }[]`; Combobox adds filtering, check doc examples. |
+| **Modal / Drawer** | Contained overlays for docs/playgrounds vs portaled, see component pages. |
 | **Toast** | Inline component; wire your own queue if you used Repkit’s global toaster. |
 
 Run MCP **`get_component`** with a slug (e.g. `button`) for the prop table and **real `.example.tsx` sources** from the docs app.
@@ -174,7 +174,7 @@ Use **`get_design_tokens`** with a theme id (e.g. `aurora`) for resolved color, 
 - [ ] Import `@bareframe/react/styles.css` once at app entry.
 - [ ] Import one `@bareframe/react/themes/<name>.css` (or `theme.css`).
 - [ ] Replace import paths: `@repkit/components` → `@bareframe/react`.
-- [ ] Search for `--rk-theme-` — no change required if aliases cover your keys; add Bareframe theme import if tokens look unstyled.
+- [ ] Search for `--rk-theme-`, no change required if aliases cover your keys; add Bareframe theme import if tokens look unstyled.
 - [ ] Search for Repkit-specific class names; map to `.bf-*` where needed.
 - [ ] Run your test suite and visual QA on forms, modals, and selects.
 - [ ] (Optional) Connect [MCP at `https://bareframe.org/mcp`](https://bareframe.org/mcp) so agents read props/examples from repo data instead of scraping HTML.

@@ -19,7 +19,7 @@ const STEPS = [
 	{
 		n: '02',
 		title: 'Review on the map',
-		body: 'Run AI review on the whole flow. Flags sit on the screens they refer to — missing steps, drop-off risk and accessibility issues.',
+		body: 'Run AI review on the whole flow. Flags sit on the screens they refer to, missing steps, drop-off risk and accessibility issues.',
 		art: 'review',
 	},
 	{
@@ -153,7 +153,7 @@ export function LandingPage() {
 						<span className="bx-kicker">Also</span>
 						<h2 id="extras-title">Component library &amp; agent docs</h2>
 						<p>
-							Bareframe includes a React component gallery and MCP docs for agents — useful once your flow is
+							Bareframe includes a React component gallery and MCP docs for agents, useful once your flow is
 							mapped, but not part of the core offer.
 						</p>
 						<Link to="/components" className="btn btn-secondary">

@@ -19,7 +19,7 @@ jobs:
           KITSUNE_API_KEY: ${{ secrets.KITSUNE_API_KEY }}
         run: |
           if [ -z "$KITSUNE_API_KEY" ]; then
-            echo "KITSUNE_API_KEY is not set — skipping Kitsune scan (configure in repo secrets to enable)."
+            echo "KITSUNE_API_KEY is not set, skipping Kitsune scan (configure in repo secrets to enable)."
             exit 0
           fi
           if ! command -v kitsune >/dev/null 2>&1; then

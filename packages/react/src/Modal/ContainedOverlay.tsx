@@ -14,7 +14,7 @@ type ContainedOverlayProps = {
 	overlayRef?: React.Ref<HTMLDivElement>;
 };
 
-/** Docs preview overlay: no ModalOverlay, no page inert — local focus scope only. */
+/** Docs preview overlay: no ModalOverlay, no page inert, local focus scope only. */
 export function ContainedOverlay({
 	isOpen,
 	onOpenChange,

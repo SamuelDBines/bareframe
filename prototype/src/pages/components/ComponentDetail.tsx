@@ -68,8 +68,8 @@ export function ComponentDetailPage() {
 									<td>
 										<code>{p.type}</code>
 									</td>
-									<td>{p.default ?? '—'}</td>
-									<td>{p.description || '—'}</td>
+									<td>{p.default ?? '-'}</td>
+									<td>{p.description || '-'}</td>
 								</tr>
 							))}
 						</tbody>

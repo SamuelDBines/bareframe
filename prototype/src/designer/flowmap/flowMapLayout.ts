@@ -226,7 +226,7 @@ export function routeConnectors(
 		return { id: c.id, d, kind, label: { x: (x1 + x2) / 2, y: (p.out + p.in) / 2, ...fit } };
 	});
 
-	// Nudge labels apart (and off cards) — alternate down/up until clear.
+	// Nudge labels apart (and off cards), alternate down/up until clear.
 	const placed: Box[] = [];
 	for (const r of [...routed].sort((p, q) => p.label.y - q.label.y)) {
 		const base = r.label.y;

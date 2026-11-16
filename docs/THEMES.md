@@ -23,10 +23,10 @@ document.documentElement.setAttribute('data-bf-theme', 'dark');
 ## Creating your own theme
 
 1. **Start from an existing palette** (`system.css`, `dark.css`) or copy [examples/theme-mybrand.css](../examples/theme-mybrand.css).
-2. **Keep the contract** — Every component’s shadow stylesheet maps design to `--bf-theme-*`. If your theme skips a token, fallbacks inside component CSS apply (but may drift between components).
-3. **Shadow DOM caveat** — Custom properties **`inherit`** into shadow trees from the outer document. Themes must assign tokens on `:root`, `[data-bf-theme='…']`, or another ancestor host; component CSS should read tokens on **`:host { … var(--bf-theme-…) }`**—not assume global element selectors pierce Shadow DOM.
-4. **Validate locally** — After `pnpm run build`, run `pnpm run validate:theme -- themes/foo.css` to check your file defines a minimum semantic set (see `scripts/validate-theme.mjs`).
-5. **Ship as static CSS only** — No build step required for authors: one CSS file (plus optional `@import` of `layout.css`).
+2. **Keep the contract**, Every component’s shadow stylesheet maps design to `--bf-theme-*`. If your theme skips a token, fallbacks inside component CSS apply (but may drift between components).
+3. **Shadow DOM caveat**, Custom properties **`inherit`** into shadow trees from the outer document. Themes must assign tokens on `:root`, `[data-bf-theme='…']`, or another ancestor host; component CSS should read tokens on **`:host { … var(--bf-theme-…) }`**, not assume global element selectors pierce Shadow DOM.
+4. **Validate locally**, After `pnpm run build`, run `pnpm run validate:theme -- themes/foo.css` to check your file defines a minimum semantic set (see `scripts/validate-theme.mjs`).
+5. **Ship as static CSS only**, No build step required for authors: one CSS file (plus optional `@import` of `layout.css`).
 
 ### Importing layout utilities
 

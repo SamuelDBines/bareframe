@@ -6,6 +6,7 @@ import {
 	type FlowSpec,
 } from '@bareframe/designer-core';
 import type { Config } from '../config.js';
+import { NO_EMDASH_INSTRUCTION } from '../llm/copy-style.js';
 
 export type FlowGenerationInput = {
 	description: string;
@@ -27,11 +28,12 @@ From the product description, produce the user flow: the screens a user moves th
 actions that take them from one screen to the next.
 Rules:
 - 4 to 14 screens; cover onboarding or sign-in only if the product needs it.
-- Every screen needs a short name (2–4 words), one-sentence purpose and 2–6 keyContent items.
+- Every screen needs a short name (2-4 words), one-sentence purpose and 2-6 keyContent items.
 - states: always "default"; add "empty", "loading", "error" or "success" where that screen has them.
-- Connections use screen ids; trigger is the visible button or action label (1–4 words).
+- Connections use screen ids; trigger is the visible button or action label (1-4 words).
 - Ids are short kebab-case and unique. Keep the ids of screens you keep when refining.
-- Do not invent features the description does not imply.`;
+- Do not invent features the description does not imply.
+${NO_EMDASH_INSTRUCTION}`;
 
 function platformText(platform: FlowPlatform) {
 	return platform === 'all' ? 'mobile, tablet and desktop' : platform;

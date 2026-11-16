@@ -4,7 +4,7 @@ Click-through prototype of the Bareframe marketing site, `@bareframe/react` docs
 
 ## Run locally
 
-From the repo root (after `pnpm run build` is optional — themes are copied from `../themes`):
+From the repo root (after `pnpm run build` is optional, themes are copied from `../themes`):
 
 ```bash
 cd prototype

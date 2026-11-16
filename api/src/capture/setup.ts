@@ -135,7 +135,7 @@ export function buildInstallPrPreview(
 		simulated: !githubAppConnected,
 		message: githubAppConnected
 			? 'Pull request creation is available when the Bareframe GitHub App is installed on this repository with contents and pull request write access.'
-			: 'Preview only — listing repos uses GitHub OAuth (repo scope). Opening a real pull request needs the Bareframe GitHub App (contents:write, pull_requests:write) installed on the target repository.',
+			: 'Preview only, listing repos uses GitHub OAuth (repo scope). Opening a real pull request needs the Bareframe GitHub App (contents:write, pull_requests:write) installed on the target repository.',
 		repo,
 		baseBranch: branch,
 		files: [

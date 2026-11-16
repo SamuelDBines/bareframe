@@ -293,6 +293,9 @@ jobs:
       - name: Typecheck (root TS)
         run: pnpm run typecheck
 
+      - name: Check for em/en dashes in authored content
+        run: pnpm run check:no-em-dashes
+
       - name: Build library + sync public/dist and public/themes
         run: pnpm run build
 

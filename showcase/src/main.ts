@@ -11,7 +11,7 @@ type TokensManifest = {
 };
 
 /**
- * Tier A essentials — surfaced first in the studio nav (see docs/TIERING.md).
+ * Tier A essentials, surfaced first in the studio nav (see docs/TIERING.md).
  * Order is preserved.
  */
 const ESSENTIAL_SLUGS = [
@@ -148,7 +148,7 @@ const OVERRIDE_TEXTAREA_DEFAULT = `:root {
 `;
 
 function stringifyDetail(d: unknown): string {
-	if (d === undefined) return '—';
+	if (d === undefined) return '-';
 	if (typeof d === 'string') return d;
 	try {
 		return JSON.stringify(d);
@@ -337,7 +337,7 @@ function renderSetupError(reason: string) {
     <p><code>pnpm run build</code></p>
     <p class="hint">Then start the studio (build + dev):</p>
     <p><code>pnpm run studio</code></p>
-    <p class="hint">If you already built, reload — the preview reads <code>public/dist/manifest.json</code> and <code>public/dist/tokens.json</code>.</p>
+    <p class="hint">If you already built, reload, the preview reads <code>public/dist/manifest.json</code> and <code>public/dist/tokens.json</code>.</p>
   </div>
 </div>`;
 }
@@ -360,7 +360,7 @@ function renderTokensTable(
 	const rows = filtered
 		.map((name) => {
 			const raw = rootStyle.getPropertyValue(name).trim();
-			const value = raw || '—';
+			const value = raw || '-';
 			return `<tr><td class="bf-tok-name"><code>${escapeHtml(name)}</code></td><td class="bf-tok-val"><span class="bf-tok-span">${escapeHtml(value)}</span></td></tr>`;
 		})
 		.join('');
@@ -376,7 +376,7 @@ function renderTokensTable(
 	container.querySelectorAll<HTMLElement>('.bf-tok-span').forEach((el) => {
 		el.addEventListener('click', () => {
 			const t = el.textContent?.trim();
-			if (t && t !== '—') {
+			if (t && t !== '-') {
 				void navigator.clipboard.writeText(t).catch(() => {});
 			}
 		});
@@ -448,7 +448,7 @@ function render(
           ${
 							tokenData.ok
 								? ''
-								: `<p class="bf-tokens-warn">${escapeHtml('tokens.json missing — run pnpm build from repo root.')}</p>`
+								: `<p class="bf-tokens-warn">${escapeHtml('tokens.json missing, run pnpm build from repo root.')}</p>`
 						}
           <div id="bfTokensMount"></div>
         </div>
@@ -461,7 +461,7 @@ function render(
               <h3 class="bf-customize-h">Shadow and ::part()</h3>
               <p class="bf-customize-recipe" id="bfCustomizeRecipeHint" hidden></p>
               <p class="bf-customize-p">Primitives use Shadow DOM. Global <code>--bf-theme-*</code> cascade from <code>:root</code>. For internals use host + <code>::part()</code> with the exported part names listed below.</p>
-              <pre class="bf-customize-pre" id="bfCustomizeParts">—</pre>
+              <pre class="bf-customize-pre" id="bfCustomizeParts">-</pre>
             </div>
             <div class="bf-customize-block">
               <h3 class="bf-customize-h">Documented events</h3>
@@ -661,13 +661,13 @@ function render(
 		const host = slugToTag(slug);
 		bfCustomizeParts!.textContent = parts.length
 			? parts.map((p) => `${host}::part(${p})`).join('\n')
-			: '— (no exported ::part detected in TSX)';
+			: 'None (no exported ::part detected in TSX)';
 		bfCustomizeEventsDoc!.replaceChildren();
 		const events = recipe?.eventsDoc ?? [];
 		if (!events.length) {
 			const li = document.createElement('li');
 			li.textContent =
-				'No curated list yet for this slug — inspect the component source or docs/COMPONENT-CONTRACT.md.';
+				'No curated list yet for this slug, inspect the component source or docs/COMPONENT-CONTRACT.md.';
 			bfCustomizeEventsDoc!.appendChild(li);
 		} else {
 			for (const line of events) {
@@ -682,7 +682,7 @@ function render(
 			const p = document.createElement('p');
 			p.className = 'bf-customize-muted';
 			p.textContent =
-				'No canned actions for this slug — interact with the preview directly.';
+				'No canned actions for this slug, interact with the preview directly.';
 			bfCustomizeActions!.appendChild(p);
 			return;
 		}
@@ -808,7 +808,7 @@ function render(
 		});
 
 		if (filtered.length === 0) {
-			nav.innerHTML = `<p style="opacity:.72;font-size:.82rem">${escapeHtml('No matches — try another search.')}</p>`;
+			nav.innerHTML = `<p style="opacity:.72;font-size:.82rem">${escapeHtml('No matches. Try another search.')}</p>`;
 			return;
 		}
 

@@ -1,7 +1,7 @@
 {
   "name": "@bareframe/react",
   "version": "0.1.0",
-  "description": "Accessible React components for Bareframe design systems — theme tokens, legacy Repkit (--rk-*) compatibility, and React Aria primitives.",
+  "description": "Accessible React components for Bareframe design systems, theme tokens, legacy Repkit (--rk-*) compatibility, and React Aria primitives.",
   "license": "MIT",
   "type": "module",
   "sideEffects": [

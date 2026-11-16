@@ -35,7 +35,7 @@
   }
 
   if (privacyOptOut()) {
-    console.info('[bareframe-capture] Skipped — Do Not Track / Global Privacy Control is enabled.');
+    console.info('[bareframe-capture] Skipped, Do Not Track / Global Privacy Control is enabled.');
     return;
   }
 
@@ -307,7 +307,7 @@
     redactOn: redactOn,
     consentRequired: consentRequired,
     retentionDays: retentionDays,
-    dataLocationNote: 'EU/UK processing when using bareframe.org cloud — confirm your DPA.',
+    dataLocationNote: 'EU/UK processing when using bareframe.org cloud, confirm your DPA.',
   };
 
   if (consentGranted) {

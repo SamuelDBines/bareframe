@@ -38,7 +38,7 @@ test.describe('DatePicker docs playground', () => {
 	});
 });
 
-test.describe('DatePicker docs — mobile touch', () => {
+test.describe('DatePicker docs, mobile touch', () => {
 	test('calendar opens on mobile project', async ({ page }, testInfo) => {
 		test.skip(testInfo.project.name !== 'chromium-mobile', 'Mobile project only');
 		await openDatePickerDoc(page);

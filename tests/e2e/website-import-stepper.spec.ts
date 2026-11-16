@@ -4,7 +4,7 @@ const FIXTURE = '/e2e-fixtures/website-import-stepper/';
 
 test.describe('website import stepper', () => {
 	for (const project of ['chromium-desktop', 'chromium-mobile', 'webkit-desktop', 'webkit-mobile'] as const) {
-		test(`stepper navigation — ${project}`, async ({ page }, testInfo) => {
+		test(`stepper navigation, ${project}`, async ({ page }, testInfo) => {
 			test.skip(testInfo.project.name !== project, `Runs on ${project}`);
 
 			await page.goto(FIXTURE, { waitUntil: 'domcontentloaded' });

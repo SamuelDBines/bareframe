@@ -236,7 +236,7 @@ test.describe('Toast interactions', () => {
 	});
 });
 
-test.describe('Presentational components — props & dark mode', () => {
+test.describe('Presentational components, props & dark mode', () => {
 	const cases: { slug: string; controlLabel: string; value: string; expectText: string }[] = [
 		{ slug: 'badge', controlLabel: 'Label', value: 'QA', expectText: 'QA' },
 		{ slug: 'button', controlLabel: 'Label', value: 'Run audit', expectText: 'Run audit' },

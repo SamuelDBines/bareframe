@@ -12,7 +12,7 @@ const EXAMPLES = [
   {
     title: 'LatticeDesk workspace & approvals',
     body:
-      'Admin SSO, teammate invites, purchase requests, manager approve or deny with appeal, and IT provisioning — multi-role paths with validation and recovery (sample Acme Robotics data).',
+      'Admin SSO, teammate invites, purchase requests, manager approve or deny with appeal, and IT provisioning, multi-role paths with validation and recovery (sample Acme Robotics data).',
     to: '/demo/b2b-workspace',
     cta: 'Open example',
     tag: 'B2B workflow',
@@ -20,7 +20,7 @@ const EXAMPLES = [
   {
     title: 'Arbor Market purchase to return',
     body:
-      'Cart through payment decline and shop credit, seller pack and ship, delivery issues, return label, refund, and seller closure — buyer and seller branches on one map.',
+      'Cart through payment decline and shop credit, seller pack and ship, delivery issues, return label, refund, and seller closure, buyer and seller branches on one map.',
     to: '/demo/marketplace-fulfilment',
     cta: 'Open example',
     tag: 'Marketplace',
@@ -70,7 +70,7 @@ export function ExamplesPage() {
         <span className="bx-kicker">Examples</span>
         <h1>See Bareframe on a real flow</h1>
         <p className="bx-lead">
-          Sample projects you can open without an account — from quick reviews to multi-branch journeys with
+          Sample projects you can open without an account, from quick reviews to multi-branch journeys with
           click-through prototypes. Fictional data only.
         </p>
       </header>

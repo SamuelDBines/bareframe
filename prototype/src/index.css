@@ -1181,7 +1181,7 @@ table.props-table tr:last-child td {
 	}
 }
 
-/* —— Component docs playground —— */
+/* Component docs playground */
 .playground {
 	display: grid;
 	gap: 1.25rem;

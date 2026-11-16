@@ -1,4 +1,4 @@
-# Bareframe Designer — Product & Interaction Spec (v0.1)
+# Bareframe Designer, Product & Interaction Spec (v0.1)
 
 > Status: draft written 25 Oct 2026, from a read-only study of `SamuelDBines/designer.io` (default branch) and `SamuelDBines/bareframe` (main plus PR #1, branch `cursor/bareframe-prototype-e0f4`, `prototype/`).
 > Audience: whoever builds the real Designer (a React app on top of the `@bareframe/*` React library).
@@ -20,7 +20,7 @@ Four things in designer.io are weak or missing, and they are exactly what Sam as
 | Sam's ask | designer.io today | Bareframe Designer must |
 |---|---|---|
 | **Mobile / device sizes** | One device per **project** (`Project.screenPresetId/screenWidth/screenHeight`). Every screen has the same size. | Make the device a property of each **Frame**. Show any mix of iPhone, iPad and desktop frames on one canvas. |
-| **Designs that scale when switching** | `setScreenPreset` multiplies every x/y/w/h by `newW/oldW`, `newH/oldH`. This is destructive, causes rounding drift, and distorts aspect ratios (`dio:src/store.tsx` L1281–1319). | Make the **layout reflow** (flex/grid, with fill/hug/percent sizing) the default. Store per-breakpoint **overrides**. Never rewrite the source geometry when the device changes. |
+| **Designs that scale when switching** | `setScreenPreset` multiplies every x/y/w/h by `newW/oldW`, `newH/oldH`. This is destructive, causes rounding drift, and distorts aspect ratios (`dio:src/store.tsx` L1281-1319). | Make the **layout reflow** (flex/grid, with fill/hug/percent sizing) the default. Store per-breakpoint **overrides**. Never rewrite the source geometry when the device changes. |
 | **Trying different styles** | A project has several themes but only one `activeThemeId`. You flip it globally and can't compare. `variantKey` is metadata only. | Give each frame a **theme override**, offer **Compare mode** (a frame × theme or frame × device matrix), and add **Style trials** (branch a frame, change tokens or variants, then promote). |
 | **Frames** | A "screen" is just a `CanvasItem` with `componentType: "screen"`, parenting is by `parentId`, children are absolutely positioned, and `duplicateCanvasPage` **does not copy children**. | Make **Frame** a first-class object that contains a design tree. Duplicate deep-copies the tree or links to it. Frames can be named, labelled, moved, resized, and rendered at true viewport width. |
 
@@ -127,7 +127,7 @@ type NodeOverride = { layout?: Partial<LayoutModel>; style?: Partial<StyleModel>
 
 // ---------- Frames ----------
 type Frame = {
-  id: string; name: string;                         // label shown above the frame: "Home — iPhone 15 · 393×852"
+  id: string; name: string;                         // label shown above the frame: "Home, iPhone 15 · 393×852"
   target: { kind: "page"; pageId: string } | { kind: "component"; definitionId: string; variantKey?: string } | { kind: "block"; blockId: string };
   x: number; y: number;                             // canvas coordinates (world space)
   width: number; height: number;                    // viewport size of the frame
@@ -164,7 +164,7 @@ type ComponentDefinition = { id: string; name: string; source: "library" | "cust
 
 ### 2.3 Default device presets
 
-These merge designer.io's two lists (`dio:src/store.tsx` L59–67 and `dio:src/domain/preview/preview-event.ts`). Excerpts: `excerpts/screen-presets-and-rescale.ts`, `excerpts/preview-device-presets.ts`.
+These merge designer.io's two lists (`dio:src/store.tsx` L59-67 and `dio:src/domain/preview/preview-event.ts`). Excerpts: `excerpts/screen-presets-and-rescale.ts`, `excerpts/preview-device-presets.ts`.
 
 | id | label | w × h | category | breakpoint |
 |---|---|---|---|---|
@@ -243,7 +243,7 @@ Problems:
 
 | Setting | designer.io value (`dio:src/views/canvas.tsx`) | Bareframe |
 |---|---|---|
-| Zoom range | 0.25 – 2.5 | **0.1 – 4.0** |
+| Zoom range | 0.25, 2.5 | **0.1, 4.0** |
 | Zoom step (buttons) | 0.1 | keep 0.1 below 100%, 0.25 above |
 | Reset | 100% | keep (`Shift+0` / `Cmd+0`) |
 | Fit | `clamp(0.25, 1, (innerWidth − 596) / (screenWidth + 140))`, auto on preset change | **Fit all** (`Shift+1`), **Fit selection** (`Shift+2`), **Fit frame** (double-click frame label). Padding 70 px per side (= the 140 in designer.io's formula). |
@@ -270,7 +270,7 @@ Problems:
 | `Cmd/Ctrl` + `D` | **New:** duplicate in place, offset +48/+48 (designer.io's duplicate offset) |
 | `Cmd/Ctrl` + `G` / `Shift+Cmd+G` | Group / ungroup (designer.io toggles with one key; split it) |
 | `Cmd/Ctrl` + `Z`; `Shift+Cmd+Z` / `Cmd+Y` | Undo / redo. History of 100 snapshots, with gesture begin/commit (keep). |
-| `F` | **New:** tool — draw a frame (shows the device picker on mouse-up) |
+| `F` | **New:** tool, draw a frame (shows the device picker on mouse-up) |
 | `R` `T` `S` | **New:** insert Row / Text / Stack at the cursor |
 | `Cmd/Ctrl` + `K` | Command palette (designer.io top bar has ⌘K) |
 | `Shift+1` / `Shift+2` / `Shift+0` | Fit all / fit selection / 100% |
@@ -395,7 +395,7 @@ Keep designer.io's accordion order (`dio:src/views/canvas/inspector-panel.tsx`) 
 | **Selection** | Name, type badge, Group Name, Page Group, breadcrumb (Frame › Section › Row › Button), **Metrics view** `all`/`px`/`rem`/`em` + **Copy metrics** (keep) |
 | **Frame** *(new, frame selected)* | Device ▾, W, H, rotate, Height mode (fixed/hug), Theme ▾, Trial ▾, Show device chrome, Clip content, Grid override, Frame set (list of siblings + "Add device") |
 | **Component** *(new, instance selected)* | Definition (link to the Components workspace), **Variant** ▾ (e.g. primary/secondary/ghost), auto-generated prop controls from the component's prop schema (enum → select, boolean → switch, string → input, date → date picker), "Reset overrides", "Detach instance" |
-| **Content** | Text, Tag (`h1–h6, p, small`), Weight (`400–700`), Icon, Icon Side, Image: Fit / Scale / Position X/Y, Connector Label, Connector Style |
+| **Content** | Text, Tag (`h1-h6, p, small`), Weight (`400-700`), Icon, Icon Side, Image: Fit / Scale / Position X/Y, Connector Label, Connector Style |
 | **Style** | Fill (token picker ↔ custom colour, as designer.io `fillMode`), Text colour, Radius, Shadow (sm/md/…), Border; each field shows the bound token name, e.g. `surface-1` |
 | **Layout** | Layout mode `free/stack/row/column/grid`, Direction, Gap, Padding T/R/B/L (linked toggle), Margin T/R/B/L, Align, Justify, Width mode `fixed/fill/hug/percent` + value, Height mode, Min/Max W/H, Grid columns/row gap/column gap, Overflow, Wrap, Parent ▾ |
 | **Responsive** | Replaces "Should resize on preset change": a breakpoint strip `base sm md lg xl` showing which have overrides; the current edit scope; "Hide on: [base] [sm] [md] [lg] [xl]"; for free nodes, constraint H/V (left/right/center/scale); "Reset to base" per field or all |
@@ -419,7 +419,7 @@ Port of `dio:src/features/themes/*`.
 - **Sub-tabs:**
   - **Theme & Tokens**: grouped editors for Colours / Typography / Spacing / Radius / Shadow / Component tokens, mapped to `--bf-theme-*`. The `validate-theme` REQUIRED set (`surface-1/2`, `text-1/2`, `border-1`, `font-family`, `button-primary-bg/color`, `button-secondary-bg/color`) is shown first, with a ✔/✖ completeness meter.
   - **Code**: read-only Monaco view of the generated CSS, plus the selector strategy `:root` vs `[data-bf-theme="…"]` and "safe to overwrite" (designer.io `cssSelectorStrategy`).
-- **Live preview panel** (right, 360–420 px, Hide/Show):
+- **Live preview panel** (right, 360-420 px, Hide/Show):
   - keep designer.io's specimen: hero/card, Typography, Buttons (primary / secondary / ghost), badge, Forms (input, alert), Surfaces;
   - Bareframe adds a **"Preview on: [current page ▾] [device ▾]"** mode that renders a real page frame with the theme being edited.
 - **Import/Export JSON** (keep).
@@ -503,7 +503,7 @@ Entry points: **Compare ▾** in the sub-tab bar, or the frame toolbar.
 | Compare | Result |
 |---|---|
 | **Devices for this page** | Shows the page's frame set in a row. Creates the missing default devices *temporarily* (dashed outline) without saving them unless you click "Keep". |
-| **Themes for this frame…** | Pick 2–6 themes (checkboxes with swatches). The canvas places **ghost frames** (same page, same device, different `themeId`) in a row to the right, each labelled with the theme name. They are read-only previews; selecting a node in one highlights it in all of them. |
+| **Themes for this frame…** | Pick 2-6 themes (checkboxes with swatches). The canvas places **ghost frames** (same page, same device, different `themeId`) in a row to the right, each labelled with the theme name. They are read-only previews; selecting a node in one highlights it in all of them. |
 | **Device × Theme matrix** | Rows are themes and columns are devices (up to 4×4), for one page. Good for checking a design system across brands. |
 | **Trials for this page** | The base frame plus each `StyleTrial` side by side. |
 
@@ -542,7 +542,7 @@ Keep designer.io's approach: zod schemas, proposals with `{id, action, args, sum
 
 | Tool | Args |
 |---|---|
-| `list_devices` / `list_themes` / `list_components` | – (components include prop schema + variants) |
+| `list_devices` / `list_themes` / `list_components` |, (components include prop schema + variants) |
 | `create_page` | `{name, route, devices?: string[], template?}` |
 | `create_frame` | `{pageId, devicePresetId \| {width,height}, x?, y?, themeId?}` |
 | `duplicate_frame_to_devices` | `{frameId, devicePresetIds[], mode: "linked"\|"copy"}` |
@@ -571,15 +571,15 @@ Risk defaults:
 
 | Area | designer.io file(s) | Verdict |
 |---|---|---|
-| Device presets list & labels | `src/store.tsx` L59–69, `src/domain/preview/preview-event.ts` | **Keep** values; **improve**: per-frame, plus breakpoint tag and landscape |
-| Rescale on preset change | `src/store.tsx` `setScreenPreset` L1281–1319 | **Replace** with reflow + overrides; keep proportional `scale` only as a per-node constraint |
+| Device presets list & labels | `src/store.tsx` L59-69, `src/domain/preview/preview-event.ts` | **Keep** values; **improve**: per-frame, plus breakpoint tag and landscape |
+| Rescale on preset change | `src/store.tsx` `setScreenPreset` L1281-1319 | **Replace** with reflow + overrides; keep proportional `scale` only as a per-node constraint |
 | Project-level `screenWidth/Height` | `src/types.ts` `Project` | **Remove**: it moves to `Frame` |
 | Canvas item model (`kind:"rect"` + `componentType`) | `src/types.ts` `CanvasItem` L81 | **Improve**: tree-first `DesignNode` with real component instances (already planned in `docs/TREE_FIRST_CANVAS_PLAN.md`) |
 | LayoutModel names (`free/stack/row/column/grid`, `fixed/fill/hug/percent`, align/justify) | `docs/TREE_FIRST_CANVAS_PLAN.md` | **Keep exactly** |
 | Layout primitive defaults (gap 16, Section 85% width, padding 16) | `src/features/canvas/layout-primitive-defaults.ts` | **Keep** |
 | Snap/guides constants & precedence | `src/editor/canvas/snap.ts`, `move-guides.ts` | **Keep** |
 | Shortcuts (Space pan, Alt-dup, marquee, undo 100) | `src/editor/canvas.tsx` | **Keep**, add zoom/fit/nudge/frame tool |
-| Zoom (0.25–2.5, scale-in-scroll) | `src/views/canvas.tsx`, `src/views/canvas/constants.ts` | **Improve**: camera transform, cursor zoom, fit-all/selection, minimap |
+| Zoom (0.25-2.5, scale-in-scroll) | `src/views/canvas.tsx`, `src/views/canvas/constants.ts` | **Improve**: camera transform, cursor zoom, fit-all/selection, minimap |
 | Auto-placement 3-per-row, gaps 56/80 | `src/store.tsx` (screen creation) | **Keep** gaps as frame snap spacing; place frame sets in rows |
 | Page duplicate (screen only, no children) | `src/store.tsx` `duplicateCanvasPage` | **Fix**: deep copy or linked frame |
 | Sync (`syncId`, Keep synced on paste) | `src/store.tsx` `updateCanvasItem`/`pasteCanvasItems`, inspector Clipboard | **Keep**; instances supersede most uses |
@@ -613,7 +613,7 @@ The prototype is a good **click-through of the product surface**: routes for Pro
 | **Theming plumbing** | `theme/ThemeContext.tsx` | It swaps **one** `<link>` and sets `data-bf-theme` on `<html>`, which makes multiple themes on screen at once impossible. For Compare mode, load each needed theme CSS once (the files are already scoped by `[data-bf-theme='x']`) and set `data-bf-theme` on each **frame root/iframe**, not on the document. |
 | **Rendering** | `Editor.tsx`, `App.css` | Components are prototype CSS classes (`.btn`, `.card`), not `@bareframe/react` (or `bf-*`) components, so the canvas isn't proving "design with real components" yet. |
 
-**Suggested next prototype iteration** (still click-through, about 1–2 days):
+**Suggested next prototype iteration** (still click-through, about 1-2 days):
 1. Canvas with camera (pan, zoom, fit) and three frames for "Home" (iPhone 15 / iPad Mini / Desktop 1440) with labels.
 2. Real flex layout in the frames, so each reflows by width.
 3. A frame toolbar with device and theme dropdowns, and Compare › Themes showing 3 ghost frames (aurora / noir / light).
@@ -648,13 +648,13 @@ The prototype is a good **click-through of the product surface**: routes for Pro
 - **New item fills:** screens `#e2e8f0`, partials `#bfdbfe`, components `#f8fafc`.
 - **Grid default:** `{show: true, columns: 4, gutter: 16, margin: 16}`.
 - **designer.config.json v1:** `framework`, `sourceRoot`, `generatedRoot: "src/generated/designer"`, `routes.strategy: "file-based"`, `codegen.language: "typescript"`, `codegen.styling: "css-modules"`.
-- **Workspace plan:** top bar 48–56 px; insertion order drop parent → selected layout parent → selected page → viewport centre; grouping modal intents Group only / Block-Section / Component.
+- **Workspace plan:** top bar 48-56 px; insertion order drop parent → selected layout parent → selected page → viewport centre; grouping modal intents Group only / Block-Section / Component.
 
 ## Appendix B: Excerpts in this folder
 
 | File | Source |
 |---|---|
-| `excerpts/screen-presets-and-rescale.ts` | `dio:src/store.tsx` L59–69, L1281–1319 |
+| `excerpts/screen-presets-and-rescale.ts` | `dio:src/store.tsx` L59-69, L1281-1319 |
 | `excerpts/preview-device-presets.ts` | `dio:src/domain/preview/preview-event.ts` |
 | `excerpts/types.ts` | `dio:src/types.ts` (full) |
 | `excerpts/snap.ts` | `dio:src/editor/canvas/snap.ts` |

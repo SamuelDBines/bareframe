@@ -397,7 +397,7 @@ export function InfiniteCanvas() {
 			</div>
 			{ui.compare && (
 				<div className="compare-bar">
-					Compare mode — sync selection on
+					Compare mode, sync selection on
 					<button type="button" className="btn btn-secondary" onClick={() => dispatch({ type: 'makeCompareReal' })}>
 						Make real frames
 					</button>

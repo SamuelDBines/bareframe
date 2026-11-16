@@ -27,7 +27,7 @@ export function createRateLimiter(config: Config) {
 		res.setHeader('X-RateLimit-Remaining', String(Math.max(0, config.rateLimitMax - bucket.count)));
 		res.setHeader('X-RateLimit-Reset', String(Math.ceil(bucket.resetAt / 1000)));
 		if (bucket.count > config.rateLimitMax) {
-			res.status(429).json({ error: 'Too many requests — try again later.' });
+			res.status(429).json({ error: 'Too many requests, try again later.' });
 			return;
 		}
 		next();

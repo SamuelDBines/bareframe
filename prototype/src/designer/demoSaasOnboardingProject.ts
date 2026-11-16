@@ -107,7 +107,7 @@ export function buildDemoSaasOnboardingProject(): DesignerProject {
 
 	return {
 		id: demoSaasOnboardingProjectId,
-		name: 'Northstar — SaaS onboarding',
+		name: 'Northstar, SaaS onboarding',
 		defaultThemeId: 'aurora' as ThemeId,
 		pages,
 		frames,

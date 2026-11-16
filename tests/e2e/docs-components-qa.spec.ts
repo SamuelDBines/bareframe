@@ -41,7 +41,7 @@ async function openComponent(page: import('@playwright/test').Page, slug: string
 	await expect(page.getByTestId('playground-preview')).toBeVisible({ timeout: 25_000 });
 }
 
-test.describe('docs component QA — playground smoke', () => {
+test.describe('docs component QA, playground smoke', () => {
 	test.beforeEach(({}, testInfo) => {
 		test.skip(testInfo.project.name !== 'chromium-desktop', 'Full component sweep runs on desktop Chromium');
 	});

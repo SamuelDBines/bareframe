@@ -217,7 +217,7 @@ const EDGES = [
 export function buildDemoB2bWorkspaceProject() {
 	return assembleDemoProject({
 		id: demoB2bWorkspaceProjectId,
-		name: 'LatticeDesk — B2B workspace & approvals',
+		name: 'LatticeDesk, B2B workspace & approvals',
 		defaultThemeId: 'future' as ThemeId,
 		productName: PRODUCT,
 		screens: [...SCREENS],

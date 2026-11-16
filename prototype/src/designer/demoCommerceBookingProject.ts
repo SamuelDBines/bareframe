@@ -57,7 +57,7 @@ const SCREEN_SPECS = [
 		name: 'Payment',
 		routePath: '/payment',
 		headline: 'Hold with card',
-		body: 'Pay at the chair or hold $15 now — free cancellation until 2 hours before.',
+		body: 'Pay at the chair or hold $15 now, free cancellation until 2 hours before.',
 		primaryCta: 'Confirm hold',
 	},
 	{
@@ -116,7 +116,7 @@ export function buildDemoCommerceBookingProject(): DesignerProject {
 
 	return {
 		id: demoCommerceBookingProjectId,
-		name: 'ReserveKit — studio booking',
+		name: 'ReserveKit, studio booking',
 		defaultThemeId: 'desert' as ThemeId,
 		pages,
 		frames,

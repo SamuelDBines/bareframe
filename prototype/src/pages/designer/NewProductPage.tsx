@@ -45,7 +45,7 @@ export function NewProductPage({ appMode }: { appMode?: boolean } = {}) {
       return;
     }
     if (config && !config.llmConfigured) {
-      setError('AI generation is taking a break right now. Your brief is safe here — try again later.');
+      setError('AI generation is taking a break right now. Your brief is safe here, try again later.');
       return;
     }
     setBusy(true);
@@ -104,7 +104,7 @@ export function NewProductPage({ appMode }: { appMode?: boolean } = {}) {
       <DsCard className="ds-form-card">
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1.25rem' }}>
           <label>
-            Idea brief — what are you building?
+            Idea brief, what are you building?
             <textarea
               required
               rows={3}
@@ -147,7 +147,7 @@ export function NewProductPage({ appMode }: { appMode?: boolean } = {}) {
           <div>
             <h3 style={{ margin: '0 0 0.35rem', fontSize: '1rem' }}>Intake questions</h3>
             <p className="ds-meta">
-              Leave blank to accept Bareframe defaults — assumptions are recorded in the package.
+              Leave blank to accept Bareframe defaults, assumptions are recorded in the package.
             </p>
           </div>
 

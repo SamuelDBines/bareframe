@@ -22,7 +22,7 @@ export async function apiFail(res: Response, fallback: string): Promise<never> {
 		code = data.error ?? data.code ?? null;
 		message = data.message ?? null;
 	} catch {
-		/* HTML error page or empty body — never shown to people */
+		/* HTML error page or empty body, never shown to people */
 	}
 	throw new ApiError(res.status, code, message, fallback);
 }

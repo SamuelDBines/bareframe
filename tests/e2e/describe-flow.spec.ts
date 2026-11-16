@@ -372,12 +372,16 @@ test.describe('generate screen designs', () => {
 		const api = await openMappedProject(page, { designDelayMs: 700 });
 		await page.getByTestId('design-all').click();
 		await expect(page.getByTestId('design-progress')).toContainText('Designing 1 of 4');
-		await expect.poll(() => api.designCalls.length, { timeout: 15_000 }).toBe(2);
+		// Wait for the second screen to start (a version-conflict retry repeats the first screen's call).
+		const screensStarted = () => new Set(api.designCalls.map((c) => c.pageId)).size;
+		await expect.poll(screensStarted, { timeout: 15_000 }).toBe(2);
+		const callsAtCancel = api.designCalls.length;
 		await page.getByTestId('design-cancel').click();
 		await expect(page.getByTestId('design-result')).toContainText('Cancelled');
 		await expect(page.getByTestId('design-result')).toContainText(/Designed [12] of 4 screens/);
 		await page.waitForTimeout(1000);
-		expect(api.designCalls.length).toBe(2);
+		expect(api.designCalls.length).toBe(callsAtCancel);
+		expect(screensStarted()).toBe(2);
 		await expect(page.getByTestId('design-all')).toBeEnabled();
 	});
 

@@ -160,6 +160,8 @@ export function tokenHasScope(scopes: string[], required: string): boolean {
 	if (required === 'recordings:upload' && scopes.includes('recordings:upload')) return true;
 	if (required === 'capture:write' && scopes.includes('capture:write')) return true;
 	if (required === 'reviews:write' && scopes.includes('projects:write')) return true;
+	if (required === 'notes:read' && (scopes.includes('notes:read') || scopes.includes('projects:read'))) return true;
+	if (required === 'notes:write' && (scopes.includes('notes:write') || scopes.includes('projects:write'))) return true;
 	return scopes.includes(required);
 }
 

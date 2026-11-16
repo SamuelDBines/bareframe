@@ -10,6 +10,7 @@ import {
 	IconConnect,
 	IconFigma,
 	IconHelp,
+	IconNotes,
 	IconMore,
 	IconPlay,
 	IconShare,
@@ -29,6 +30,9 @@ type Props = {
 	onStartTour?: () => void;
 	/** Opens the refine/regenerate dialog for an AI-mapped flow. */
 	onRefineFlow?: () => void;
+	notesOpen?: boolean;
+	onNotesOpenChange?: (open: boolean) => void;
+	showNotes?: boolean;
 };
 
 export async function copyShareLink(projectId: string): Promise<string> {
@@ -70,6 +74,9 @@ export function FlowMapToolbar({
 	readOnly,
 	onStartTour,
 	onRefineFlow,
+	notesOpen,
+	onNotesOpenChange,
+	showNotes,
 }: Props) {
 	const { state, dispatch } = useDesigner();
 	const chrome = useAppCanvasChrome();
@@ -183,6 +190,17 @@ export function FlowMapToolbar({
 							<IconSparkle size={16} />
 							<span>Refine flow</span>
 						</button>
+					) : null}
+					{showNotes && onNotesOpenChange ? (
+						<ToolbarIconButton
+							label={notesOpen ? 'Close notes' : 'Open notes'}
+							data-testid="flow-notes-toggle"
+							pressed={notesOpen}
+							className={notesOpen ? 'btn-dark' : 'btn-secondary'}
+							onClick={() => onNotesOpenChange(!notesOpen)}
+						>
+							<IconNotes />
+						</ToolbarIconButton>
 					) : null}
 					{onStartTour ? (
 						<ToolbarIconButton label="Take a tour" data-testid="flow-tour-help" onClick={onStartTour}>

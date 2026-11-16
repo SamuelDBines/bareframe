@@ -62,6 +62,9 @@ const STUDIO_TOOLS = [
 	['render_frame', 'PNG render of a frame.'],
 	['screenshot_url', 'Capture a live URL to PNG.'],
 	['review_project', 'AI UX review (Pro).'],
+	['list_notes', 'Project review notes (filter by status, screen, tag, search).'],
+	['add_note', 'Add an issue note while reviewing a site.'],
+	['update_note', 'Edit a note or mark it done.'],
 	['check_url', 'URL audit via studio credentials.'],
 ] as const;
 

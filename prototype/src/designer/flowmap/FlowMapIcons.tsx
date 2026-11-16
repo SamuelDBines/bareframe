@@ -109,6 +109,20 @@ export function IconUpgrade(props: IconProps) {
 	);
 }
 
+export function IconNotes(props: IconProps) {
+	return (
+		<Base {...props}>
+			<path
+				d="M6 5h12v14H6V5z"
+				stroke="currentColor"
+				strokeWidth="1.75"
+				strokeLinejoin="round"
+			/>
+			<path d="M8.5 9h7M8.5 12.5h5.5M8.5 16h7" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+		</Base>
+	);
+}
+
 export function IconSparkle(props: IconProps) {
 	return (
 		<Base {...props}>

@@ -1,4 +1,4 @@
-/* Published with @bareframe/react/styles.css, not imported by the bareframe.org docs app. */
+/* Published with @bareframe/react/styles.css. The bareframe.org docs app loads it scoped to component previews. */
 .bf-btn,
 .btn.bf-btn {
 	display: inline-flex;
@@ -19,6 +19,12 @@
 .bf-btn:active,
 .btn.bf-btn:active {
 	transform: translateY(var(--bf-theme-active-translate-y, 1px));
+}
+.bf-btn[data-disabled],
+.btn.bf-btn[data-disabled] {
+	opacity: 0.55;
+	cursor: not-allowed;
+	transform: none;
 }
 .bf-btn--primary,
 .btn.bf-btn--primary {
@@ -48,12 +54,16 @@
 	font-size: 0.8125rem;
 }
 
-.bf-btn--destructive {
+.bf-btn--destructive,
+.btn.bf-btn--destructive {
 	background: #dc2626;
 	color: #fff;
 	border-color: #dc2626;
 }
-.bf-btn--lg { padding: 0.7rem 1.25rem; }
+.bf-btn--lg,
+.btn.bf-btn--lg {
+	padding: 0.7rem 1.25rem;
+}
 .bf-btn__spinner {
 	width: 0.9rem;
 	height: 0.9rem;

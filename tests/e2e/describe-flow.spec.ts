@@ -41,6 +41,8 @@ type MockOptions = {
 	designAllowance?: number;
 	/** `features.ai` from /api/me; defaults to true. */
 	ai?: boolean;
+	/** Simulate an autosave landing while the first screen is being designed. */
+	saveDuringFirstDesign?: boolean;
 };
 
 const DESIGN_PRESET: Record<string, { id: string; width: number; height: number }> = {
@@ -103,6 +105,7 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 			const body = req.postDataJSON() as { baseVersion: number; device: string };
 			designCalls.push({ pageId, device: body.device });
 			if (options.designDelayMs) await new Promise((r) => setTimeout(r, options.designDelayMs));
+			if (options.saveDuringFirstDesign && designCalls.length === 1) version += 1;
 			if (designCalls.length > (options.designAllowance ?? 99)) {
 				return json(
 					{ error: 'screen_design_limit', message: "The free plan includes 3 screen designs a month, and you've used them all. Upgrade to Bareframe Pro for more." },
@@ -376,6 +379,16 @@ test.describe('generate screen designs', () => {
 		await page.waitForTimeout(1000);
 		expect(api.designCalls.length).toBe(2);
 		await expect(page.getByTestId('design-all')).toBeEnabled();
+	});
+
+	test('keeps going when an autosave lands mid-queue', async ({ page }) => {
+		const api = await openMappedProject(page, { saveDuringFirstDesign: true });
+		await page.getByTestId('design-all').click();
+		await expect(page.getByTestId('design-result')).toContainText('Designed 4 of 4 screens', { timeout: 15_000 });
+		await expect(page.getByTestId('design-result')).not.toHaveAttribute('role', 'alert');
+		// The first screen was retried once on the new version.
+		expect(api.designCalls).toHaveLength(5);
+		expect(api.designCalls[0]!.pageId).toBe(api.designCalls[1]!.pageId);
 	});
 
 	test('stops the queue at the plan limit and says why', async ({ page }) => {

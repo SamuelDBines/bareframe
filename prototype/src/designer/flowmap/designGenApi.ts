@@ -84,7 +84,17 @@ export function useDesignQueue(projectId: string | undefined) {
 				abortRef.current = controller;
 				try {
 					version ??= (await fetchProject(projectId)).version;
-					const result = await generateScreenDesign(projectId, frame.pageId, { baseVersion: version, device }, controller.signal);
+					const design = (baseVersion: number) =>
+						generateScreenDesign(projectId, frame.pageId, { baseVersion, device }, controller.signal);
+					let result: ScreenDesignResult;
+					try {
+						result = await design(version);
+					} catch (e) {
+						// An autosave (e.g. the camera moving) can land between screens; retry once on the new version.
+						if (!(e instanceof ApiError && e.status === 409) || controller.signal.aborted) throw e;
+						version = (await fetchProject(projectId)).version;
+						result = await design(version);
+					}
 					version = result.version;
 					designed += 1;
 					dispatch({ type: 'hydrateProject', project: fromProjectDocument(result.document), remoteVersion: result.version });

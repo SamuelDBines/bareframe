@@ -37,7 +37,7 @@ export function ComponentDocPage({ entry }: { entry: ComponentRegistryEntry }) {
 			</DocSection>
 
 			<DocSection id="playground" title="Playground">
-				<ComponentPlayground entry={entry} />
+				<ComponentPlayground key={entry.slug} entry={entry} />
 			</DocSection>
 
 			{examplesLoading ? (

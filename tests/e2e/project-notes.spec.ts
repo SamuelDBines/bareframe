@@ -141,14 +141,18 @@ test.describe('project notes panel', () => {
 		await expect(page.getByTestId('project-note-item')).toHaveCount(0);
 
 		await page.getByTestId('project-notes-filter-open').click();
-		const notesPanel = page.getByTestId('project-notes-panel');
-		const notesList = notesPanel.getByTestId('project-notes-list');
-		await notesList.evaluate((el) => {
-			el.scrollTop = el.scrollHeight;
-		});
-		const markDone = notesPanel.getByRole('button', { name: 'Mark done' }).first();
+		await expect(page.getByTestId('project-note-item')).toHaveCount(2);
+		const firstNote = page.getByTestId('project-note-item').first();
+		const markDone = firstNote.getByTestId('project-note-toggle-done');
+		const patchDone = page.waitForResponse(
+			(res) =>
+				res.request().method() === 'PATCH' &&
+				res.url().includes(`/api/projects/${PROJECT_ID}/notes/`) &&
+				res.status() === 200,
+		);
 		await markDone.scrollIntoViewIfNeeded();
-		await markDone.click();
+		await markDone.click({ force: true });
+		await patchDone;
 		await page.getByTestId('project-notes-filter-done').click();
 		await expect(page.getByTestId('project-note-item')).toHaveCount(1);
 	});

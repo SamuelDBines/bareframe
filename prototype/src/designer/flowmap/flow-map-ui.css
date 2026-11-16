@@ -47,6 +47,12 @@
 	align-items: flex-start;
 	justify-content: space-between;
 	gap: 0.5rem;
+	flex-shrink: 0;
+}
+
+.flow-map-notes-panel__compose,
+.flow-map-notes-panel__filters {
+	flex-shrink: 0;
 }
 
 .flow-map-notes-panel__head strong {

@@ -2,6 +2,8 @@ import { expect, test, type Page, type Route } from './fixtures';
 import { createEmptyProjectDocument } from '../../packages/designer-core/dist/index.js';
 
 const PROJECT_ID = 'p-notes-e2e';
+let idSeq = 0;
+const newId = (prefix: string) => `${prefix}-e2e-${++idSeq}`;
 
 type StoredNote = {
 	id: string;

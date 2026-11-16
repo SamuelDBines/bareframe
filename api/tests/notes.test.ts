@@ -14,6 +14,7 @@ describe('project notes API', () => {
 	let baseUrl = '';
 	let server: Server;
 	let sessionCookie = '';
+	let sharedProjectId = '';
 
 	beforeAll(async () => {
 		process.env.NODE_ENV = 'test';
@@ -54,6 +55,7 @@ describe('project notes API', () => {
 		});
 		expect(created.status).toBe(201);
 		const project = (await created.json()) as { id: string; document: { project: { frames: { id: string }[] } } };
+		sharedProjectId = project.id;
 		const frameId = project.document.project.frames[0]?.id ?? 'frame-1';
 
 		const postRes = await fetch(`${baseUrl}/api/projects/${project.id}/notes`, {
@@ -126,15 +128,10 @@ describe('project notes API', () => {
 	});
 
 	it('capture endpoint stores where, selector, and screenshot asset', async () => {
-		const created = await fetch(`${baseUrl}/api/projects`, {
-			method: 'POST',
-			headers: { Cookie: sessionCookie, 'Content-Type': 'application/json' },
-			body: JSON.stringify({ name: 'Capture notes' }),
-		});
-		const project = (await created.json()) as { id: string };
+		expect(sharedProjectId).toBeTruthy();
 		const png =
 			'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
-		const cap = await fetch(`${baseUrl}/api/projects/${project.id}/notes/capture`, {
+		const cap = await fetch(`${baseUrl}/api/projects/${sharedProjectId}/notes/capture`, {
 			method: 'POST',
 			headers: { Cookie: sessionCookie, 'Content-Type': 'application/json' },
 			body: JSON.stringify({

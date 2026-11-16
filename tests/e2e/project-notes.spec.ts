@@ -37,7 +37,7 @@ function notePayload(n: StoredNote) {
 async function mockNotesApi(page: Page) {
 	let noteSeq = 0;
 	const notes: StoredNote[] = [];
-	let document = createEmptyProjectDocument(PROJECT_ID, 'Notes demo', 'light');
+	let document = createEmptyProjectDocument(PROJECT_ID, 'Notes demo', 'light', { newId });
 	const frame = {
 		id: 'frame-home',
 		name: 'Home',

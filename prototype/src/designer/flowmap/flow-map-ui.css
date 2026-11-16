@@ -246,14 +246,17 @@
 @media (max-width: 720px) {
 	.flow-map-stage--with-notes .flow-map-viewport {
 		right: 0;
-		bottom: min(52vh, 420px);
+		bottom: min(45%, 360px);
 	}
 
 	.flow-map-notes-panel {
 		top: auto;
+		bottom: 0;
 		left: 0;
+		right: 0;
 		width: 100%;
-		max-height: min(52vh, 420px);
+		max-height: min(45%, 360px);
+		z-index: 12;
 		border-left: none;
 		border-top: 1px solid var(--bx-border, #e5e7eb);
 		box-shadow: 0 -8px 24px rgb(28 28 60 / 8%);

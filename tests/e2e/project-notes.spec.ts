@@ -130,7 +130,10 @@ test.describe('project notes panel', () => {
 		await expect(page.getByTestId('project-note-item')).toHaveCount(0);
 
 		await page.getByTestId('project-notes-filter-open').click();
-		await page.getByTestId('project-note-toggle-done').first().click();
+		const notesPanel = page.getByTestId('project-notes-panel');
+		const markDone = notesPanel.getByTestId('project-note-toggle-done').first();
+		await markDone.scrollIntoViewIfNeeded();
+		await markDone.click();
 		await page.getByTestId('project-notes-filter-done').click();
 		await expect(page.getByTestId('project-note-item')).toHaveCount(1);
 	});

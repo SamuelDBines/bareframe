@@ -31,8 +31,7 @@ test.describe('component playground', () => {
 			});
 
 		// Background and opacity animate, so poll until they settle.
-		const primary = await look();
-		expect(primary.bg).not.toBe('rgba(0, 0, 0, 0)');
+		await expect.poll(async () => (await look()).bg).not.toBe('rgba(0, 0, 0, 0)');
 		await page.getByLabel('Variant').selectOption('ghost');
 		await expect.poll(async () => (await look()).bg).toBe('rgba(0, 0, 0, 0)');
 

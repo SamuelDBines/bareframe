@@ -166,6 +166,7 @@ var CommandError = class extends Error {
     this.code = code;
     this.name = "CommandError";
   }
+  code;
 };
 function parseProjectCommand(input) {
   return projectCommandSchema.parse(input);
@@ -611,6 +612,14 @@ var FLOW_PLATFORM_PRESET = {
   desktop: "desktop-1440",
   all: "mobile"
 };
+var FLOW_DEVICES = ["mobile", "tablet", "desktop"];
+function platformForDevices(devices) {
+  const unique = FLOW_DEVICES.filter((d) => devices.includes(d));
+  return unique.length === 1 ? unique[0] : "all";
+}
+function devicesForPlatform(platform) {
+  return platform === "all" ? [...FLOW_DEVICES] : [platform];
+}
 var SCREEN_STATES = ["default", "empty", "loading", "error", "success"];
 var FLOW_LIMITS = {
   maxScreens: 24,
@@ -641,6 +650,7 @@ var FlowSpecError = class extends Error {
     this.issues = issues;
     this.name = "FlowSpecError";
   }
+  issues;
 };
 var STATE_ALIASES = {
   default: "default",
@@ -826,7 +836,8 @@ function rootNode(id) {
 function applyFlowSpec(document, spec, options) {
   const doc = JSON.parse(JSON.stringify(document));
   const project = doc.project;
-  const presetId = FLOW_PLATFORM_PRESET[options.platform];
+  const devices = options.platforms?.length ? FLOW_DEVICES.filter((d) => options.platforms.includes(d)) : devicesForPlatform(options.platform);
+  const presetId = FLOW_PLATFORM_PRESET[devices[0] ?? options.platform];
   const preset = getDevicePreset(presetId);
   const dim = deviceDimensions(preset);
   const existingByKey = new Map(project.pages.map((p) => [screenKeyForPage(p), p]));
@@ -896,6 +907,7 @@ function applyFlowSpec(document, spec, options) {
   project.productBrief = {
     description: options.description,
     platform: options.platform,
+    platforms: devices,
     updatedAt: (options.now?.() ?? /* @__PURE__ */ new Date()).toISOString()
   };
   return { document: doc, screenFrameIds };
@@ -933,6 +945,7 @@ var DesignSpecError = class extends Error {
     this.issues = issues;
     this.name = "DesignSpecError";
   }
+  issues;
 };
 function isRecord2(v) {
   return typeof v === "object" && v !== null && !Array.isArray(v);
@@ -1163,6 +1176,7 @@ export {
   FLOW_CARD_GAP_Y,
   FLOW_CARD_HEIGHT,
   FLOW_CARD_WIDTH,
+  FLOW_DEVICES,
   FLOW_LABEL_HEIGHT,
   FLOW_LIMITS,
   FLOW_ORIGIN_X,
@@ -1184,6 +1198,7 @@ export {
   defaultNewId,
   designToNodes,
   deviceDimensions,
+  devicesForPlatform,
   flowSpecFromDocument,
   getDevicePreset,
   isEmptyFlow,
@@ -1191,6 +1206,7 @@ export {
   layoutFramesInFlowRow,
   listPageButtons,
   parseProjectCommand,
+  platformForDevices,
   projectCommandSchema,
   repairDesignSpec,
   repairFlowSpec,

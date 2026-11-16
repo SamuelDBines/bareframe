@@ -2,9 +2,13 @@ import { useEffect } from 'react';
 
 const BODY_CLASS = 'designer-editor-active';
 
-/** Lock the editor to the viewport: no page scroll, no horizontal document overflow. */
-export function useDesignerEditorChrome() {
+/**
+ * Lock the editor to the viewport: no page scroll, no horizontal document overflow. Off for a
+ * workspace embedded in a scrolling page (examples).
+ */
+export function useDesignerEditorChrome(enabled = true) {
 	useEffect(() => {
+		if (!enabled) return;
 		document.body.classList.add(BODY_CLASS);
 		const prevHtmlOverflow = document.documentElement.style.overflowX;
 		const prevBodyOverflow = document.body.style.overflowX;
@@ -25,5 +29,5 @@ export function useDesignerEditorChrome() {
 			document.body.style.overflowX = prevBodyOverflow;
 			window.removeEventListener('resize', resetScroll);
 		};
-	}, []);
+	}, [enabled]);
 }

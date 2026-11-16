@@ -131,13 +131,15 @@ export function createApp(deps: AppDeps): Hono {
 	});
 
 	app.get('/api/me', async (c) => {
+		// Lets the app hide AI-only features up front instead of failing when they're used.
+		const features = { ai: config.llmAdapter !== 'disabled' };
 		const token = readSignedCookie(c, SESSION_COOKIE, config.sessionSecret);
-		if (!token) return c.json({ user: null });
+		if (!token) return c.json({ user: null, features });
 
 		const user = await findUserBySessionToken(pool, hashToken(token));
-		if (!user) return c.json({ user: null });
+		if (!user) return c.json({ user: null, features });
 
-		return c.json({ user: toPublicUser(user) });
+		return c.json({ user: toPublicUser(user), features });
 	});
 
 	app.post('/api/auth/logout', async (c) => {

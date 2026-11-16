@@ -1,23 +1,17 @@
 import { useId, useState, type FormEvent } from 'react';
-import { FLOW_LIMITS, type FlowPlatform } from '@bareframe/designer-core';
-
-const PLATFORMS: { value: FlowPlatform; label: string }[] = [
-	{ value: 'mobile', label: 'Mobile' },
-	{ value: 'tablet', label: 'Tablet' },
-	{ value: 'desktop', label: 'Desktop' },
-	{ value: 'all', label: 'All' },
-];
+import { FLOW_LIMITS, type FlowDevice } from '@bareframe/designer-core';
+import { PlatformPicker } from './PlatformPicker';
 
 const MIN_LENGTH = 10;
 
 type Props = {
 	initialDescription?: string;
-	initialPlatform?: FlowPlatform;
+	initialPlatforms?: FlowDevice[];
 	busy: boolean;
 	error: string | null;
 	submitLabel: string;
 	busyLabel: string;
-	onSubmit: (value: { description: string; platform: FlowPlatform }) => void;
+	onSubmit: (value: { description: string; platforms: FlowDevice[] }) => void;
 	onCancel?: () => void;
 	autoFocus?: boolean;
 };
@@ -25,7 +19,7 @@ type Props = {
 /** Product description and platform; shared by the empty-canvas panel and the refine dialog. */
 export function DescribeProductForm({
 	initialDescription = '',
-	initialPlatform = 'mobile',
+	initialPlatforms = ['mobile'],
 	busy,
 	error,
 	submitLabel,
@@ -36,23 +30,26 @@ export function DescribeProductForm({
 }: Props) {
 	const id = useId();
 	const [description, setDescription] = useState(initialDescription);
-	const [platform, setPlatform] = useState<FlowPlatform>(initialPlatform);
+	const [platforms, setPlatforms] = useState<FlowDevice[]>(initialPlatforms);
 	const [touched, setTouched] = useState(false);
 	const trimmed = description.trim();
 	const tooShort = trimmed.length < MIN_LENGTH;
 	const showLengthError = touched && tooShort;
+	const [submitted, setSubmitted] = useState(false);
+	const noPlatform = platforms.length === 0;
 
 	function submit(e: FormEvent) {
 		e.preventDefault();
 		setTouched(true);
-		if (tooShort || busy) return;
-		onSubmit({ description: trimmed, platform });
+		setSubmitted(true);
+		if (tooShort || noPlatform || busy) return;
+		onSubmit({ description: trimmed, platforms });
 	}
 
 	return (
 		<form className="describe-form" onSubmit={submit} noValidate aria-busy={busy}>
 			<label className="field" htmlFor={`${id}-desc`}>
-				<span>Describe your product</span>
+				<span>What are you building?</span>
 			</label>
 			<p className="bx-hint" id={`${id}-hint`}>
 				What it is, who it’s for, and the main things people do with it.
@@ -77,24 +74,7 @@ export function DescribeProductForm({
 					Add a little more detail (at least {MIN_LENGTH} characters).
 				</p>
 			) : null}
-			<fieldset className="describe-form__platforms" disabled={busy}>
-				<legend>Platform</legend>
-				<div className="describe-seg" data-testid="describe-platform">
-					{PLATFORMS.map((p) => (
-						<label key={p.value} className={platform === p.value ? 'is-active' : undefined}>
-							<input
-								className="bx-visually-hidden"
-								type="radio"
-								name={`${id}-platform`}
-								value={p.value}
-								checked={platform === p.value}
-								onChange={() => setPlatform(p.value)}
-							/>
-							<span>{p.label}</span>
-						</label>
-					))}
-				</div>
-			</fieldset>
+			<PlatformPicker value={platforms} onChange={setPlatforms} disabled={busy} showError={submitted && noPlatform} />
 			{error ? (
 				<div className="bx-notice bx-notice--warn" role="alert">
 					<span className="bx-notice__icon" aria-hidden>

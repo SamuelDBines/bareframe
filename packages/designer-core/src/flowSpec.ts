@@ -19,6 +19,19 @@ export const FLOW_PLATFORM_PRESET: Record<FlowPlatform, string> = {
 	all: 'mobile',
 };
 
+/** Devices someone can pick for their product; more than one is stored as platform `all`. */
+export const FLOW_DEVICES = ['mobile', 'tablet', 'desktop'] as const;
+export type FlowDevice = (typeof FLOW_DEVICES)[number];
+
+export function platformForDevices(devices: readonly FlowDevice[]): FlowPlatform {
+	const unique = FLOW_DEVICES.filter((d) => devices.includes(d));
+	return unique.length === 1 ? unique[0]! : 'all';
+}
+
+export function devicesForPlatform(platform: FlowPlatform): FlowDevice[] {
+	return platform === 'all' ? [...FLOW_DEVICES] : [platform];
+}
+
 export const SCREEN_STATES = ['default', 'empty', 'loading', 'error', 'success'] as const;
 export type ScreenState = (typeof SCREEN_STATES)[number];
 
@@ -287,6 +300,8 @@ function rootNode(id: string): DesignNode {
 
 export type ApplyFlowSpecOptions = {
 	platform: FlowPlatform;
+	/** The exact devices chosen; defaults to every device the platform covers. */
+	platforms?: FlowDevice[];
 	description: string;
 	newId: (prefix: string) => string;
 	now?: () => Date;
@@ -304,7 +319,8 @@ export function applyFlowSpec(
 ): { document: ProjectDocument; screenFrameIds: Record<string, string> } {
 	const doc = JSON.parse(JSON.stringify(document)) as ProjectDocument;
 	const project = doc.project;
-	const presetId = FLOW_PLATFORM_PRESET[options.platform];
+	const devices = options.platforms?.length ? FLOW_DEVICES.filter((d) => options.platforms!.includes(d)) : devicesForPlatform(options.platform);
+	const presetId = FLOW_PLATFORM_PRESET[devices[0] ?? options.platform];
 	const preset = getDevicePreset(presetId)!;
 	const dim = deviceDimensions(preset);
 
@@ -383,6 +399,7 @@ export function applyFlowSpec(
 	project.productBrief = {
 		description: options.description,
 		platform: options.platform,
+		platforms: devices,
 		updatedAt: (options.now?.() ?? new Date()).toISOString(),
 	};
 	return { document: doc, screenFrameIds };

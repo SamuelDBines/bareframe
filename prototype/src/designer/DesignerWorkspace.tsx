@@ -7,7 +7,7 @@ import { LibrarySidebar } from './components/LibrarySidebar';
 import { DesignerCloudSync } from './DesignerCloudSync';
 import { DesignerProvider, useDesigner } from './store';
 import { useDesignerEditorChrome } from './useDesignerEditorChrome';
-import { AppCanvasChromeProvider, type AppCanvasChromeValue } from './AppCanvasChrome';
+import { AppCanvasChromeProvider, useAppCanvasChrome, type AppCanvasChromeValue } from './AppCanvasChrome';
 import { DemoReviewCameraFit } from './DemoReviewCameraFit';
 import { ReviewProvider } from '../app/ReviewContext';
 import type { ReactNode } from 'react';
@@ -29,7 +29,8 @@ function WorkspaceInner({
 }) {
 	const { state, dispatch } = useDesigner();
 	const { mobilePanel } = state.ui;
-	useDesignerEditorChrome();
+	const { embedded } = useAppCanvasChrome();
+	useDesignerEditorChrome(!embedded);
 	const useFlowMap = flowMap ?? compactChrome;
 
 	return (
@@ -82,6 +83,8 @@ type DesignerWorkspaceProps = {
 	prototypeStartFrameId?: string | null;
 	/** Shared playable link: skip flow map chrome and show the player only. */
 	prototypeOnly?: boolean;
+	/** Shown inside a scrolling page (examples), so plain scroll scrolls the page. */
+	embedded?: boolean;
 };
 
 export function DesignerWorkspace({
@@ -96,10 +99,12 @@ export function DesignerWorkspace({
 	openPrototypeOnMount,
 	prototypeStartFrameId,
 	prototypeOnly,
+	embedded,
 }: DesignerWorkspaceProps) {
 	const chrome: AppCanvasChromeValue = {
 		...appChrome,
 		projectId: appChrome?.projectId ?? projectId,
+		embedded: appChrome?.embedded ?? embedded,
 	};
 
 	const inner = (

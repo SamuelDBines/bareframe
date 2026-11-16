@@ -94,6 +94,19 @@ describe('describe → flow generation', () => {
 		expect(plan.usage.flowGenerationsThisMonth).toBe(1);
 	});
 
+	it('keeps the exact devices chosen', async () => {
+		const project = await newProject();
+		const res = await generate(project.id, {
+			baseVersion: project.version,
+			description: DESCRIPTION,
+			platforms: ['desktop', 'mobile'],
+		});
+		expect(res.status).toBe(200);
+		const { document } = (await res.json()) as { document: ProjectDocument };
+		expect(document.project.productBrief).toMatchObject({ platform: 'all', platforms: ['mobile', 'desktop'] });
+		expect(document.project.frames.every((f) => f.devicePresetId === 'mobile')).toBe(true);
+	});
+
 	it('limits the free plan to one flow generation a month', async () => {
 		const project = await newProject();
 		const first = await generate(project.id, { baseVersion: project.version, description: DESCRIPTION });

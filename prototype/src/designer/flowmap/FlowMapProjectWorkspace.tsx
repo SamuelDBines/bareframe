@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppCanvasChrome } from '../AppCanvasChrome';
+import { useAiAvailable } from '../../app/useAiAvailable';
 import { useDesigner } from '../store';
 import type { Frame } from '../types';
 import { FlowMapCanvas } from './FlowMapCanvas';
@@ -38,10 +39,12 @@ export function FlowMapProjectWorkspace({
 	const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
 	const [pendingDelete, setPendingDelete] = useState<{ frame: Frame; connectors: number } | null>(null);
 	const [refineOpen, setRefineOpen] = useState(false);
+	const [startedByHand, setStartedByHand] = useState(false);
 	const [flowToast, setFlowToast] = useState<string | null>(null);
 	const [designDevice, setDesignDevice] = useState<DesignDevice>(() => {
-		const platform = state.project.productBrief?.platform;
-		return platform === 'tablet' ? 'tablet' : platform === 'desktop' ? 'desktop' : 'phone';
+		const brief = state.project.productBrief;
+		const first = brief?.platforms?.[0] ?? brief?.platform;
+		return first === 'tablet' ? 'tablet' : first === 'desktop' ? 'desktop' : 'phone';
 	});
 	const designs = useDesignQueue(chrome.projectId);
 
@@ -50,6 +53,9 @@ export function FlowMapProjectWorkspace({
 		[state.project.frames],
 	);
 	const canGenerate = !readOnly && Boolean(chrome.projectId);
+	// AI-only actions (refine, screen designs) are hidden when this workspace has no AI.
+	const aiAvailable = useAiAvailable();
+	const canUseAi = canGenerate && aiAvailable;
 	const showLinkPanel = mode === 'edit' && !connectMode && !readOnly && Boolean(state.ui.selectedFrameId);
 	// Empty project: no screens yet, or only the untouched starter screen.
 	const flowIsEmpty = useMemo(() => {
@@ -58,7 +64,7 @@ export function FlowMapProjectWorkspace({
 		if (frames.length > 1 || state.project.connectors.length > 0) return false;
 		return state.project.pages.every((p) => (p.nodes[p.rootNodeId]?.children.length ?? 0) === 0) && !state.project.productBrief;
 	}, [state.project]);
-	const showDescribe = canGenerate && flowIsEmpty;
+	const showDescribe = canGenerate && flowIsEmpty && !startedByHand;
 	const tourAutoEligible = !readOnly && screenCount <= 1 && !showDescribe;
 
 	useEffect(() => {
@@ -127,9 +133,9 @@ export function FlowMapProjectWorkspace({
 				}}
 				readOnly={readOnly}
 				onStartTour={() => setTourOpen(true)}
-				onRefineFlow={canGenerate && !flowIsEmpty ? () => setRefineOpen(true) : undefined}
+				onRefineFlow={canUseAi && !flowIsEmpty ? () => setRefineOpen(true) : undefined}
 			/>
-			{canGenerate && !flowIsEmpty ? (
+			{canUseAi && !flowIsEmpty ? (
 				<DesignBar
 					device={designDevice}
 					onDeviceChange={setDesignDevice}
@@ -145,7 +151,7 @@ export function FlowMapProjectWorkspace({
 				<FlowMapCanvas
 					readOnly={readOnly}
 					hideEmptyState={showDescribe}
-					onGenerateDesign={canGenerate && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
+					onGenerateDesign={canUseAi && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
 					designingFrameId={designs.queue.currentFrameId}
 					designBusy={designs.queue.running}
 					connectMode={mode === 'edit' && connectMode && !readOnly}
@@ -174,7 +180,31 @@ export function FlowMapProjectWorkspace({
 					}}
 				/>
 				{showDescribe && chrome.projectId ? (
-					<DescribeProductPanel projectId={chrome.projectId} onGenerated={setFlowToast} />
+					<DescribeProductPanel
+						projectId={chrome.projectId}
+						aiAvailable={aiAvailable}
+						onGenerated={setFlowToast}
+						onAddScreen={() => {
+							// Use the untouched starter screen if there is one; otherwise create the first screen.
+							setStartedByHand(true);
+							setMode('edit');
+							const starter = state.project.frames.find(
+								(f) => !f.ghost && state.project.pages.some((p) => p.id === f.pageId),
+							);
+							if (starter) {
+								dispatch({ type: 'selectFrame', frameId: starter.id });
+								return;
+							}
+							dispatch({
+								type: 'addScreen',
+								frameId: `frame-${Date.now().toString(36)}`,
+								name: 'First screen',
+								heading: 'First screen',
+								x: 96,
+								y: 88,
+							});
+						}}
+					/>
 				) : null}
 				{flowToast ? (
 					<p className="flow-gen-toast" role="status" data-testid="flow-gen-toast">
@@ -192,7 +222,7 @@ export function FlowMapProjectWorkspace({
 				readOnly={readOnly}
 				onRename={promptRename}
 				onRequestDelete={(frame, connectorCount) => setPendingDelete({ frame, connectors: connectorCount })}
-				onGenerateDesign={canGenerate && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
+				onGenerateDesign={canUseAi && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
 				designBusy={designs.queue.running}
 				onAddScreen={() => {
 					setMode('edit');

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { THEME_IDS, THEME_LABELS, type ThemeId } from '../../theme/themes';
 import { generateComponentSnippet } from '../../components/library/codegen';
 import type { ComponentRegistryEntry, PreviewInteractionState } from '../../components/library/types';
@@ -15,17 +15,31 @@ type Props = {
 	entry: ComponentRegistryEntry;
 };
 
-function previewWrapperClass(state: PreviewInteractionState): string {
+function previewWrapperClass(state: PreviewInteractionState, simulated: boolean): string {
 	return [
 		'bf-docs-preview',
 		state === 'hover' && 'bf-preview-hover',
 		state === 'focus' && 'bf-preview-focus',
 		state === 'disabled' && 'bf-preview-disabled',
 		state === 'loading' && 'bf-preview-loading',
+		simulated && 'bf-preview-simulated',
 	]
 		.filter(Boolean)
 		.join(' ');
 }
+
+function supportsProp(entry: ComponentRegistryEntry, prop: string): boolean {
+	return prop in entry.defaultProps || entry.controls.some((c) => c.prop === prop);
+}
+
+/** Disabled and loading set the component's own prop when it has one; otherwise the frame simulates them. */
+function interactionProps(entry: ComponentRegistryEntry, state: PreviewInteractionState): Record<string, unknown> | null {
+	if ((state === 'disabled' || state === 'loading') && supportsProp(entry, state)) return { [state]: true };
+	return null;
+}
+
+const INTERACTIVE_SELECTOR =
+	'button, a[href], input, select, textarea, [role="button"], [role="tab"], [role="switch"], [role="checkbox"], [role="radio"], [role="slider"], [role="combobox"], [tabindex]:not([tabindex="-1"])';
 
 function mergeProps(
 	entry: ComponentRegistryEntry,
@@ -48,7 +62,11 @@ export function ComponentPlayground({ entry }: Props) {
 	const effectiveTheme: ThemeId =
 		colorMode === 'theme' ? previewTheme : colorMode === 'dark' ? 'dark' : 'light';
 
-	const liveProps = useMemo(() => mergeProps(entry, props), [entry, props]);
+	const simulated = (interaction === 'disabled' || interaction === 'loading') && !interactionProps(entry, interaction);
+	const liveProps = useMemo(
+		() => ({ ...mergeProps(entry, props), ...interactionProps(entry, interaction) }),
+		[entry, props, interaction],
+	);
 	const snippet = useMemo(() => generateComponentSnippet(entry, liveProps), [entry, liveProps]);
 
 	const setProp = useCallback((key: string, value: unknown) => {
@@ -170,6 +188,17 @@ export function ComponentPlayground({ entry }: Props) {
 		[entry, setProp],
 	);
 
+	// Hover and focus can't be forced from script, so mark the first interactive element for the
+	// preview styles to draw that state on.
+	const contentRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		if (interaction !== 'hover' && interaction !== 'focus') return;
+		const root = contentRef.current;
+		const target = root?.querySelector<HTMLElement>(INTERACTIVE_SELECTOR) ?? (root?.firstElementChild as HTMLElement | null);
+		target?.setAttribute('data-bf-preview-state', interaction);
+		return () => target?.removeAttribute('data-bf-preview-state');
+	}, [interaction, previewProps]);
+
 	const activeVariant = typeof liveProps.variant === 'string' ? liveProps.variant : entry.variants[0];
 	const previewNode = (
 		<div className="playground-frame" data-bf-theme={effectiveTheme} data-viewport={viewport}>
@@ -215,12 +244,24 @@ export function ComponentPlayground({ entry }: Props) {
 			</div>
 			<div className="playground-frame__stage" data-testid="playground-stage">
 				<div
-					className={`playground-frame__canvas ${previewWrapperClass(interaction)}`}
+					className={`playground-frame__canvas ${previewWrapperClass(interaction, simulated)}`}
 					data-testid="playground-preview"
 				>
 					<PlaygroundPortalProvider portalRoot={portalRoot} floatingPortalRoot={floatingPortalRoot}>
 						<PlaygroundOverlayLayer onPortalRootChange={setPortalRoot} />
-						<div className="playground-preview-content">{entry.render(previewProps)}</div>
+						{interaction === 'dismiss' ? (
+							<p className="playground-dismissed" data-testid="playground-dismissed">
+								Dismissed. Choose another preview state to show it again.
+							</p>
+						) : (
+							<div
+								ref={contentRef}
+								className="playground-preview-content"
+								aria-busy={interaction === 'loading' || undefined}
+							>
+								{entry.render(previewProps)}
+							</div>
+						)}
 						<PlaygroundFloatingPortalLayer onPortalRootChange={setFloatingPortalRoot} />
 					</PlaygroundPortalProvider>
 				</div>

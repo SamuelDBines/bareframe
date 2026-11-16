@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
-import { describe, expect, it, vi } from 'vitest';
 import { Button } from './Button';
 
 describe('Button', () => {
@@ -27,6 +26,20 @@ describe('Button', () => {
 	it('is disabled when loading', () => {
 		render(<Button loading>Saving</Button>);
 		expect(screen.getByRole('button')).toBeDisabled();
+	});
+
+	it('accepts the native disabled prop as an alias for isDisabled', async () => {
+		const user = userEvent.setup();
+		const onPress = vi.fn();
+		render(
+			<Button disabled onPress={onPress}>
+				Save
+			</Button>,
+		);
+		const button = screen.getByRole('button');
+		expect(button).toBeDisabled();
+		await user.click(button);
+		expect(onPress).not.toHaveBeenCalled();
 	});
 
 	it('has no axe violations', async () => {

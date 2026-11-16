@@ -35,7 +35,7 @@ function renderSteps(steps) {
     .map(
       (s, i) =>
         `<div><label><input type="checkbox" data-i="${i}" checked /> ${i + 1}. ${s.url}${
-          s.click?.name ? ` — ${s.click.name}` : ''
+          s.click?.name ? `, ${s.click.name}` : ''
         }</label></div>`,
     )
     .join('');

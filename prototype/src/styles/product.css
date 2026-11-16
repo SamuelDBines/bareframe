@@ -433,7 +433,7 @@ a {
 	font-size: 0.75rem;
 }
 
-/* Severity chips — used on the map, in the side panel and on marketing. */
+/* Severity chips, used on the map, in the side panel and on marketing. */
 .bx-sev {
 	display: inline-flex;
 	align-items: center;
@@ -537,7 +537,7 @@ a {
 	margin: 0;
 }
 
-/* Calm inline notice — replaces raw server errors everywhere. */
+/* Calm inline notice, replaces raw server errors everywhere. */
 .bx-notice {
 	display: flex;
 	gap: 0.75rem;

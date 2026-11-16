@@ -989,6 +989,156 @@
 	font-size: 0.7rem;
 }
 
+/* Review and share loop on the same 3.2s beat as the import art. */
+.step-art--review .sa-node,
+.step-art--review .sa-line {
+	animation: sa-draw-in 3.2s var(--bx-ease) infinite both;
+}
+
+.step-art--review .sa-line {
+	transform-origin: left center;
+	animation-name: sa-line-in;
+}
+
+.step-art--review > :nth-child(2) {
+	animation-delay: 0.15s;
+}
+
+.step-art--review > :nth-child(3) {
+	animation-delay: 0.3s;
+}
+
+.step-art--review > :nth-child(4) {
+	animation-delay: 0.45s;
+}
+
+.step-art--review > :nth-child(5) {
+	animation-delay: 0.6s;
+}
+
+.step-art--review .sa-node--flag b {
+	animation:
+		sa-flag-in 3.2s var(--bx-ease) infinite both,
+		bx-pulse 2s infinite;
+}
+
+@keyframes sa-draw-in {
+	0%,
+	8% {
+		transform: translateY(12px);
+		opacity: 0;
+	}
+	24%,
+	88% {
+		transform: none;
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes sa-line-in {
+	0%,
+	12% {
+		transform: scaleX(0);
+	}
+	28%,
+	88% {
+		transform: scaleX(1);
+		opacity: 1;
+	}
+	100% {
+		transform: scaleX(1);
+		opacity: 0;
+	}
+}
+
+@keyframes sa-flag-in {
+	0%,
+	34% {
+		transform: scale(0);
+	}
+	44% {
+		transform: scale(1.2);
+	}
+	50%,
+	88% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+.step-art--share .sa-phone {
+	animation: sa-phone-in 3.2s var(--bx-ease) infinite both;
+}
+
+.step-art--share .sa-hotspot {
+	animation: sa-tap 3.2s var(--bx-ease) infinite both;
+}
+
+.step-art--share .sa-link {
+	animation: sa-link-in 3.2s var(--bx-ease) infinite both;
+}
+
+.step-art--share .sa-link b {
+	animation: sa-flag-in 3.2s var(--bx-ease) infinite both;
+	animation-delay: 0.5s;
+}
+
+@keyframes sa-phone-in {
+	0%,
+	8% {
+		transform: translateY(40px);
+		opacity: 0;
+	}
+	24%,
+	88% {
+		transform: none;
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes sa-tap {
+	0%,
+	30% {
+		transform: none;
+		background: var(--bx-accent-soft);
+	}
+	36% {
+		transform: scale(0.92);
+		background: var(--bx-accent);
+	}
+	44%,
+	100% {
+		transform: none;
+		background: var(--bx-accent-soft);
+	}
+}
+
+@keyframes sa-link-in {
+	0%,
+	40% {
+		transform: translate(-50%, 12px);
+		opacity: 0;
+	}
+	52%,
+	88% {
+		transform: translate(-50%, 0);
+		opacity: 1;
+	}
+	100% {
+		transform: translate(-50%, 0);
+		opacity: 0;
+	}
+}
+
 /* ---------- Catch list ---------- */
 
 .bx-section--tint {
@@ -1513,9 +1663,24 @@
 	gap: 2rem;
 }
 
+/* Scrolled to the end, the stage sits 1rem under the site header and 1rem above the window edge. */
+.bx-page.demo-flow-example {
+	padding-bottom: 1rem;
+}
+
+.demo-head__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	flex-shrink: 0;
+}
+
+/* Fills the window once the heading scrolls away, so the whole map is in view. */
 .demo-flow-example__stage {
-	height: min(760px, calc(100vh - var(--bx-header-h, 64px) - 11rem));
+	position: relative;
+	height: calc(100dvh - var(--bx-header-h, 64px) - 2rem);
 	min-height: 480px;
+	max-height: 900px;
 	margin-top: 1.5rem;
 	border: 1px solid color-mix(in srgb, var(--bx-border, #d8d3ef) 80%, transparent);
 	border-radius: var(--bx-radius-lg, 16px);
@@ -1523,8 +1688,27 @@
 	background: var(--bx-surface-2, #f6f4ff);
 }
 
-.demo-flow-example__stage .designer-workspace-v2 {
+.demo-flow-example__stage .designer-workspace-v2,
+.demo-flow-example__stage .app-project-layout,
+.demo-flow-example__stage .app-share-layout {
 	height: 100%;
+	min-height: 0;
+}
+
+.demo-flow-example__stage--auto {
+	height: auto;
+	min-height: 0;
+	max-height: none;
+	overflow: visible;
+	border: 0;
+	background: none;
+}
+
+@media (max-width: 720px) {
+	.demo-head {
+		flex-direction: column;
+		align-items: flex-start;
+	}
 }
 
 @media (max-width: 1100px) {

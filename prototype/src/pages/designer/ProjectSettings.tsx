@@ -108,7 +108,7 @@ export function ProjectSettingsPage() {
 				<h1>Project settings</h1>
 				<p className="lead">
 					Project-scoped tokens (<code>bf_proj_…</code>) power MCP assistants and in-app capture. Each
-					token is shown once — store it in your secrets manager.
+					token is shown once, store it in your secrets manager.
 				</p>
 				<p>
 					<Link to={designerPath('/')}>← All projects</Link>
@@ -132,7 +132,7 @@ export function ProjectSettingsPage() {
 				</div>
 				{(mintedMcpToken || mintedCaptureToken) && (
 					<p style={{ marginTop: '1rem', fontSize: '0.9rem' }}>
-						<strong>Token minted.</strong> Copy it now — it will not be shown again.
+						<strong>Token minted.</strong> Copy it now, it will not be shown again.
 					</p>
 				)}
 				<ul style={{ marginTop: '1rem' }}>

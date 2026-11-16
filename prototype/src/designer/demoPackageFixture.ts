@@ -3,7 +3,7 @@ export const DEMO_PACKAGE_DOC: Record<string, unknown> = {
   contract: 'bareframe.package',
   version: '1.0',
   project: 'Hookoh',
-  summary: 'AI-generated social posts for busy founders — book, edit, and ship from one queue.',
+  summary: 'AI-generated social posts for busy founders, book, edit, and ship from one queue.',
   status: 'in_review',
   selected_direction: 'dir_slate',
   design_options: [

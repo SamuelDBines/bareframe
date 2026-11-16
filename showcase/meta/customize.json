@@ -1,6 +1,6 @@
 {
   "button": {
-    "eventsDoc": ["bf-click (composed, bubbles) — detail.payload when using payload attr"],
+    "eventsDoc": ["bf-click (composed, bubbles), detail.payload when using payload attr"],
     "actionIds": ["click-first-bf-button"],
     "cssHint": "Theme: --bf-theme-button-* tokens. Shadow: bf-button::part(button)."
   },
@@ -27,7 +27,7 @@
   "modal": {
     "eventsDoc": ["bf-open", "bf-close", "bf-change"],
     "actionIds": ["click-open-modal-primary"],
-    "cssHint": "Overlay/panel styling often uses bf-modal::part(...) — see Parts list from build."
+    "cssHint": "Overlay/panel styling often uses bf-modal::part(...), see Parts list from build."
   },
   "dialog": {
     "eventsDoc": ["bf-open", "bf-close"],

@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
 	applyFlowSpec,
 	createEmptyProjectDocument,
+	devicesForPlatform,
 	flowSpecFromDocument,
 	FlowSpecError,
 	isEmptyFlow,
+	platformForDevices,
 	repairFlowSpec,
 } from '../src/index.js';
 
@@ -84,7 +86,7 @@ describe('applyFlowSpec', () => {
 		const xs = ['welcome', 'sign-up', 'home'].map((id) => project.frames.find((f) => f.id === screenFrameIds[id])!.x);
 		expect(xs[0]).toBeLessThan(xs[1]!);
 		expect(xs[1]).toBeLessThan(xs[2]!);
-		expect(project.productBrief).toMatchObject({ description: 'A habit app', platform: 'tablet' });
+		expect(project.productBrief).toMatchObject({ description: 'A habit app', platform: 'tablet', platforms: ['tablet'] });
 		expect(isEmptyFlow(document)).toBe(false);
 	});
 
@@ -113,5 +115,30 @@ describe('applyFlowSpec', () => {
 		expect(second.project.annotations.map((a) => a.id)).toEqual(['a1']);
 		expect(second.project.pages.some((p) => p.brief?.key === 'welcome')).toBe(false);
 		expect(second.project.connectors).toHaveLength(2);
+	});
+});
+
+describe('platform devices', () => {
+	it('stores one device as that platform and several as all', () => {
+		expect(platformForDevices(['desktop'])).toBe('desktop');
+		expect(platformForDevices(['desktop', 'mobile'])).toBe('all');
+		expect(devicesForPlatform('all')).toEqual(['mobile', 'tablet', 'desktop']);
+		expect(devicesForPlatform('tablet')).toEqual(['tablet']);
+	});
+
+	it('keeps the exact devices in the brief and lays frames out on the first one', () => {
+		const empty = createEmptyProjectDocument('p2', 'Test', 'light', { newId });
+		const spec = repairFlowSpec({
+			screens: [{ id: 'home', name: 'Home', purpose: 'Start', keyContent: [], states: ['default'] }],
+			connections: [],
+		}).spec;
+		const { document } = applyFlowSpec(empty, spec, {
+			platform: 'all',
+			platforms: ['desktop', 'mobile'],
+			description: 'x',
+			newId,
+		});
+		expect(document.project.productBrief?.platforms).toEqual(['mobile', 'desktop']);
+		expect(document.project.frames.find((f) => !f.ghost)?.devicePresetId).toBe('mobile');
 	});
 });

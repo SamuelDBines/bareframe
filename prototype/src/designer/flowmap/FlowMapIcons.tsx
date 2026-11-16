@@ -136,3 +136,30 @@ export function IconSparkle(props: IconProps) {
 		</Base>
 	);
 }
+
+export function IconPhone(props: IconProps) {
+	return (
+		<Base {...props}>
+			<rect x="7" y="2.5" width="10" height="19" rx="2.5" stroke="currentColor" strokeWidth="1.75" />
+			<path d="M11 18.5h2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+		</Base>
+	);
+}
+
+export function IconTablet(props: IconProps) {
+	return (
+		<Base {...props}>
+			<rect x="4.5" y="2.5" width="15" height="19" rx="2.5" stroke="currentColor" strokeWidth="1.75" />
+			<path d="M11 18.5h2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+		</Base>
+	);
+}
+
+export function IconDesktop(props: IconProps) {
+	return (
+		<Base {...props}>
+			<rect x="2.5" y="4" width="19" height="12.5" rx="2" stroke="currentColor" strokeWidth="1.75" />
+			<path d="M9 20.5h6M12 16.5v4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+		</Base>
+	);
+}

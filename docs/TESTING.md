@@ -53,4 +53,4 @@ pnpm run build:lib
 pnpm run validate:theme -- themes/dark.css --check-union
 ```
 
-`--check-union` exits with code `1` unless every token listed in `dist/tokens.json` appears in the flattened theme file — **very strict** (use for internal themes / CI gates selectively).
+`--check-union` exits with code `1` unless every token listed in `dist/tokens.json` appears in the flattened theme file, **very strict** (use for internal themes / CI gates selectively).

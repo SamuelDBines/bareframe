@@ -1,4 +1,4 @@
-/* Docs shell — calm, token-driven chrome (dogfoods Bareframe variables) */
+/* Docs shell, calm, token-driven chrome (dogfoods Bareframe variables) */
 
 .docs-shell {
 	--docs-sidebar-w: 16.5rem;
@@ -517,6 +517,41 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+/* Preview state control. Focus and hover are drawn on the first interactive element. */
+.playground-frame__canvas.bf-preview-focus {
+	outline: none;
+}
+
+.playground-preview-content [data-bf-preview-state='focus'] {
+	outline: var(--bf-theme-focus-ring-width, 2px) var(--bf-theme-focus-ring-style, solid)
+		var(--bf-theme-focus-ring-color, #2563eb);
+	outline-offset: var(--bf-theme-focus-ring-offset, 2px);
+}
+
+.playground-preview-content [data-bf-preview-state='hover'] {
+	opacity: var(--bf-theme-opacity-hover, 0.96);
+	filter: brightness(0.94);
+}
+
+/* Components without their own disabled or loading prop. */
+.bf-preview-simulated.bf-preview-disabled .playground-preview-content {
+	opacity: 0.55;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.bf-preview-simulated.bf-preview-loading .playground-preview-content {
+	opacity: 0.6;
+	cursor: progress;
+	pointer-events: none;
+}
+
+.playground-dismissed {
+	margin: 0;
+	color: var(--bf-theme-text-2);
+	font-size: 0.9rem;
 }
 
 .playground-overlay-root {

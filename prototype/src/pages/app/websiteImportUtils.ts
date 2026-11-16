@@ -41,7 +41,7 @@ export function buildCaptureSnippet(opts: {
 
 export function buildPrivacyNoticeSnippet(hostname: string): string {
 	return [
-		`Privacy notice (summary — not legal advice):`,
+		`Privacy notice (summary, not legal advice):`,
 		`Your organisation is the data controller for visitors on ${hostname}. Bareframe acts as a processor for capture data you send.`,
 		`Installed capture records: page URL, document title, viewport size, optional masked screenshots, and link navigation (no keystrokes, passwords, or payment fields).`,
 		`Form field values are masked client-side before upload; mark sensitive UI with data-bareframe-mask.`,

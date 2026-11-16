@@ -67,6 +67,8 @@ type ScreenBrief = {
 type ProductBrief = {
     description: string;
     platform: 'mobile' | 'tablet' | 'desktop' | 'all';
+    /** Devices chosen, when more specific than `platform` (e.g. mobile and desktop). */
+    platforms?: ('mobile' | 'tablet' | 'desktop')[];
     updatedAt: string;
 };
 type Frame = {
@@ -551,6 +553,11 @@ declare const FLOW_PLATFORMS: readonly ["mobile", "tablet", "desktop", "all"];
 type FlowPlatform = (typeof FLOW_PLATFORMS)[number];
 /** Device preset used for flow-map frames; `all` maps screens on phone first. */
 declare const FLOW_PLATFORM_PRESET: Record<FlowPlatform, string>;
+/** Devices someone can pick for their product; more than one is stored as platform `all`. */
+declare const FLOW_DEVICES: readonly ["mobile", "tablet", "desktop"];
+type FlowDevice = (typeof FLOW_DEVICES)[number];
+declare function platformForDevices(devices: readonly FlowDevice[]): FlowPlatform;
+declare function devicesForPlatform(platform: FlowPlatform): FlowDevice[];
 declare const SCREEN_STATES: readonly ["default", "empty", "loading", "error", "success"];
 type ScreenState = (typeof SCREEN_STATES)[number];
 type FlowScreen = {
@@ -604,6 +611,8 @@ declare function flowSpecFromDocument(document: ProjectDocument): FlowSpec;
 declare function isEmptyFlow(document: ProjectDocument): boolean;
 type ApplyFlowSpecOptions = {
     platform: FlowPlatform;
+    /** The exact devices chosen; defaults to every device the platform covers. */
+    platforms?: FlowDevice[];
     description: string;
     newId: (prefix: string) => string;
     now?: () => Date;
@@ -707,4 +716,4 @@ declare function attachConnectorButtonNodes(document: ProjectDocument, pageId: s
 declare function defaultNewId(prefix: string): string;
 declare function createDefaultCommandContext(isValidComponentSlug: (slug: string) => boolean): CommandContext;
 
-export { type Annotation, type AnnotationTarget, type ApplyFlowSpecOptions, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, DESIGN_COMPONENTS, DESIGN_DEVICES, DESIGN_LAYOUTS, DESIGN_LIMITS, DESIGN_SPEC_SCHEMA_HINT, type DesignComponent, type DesignDevice, type DesignLayout, type DesignNode, type DesignSpec, DesignSpecError, type DesignStateName, type DesignTreeNode, type DesignerProject, type DevicePreset, FLOW_CARD_GAP_X, FLOW_CARD_GAP_Y, FLOW_CARD_HEIGHT, FLOW_CARD_WIDTH, FLOW_LABEL_HEIGHT, FLOW_LIMITS, FLOW_ORIGIN_X, FLOW_ORIGIN_Y, FLOW_PLATFORMS, FLOW_PLATFORM_PRESET, FLOW_SPEC_SCHEMA_HINT, FLOW_THUMB_HEIGHT, type FlowConnection, type FlowPlatform, type FlowScreen, type FlowSpec, FlowSpecError, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type LayoutMode, type LayoutModel, type Page, type ProductBrief, type ProjectCommand, type ProjectDocument, SCREEN_STATES, type ScreenBrief, type ScreenState, type SizingMode, type StyleModel, type StyleTrial, type ThemeId, applyFlowSpec, applyImportScreenshots, applyProjectCommand, attachConnectorButtonNodes, autoPlaceFrame, countDesignNodes, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, designToNodes, deviceDimensions, flowSpecFromDocument, getDevicePreset, isEmptyFlow, layeredFlowLayout, layoutFramesInFlowRow, listPageButtons, parseProjectCommand, projectCommandSchema, repairDesignSpec, repairFlowSpec, screenKeyForPage, slugifyScreenId };
+export { type Annotation, type AnnotationTarget, type ApplyFlowSpecOptions, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, DESIGN_COMPONENTS, DESIGN_DEVICES, DESIGN_LAYOUTS, DESIGN_LIMITS, DESIGN_SPEC_SCHEMA_HINT, type DesignComponent, type DesignDevice, type DesignLayout, type DesignNode, type DesignSpec, DesignSpecError, type DesignStateName, type DesignTreeNode, type DesignerProject, type DevicePreset, FLOW_CARD_GAP_X, FLOW_CARD_GAP_Y, FLOW_CARD_HEIGHT, FLOW_CARD_WIDTH, FLOW_DEVICES, FLOW_LABEL_HEIGHT, FLOW_LIMITS, FLOW_ORIGIN_X, FLOW_ORIGIN_Y, FLOW_PLATFORMS, FLOW_PLATFORM_PRESET, FLOW_SPEC_SCHEMA_HINT, FLOW_THUMB_HEIGHT, type FlowConnection, type FlowDevice, type FlowPlatform, type FlowScreen, type FlowSpec, FlowSpecError, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type LayoutMode, type LayoutModel, type Page, type ProductBrief, type ProjectCommand, type ProjectDocument, SCREEN_STATES, type ScreenBrief, type ScreenState, type SizingMode, type StyleModel, type StyleTrial, type ThemeId, applyFlowSpec, applyImportScreenshots, applyProjectCommand, attachConnectorButtonNodes, autoPlaceFrame, countDesignNodes, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, designToNodes, deviceDimensions, devicesForPlatform, flowSpecFromDocument, getDevicePreset, isEmptyFlow, layeredFlowLayout, layoutFramesInFlowRow, listPageButtons, parseProjectCommand, platformForDevices, projectCommandSchema, repairDesignSpec, repairFlowSpec, screenKeyForPage, slugifyScreenId };

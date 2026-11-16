@@ -2,7 +2,12 @@ import type { BareframePackage } from '@bareframe/package-contracts';
 import type { IntakePayload } from '@bareframe/package-contracts';
 import { buildReviewChecklist, buildDeliveryFlowContracts } from '../delivery-flow/build.js';
 import { buildRealHandoff } from '../handoff/build-real-handoff.js';
+import { NO_EMDASH_INSTRUCTION } from '../llm-copy-style.js';
 import type { LlmAdapter, PipelineArtifacts, PipelineContext, StageProgress } from '../types.js';
+
+function withCopyStyle(system: string): string {
+	return `${system} ${NO_EMDASH_INSTRUCTION}`;
+}
 
 const STAGES: { stage: StageProgress['stage']; label: string }[] = [
   { stage: 'definition', label: 'Product definition' },
@@ -31,7 +36,7 @@ export async function runPipelineStages(
       case 'definition': {
         const out = await llm.completeJson<{ product: Record<string, unknown> }>({
           stage,
-          system: 'You are Bareframe product strategist. Output JSON with a product object.',
+          system: withCopyStyle('You are Bareframe product strategist. Output JSON with a product object.'),
           user: baseUser,
           schemaHint: '{ "product": { problem, audience[], value_proposition, core_features[], mvp_scope[], non_goals[], success_measures[] } }',
         });
@@ -41,7 +46,7 @@ export async function runPipelineStages(
       case 'naming_branding': {
         const out = await llm.completeJson<{ naming: Record<string, unknown>; branding: Record<string, unknown> }>({
           stage,
-          system: 'You are a naming and brand strategist for digital products.',
+          system: withCopyStyle('You are a naming and brand strategist for digital products.'),
           user: baseUser,
           schemaHint: '{ "naming": { options[5-7], recommended }, "branding": { personality, tone_of_voice, taglines, logo_direction } }',
         });
@@ -52,7 +57,9 @@ export async function runPipelineStages(
       case 'design_directions': {
         const out = await llm.completeJson<{ design_options: Record<string, unknown>[] }>({
           stage,
-          system: 'You produce 2-3 design directions mapped to Bareframe themes (aurora, simple, noir, oceanic, etc).',
+          system: withCopyStyle(
+            'You produce 2-3 design directions mapped to Bareframe themes (aurora, simple, noir, oceanic, etc).',
+          ),
           user: baseUser,
           schemaHint: '{ "design_options": [ DesignDirection ] } with hex palette and contrast_checks',
         });
@@ -62,7 +69,7 @@ export async function runPipelineStages(
       case 'ia': {
         const out = await llm.completeJson<{ ia: Record<string, unknown> }>({
           stage,
-          system: 'You design sitemaps for MVPs.',
+          system: withCopyStyle('You design sitemaps for MVPs.'),
           user: baseUser,
           schemaHint: '{ "ia": { sitemap[], navigation } }',
         });
@@ -72,7 +79,7 @@ export async function runPipelineStages(
       case 'journeys': {
         const out = await llm.completeJson<{ journeys: PipelineArtifacts['journeys'] }>({
           stage,
-          system: 'You define 3-5 user journeys as step lists referencing screen ids from IA.',
+          system: withCopyStyle('You define 3-5 user journeys as step lists referencing screen ids from IA.'),
           user: baseUser,
           schemaHint: '{ "journeys": [ { id, name, persona, goal, story_ids, steps[] } ] }',
         });
@@ -82,7 +89,7 @@ export async function runPipelineStages(
       case 'screens_copy': {
         const out = await llm.completeJson<{ screens: PipelineArtifacts['screens']; copy: Record<string, unknown>[] }>({
           stage,
-          system: 'You plan 6-12 prototype screens using @bareframe/react component slugs.',
+          system: withCopyStyle('You plan 6-12 prototype screens using @bareframe/react component slugs.'),
           user: baseUser,
           schemaHint: '{ "screens": [...], "copy": [ { screen_id, blocks[] } ] }',
         });
@@ -93,7 +100,9 @@ export async function runPipelineStages(
       case 'handoff': {
         const out = await llm.completeJson<{ handoff: Record<string, unknown> }>({
           stage,
-          system: 'You produce technical handoff: components, tokens, scaffolded_screens paths, entities, APIs, stack.',
+          system: withCopyStyle(
+            'You produce technical handoff: components, tokens, scaffolded_screens paths, entities, APIs, stack.',
+          ),
           user: baseUser,
           schemaHint: '{ "handoff": { components, design_tokens, scaffolded_screens, data_entities, api_contracts, stack } }',
         });

@@ -58,7 +58,7 @@ import '@bareframe/react/themes/light.css';
 
 			<DocSection id="imports" title="Component imports">
 				<div className="doc-prose">
-					<p>Update the package path — export names match for the React layer in this repo:</p>
+					<p>Update the package path, export names match for the React layer in this repo:</p>
 				</div>
 				<LazyCode
 					code={`// Before
@@ -70,7 +70,7 @@ import { Button, Input, Modal } from '@bareframe/react';`}
 				<div className="doc-prose">
 					<p>
 						Supported exports include Alert, Badge, Button, Calendar, Card, DatePicker, form controls,
-						Modal, Drawer, Select, Combobox, Tabs, Tooltip, and more — see{' '}
+						Modal, Drawer, Select, Combobox, Tabs, Tooltip, and more, see{' '}
 						<code>packages/react/src/index.ts</code> or MCP <code>list_components</code>.
 					</p>
 				</div>

@@ -13,7 +13,7 @@ type Props = {
 	selectedNodeId: string | null;
 	onSelectNode: (nodeId: string) => void;
 	protoHotspotNodeIds?: string[];
-	/** Lock iframe document to frame height (prototype player — avoids iframe clipping tall trees). */
+	/** Lock iframe document to frame height (prototype player, avoids iframe clipping tall trees). */
 	lockDocumentHeight?: boolean;
 };
 

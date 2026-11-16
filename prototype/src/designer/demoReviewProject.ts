@@ -12,7 +12,7 @@ export const DEMO_REVIEW_ISSUES = [
     severity: 'major',
     title: 'Sign in competes with the Hookoh signup CTA',
     explanation:
-      'Ghost “Sign in” in the nav matches weight with the hero email field — first-time founders may hesitate on the primary path.',
+      'Ghost “Sign in” in the nav matches weight with the hero email field, first-time founders may hesitate on the primary path.',
     fix: 'Keep one primary action in the hero; move Sign in to a text link below the email field.',
     status: 'open',
   },
@@ -57,7 +57,7 @@ export function buildDemoReviewProject(): DesignerProject {
 
   return {
     id: demoReviewProjectId,
-    name: 'Hookoh — social queue',
+    name: 'Hookoh, social queue',
     defaultThemeId: 'noir' as ThemeId,
     pages: [landing.page, code.page, home.page],
     frames,

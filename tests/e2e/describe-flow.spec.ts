@@ -1,6 +1,7 @@
 import { expect, test, type Page, type Route } from '@playwright/test';
 import {
 	applyFlowSpec,
+	platformForDevices,
 	createEmptyProjectDocument,
 	designToNodes,
 	repairDesignSpec,
@@ -38,6 +39,10 @@ type MockOptions = {
 	designDelayMs?: number;
 	/** Screen designs allowed before the mock answers 429 (free plan: 3). */
 	designAllowance?: number;
+	/** `features.ai` from /api/me; defaults to true. */
+	ai?: boolean;
+	/** Simulate an autosave landing while the first screen is being designed. */
+	saveDuringFirstDesign?: boolean;
 };
 
 const DESIGN_PRESET: Record<string, { id: string; width: number; height: number }> = {
@@ -62,7 +67,10 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 			route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) });
 		if (p.endsWith('/api/healthz')) return route.fulfill({ status: 200, body: 'ok' });
 		if (p.endsWith('/api/me')) {
-			return json({ user: { id: 1, login: 'tester', name: 'Tester', avatarUrl: null, email: 't@example.com' } });
+			return json({
+				user: { id: 1, login: 'tester', name: 'Tester', avatarUrl: null, email: 't@example.com' },
+				features: { ai: options.ai ?? true },
+			});
 		}
 		if (p.endsWith('/api/plan')) return json({ tier: 'free', limits: {}, usage: {} });
 		if (p.endsWith('/api/billing/config')) return json({ stripeEnabled: false });
@@ -97,6 +105,7 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 			const body = req.postDataJSON() as { baseVersion: number; device: string };
 			designCalls.push({ pageId, device: body.device });
 			if (options.designDelayMs) await new Promise((r) => setTimeout(r, options.designDelayMs));
+			if (options.saveDuringFirstDesign && designCalls.length === 1) version += 1;
 			if (designCalls.length > (options.designAllowance ?? 99)) {
 				return json(
 					{ error: 'screen_design_limit', message: "The free plan includes 3 screen designs a month, and you've used them all. Upgrade to Bareframe Pro for more." },
@@ -141,7 +150,7 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 			const body = req.postDataJSON() as {
 				baseVersion: number;
 				description?: string;
-				platform?: 'mobile' | 'tablet' | 'desktop' | 'all';
+				platforms?: ('mobile' | 'tablet' | 'desktop')[];
 				instruction?: string;
 			};
 			generateBodies.push({ ...body, serverVersion: version });
@@ -166,8 +175,8 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 			}
 			const { spec, repairs } = repairFlowSpec(raw);
 			const description = body.description ?? document.project.productBrief?.description ?? '';
-			const platform = body.platform ?? document.project.productBrief?.platform ?? 'mobile';
-			document = applyFlowSpec(document, spec, { platform, description, newId }).document;
+			const platforms = body.platforms ?? document.project.productBrief?.platforms ?? ['mobile'];
+			document = applyFlowSpec(document, spec, { platform: platformForDevices(platforms), platforms, description, newId }).document;
 			version += 1;
 			return json({
 				version,
@@ -213,13 +222,13 @@ test.describe('describe your product → flow map', () => {
 
 		await panel.getByRole('button', { name: 'Map my flow' }).click();
 		await expect(panel.getByText('Add a little more detail')).toBeVisible();
-		await expect(panel.getByRole('textbox', { name: 'Describe your product' })).toHaveAttribute('aria-invalid', 'true');
+		await expect(panel.getByRole('textbox', { name: 'What are you building?' })).toHaveAttribute('aria-invalid', 'true');
 
 		await panel
-			.getByRole('textbox', { name: 'Describe your product' })
+			.getByRole('textbox', { name: 'What are you building?' })
 			.fill('Habitual: a habit tracker for busy parents who want small daily routines.');
-		await panel.getByText('Tablet', { exact: true }).click();
-		await expect(panel.getByRole('radio', { name: 'Tablet' })).toBeChecked();
+		await panel.getByRole('checkbox', { name: 'Mobile' }).uncheck();
+		await panel.getByRole('checkbox', { name: 'Tablet' }).check();
 		await panel.getByRole('button', { name: 'Map my flow' }).click();
 		await expect(panel.getByRole('button', { name: 'Mapping your screens…' })).toBeDisabled();
 
@@ -229,7 +238,7 @@ test.describe('describe your product → flow map', () => {
 		await expect(page.locator('.flow-map-card__footer')).toContainText(['Welcome', 'Sign up', 'Home', 'Habit detail']);
 		// Generation is based on the server's current version (an autosave may have landed first).
 		const [first] = api.generateBodies;
-		expect(first).toMatchObject({ platform: 'tablet' });
+		expect(first).toMatchObject({ platforms: ['tablet'] });
 		expect(first.baseVersion).toBe(first.serverVersion);
 
 		// Generated screens sit left to right in flow order.
@@ -242,21 +251,36 @@ test.describe('describe your product → flow map', () => {
 		expect(api.current().version).toBeGreaterThanOrEqual(2);
 	});
 
-	test('platform choice is a keyboard-operable radio group', async ({ page }) => {
-		await mockApi(page);
+	test('platforms are checkboxes: several can be chosen, and at least one is required', async ({ page }) => {
+		const api = await mockApi(page);
 		await openProject(page);
-		const group = page.getByRole('group', { name: 'Platform' });
-		await group.getByRole('radio', { name: 'Mobile' }).focus();
-		await page.keyboard.press('ArrowRight');
-		await expect(group.getByRole('radio', { name: 'Tablet' })).toBeChecked();
-		await expect(group.getByRole('radio', { name: 'Tablet' })).toBeFocused();
+		const group = page.getByRole('group', { name: 'Platforms' });
+		await expect(group.getByRole('checkbox', { name: 'Mobile' })).toBeChecked();
+		await group.getByRole('checkbox', { name: 'Desktop' }).focus();
+		await page.keyboard.press('Space');
+		await expect(group.getByRole('checkbox', { name: 'Desktop' })).toBeChecked();
+
+		await group.getByRole('checkbox', { name: 'Mobile' }).uncheck();
+		await group.getByRole('checkbox', { name: 'Desktop' }).uncheck();
+		await page
+			.getByRole('textbox', { name: 'What are you building?' })
+			.fill('Habitual: a habit tracker for busy parents who want small daily routines.');
+		await page.getByRole('button', { name: 'Map my flow' }).click();
+		await expect(group.getByText('Choose at least one platform.')).toBeVisible();
+		expect(api.generateBodies).toHaveLength(0);
+
+		await group.getByRole('checkbox', { name: 'Mobile' }).check();
+		await group.getByRole('checkbox', { name: 'Desktop' }).check();
+		await page.getByRole('button', { name: 'Map my flow' }).click();
+		await expectFlowMapCards(page, 4);
+		expect(api.generateBodies[0]).toMatchObject({ platforms: ['mobile', 'desktop'] });
 	});
 
 	test('refines the flow with a follow-up instruction', async ({ page }) => {
 		await mockApi(page);
 		await openProject(page);
 		await page
-			.getByRole('textbox', { name: 'Describe your product' })
+			.getByRole('textbox', { name: 'What are you building?' })
 			.fill('Habitual: a habit tracker for busy parents who want small daily routines.');
 		await page.getByRole('button', { name: 'Map my flow' }).click();
 		await expectFlowMapCards(page, 4);
@@ -278,7 +302,7 @@ test.describe('describe your product → flow map', () => {
 		await mockApi(page, { refineStatus: 429 });
 		await openProject(page);
 		await page
-			.getByRole('textbox', { name: 'Describe your product' })
+			.getByRole('textbox', { name: 'What are you building?' })
 			.fill('Habitual: a habit tracker for busy parents who want small daily routines.');
 		await page.getByRole('button', { name: 'Map my flow' }).click();
 		await expectFlowMapCards(page, 4);
@@ -299,7 +323,7 @@ async function openMappedProject(page: Page, options: MockOptions = {}) {
 	const api = await mockApi(page, options);
 	await openProject(page);
 	await page
-		.getByRole('textbox', { name: 'Describe your product' })
+		.getByRole('textbox', { name: 'What are you building?' })
 		.fill('Habitual: a habit tracker for busy parents who want small daily routines.');
 	await page.getByRole('button', { name: 'Map my flow' }).click();
 	await expectFlowMapCards(page, 4);
@@ -348,13 +372,27 @@ test.describe('generate screen designs', () => {
 		const api = await openMappedProject(page, { designDelayMs: 700 });
 		await page.getByTestId('design-all').click();
 		await expect(page.getByTestId('design-progress')).toContainText('Designing 1 of 4');
-		await expect.poll(() => api.designCalls.length, { timeout: 15_000 }).toBe(2);
+		// Wait for the second screen to start (a version-conflict retry repeats the first screen's call).
+		const screensStarted = () => new Set(api.designCalls.map((c) => c.pageId)).size;
+		await expect.poll(screensStarted, { timeout: 15_000 }).toBe(2);
+		const callsAtCancel = api.designCalls.length;
 		await page.getByTestId('design-cancel').click();
 		await expect(page.getByTestId('design-result')).toContainText('Cancelled');
 		await expect(page.getByTestId('design-result')).toContainText(/Designed [12] of 4 screens/);
 		await page.waitForTimeout(1000);
-		expect(api.designCalls.length).toBe(2);
+		expect(api.designCalls.length).toBe(callsAtCancel);
+		expect(screensStarted()).toBe(2);
 		await expect(page.getByTestId('design-all')).toBeEnabled();
+	});
+
+	test('keeps going when an autosave lands mid-queue', async ({ page }) => {
+		const api = await openMappedProject(page, { saveDuringFirstDesign: true });
+		await page.getByTestId('design-all').click();
+		await expect(page.getByTestId('design-result')).toContainText('Designed 4 of 4 screens', { timeout: 15_000 });
+		await expect(page.getByTestId('design-result')).not.toHaveAttribute('role', 'alert');
+		// The first screen was retried once on the new version.
+		expect(api.designCalls).toHaveLength(5);
+		expect(api.designCalls[0]!.pageId).toBe(api.designCalls[1]!.pageId);
 	});
 
 	test('stops the queue at the plan limit and says why', async ({ page }) => {
@@ -377,4 +415,56 @@ test.describe('generate screen designs', () => {
 		await page.getByRole('button', { name: /Get started: go to Sign up/ }).click();
 		await expect(page.frameLocator('[class*="proto"] iframe').first().getByRole('heading', { name: 'Sign up' })).toBeVisible();
 	});
+});
+
+test.describe('without AI', () => {
+	test('offers starter flows instead of AI mapping, and hides AI-only features', async ({ page }) => {
+		const api = await mockApi(page, { ai: false });
+		await page.addInitScript(() => {
+			localStorage.setItem('bareframe.flowMapTour.v1', JSON.stringify({ dismissed: true }));
+		});
+		await page.goto(`/#/app/project/${PROJECT_ID}`);
+		const panel = page.getByTestId('describe-product-panel');
+		await expect(panel.getByRole('heading', { name: 'Start your flow' })).toBeVisible({ timeout: 30_000 });
+		await expect(panel.getByRole('textbox', { name: 'What are you building?' })).toHaveCount(0);
+		await expect(page.getByText('AI features are taking a break')).toHaveCount(0);
+
+		await panel.getByRole('checkbox', { name: 'Desktop' }).check();
+		await panel.getByRole('button', { name: 'Create a starter flow' }).click();
+		await expect(page.getByTestId('flow-gen-toast')).toContainText('Started from');
+		await expect(page.getByTestId('describe-product-panel')).toHaveCount(0);
+		expect(await page.locator('.flow-map-card').count()).toBeGreaterThanOrEqual(5);
+		expect(api.generateBodies).toHaveLength(0);
+
+		// Nothing that needs AI is offered.
+		await expect(page.getByTestId('flow-refine-open')).toHaveCount(0);
+		await expect(page.getByTestId('design-bar')).toHaveCount(0);
+		await expect(page.getByTestId('card-generate-design')).toHaveCount(0);
+		await expect(page.getByRole('tab', { name: /AI findings/ })).toHaveCount(0);
+		await expect(page.getByTestId('run-review')).toHaveCount(0);
+
+		// The starter flow autosaves like any edit.
+		await expect.poll(() => api.current().document.project.frames.filter((f) => !f.ghost).length).toBeGreaterThanOrEqual(5);
+	});
+
+	test('add a screen yourself switches to Edit with a screen', async ({ page }) => {
+		await mockApi(page, { ai: false });
+		await page.addInitScript(() => {
+			localStorage.setItem('bareframe.flowMapTour.v1', JSON.stringify({ dismissed: true }));
+		});
+		await page.goto(`/#/app/project/${PROJECT_ID}`);
+		await page.getByTestId('start-blank').click({ timeout: 30_000 });
+		await expect(page.locator('.flow-map-card')).toHaveCount(1);
+		await expect(page.getByRole('tab', { name: 'Edit' })).toHaveAttribute('aria-selected', 'true');
+	});
+});
+
+test('with AI, a starter flow is still one click away', async ({ page }) => {
+	const api = await mockApi(page);
+	await openProject(page);
+	await page.getByTestId('use-starter-flow').click();
+	await page.getByRole('button', { name: 'Create a starter flow' }).click();
+	await expect(page.getByTestId('flow-gen-toast')).toContainText('Started from');
+	expect(api.generateBodies).toHaveLength(0);
+	await expect(page.getByTestId('flow-refine-open')).toBeVisible();
 });

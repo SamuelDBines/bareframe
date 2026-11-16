@@ -55,7 +55,7 @@ const SCREENS = [
 		name: 'Shipping speed',
 		routePath: '/checkout/shipping',
 		headline: 'Choose delivery',
-		body: 'Standard 5–7 days free · Express 2 days $14 · Carbon offset included.',
+		body: 'Standard 5-7 days free · Express 2 days $14 · Carbon offset included.',
 		primaryCta: 'Express 2-day',
 		secondaryCta: 'Standard free',
 	},
@@ -217,7 +217,7 @@ const EDGES = [
 export function buildDemoMarketplaceFulfilmentProject() {
 	return assembleDemoProject({
 		id: demoMarketplaceFulfilmentProjectId,
-		name: 'Arbor Market — purchase to return',
+		name: 'Arbor Market, purchase to return',
 		defaultThemeId: 'nature' as ThemeId,
 		productName: PRODUCT,
 		screens: [...SCREENS],

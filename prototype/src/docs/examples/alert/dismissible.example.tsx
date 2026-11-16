@@ -6,7 +6,7 @@ export default function DismissibleAlertExample() {
 	if (!visible) return <p className="bf-muted">Alert dismissed.</p>;
 	return (
 		<Alert dismissible title="Heads up" onDismiss={() => setVisible(false)}>
-			Your export finished — download it from the dashboard.
+			Your export finished, download it from the dashboard.
 		</Alert>
 	);
 }

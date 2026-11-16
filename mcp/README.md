@@ -1,6 +1,6 @@
 # @bareframe/mcp-server
 
-Public **Model Context Protocol** server for Bareframe — served at **`https://bareframe.org/mcp`** on the main site ingress (namespace `bareframe`).
+Public **Model Context Protocol** server for Bareframe, served at **`https://bareframe.org/mcp`** on the main site ingress (namespace `bareframe`).
 
 - **Health:** `https://bareframe.org/mcp/healthz`
 - **Migration guide (Repkit → React):** [`docs/MIGRATING-TO-BAREFRAME-REACT.md`](../docs/MIGRATING-TO-BAREFRAME-REACT.md)

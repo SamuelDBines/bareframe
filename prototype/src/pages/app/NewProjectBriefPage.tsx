@@ -50,7 +50,7 @@ export function NewProjectBriefPage() {
       />
 
       <AppInlineNotice variant="info" title="AI review">
-        You can map flows manually anytime. AI review runs when you click Run review pass on a project — no setup
+        You can map flows manually anytime. AI review runs when you click Run review pass on a project, no setup
         required to explore the demo.
       </AppInlineNotice>
 
@@ -65,7 +65,7 @@ export function NewProjectBriefPage() {
           />
           <AppTextAreaField
             label="What journey are you mapping?"
-            hint="One or two sentences is enough — you can refine on the canvas."
+            hint="One or two sentences is enough, you can refine on the canvas."
             rows={4}
             required
             value={summary}

@@ -1,4 +1,4 @@
-/* Legacy Repkit token aliases — map to Bareframe theme variables */
+/* Legacy Repkit token aliases, map to Bareframe theme variables */
 :where([data-bf-theme], :root) {
 	--rk-theme-surface-1: var(--bf-theme-surface-1);
 	--rk-theme-surface-2: var(--bf-theme-surface-2);

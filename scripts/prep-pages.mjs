@@ -77,7 +77,7 @@ async function walkHtmlFiles(dir, out = []) {
 
 async function main() {
 	if (!(await exists(distDir))) {
-		throw new Error('Missing ./dist — run `pnpm run build` (library build) first.');
+		throw new Error('Missing ./dist, run `pnpm run build` (library build) first.');
 	}
 	if (!(await exists(themesSource))) {
 		throw new Error('Missing ./themes directory.');

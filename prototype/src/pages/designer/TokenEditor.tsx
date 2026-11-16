@@ -5,7 +5,7 @@ export function TokenEditorPage() {
 		<>
 			<div className="page-hero">
 				<h1>Token editor</h1>
-				<p className="lead">Map semantic tokens to values — synced with tokens.json export.</p>
+				<p className="lead">Map semantic tokens to values, synced with tokens.json export.</p>
 			</div>
 			<div className="designer-split">
 				<div className="table-wrap designer-split-main">

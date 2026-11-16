@@ -126,7 +126,7 @@ function homeNodes(): Record<string, DesignNode> {
 			parentId: 'node-hero',
 			children: [],
 			content: {
-				text: 'Real-time dashboards and signup funnels — styled with your Bareframe theme tokens.',
+				text: 'Real-time dashboards and signup funnels, styled with your Bareframe theme tokens.',
 				textTag: 'p',
 			},
 			layout: baseLayout,

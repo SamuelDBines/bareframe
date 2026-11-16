@@ -2,14 +2,18 @@ import { createOpenAiCompatibleAdapter } from '@bareframe/package-generator';
 import {
 	FLOW_SPEC_SCHEMA_HINT,
 	slugifyScreenId,
+	type FlowDevice,
 	type FlowPlatform,
 	type FlowSpec,
 } from '@bareframe/designer-core';
 import type { Config } from '../config.js';
+import { NO_EMDASH_INSTRUCTION } from '../llm/copy-style.js';
 
 export type FlowGenerationInput = {
 	description: string;
 	platform: FlowPlatform;
+	/** Exact devices chosen, when more specific than `platform`. */
+	platforms?: FlowDevice[];
 	/** Follow-up such as "add a settings screen"; `current` is the flow to change. */
 	instruction?: string;
 	current?: FlowSpec;
@@ -27,18 +31,20 @@ From the product description, produce the user flow: the screens a user moves th
 actions that take them from one screen to the next.
 Rules:
 - 4 to 14 screens; cover onboarding or sign-in only if the product needs it.
-- Every screen needs a short name (2–4 words), one-sentence purpose and 2–6 keyContent items.
+- Every screen needs a short name (2-4 words), one-sentence purpose and 2-6 keyContent items.
 - states: always "default"; add "empty", "loading", "error" or "success" where that screen has them.
-- Connections use screen ids; trigger is the visible button or action label (1–4 words).
+- Connections use screen ids; trigger is the visible button or action label (1-4 words).
 - Ids are short kebab-case and unique. Keep the ids of screens you keep when refining.
-- Do not invent features the description does not imply.`;
+- Do not invent features the description does not imply.
+${NO_EMDASH_INSTRUCTION}`;
 
-function platformText(platform: FlowPlatform) {
-	return platform === 'all' ? 'mobile, tablet and desktop' : platform;
+function platformText(platform: FlowPlatform, platforms?: FlowDevice[]) {
+	const devices = platforms?.length ? platforms : platform === 'all' ? ['mobile', 'tablet', 'desktop'] : [platform];
+	return devices.length > 1 ? `${devices.slice(0, -1).join(', ')} and ${devices.at(-1)}` : devices[0]!;
 }
 
 export function buildFlowUserPrompt(input: FlowGenerationInput): string {
-	const parts = [`Product description:\n${input.description}`, `Platform: ${platformText(input.platform)}`];
+	const parts = [`Product description:\n${input.description}`, `Platform: ${platformText(input.platform, input.platforms)}`];
 	if (input.current && input.instruction) {
 		parts.push(`Current flow (JSON):\n${JSON.stringify(input.current)}`);
 		parts.push(

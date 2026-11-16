@@ -5,7 +5,10 @@ import {
 	applyFlowSpec,
 	defaultNewId,
 	FLOW_LIMITS,
+	FLOW_DEVICES,
 	FLOW_PLATFORMS,
+	devicesForPlatform,
+	platformForDevices,
 	flowSpecFromDocument,
 	FlowSpecError,
 	isEmptyFlow,
@@ -23,6 +26,8 @@ const generateBodySchema = z.object({
 	baseVersion: z.number().int().nonnegative(),
 	description: z.string().trim().min(10).max(FLOW_LIMITS.descriptionLength).optional(),
 	platform: z.enum(FLOW_PLATFORMS).optional(),
+	/** Exact devices chosen (wins over `platform`). */
+	platforms: z.array(z.enum(FLOW_DEVICES)).min(1).max(FLOW_DEVICES.length).optional(),
 	instruction: z.string().trim().min(3).max(FLOW_LIMITS.instructionLength).optional(),
 });
 
@@ -79,7 +84,13 @@ export function createFlowGenerationRouter(pool: pg.Pool, config: Config) {
 			if (!description) {
 				return c.json({ error: 'invalid_request', issues: ['description: describe your product first'] }, 400);
 			}
-			const platform = body.platform ?? document.project.productBrief?.platform ?? 'mobile';
+			const brief = document.project.productBrief;
+			const platforms = body.platforms
+				? FLOW_DEVICES.filter((d) => body.platforms!.includes(d))
+				: body.platform
+					? devicesForPlatform(body.platform)
+					: (brief?.platforms ?? devicesForPlatform(brief?.platform ?? 'mobile'));
+			const platform = body.platforms ? platformForDevices(platforms) : (body.platform ?? brief?.platform ?? 'mobile');
 
 			const llm = flowLlmForConfig(config);
 			if (!llm) {
@@ -100,6 +111,7 @@ export function createFlowGenerationRouter(pool: pg.Pool, config: Config) {
 				result = await generateFlowSpec(llm, {
 					description,
 					platform,
+					platforms,
 					instruction: refining ? body.instruction : undefined,
 					current: refining ? flowSpecFromDocument(document) : undefined,
 				});
@@ -124,7 +136,7 @@ export function createFlowGenerationRouter(pool: pg.Pool, config: Config) {
 				spec.connections = spec.connections.filter((l) => kept.has(l.from) && kept.has(l.to));
 			}
 
-			const next = applyFlowSpec(document, spec, { platform, description, newId: defaultNewId });
+			const next = applyFlowSpec(document, spec, { platform, platforms, description, newId: defaultNewId });
 			const version = await replaceProjectDocument(pool, projectId, actor.userId, next.document, body.baseVersion);
 			reserved = false;
 			publishProjectUpdate(projectId, version);

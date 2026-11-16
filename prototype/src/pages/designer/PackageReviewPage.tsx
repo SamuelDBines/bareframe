@@ -273,7 +273,7 @@ export function PackageReviewPage({ demo, appMode }: { demo?: boolean; appMode?:
 
             <section className="ds-review-panel">
               <h2>Design direction</h2>
-              <p className="ds-meta">Palette and typography preview — updates the playable prototype.</p>
+              <p className="ds-meta">Palette and typography preview, updates the playable prototype.</p>
               <div className="ds-direction-list">
                 {designOptions.map((d) => {
                   const tid = (d.bareframe_theme?.base_theme ?? 'simple') as ThemeId;

@@ -1,6 +1,6 @@
 /**
  * Sample journey shown in the homepage demo. It is an illustration of how a
- * project looks after an AI review — labelled "Sample project" in the UI.
+ * project looks after an AI review, labelled "Sample project" in the UI.
  */
 
 export type Severity = 'critical' | 'major' | 'minor' | 'info';

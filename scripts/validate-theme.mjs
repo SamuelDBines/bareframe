@@ -80,7 +80,7 @@ async function main() {
 
 	const missing = REQUIRED.filter((n) => !defined.has(n));
 	if (missing.length) {
-		console.error('validate-theme: FAILED — missing required tokens:');
+		console.error('validate-theme: FAILED, missing required tokens:');
 		for (const n of missing) console.error(`  - ${n}`);
 		process.exit(1);
 	}
@@ -91,7 +91,7 @@ async function main() {
 		try {
 			union = JSON.parse(await readFile(unionPath, 'utf8'));
 		} catch {
-			console.warn('validate-theme: dist/tokens.json missing — run `pnpm run build:lib`');
+			console.warn('validate-theme: dist/tokens.json missing, run `pnpm run build:lib`');
 			process.exit(0);
 		}
 		const all = Array.isArray(union.tokens) ? union.tokens : [];
@@ -108,7 +108,7 @@ async function main() {
 		}
 	}
 
-	console.log(`validate-theme: OK — ${path.relative(root, abs)}`);
+	console.log(`validate-theme: OK, ${path.relative(root, abs)}`);
 }
 
 main().catch((e) => {

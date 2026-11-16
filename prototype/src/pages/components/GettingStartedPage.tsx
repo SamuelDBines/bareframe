@@ -51,7 +51,7 @@ import '/themes/light.css';
 				/>
 				<div className="doc-prose">
 					<p>
-						Legacy Repkit apps can keep using <code>--rk-*</code> variables — they alias to{' '}
+						Legacy Repkit apps can keep using <code>--rk-*</code> variables, they alias to{' '}
 						<code>--bf-theme-*</code> inside the package CSS.
 					</p>
 				</div>

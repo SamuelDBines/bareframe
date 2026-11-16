@@ -215,7 +215,7 @@ export function LiveFlowDemo() {
 					<i />
 				</span>
 				<div className="live-demo__title">
-					<strong>Budgetly — sign-up &amp; upgrade</strong>
+					<strong>Budgetly, sign-up &amp; upgrade</strong>
 					<span className="bx-chip">Sample project</span>
 				</div>
 				<div className="live-demo__modes" role="tablist" aria-label="Demo view">

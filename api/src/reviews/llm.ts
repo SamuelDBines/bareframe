@@ -2,19 +2,21 @@ import { createOpenAiCompatibleAdapter } from '@bareframe/package-generator';
 import type { ProjectDocument } from '@bareframe/designer-core';
 import type { Config } from '../config.js';
 import type { ReviewIssue, ReviewLlmAdapter } from './process-review.js';
+import { NO_EMDASH_INSTRUCTION } from '../llm/copy-style.js';
 
 const REVIEW_SYSTEM = `You are a senior UX reviewer for Bareframe journey maps.
-Analyze the project summary and return actionable issues only — no filler.
+Analyze the project summary and return actionable issues only, no filler.
 Categories (use exactly these values):
-- ux_problem — confusing UX or unclear hierarchy
-- missing_state — missing empty, error, loading, or edge-case screens
-- drop_off_estimate — likely drop-off (label as estimate; no analytics claims)
-- accessibility — WCAG 2.2 AA concerns
-- design_consistency — deviation from @bareframe/react patterns
-- alternative_solution — suggest a fix; optional previewHint component slug
+- ux_problem: confusing UX or unclear hierarchy
+- missing_state: missing empty, error, loading, or edge-case screens
+- drop_off_estimate: likely drop-off (label as estimate; no analytics claims)
+- accessibility: WCAG 2.2 AA concerns
+- design_consistency: deviation from @bareframe/react patterns
+- alternative_solution: suggest a fix; optional previewHint component slug
 
 Severity: critical | major | minor | info.
-Prefer frameId from the summary when the issue is screen-specific.`;
+Prefer frameId from the summary when the issue is screen-specific.
+${NO_EMDASH_INSTRUCTION}`;
 
 const ISSUES_SCHEMA = `{
   "issues": [
@@ -65,7 +67,7 @@ Page count: ${input.pageCount}
 
 ${summary}
 
-Return 4–10 issues covering multiple categories where relevant.`;
+Return 4-10 issues covering multiple categories where relevant.`;
       const result = await adapter.completeJson<{ issues: ReviewIssue[] }>({
         stage: 'prototype',
         system: REVIEW_SYSTEM,

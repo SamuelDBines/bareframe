@@ -6,7 +6,7 @@ function baseOrigin(): string {
 	return u.replace(/\/$/, '');
 }
 
-test.describe('smoke — static artifact + showcase', () => {
+test.describe('smoke, static artifact + showcase', () => {
 	test('prototype root and legacy dist manifest respond', async ({ request, page }) => {
 		await page.goto('/');
 		await expect(page.getByText('Bareframe', { exact: false }).first()).toBeVisible();

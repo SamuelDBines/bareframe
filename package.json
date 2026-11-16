@@ -65,6 +65,7 @@
     "smoke:pages": "node ./scripts/smoke-pages.mjs",
     "studio": "pnpm run build && pnpm --prefix showcase dev",
     "validate:theme": "node ./scripts/validate-theme.mjs",
+    "check:no-em-dashes": "node ./scripts/check-no-em-dashes.mjs",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium",
     "showcase:dev": "pnpm --prefix showcase dev",

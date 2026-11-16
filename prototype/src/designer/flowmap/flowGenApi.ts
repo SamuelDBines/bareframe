@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { FlowPlatform, ProjectDocument } from '@bareframe/designer-core';
+import type { FlowDevice, FlowPlatform, ProjectDocument } from '@bareframe/designer-core';
 import { ApiError, apiFail, friendlyError } from '../../app/apiError';
 import { fetchProject, fromProjectDocument } from '../projectApi';
 import { useDesigner } from '../store';
@@ -15,7 +15,13 @@ export type GenerateFlowResult = {
 
 export async function generateFlow(
 	projectId: string,
-	body: { baseVersion: number; description?: string; platform?: FlowPlatform; instruction?: string },
+	body: {
+		baseVersion: number;
+		description?: string;
+		platform?: FlowPlatform;
+		platforms?: FlowDevice[];
+		instruction?: string;
+	},
 ): Promise<GenerateFlowResult> {
 	const res = await fetch(`/api/projects/${projectId}/flow/generate`, {
 		method: 'POST',
@@ -45,13 +51,20 @@ export function useGenerateFlow(projectId: string | undefined) {
 	const [error, setError] = useState<string | null>(null);
 
 	const run = useCallback(
-		async (input: { description?: string; platform?: FlowPlatform; instruction?: string }) => {
+		async (input: { description?: string; platforms?: FlowDevice[]; instruction?: string }) => {
 			if (!projectId) return null;
 			setBusy(true);
 			setError(null);
 			try {
-				const current = await fetchProject(projectId);
-				const result = await generateFlow(projectId, { baseVersion: current.version, ...input });
+				const attempt = async () => generateFlow(projectId, { baseVersion: (await fetchProject(projectId)).version, ...input });
+				let result: GenerateFlowResult;
+				try {
+					result = await attempt();
+				} catch (e) {
+					// An autosave can land between reading the version and generating; retry once.
+					if (!(e instanceof ApiError && e.status === 409)) throw e;
+					result = await attempt();
+				}
 				dispatch({
 					type: 'hydrateProject',
 					project: fromProjectDocument(result.document),

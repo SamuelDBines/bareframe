@@ -9,6 +9,8 @@ export type ButtonProps = Omit<RACButtonProps, 'className'> & {
 	variant?: ButtonVariant;
 	size?: ButtonSize;
 	loading?: boolean;
+	/** Alias for `isDisabled`, matching the native button attribute. */
+	disabled?: boolean;
 	className?: string;
 	children?: ReactNode;
 };
@@ -21,6 +23,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 		className,
 		children,
 		isDisabled,
+		disabled,
 		...props
 	},
 	ref,
@@ -29,7 +32,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 		<RACButton
 			ref={ref}
 			className={cn('btn', 'bf-btn', `bf-btn--${variant}`, `bf-btn--${size}`, className)}
-			isDisabled={isDisabled || loading}
+			isDisabled={isDisabled || disabled || loading}
 			aria-busy={loading || undefined}
 			{...props}
 		>

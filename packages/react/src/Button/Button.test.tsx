@@ -29,6 +29,20 @@ describe('Button', () => {
 		expect(screen.getByRole('button')).toBeDisabled();
 	});
 
+	it('accepts the native disabled prop as an alias for isDisabled', async () => {
+		const user = userEvent.setup();
+		const onPress = vi.fn();
+		render(
+			<Button disabled onPress={onPress}>
+				Save
+			</Button>,
+		);
+		const button = screen.getByRole('button');
+		expect(button).toBeDisabled();
+		await user.click(button);
+		expect(onPress).not.toHaveBeenCalled();
+	});
+
 	it('has no axe violations', async () => {
 		const { container } = render(<Button>Primary</Button>);
 		expect(await axe(container)).toHaveNoViolations();

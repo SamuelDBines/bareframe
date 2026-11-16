@@ -252,7 +252,7 @@
 @media (max-width: 720px) {
 	.flow-map-stage--with-notes .flow-map-viewport {
 		right: 0;
-		bottom: min(45%, 360px);
+		bottom: min(62%, 28rem);
 	}
 
 	.flow-map-notes-panel {
@@ -261,11 +261,56 @@
 		left: 0;
 		right: 0;
 		width: 100%;
-		max-height: min(45%, 360px);
+		height: min(62%, 28rem);
+		max-height: min(62%, 28rem);
 		z-index: 12;
+		gap: 0.5rem;
+		padding: 0.5rem 0.65rem calc(0.5rem + env(safe-area-inset-bottom, 0));
 		border-left: none;
 		border-top: 1px solid var(--bx-border, #e5e7eb);
 		box-shadow: 0 -8px 24px rgb(28 28 60 / 8%);
+	}
+
+	.flow-map-notes-panel__head .bx-hint {
+		display: none;
+	}
+
+	.flow-map-notes-panel__compose textarea {
+		min-height: 3.25rem;
+	}
+
+	.flow-map-notes-panel__screen-filter {
+		display: none;
+	}
+
+	.flow-map-notes-panel__filter-row {
+		order: 5;
+		flex-shrink: 0;
+	}
+
+	.flow-map-notes-panel__compose {
+		order: 4;
+		flex-shrink: 0;
+	}
+
+	.flow-map-notes-panel__filters {
+		order: 1;
+	}
+
+	.flow-map-notes-panel__paste {
+		order: 3;
+	}
+
+	.flow-map-notes-panel__list {
+		order: 2;
+		flex: 1 1 auto;
+		min-height: 7.5rem;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.flow-map-notes-item__actions .btn {
+		min-height: 2.25rem;
+		min-width: 2.75rem;
 	}
 }
 

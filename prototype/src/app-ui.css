@@ -1046,6 +1046,14 @@
 		min-height: 0;
 	}
 
+	.app-project-layout:has(.flow-map-workspace--notes-open) {
+		grid-template-rows: minmax(0, 1fr);
+	}
+
+	.app-project-layout:has(.flow-map-workspace--notes-open) > .side-panel {
+		display: none;
+	}
+
 	.app-project-canvas {
 		min-height: 0;
 	}

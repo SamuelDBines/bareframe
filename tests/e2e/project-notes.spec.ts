@@ -150,8 +150,9 @@ test.describe('project notes panel', () => {
 				res.url().includes(`/api/projects/${PROJECT_ID}/notes/`) &&
 				res.status() === 200,
 		);
+		await expect(markDone).toBeVisible();
 		await markDone.scrollIntoViewIfNeeded();
-		await markDone.click({ force: true });
+		await markDone.click();
 		await patchDone;
 		await page.getByTestId('project-notes-filter-done').click();
 		await expect(page.getByTestId('project-note-item')).toHaveCount(1);

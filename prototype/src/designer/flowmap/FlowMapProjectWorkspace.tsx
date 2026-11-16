@@ -115,7 +115,12 @@ export function FlowMapProjectWorkspace({
 	}
 
 	const stage = (
-		<div className="flow-map-workspace" data-testid="flow-map-workspace">
+		<div
+			className={`flow-map-workspace${
+				notesOpen && cloudProjectId ? ' flow-map-workspace--notes-open' : ''
+			}`}
+			data-testid="flow-map-workspace"
+		>
 			<FlowMapToolbar
 				mode={mode}
 				onModeChange={(m) => {

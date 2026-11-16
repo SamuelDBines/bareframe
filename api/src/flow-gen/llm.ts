@@ -2,6 +2,7 @@ import { createOpenAiCompatibleAdapter } from '@bareframe/package-generator';
 import {
 	FLOW_SPEC_SCHEMA_HINT,
 	slugifyScreenId,
+	type FlowDevice,
 	type FlowPlatform,
 	type FlowSpec,
 } from '@bareframe/designer-core';
@@ -11,6 +12,8 @@ import { NO_EMDASH_INSTRUCTION } from '../llm/copy-style.js';
 export type FlowGenerationInput = {
 	description: string;
 	platform: FlowPlatform;
+	/** Exact devices chosen, when more specific than `platform`. */
+	platforms?: FlowDevice[];
 	/** Follow-up such as "add a settings screen"; `current` is the flow to change. */
 	instruction?: string;
 	current?: FlowSpec;
@@ -35,12 +38,13 @@ Rules:
 - Do not invent features the description does not imply.
 ${NO_EMDASH_INSTRUCTION}`;
 
-function platformText(platform: FlowPlatform) {
-	return platform === 'all' ? 'mobile, tablet and desktop' : platform;
+function platformText(platform: FlowPlatform, platforms?: FlowDevice[]) {
+	const devices = platforms?.length ? platforms : platform === 'all' ? ['mobile', 'tablet', 'desktop'] : [platform];
+	return devices.length > 1 ? `${devices.slice(0, -1).join(', ')} and ${devices.at(-1)}` : devices[0]!;
 }
 
 export function buildFlowUserPrompt(input: FlowGenerationInput): string {
-	const parts = [`Product description:\n${input.description}`, `Platform: ${platformText(input.platform)}`];
+	const parts = [`Product description:\n${input.description}`, `Platform: ${platformText(input.platform, input.platforms)}`];
 	if (input.current && input.instruction) {
 		parts.push(`Current flow (JSON):\n${JSON.stringify(input.current)}`);
 		parts.push(

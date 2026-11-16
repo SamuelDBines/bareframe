@@ -77,6 +77,8 @@ export type ScreenBrief = {
 export type ProductBrief = {
 	description: string;
 	platform: 'mobile' | 'tablet' | 'desktop' | 'all';
+	/** Devices chosen, when more specific than `platform` (e.g. mobile and desktop). */
+	platforms?: ('mobile' | 'tablet' | 'desktop')[];
 	updatedAt: string;
 };
 

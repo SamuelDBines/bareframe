@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { FLOW_LIMITS } from '@bareframe/designer-core';
+import { FLOW_LIMITS, devicesForPlatform } from '@bareframe/designer-core';
 import { useDesigner } from '../store';
 import { DescribeProductForm } from './DescribeProductForm';
 import { flowResultMessage, useGenerateFlow } from './flowGenApi';
@@ -140,7 +140,7 @@ export function RefineFlowDialog({ projectId, onClose, onDone }: Props) {
 						</p>
 						<DescribeProductForm
 							initialDescription={brief?.description}
-							initialPlatform={brief?.platform}
+							initialPlatforms={brief ? (brief.platforms ?? devicesForPlatform(brief.platform)) : undefined}
 							busy={busy}
 							error={error}
 							submitLabel="Map flow again"

@@ -27,9 +27,7 @@ export function AppShell() {
 
 	const fullBleed =
 		(pathname.startsWith('/app/project') && !pathname.includes('/website-setup')) ||
-		pathname.startsWith('/share') ||
-		pathname.startsWith('/demo/journey-review') ||
-		pathname.startsWith('/demo/share-canvas');
+		pathname.startsWith('/share');
 
 	useEffect(() => {
 		const onScroll = () => setScrolled(window.scrollY > 8);

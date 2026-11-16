@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { CATEGORY_LABEL, SEVERITY_ORDER, severityOf, useReview, type Severity } from '../../app/ReviewContext';
 import type { ReviewIssue } from '../../app/reviewApi';
 import { useDesigner } from '../../designer/store';
+import { useAiConfigured } from '../../app/useAiAvailable';
 
 const SEV_LABEL: Record<Severity, string> = { critical: 'Critical', major: 'Major', minor: 'Minor', info: 'Info' };
 
@@ -149,6 +150,7 @@ function ScreenTab() {
 export function AppReviewPanel() {
 	const review = useReview();
 	const { state } = useDesigner();
+	const aiConfigured = useAiConfigured();
 	const [tab, setTab] = useState<Tab>('findings');
 	const [filter, setFilter] = useState<Severity | 'all'>('all');
 
@@ -176,6 +178,14 @@ export function AppReviewPanel() {
 		);
 
 	if (!review) return null;
+	// No AI on this workspace: the review can never run, so show only the screen details.
+	if (!aiConfigured && !review.demo) {
+		return (
+			<aside className="side-panel side-panel--screen-only" aria-label="Project details">
+				<ScreenTab />
+			</aside>
+		);
+	}
 	const frameName = (id?: string) => state.project.frames.find((f) => f.id === id)?.name;
 	const running = review.status === 'running';
 

@@ -22,11 +22,13 @@ type AuthStatus = 'loading' | 'authenticated' | 'anonymous' | 'unavailable';
 type AuthContextValue = {
 	status: AuthStatus;
 	user: AuthUser | null;
+	/** False when this workspace runs without AI; AI-only features are hidden rather than failing. */
+	aiAvailable: boolean;
 	refresh: () => Promise<void>;
 	signOut: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 let apiAvailability: 'unknown' | 'available' | 'missing' = 'unknown';
 
@@ -47,16 +49,17 @@ async function probeApiAvailable(): Promise<boolean> {
 	}
 }
 
-async function fetchMe(): Promise<AuthUser | null> {
+async function fetchMe(): Promise<{ user: AuthUser | null; aiAvailable: boolean }> {
 	const res = await fetch('/api/me', { credentials: 'include' });
 	if (!res.ok) throw new Error(`me ${res.status}`);
-	const data = (await res.json()) as { user: AuthUser | null };
-	return data.user ?? null;
+	const data = (await res.json()) as { user: AuthUser | null; features?: { ai?: boolean } };
+	return { user: data.user ?? null, aiAvailable: data.features?.ai !== false };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [status, setStatus] = useState<AuthStatus>('loading');
 	const [user, setUser] = useState<AuthUser | null>(null);
+	const [aiAvailable, setAiAvailable] = useState(true);
 
 	const refresh = useCallback(async () => {
 		try {
@@ -66,9 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				setStatus('anonymous');
 				return;
 			}
-			const u = await fetchMe();
-			setUser(u);
-			setStatus(u ? 'authenticated' : 'anonymous');
+			const me = await fetchMe();
+			setUser(me.user);
+			setAiAvailable(me.aiAvailable);
+			setStatus(me.user ? 'authenticated' : 'anonymous');
 		} catch {
 			setUser(null);
 			setStatus('unavailable');
@@ -93,8 +97,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	const value = useMemo(
-		() => ({ status, user, refresh, signOut }),
-		[status, user, refresh, signOut],
+		() => ({ status, user, aiAvailable, refresh, signOut }),
+		[status, user, aiAvailable, refresh, signOut],
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

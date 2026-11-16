@@ -3,6 +3,7 @@ import type { ThemeId } from '../../theme/themes';
 import { SEVERITY_ORDER, severityOf, useReview, type Severity } from '../../app/ReviewContext';
 import type { ReviewIssue } from '../../app/reviewApi';
 import { FramePreview } from '../components/FramePreview';
+import { useAppCanvasChrome } from '../AppCanvasChrome';
 import { useDesigner } from '../store';
 import type { Annotation, Frame, Page } from '../types';
 import {
@@ -286,6 +287,9 @@ export function FlowMapCanvas({
 	const { project, ui } = state;
 	const camera = ui.camera;
 	const containerRef = useRef<HTMLDivElement>(null);
+	const { embedded } = useAppCanvasChrome();
+	const [scrollHint, setScrollHint] = useState(false);
+	const scrollHintTimer = useRef<number | undefined>(undefined);
 	const worldRef = useRef<HTMLDivElement>(null);
 	const liveCameraRef = useRef(camera);
 	const [viewport, setViewport] = useState({ w: 900, h: 600 });
@@ -384,8 +388,17 @@ export function FlowMapCanvas({
 			commitCamera(setCameraZoomAtScreenPoint(cam, e.clientX, e.clientY, rect.left, rect.top, cam.zoom * factor));
 			return;
 		}
+		if (embedded) {
+			// Inside a scrolling page: let the page scroll, and say how to move the map instead.
+			setScrollHint(true);
+			window.clearTimeout(scrollHintTimer.current);
+			scrollHintTimer.current = window.setTimeout(() => setScrollHint(false), 1600);
+			return;
+		}
 		commitCamera(panCamera(liveCameraRef.current, -e.deltaX, -e.deltaY));
 	};
+
+	useEffect(() => () => window.clearTimeout(scrollHintTimer.current), []);
 
 	useEffect(() => {
 		// React's onWheel is passive; block browser zoom on pinch inside the canvas.
@@ -519,6 +532,11 @@ export function FlowMapCanvas({
 			aria-label="Flow map. Arrow keys pan, plus and minus zoom, 0 fits the flow. Tab to move between screens."
 			data-testid="flow-map-viewport"
 		>
+			{embedded ? (
+				<p className={`flow-map-scroll-hint${scrollHint ? ' is-visible' : ''}`} aria-hidden={!scrollHint}>
+					Drag to move the map. Pinch or hold Ctrl (⌘ on Mac) and scroll to zoom.
+				</p>
+			) : null}
 			<div
 				className="flow-map-grid"
 				onContextMenu={(e) => {

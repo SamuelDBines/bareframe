@@ -27,6 +27,9 @@ export const STUDIO_TOOL_NAMES = [
 	'list_recordings',
 	'build_flow_from_recording',
 	'review_project',
+	'list_notes',
+	'add_note',
+	'update_note',
 	'check_url',
 ] as const;
 
@@ -759,6 +762,86 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 				);
 			}
 			return { content: [{ type: 'text', text: JSON.stringify(last, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'list_notes',
+		{
+			description: 'List project review notes (filter by status, screen frameId, tag, or body search).',
+			inputSchema: {
+				projectId: z.string(),
+				status: z.enum(['open', 'done', 'all']).optional(),
+				frameId: z.string().optional(),
+				tag: z.string().optional(),
+				q: z.string().optional(),
+			},
+		},
+		async (args) => {
+			const q = new URLSearchParams();
+			if (args.status) q.set('status', args.status);
+			if (args.frameId) q.set('frameId', args.frameId);
+			if (args.tag) q.set('tag', args.tag);
+			if (args.q) q.set('q', args.q);
+			const suffix = q.toString() ? `?${q.toString()}` : '';
+			const data = await api.request(`/api/projects/${args.projectId}/notes${suffix}`);
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'add_note',
+		{
+			description: 'Add a project note while reviewing a site (requires notes:write or projects:write).',
+			inputSchema: {
+				projectId: z.string(),
+				where: z.string().optional(),
+				body: z.string().min(1),
+				frameId: z.string().optional(),
+				nodeId: z.string().optional(),
+				pageUrl: z.string().optional(),
+				tags: z.array(z.string()).optional(),
+			},
+		},
+		async (args) => {
+			const data = await api.request(`/api/projects/${args.projectId}/notes`, {
+				method: 'POST',
+				body: JSON.stringify({
+					where: args.where,
+					body: args.body,
+					frameId: args.frameId,
+					nodeId: args.nodeId,
+					pageUrl: args.pageUrl,
+					tags: args.tags,
+				}),
+			});
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'update_note',
+		{
+			description: 'Update note Where, Issue, pins, tags, or mark open/done.',
+			inputSchema: {
+				projectId: z.string(),
+				noteId: z.string().uuid(),
+				where: z.string().nullable().optional(),
+				body: z.string().min(1).optional(),
+				frameId: z.string().nullable().optional(),
+				nodeId: z.string().nullable().optional(),
+				pageUrl: z.string().nullable().optional(),
+				status: z.enum(['open', 'done']).optional(),
+				tags: z.array(z.string()).optional(),
+			},
+		},
+		async (args) => {
+			const { projectId, noteId, ...patch } = args;
+			const data = await api.request(`/api/projects/${projectId}/notes/${noteId}`, {
+				method: 'PATCH',
+				body: JSON.stringify(patch),
+			});
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
 		},
 	);
 

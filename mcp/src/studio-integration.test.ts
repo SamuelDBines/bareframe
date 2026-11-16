@@ -117,4 +117,46 @@ describe.skipIf(!databaseUrl)('Studio MCP end-to-end', () => {
 		await client.close();
 		globalThis.fetch = origFetch;
 	});
+
+	it('add_note and list_notes via MCP', async () => {
+		const origFetch = globalThis.fetch;
+		globalThis.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+			const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+			if (url.startsWith(studioUrl)) {
+				const headers = new Headers(init?.headers);
+				headers.set('Authorization', `Bearer ${token}`);
+				return origFetch(input, { ...init, headers });
+			}
+			return origFetch(input, init);
+		};
+
+		const transport = new StreamableHTTPClientTransport(new URL(studioUrl));
+		const client = new Client({ name: 'studio-notes', version: '1.0.0' });
+		await client.connect(transport);
+
+		const added = await client.callTool({
+			name: 'add_note',
+			arguments: { projectId, where: 'Sign up screen', body: 'Signup form lacks labels' },
+		});
+		expect(added.isError).not.toBe(true);
+		const addedText = (added.content as { type: string; text: string }[])[0]?.text ?? '';
+		const created = JSON.parse(addedText) as { note: { id: string } };
+
+		const listed = await client.callTool({
+			name: 'list_notes',
+			arguments: { projectId, status: 'open' },
+		});
+		const listText = (listed.content as { type: string; text: string }[])[0]?.text ?? '';
+		const list = JSON.parse(listText) as { notes: { id: string }[] };
+		expect(list.notes.some((n) => n.id === created.note.id)).toBe(true);
+
+		const updated = await client.callTool({
+			name: 'update_note',
+			arguments: { projectId, noteId: created.note.id, status: 'done' },
+		});
+		expect(updated.isError).not.toBe(true);
+
+		await client.close();
+		globalThis.fetch = origFetch;
+	});
 });

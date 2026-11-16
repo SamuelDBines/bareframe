@@ -15,6 +15,9 @@ import type { DesignDevice } from '@bareframe/designer-core';
 import { PrototypePlayer } from './PrototypePlayer';
 import { FlowMapScreenLinkPanel } from './FlowMapScreenLinkPanel';
 import './flow-map-ui.css';
+import { useAuth } from '../../auth/AuthContext';
+import { ProjectNotesPanel } from './ProjectNotesPanel';
+import { ProjectNotesProvider } from './ProjectNotesContext';
 
 type Props = {
 	readOnly?: boolean;
@@ -47,6 +50,10 @@ export function FlowMapProjectWorkspace({
 		return first === 'tablet' ? 'tablet' : first === 'desktop' ? 'desktop' : 'phone';
 	});
 	const designs = useDesignQueue(chrome.projectId);
+	const { status: authStatus } = useAuth();
+	const [notesOpen, setNotesOpen] = useState(false);
+	const cloudProjectId =
+		!readOnly && authStatus === 'authenticated' && chrome.projectId ? chrome.projectId : undefined;
 
 	const screenCount = useMemo(
 		() => state.project.frames.filter((f) => !f.ghost).length,
@@ -113,8 +120,13 @@ export function FlowMapProjectWorkspace({
 		);
 	}
 
-	return (
-		<div className="flow-map-workspace" data-testid="flow-map-workspace">
+	const stage = (
+		<div
+			className={`flow-map-workspace${
+				notesOpen && cloudProjectId ? ' flow-map-workspace--notes-open' : ''
+			}`}
+			data-testid="flow-map-workspace"
+		>
 			<FlowMapToolbar
 				mode={mode}
 				onModeChange={(m) => {
@@ -134,6 +146,9 @@ export function FlowMapProjectWorkspace({
 				readOnly={readOnly}
 				onStartTour={() => setTourOpen(true)}
 				onRefineFlow={canUseAi && !flowIsEmpty ? () => setRefineOpen(true) : undefined}
+				showNotes={Boolean(cloudProjectId)}
+				notesOpen={notesOpen}
+				onNotesOpenChange={setNotesOpen}
 			/>
 			{canUseAi && !flowIsEmpty ? (
 				<DesignBar
@@ -146,7 +161,11 @@ export function FlowMapProjectWorkspace({
 					onDismiss={designs.dismiss}
 				/>
 			) : null}
-			<div className={`flow-map-stage${showLinkPanel ? ' flow-map-stage--with-link' : ''}`}>
+			<div
+				className={`flow-map-stage${showLinkPanel ? ' flow-map-stage--with-link' : ''}${
+					notesOpen && cloudProjectId ? ' flow-map-stage--with-notes' : ''
+				}`}
+			>
 				{showLinkPanel ? <FlowMapScreenLinkPanel /> : null}
 				<FlowMapCanvas
 					readOnly={readOnly}
@@ -179,6 +198,16 @@ export function FlowMapProjectWorkspace({
 						dispatch({ type: 'addFrame', presetId: 'iphone-15' });
 					}}
 				/>
+				{notesOpen && cloudProjectId ? (
+					<ProjectNotesPanel
+						projectId={cloudProjectId}
+						onClose={() => setNotesOpen(false)}
+						onFocusFrame={(frameId) => {
+							dispatch({ type: 'selectFrame', frameId });
+							setMode('map');
+						}}
+					/>
+				) : null}
 				{showDescribe && chrome.projectId ? (
 					<DescribeProductPanel
 						projectId={chrome.projectId}
@@ -241,4 +270,6 @@ export function FlowMapProjectWorkspace({
 			<FlowMapTour open={tourOpen} onOpenChange={setTourOpen} autoEligible={tourAutoEligible} />
 		</div>
 	);
+
+	return cloudProjectId ? <ProjectNotesProvider projectId={cloudProjectId}>{stage}</ProjectNotesProvider> : stage;
 }

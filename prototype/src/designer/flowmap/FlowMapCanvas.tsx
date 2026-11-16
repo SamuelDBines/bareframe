@@ -17,6 +17,7 @@ import {
 } from './flowMapLayout';
 import { panCamera, setCameraZoomAtScreenPoint, zoomCameraAroundPoint, type Camera } from '../camera';
 import type { ContextMenuState } from './FlowMapContextMenu';
+import { useProjectNotes } from './ProjectNotesContext';
 
 const THUMB_SCALE = FLOW_CARD_WIDTH / 393;
 const SEV_LABEL: Record<Severity, string> = { critical: 'Critical', major: 'Major', minor: 'Minor', info: 'Info' };
@@ -134,9 +135,11 @@ function FlowMapCard({
 	designBusy?: boolean;
 }) {
 	const review = useReview();
+	const projectNotes = useProjectNotes();
 	const hasDesign = (page.nodes[page.rootNodeId]?.children.length ?? 0) > 0;
 	const dragRef = useRef<{ x: number; y: number; ox: number; oy: number; moved: boolean } | null>(null);
 	const notes = annotations.filter((a) => a.kind === 'note');
+	const projectNoteOpenCount = projectNotes?.openCountByFrame.get(frame.id) ?? 0;
 	const openCount = issues?.filter((i) => i.status === 'open').length ?? 0;
 
 	return (
@@ -219,6 +222,15 @@ function FlowMapCard({
 				{notes.length ? (
 					<span className="flow-map-card__note" title={notes.map((n) => n.text).join('\n')}>
 						{notes.length} fix note{notes.length === 1 ? '' : 's'}
+					</span>
+				) : null}
+				{projectNoteOpenCount > 0 ? (
+					<span
+						className="flow-map-card__project-note"
+						data-testid="flow-map-card-project-note-count"
+						title={`${projectNoteOpenCount} open project note${projectNoteOpenCount === 1 ? '' : 's'}`}
+					>
+						{projectNoteOpenCount}
 					</span>
 				) : null}
 			</div>

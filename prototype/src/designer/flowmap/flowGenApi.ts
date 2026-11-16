@@ -50,8 +50,15 @@ export function useGenerateFlow(projectId: string | undefined) {
 			setBusy(true);
 			setError(null);
 			try {
-				const current = await fetchProject(projectId);
-				const result = await generateFlow(projectId, { baseVersion: current.version, ...input });
+				const attempt = async () => generateFlow(projectId, { baseVersion: (await fetchProject(projectId)).version, ...input });
+				let result: GenerateFlowResult;
+				try {
+					result = await attempt();
+				} catch (e) {
+					// An autosave can land between reading the version and generating; retry once.
+					if (!(e instanceof ApiError && e.status === 409)) throw e;
+					result = await attempt();
+				}
 				dispatch({
 					type: 'hydrateProject',
 					project: fromProjectDocument(result.document),

@@ -99,10 +99,32 @@
 	margin: 0;
 }
 
+.flow-map-notes-panel__filter-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.flow-map-notes-panel__paste textarea {
+	width: 100%;
+	font: inherit;
+	padding: 0.55rem 0.65rem;
+	border: 1px solid var(--bx-border, #e5e7eb);
+	border-radius: 8px;
+}
+
+.flow-map-notes-panel__paste-preview {
+	margin: 0.5rem 0;
+	padding-left: 1.25rem;
+	font-size: 0.85rem;
+	color: var(--bx-text-2, #64748b);
+}
+
 .flow-map-notes-panel__list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	counter-reset: note-num;
 	display: flex;
 	flex-direction: column;
 	gap: 0.65rem;
@@ -134,6 +156,24 @@
 
 .flow-map-notes-item--done {
 	opacity: 0.82;
+}
+
+.flow-map-notes-item__number {
+	display: inline-grid;
+	place-items: center;
+	min-width: 1.4rem;
+	height: 1.4rem;
+	border-radius: 6px;
+	background: var(--bx-surface, #fff);
+	border: 1px solid var(--bx-border, #e5e7eb);
+	font-size: 0.75rem;
+	font-weight: 800;
+}
+
+.flow-map-notes-item__where {
+	font-size: 0.82rem;
+	font-weight: 600;
+	color: var(--bx-text, #1e293b);
 }
 
 .flow-map-notes-item__meta {

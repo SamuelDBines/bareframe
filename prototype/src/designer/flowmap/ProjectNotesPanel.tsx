@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
 	createProjectNote,
+	createProjectNotesBatch,
 	deleteProjectNote,
 	listProjectNotes,
 	notesToMarkdown,
 	updateProjectNote,
 	type ProjectNote,
 } from '../../app/notesApi';
+import { parseBulkNotes, type ParsedBulkNote } from '../../app/parseBulkNotes';
 import { friendlyError } from '../../app/apiError';
 import { useDesigner } from '../store';
 import { useProjectNotes } from './ProjectNotesContext';
@@ -26,15 +28,23 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 	const [notes, setNotes] = useState<ProjectNote[]>([]);
 	const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 	const [screenFilter, setScreenFilter] = useState<string>('');
-	const [draft, setDraft] = useState('');
+	const [whereDraft, setWhereDraft] = useState('');
+	const [issueDraft, setIssueDraft] = useState('');
+	const lastWhereRef = useRef('');
 	const [pinFrame, setPinFrame] = useState(Boolean(state.ui.selectedFrameId));
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [editingId, setEditingId] = useState<string | null>(null);
-	const [editBody, setEditBody] = useState('');
-	const composeRef = useRef<HTMLTextAreaElement>(null);
+	const [editWhere, setEditWhere] = useState('');
+	const [editIssue, setEditIssue] = useState('');
+	const [pasteOpen, setPasteOpen] = useState(false);
+	const [pasteText, setPasteText] = useState('');
+	const [pastePreview, setPastePreview] = useState<ParsedBulkNote[]>([]);
+	const issueRef = useRef<HTMLTextAreaElement>(null);
 	const pinId = useId();
 	const filterScreenId = useId();
+	const whereComposeId = useId();
+	const issueComposeId = useId();
 
 	const selectedFrameId = state.ui.selectedFrameId;
 
@@ -56,22 +66,55 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 	}, [load]);
 
 	useEffect(() => {
-		composeRef.current?.focus();
+		issueRef.current?.focus();
 	}, []);
 
+	useEffect(() => {
+		if (pasteOpen) setPastePreview(parseBulkNotes(pasteText));
+	}, [pasteOpen, pasteText]);
+
 	async function submitDraft() {
-		const body = draft.trim();
+		const body = issueDraft.trim();
 		if (!body || busy) return;
+		const where = whereDraft.trim() || lastWhereRef.current.trim() || null;
 		setBusy(true);
 		setError(null);
 		try {
 			const frameId = pinFrame && selectedFrameId ? selectedFrameId : null;
-			const created = await createProjectNote(projectId, { body, frameId });
-			setNotes((prev) => [created, ...prev]);
+			const created = await createProjectNote(projectId, { where, body, frameId });
+			setNotes((prev) => [...prev, created]);
 			notesCtx?.mergeNote(created);
-			setDraft('');
+			if (where) lastWhereRef.current = where;
+			setWhereDraft(where ?? '');
+			setIssueDraft('');
 		} catch (err) {
 			setError(friendlyError(err, 'Could not save note'));
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	async function savePasteBatch() {
+		if (!pastePreview.length || busy) return;
+		setBusy(true);
+		try {
+			const created = await createProjectNotesBatch(
+				projectId,
+				pastePreview.map((p) => ({ where: p.where || null, body: p.issue })),
+			);
+			setNotes((prev) => [...prev, ...created]);
+			for (const n of created) notesCtx?.mergeNote(n);
+			const last = pastePreview[pastePreview.length - 1];
+			if (last?.where) {
+				lastWhereRef.current = last.where;
+				setWhereDraft(last.where);
+			}
+			setPasteText('');
+			setPastePreview([]);
+			setPasteOpen(false);
+			void load();
+		} catch (err) {
+			setError(friendlyError(err, 'Could not import notes'));
 		} finally {
 			setBusy(false);
 		}
@@ -93,11 +136,14 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 	}
 
 	async function saveEdit(noteId: string) {
-		const body = editBody.trim();
+		const body = editIssue.trim();
 		if (!body) return;
 		setBusy(true);
 		try {
-			const updated = await updateProjectNote(projectId, noteId, { body });
+			const updated = await updateProjectNote(projectId, noteId, {
+				where: editWhere.trim() || null,
+				body,
+			});
 			setNotes((prev) => prev.map((n) => (n.id === noteId ? updated : n)));
 			notesCtx?.mergeNote(updated);
 			setEditingId(null);
@@ -124,7 +170,7 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 
 	async function copyMarkdown() {
 		const exportNotes = await listProjectNotes(projectId, { status: 'all' });
-		const md = notesToMarkdown(exportNotes, frameNameById);
+		const md = notesToMarkdown(exportNotes);
 		try {
 			await navigator.clipboard.writeText(md);
 		} catch {
@@ -132,7 +178,7 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 		}
 	}
 
-	function handleComposeKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+	function handleIssueKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			void submitDraft();
@@ -144,7 +190,7 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 			<header className="flow-map-notes-panel__head">
 				<div>
 					<strong>Notes</strong>
-					<p className="bx-hint">Capture issues while you review. Enter saves; Shift+Enter adds a line.</p>
+					<p className="bx-hint">Where + Issue per row. Enter in Issue saves; Shift+Enter adds a line.</p>
 				</div>
 				<button type="button" className="btn btn-sm btn-secondary" onClick={onClose} aria-label="Close notes">
 					Close
@@ -156,20 +202,32 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 				</p>
 			) : null}
 			<div className="flow-map-notes-panel__compose">
-				<label className="sr-only" htmlFor="project-note-compose">
-					New note
-				</label>
-				<textarea
-					id="project-note-compose"
-					ref={composeRef}
-					data-testid="project-note-compose"
-					rows={3}
-					placeholder="Describe an issue on this site…"
-					value={draft}
-					disabled={busy}
-					onChange={(e) => setDraft(e.target.value)}
-					onKeyDown={handleComposeKey}
-				/>
+				<div className="field">
+					<label htmlFor={whereComposeId}>Where</label>
+					<input
+						id={whereComposeId}
+						type="text"
+						data-testid="project-note-where"
+						placeholder="e.g. top navigation on root page"
+						value={whereDraft}
+						disabled={busy}
+						onChange={(e) => setWhereDraft(e.target.value)}
+					/>
+				</div>
+				<div className="field">
+					<label htmlFor={issueComposeId}>Issue</label>
+					<textarea
+						id={issueComposeId}
+						ref={issueRef}
+						data-testid="project-note-compose"
+						rows={3}
+						placeholder="What is wrong here?"
+						value={issueDraft}
+						disabled={busy}
+						onChange={(e) => setIssueDraft(e.target.value)}
+						onKeyDown={handleIssueKey}
+					/>
+				</div>
 				<div className="flow-map-notes-panel__compose-actions">
 					<label className="flow-map-notes-panel__pin">
 						<input
@@ -185,7 +243,7 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 						type="button"
 						className="btn btn-primary btn-sm"
 						data-testid="project-note-add"
-						disabled={busy || !draft.trim()}
+						disabled={busy || !issueDraft.trim()}
 						onClick={() => void submitDraft()}
 					>
 						Add
@@ -225,20 +283,66 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 							))}
 					</select>
 				</div>
-				<button
-					type="button"
-					className="btn btn-secondary btn-sm"
-					data-testid="project-notes-copy-md"
-					onClick={() => void copyMarkdown()}
-				>
-					Copy all as Markdown
-				</button>
+				<div className="flow-map-notes-panel__filter-row">
+					<button
+						type="button"
+						className="btn btn-secondary btn-sm"
+						data-testid="project-notes-paste-open"
+						onClick={() => setPasteOpen((o) => !o)}
+					>
+						Paste notes
+					</button>
+					<button
+						type="button"
+						className="btn btn-secondary btn-sm"
+						data-testid="project-notes-copy-md"
+						onClick={() => void copyMarkdown()}
+					>
+						Copy all as Markdown
+					</button>
+				</div>
 			</div>
-			<ul className="flow-map-notes-panel__list" data-testid="project-notes-list">
+			{pasteOpen ? (
+				<div className="flow-map-notes-panel__paste" data-testid="project-notes-paste">
+					<label className="sr-only" htmlFor="project-notes-paste-text">
+						Paste bulk notes
+					</label>
+					<textarea
+						id="project-notes-paste-text"
+						rows={6}
+						data-testid="project-notes-paste-text"
+						placeholder="Paste numbered Where/Issue blocks…"
+						value={pasteText}
+						onChange={(e) => setPasteText(e.target.value)}
+					/>
+					{pastePreview.length ? (
+						<ol className="flow-map-notes-panel__paste-preview" data-testid="project-notes-paste-preview">
+							{pastePreview.map((p) => (
+								<li key={`${p.index}-${p.where}-${p.issue.slice(0, 24)}`}>
+									<strong>{p.index}.</strong> {p.where ? <span>Where: {p.where}. </span> : null}
+									Issue: {p.issue}
+								</li>
+							))}
+						</ol>
+					) : (
+						<p className="bx-hint">No blocks recognized yet.</p>
+					)}
+					<button
+						type="button"
+						className="btn btn-primary btn-sm"
+						data-testid="project-notes-paste-save"
+						disabled={busy || !pastePreview.length}
+						onClick={() => void savePasteBatch()}
+					>
+						Save {pastePreview.length} note{pastePreview.length === 1 ? '' : 's'}
+					</button>
+				</div>
+			) : null}
+			<ol className="flow-map-notes-panel__list" data-testid="project-notes-list">
 				{notes.length === 0 ? (
 					<li className="flow-map-notes-panel__empty">No notes yet. Add the first issue above.</li>
 				) : (
-					notes.map((note) => (
+					notes.map((note, idx) => (
 						<li
 							key={note.id}
 							className={`flow-map-notes-item${note.status === 'done' ? ' flow-map-notes-item--done' : ''}${
@@ -259,26 +363,40 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 							tabIndex={note.frameId ? 0 : undefined}
 						>
 							<div className="flow-map-notes-item__meta">
+								<span className="flow-map-notes-item__number" aria-hidden>
+									{idx + 1}
+								</span>
 								<span className={`flow-map-notes-item__status flow-map-notes-item__status--${note.status}`}>
 									{note.status}
 								</span>
+								{note.where ? <span className="flow-map-notes-item__where">{note.where}</span> : null}
 								{note.frameId ? (
 									<button
 										type="button"
 										className="flow-map-notes-item__screen"
-										onClick={() => onFocusFrame(note.frameId!)}
+										onClick={(e) => {
+											e.stopPropagation();
+											onFocusFrame(note.frameId!);
+										}}
 									>
 										{frameNameById.get(note.frameId) ?? 'Screen'}
 									</button>
 								) : null}
 							</div>
 							{editingId === note.id ? (
-								<>
+								<div onClick={(e) => e.stopPropagation()}>
+									<input
+										type="text"
+										value={editWhere}
+										aria-label="Edit where"
+										onChange={(e) => setEditWhere(e.target.value)}
+									/>
 									<textarea
 										rows={3}
-										value={editBody}
-										onChange={(e) => setEditBody(e.target.value)}
+										value={editIssue}
+										aria-label="Edit issue"
 										data-testid="project-note-edit"
+										onChange={(e) => setEditIssue(e.target.value)}
 									/>
 									<div className="flow-map-notes-item__actions">
 										<button type="button" className="btn btn-primary btn-sm" onClick={() => void saveEdit(note.id)}>
@@ -288,7 +406,7 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 											Cancel
 										</button>
 									</div>
-								</>
+								</div>
 							) : (
 								<p className="flow-map-notes-item__body">{note.body}</p>
 							)}
@@ -307,7 +425,8 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 										className="btn btn-secondary btn-sm"
 										onClick={() => {
 											setEditingId(note.id);
-											setEditBody(note.body);
+											setEditWhere(note.where ?? '');
+											setEditIssue(note.body);
 										}}
 									>
 										Edit
@@ -320,7 +439,7 @@ export function ProjectNotesPanel({ projectId, onFocusFrame, onClose }: Props) {
 						</li>
 					))
 				)}
-			</ul>
+			</ol>
 		</aside>
 	);
 }

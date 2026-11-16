@@ -136,7 +136,7 @@ describe.skipIf(!databaseUrl)('Studio MCP end-to-end', () => {
 
 		const added = await client.callTool({
 			name: 'add_note',
-			arguments: { projectId, body: 'Signup form lacks labels' },
+			arguments: { projectId, where: 'Sign up screen', body: 'Signup form lacks labels' },
 		});
 		expect(added.isError).not.toBe(true);
 		const addedText = (added.content as { type: string; text: string }[])[0]?.text ?? '';

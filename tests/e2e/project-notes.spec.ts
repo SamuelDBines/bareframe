@@ -5,10 +5,32 @@ const PROJECT_ID = 'p-notes-e2e';
 
 type StoredNote = {
 	id: string;
+	where: string | null;
 	body: string;
 	frameId: string | null;
 	status: 'open' | 'done';
+	createdAt: string;
 };
+
+function notePayload(n: StoredNote) {
+	return {
+		id: n.id,
+		projectId: PROJECT_ID,
+		authorUserId: 1,
+		where: n.where,
+		body: n.body,
+		frameId: n.frameId,
+		nodeId: null,
+		pageUrl: null,
+		elementSelector: null,
+		screenshotAssetId: null,
+		status: n.status,
+		tags: [],
+		convertedToBacklogId: null,
+		createdAt: n.createdAt,
+		updatedAt: n.createdAt,
+	};
+}
 
 async function mockNotesApi(page: Page) {
 	let noteSeq = 0;
@@ -43,54 +65,23 @@ async function mockNotesApi(page: Page) {
 			const url = new URL(req.url());
 			const status = url.searchParams.get('status');
 			const frameId = url.searchParams.get('frameId');
-			let list = [...notes];
+			let list = [...notes].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 			if (status === 'open' || status === 'done') list = list.filter((n) => n.status === status);
 			if (frameId) list = list.filter((n) => n.frameId === frameId);
-			return json({
-				notes: list.map((n) => ({
-					id: n.id,
-					projectId: PROJECT_ID,
-					authorUserId: 1,
-					body: n.body,
-					frameId: n.frameId,
-					nodeId: null,
-					pageUrl: null,
-					status: n.status,
-					tags: [],
-					convertedToBacklogId: null,
-					createdAt: new Date().toISOString(),
-					updatedAt: new Date().toISOString(),
-				})),
-			});
+			return json({ notes: list.map(notePayload) });
 		}
 		if (p === `/api/projects/${PROJECT_ID}/notes` && req.method() === 'POST') {
-			const body = (await req.postDataJSON()) as { body?: string; frameId?: string };
+			const body = (await req.postDataJSON()) as { body?: string; where?: string; frameId?: string };
 			const note: StoredNote = {
 				id: `note-${++noteSeq}`,
+				where: body.where?.trim() || null,
 				body: body.body?.trim() ?? '',
 				frameId: body.frameId ?? null,
 				status: 'open',
+				createdAt: new Date().toISOString(),
 			};
-			notes.unshift(note);
-			return json(
-				{
-					note: {
-						id: note.id,
-						projectId: PROJECT_ID,
-						authorUserId: 1,
-						body: note.body,
-						frameId: note.frameId,
-						nodeId: null,
-						pageUrl: null,
-						status: note.status,
-						tags: [],
-						convertedToBacklogId: null,
-						createdAt: new Date().toISOString(),
-						updatedAt: new Date().toISOString(),
-					},
-				},
-				201,
-			);
+			notes.push(note);
+			return json({ note: notePayload(note) }, 201);
 		}
 		const patchMatch = p.match(new RegExp(`^/api/projects/${PROJECT_ID}/notes/([^/]+)$`));
 		if (patchMatch && req.method() === 'PATCH') {
@@ -99,22 +90,7 @@ async function mockNotesApi(page: Page) {
 			const target = notes.find((n) => n.id === noteId);
 			if (!target) return json({ error: 'Not found' }, 404);
 			if (patch.status) target.status = patch.status;
-			return json({
-				note: {
-					id: target.id,
-					projectId: PROJECT_ID,
-					authorUserId: 1,
-					body: target.body,
-					frameId: target.frameId,
-					nodeId: null,
-					pageUrl: null,
-					status: target.status,
-					tags: [],
-					convertedToBacklogId: null,
-					createdAt: new Date().toISOString(),
-					updatedAt: new Date().toISOString(),
-				},
-			});
+			return json({ note: notePayload(target) });
 		}
 		if (p.endsWith('/api/projects') && req.method() === 'GET') {
 			return json({ projects: [{ id: PROJECT_ID, name: 'Notes demo', version: 1 }] });
@@ -133,16 +109,18 @@ test.describe('project notes panel', () => {
 		await expect(page.getByTestId('flow-map-workspace')).toBeVisible({ timeout: 30_000 });
 	});
 
-	test('add, filter, and complete notes', async ({ page }) => {
+	test('add, filter, and complete notes with Where and Issue', async ({ page }) => {
 		await page.getByTestId('flow-notes-toggle').click();
 		await expect(page.getByTestId('project-notes-panel')).toBeVisible();
 
+		await page.getByTestId('project-note-where').fill('top navigation');
 		const compose = page.getByTestId('project-note-compose');
 		await compose.fill('Hero CTA is below the fold');
 		await page.getByTestId('project-note-add').click();
 		await expect(page.getByTestId('project-note-item')).toHaveCount(1);
 
-		await compose.fill('Footer links are stale');
+		await page.getByTestId('project-note-where').fill('footer');
+		await compose.fill('Stale copyright year');
 		await page.getByTestId('project-note-add').click();
 		await expect(page.getByTestId('project-note-item')).toHaveCount(2);
 

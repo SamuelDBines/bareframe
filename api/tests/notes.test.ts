@@ -59,11 +59,17 @@ describe('project notes API', () => {
 		const postRes = await fetch(`${baseUrl}/api/projects/${project.id}/notes`, {
 			method: 'POST',
 			headers: { Cookie: sessionCookie, 'Content-Type': 'application/json' },
-			body: JSON.stringify({ body: 'Checkout button is hard to find', frameId, tags: ['ux'] }),
+			body: JSON.stringify({
+				where: 'Checkout page',
+				body: 'Checkout button is hard to find',
+				frameId,
+				tags: ['ux'],
+			}),
 		});
 		expect(postRes.status).toBe(201);
-		const { note } = (await postRes.json()) as { note: { id: string; status: string } };
+		const { note } = (await postRes.json()) as { note: { id: string; status: string; where: string } };
 		expect(note.status).toBe('open');
+		expect(note.where).toBe('Checkout page');
 
 		const listRes = await fetch(`${baseUrl}/api/projects/${project.id}/notes?status=open&frameId=${frameId}`, {
 			headers: { Cookie: sessionCookie },
@@ -117,5 +123,34 @@ describe('project notes API', () => {
 			body: JSON.stringify({ body: 'From MCP' }),
 		});
 		expect(ok.status).toBe(201);
+	});
+
+	it('capture endpoint stores where, selector, and screenshot asset', async () => {
+		const created = await fetch(`${baseUrl}/api/projects`, {
+			method: 'POST',
+			headers: { Cookie: sessionCookie, 'Content-Type': 'application/json' },
+			body: JSON.stringify({ name: 'Capture notes' }),
+		});
+		const project = (await created.json()) as { id: string };
+		const png =
+			'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+		const cap = await fetch(`${baseUrl}/api/projects/${project.id}/notes/capture`, {
+			method: 'POST',
+			headers: { Cookie: sessionCookie, 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				where: 'app/Billing',
+				issue: 'Tax row missing',
+				pageUrl: 'https://example.com/billing',
+				elementSelector: 'table.totals tr.tax',
+				screenshot: png,
+			}),
+		});
+		expect(cap.status).toBe(201);
+		const body = (await cap.json()) as {
+			note: { where: string; body: string; screenshotAssetId: string | null; elementSelector: string | null };
+		};
+		expect(body.note.where).toBe('app/Billing');
+		expect(body.note.screenshotAssetId).toBeTruthy();
+		expect(body.note.elementSelector).toContain('tax');
 	});
 });

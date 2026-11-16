@@ -38,7 +38,12 @@ export function ProjectNotesProvider({ projectId, children }: { projectId: strin
 			notes,
 			openCountByFrame,
 			refresh,
-			mergeNote: (note) => setNotes((prev) => [note, ...prev.filter((n) => n.id !== note.id)]),
+			mergeNote: (note) =>
+				setNotes((prev) =>
+					[...prev.filter((n) => n.id !== note.id), note].sort(
+						(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+					),
+				),
 			removeNote: (noteId) => setNotes((prev) => prev.filter((n) => n.id !== noteId)),
 			reloadFromPanel: (next) => setNotes(next),
 		}),

@@ -795,6 +795,7 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 			description: 'Add a project note while reviewing a site (requires notes:write or projects:write).',
 			inputSchema: {
 				projectId: z.string(),
+				where: z.string().optional(),
 				body: z.string().min(1),
 				frameId: z.string().optional(),
 				nodeId: z.string().optional(),
@@ -806,6 +807,7 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 			const data = await api.request(`/api/projects/${args.projectId}/notes`, {
 				method: 'POST',
 				body: JSON.stringify({
+					where: args.where,
 					body: args.body,
 					frameId: args.frameId,
 					nodeId: args.nodeId,
@@ -820,10 +822,11 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 	server.registerTool(
 		'update_note',
 		{
-			description: 'Update note body, pins, tags, or mark open/done.',
+			description: 'Update note Where, Issue, pins, tags, or mark open/done.',
 			inputSchema: {
 				projectId: z.string(),
 				noteId: z.string().uuid(),
+				where: z.string().nullable().optional(),
 				body: z.string().min(1).optional(),
 				frameId: z.string().nullable().optional(),
 				nodeId: z.string().nullable().optional(),

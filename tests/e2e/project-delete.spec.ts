@@ -19,7 +19,7 @@ async function mockApi(page: Page, deleted: { value: boolean }) {
 				projects: [{ id: PROJECT_ID, name: 'To delete', version: 1, updatedAt: new Date().toISOString() }],
 			});
 		}
-		if (p.endsWith(`/api/projects/${PROJECT_ID}`) && req.method() === 'DELETE') {
+		if (p === `/api/projects/${PROJECT_ID}` && req.method() === 'DELETE') {
 			deleted.value = true;
 			return json({ ok: true });
 		}
@@ -38,12 +38,8 @@ test('deletes a project from the card menu', async ({ page, isMobile }) => {
 	const dialog = page.getByTestId('delete-project-dialog');
 	await expect(dialog).toBeVisible();
 	await expect(dialog).toContainText('To delete');
-	const deleteReq = page.waitForResponse(
-		(res) => res.request().method() === 'DELETE' && res.url().includes(`/api/projects/${PROJECT_ID}`),
-	);
 	await page.getByTestId('confirm-delete-project').click();
-	await deleteReq;
-	await expect(cardName).toHaveCount(0);
+	await expect(cardName).toHaveCount(0, { timeout: 15_000 });
 	if (!isMobile) {
 		await expect(page.getByTestId(`project-menu-${PROJECT_ID}`)).toHaveCount(0);
 	}

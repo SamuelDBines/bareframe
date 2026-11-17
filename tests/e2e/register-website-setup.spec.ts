@@ -51,11 +51,20 @@ test('sign-up and GitHub install preserve the website configure return URL', asy
 		);
 	}, PROJECT_ID);
 	await mockApi(page);
+	await page.route('**/api/me', (route) =>
+		route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify({ user: null, features: { ai: true, llm: false } }),
+		}),
+	);
 	await page.goto('/#/sign-up');
 	const signInHref = await page.getByRole('link', { name: 'Continue with GitHub' }).getAttribute('href');
 	expect(signInHref).toContain('returnTo=');
 	expect(decodeURIComponent(signInHref ?? '')).toMatch(/%2F%23%2Fapp|\/#\/app/);
 
+	await page.unroute('**/api/me');
+	await mockApi(page);
 	await page.goto(`/#/app/project/${PROJECT_ID}/website-setup?url=${encodeURIComponent(WEBSITE)}`);
 	await expect(page.getByTestId('website-capture-setup')).toBeVisible({ timeout: 15_000 });
 	await expect(page.getByText('Missing or invalid website URL')).toHaveCount(0);

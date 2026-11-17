@@ -60,9 +60,8 @@ export function FlowMapProjectWorkspace({
 		[state.project.frames],
 	);
 	const canGenerate = !readOnly && Boolean(chrome.projectId);
-	// AI-only actions (refine, screen designs) are hidden when this workspace has no AI.
 	const aiAvailable = useAiAvailable();
-	const canUseAi = canGenerate && aiAvailable;
+	const canUseDesignTools = canGenerate;
 	const showLinkPanel = mode === 'edit' && !connectMode && !readOnly && Boolean(state.ui.selectedFrameId);
 	// Empty project: no screens yet, or only the untouched starter screen.
 	const flowIsEmpty = useMemo(() => {
@@ -145,12 +144,12 @@ export function FlowMapProjectWorkspace({
 				}}
 				readOnly={readOnly}
 				onStartTour={() => setTourOpen(true)}
-				onRefineFlow={canUseAi && !flowIsEmpty ? () => setRefineOpen(true) : undefined}
+				onRefineFlow={canUseDesignTools && !flowIsEmpty ? () => setRefineOpen(true) : undefined}
 				showNotes={Boolean(cloudProjectId)}
 				notesOpen={notesOpen}
 				onNotesOpenChange={setNotesOpen}
 			/>
-			{canUseAi && !flowIsEmpty ? (
+			{canUseDesignTools && !flowIsEmpty ? (
 				<DesignBar
 					device={designDevice}
 					onDeviceChange={setDesignDevice}
@@ -164,13 +163,14 @@ export function FlowMapProjectWorkspace({
 			<div
 				className={`flow-map-stage${showLinkPanel ? ' flow-map-stage--with-link' : ''}${
 					notesOpen && cloudProjectId ? ' flow-map-stage--with-notes' : ''
-				}`}
+				}${showDescribe ? ' flow-map-stage--onboarding' : ''}`}
 			>
 				{showLinkPanel ? <FlowMapScreenLinkPanel /> : null}
 				<FlowMapCanvas
 					readOnly={readOnly}
 					hideEmptyState={showDescribe}
-					onGenerateDesign={canUseAi && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
+					workspaceMode={mode}
+					onGenerateDesign={canUseDesignTools && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
 					designingFrameId={designs.queue.currentFrameId}
 					designBusy={designs.queue.running}
 					connectMode={mode === 'edit' && connectMode && !readOnly}
@@ -251,7 +251,7 @@ export function FlowMapProjectWorkspace({
 				readOnly={readOnly}
 				onRename={promptRename}
 				onRequestDelete={(frame, connectorCount) => setPendingDelete({ frame, connectors: connectorCount })}
-				onGenerateDesign={canUseAi && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
+				onGenerateDesign={canUseDesignTools && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
 				designBusy={designs.queue.running}
 				onAddScreen={() => {
 					setMode('edit');

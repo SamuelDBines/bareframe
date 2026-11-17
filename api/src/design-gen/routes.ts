@@ -20,7 +20,7 @@ import { assertProjectAccess, replaceProjectDocument, tokenHasScope } from '../d
 import { refundGeneration, reserveGeneration } from '../plans/limits.js';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from '../projects/auth.js';
 import { publishProjectUpdate } from '../projects/events.js';
-import { designLlmForConfig, type DesignGenerationInput, type DesignLlm } from './llm.js';
+import { designLlmForConfig, designUsesLlm, type DesignGenerationInput, type DesignLlm } from './llm.js';
 
 /** Same presets as the canvas device switch (Phone / Tablet / Desktop). */
 export const DEVICE_PRESET: Record<DesignDevice, string> = { phone: 'mobile', tablet: 'tablet', desktop: 'desktop-1440' };
@@ -111,9 +111,7 @@ export function createDesignGenerationRouter(pool: pg.Pool, config: Config) {
 			const frames = document.project.frames.filter((f) => !f.ghost && f.pageId === pageId);
 
 			const llm = designLlmForConfig(config);
-			if (!llm) {
-				return c.json({ error: 'llm_not_configured', message: 'Design generation needs an LLM.' }, 503);
-			}
+			const usedLlm = designUsesLlm(config);
 			await reserveGeneration(pool, actor.userId, 'screen_design');
 			reserved = true;
 
@@ -175,6 +173,7 @@ export function createDesignGenerationRouter(pool: pg.Pool, config: Config) {
 					repairs: result.repairs,
 					attempts: result.attempts,
 					connectorLinks: linkNotes,
+					source: usedLlm ? 'llm' : 'template',
 				},
 			});
 		} catch (err) {

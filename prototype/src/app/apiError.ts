@@ -45,7 +45,9 @@ const PLAN_CODES = new Set([
  */
 export function friendlyError(e: unknown, fallback = 'Something went wrong. Please try again.'): string {
 	if (e instanceof ApiError) {
-		if (isAiUnavailable(e)) return 'AI features are taking a break on this workspace. Everything else still works.';
+		if (isAiUnavailable(e)) {
+			return 'The AI writer is offline. We still built screens from templates where we could. Try again later for AI wording.';
+		}
 		if (e.status === 401) return 'Please sign in to continue.';
 		if (e.status === 403 && e.code && PLAN_CODES.has(e.code) && e.serverMessage) return e.serverMessage;
 		if (e.status === 429 || (e.code && PLAN_CODES.has(e.code))) {

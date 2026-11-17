@@ -279,7 +279,9 @@ export function FlowMapCanvas({
 	onGenerateDesign,
 	designingFrameId,
 	designBusy,
+	workspaceMode = 'map',
 }: {
+	workspaceMode?: 'map' | 'edit';
 	connectMode?: boolean;
 	onGenerateDesign?: (frame: Frame) => void;
 	designingFrameId?: string | null;
@@ -665,7 +667,7 @@ export function FlowMapCanvas({
 				</div>
 			) : null}
 
-			{frames.length > 0 ? (
+			{frames.length > 0 && workspaceMode === 'map' ? (
 				<div
 					className="flow-map-minimap"
 					style={{ width: miniW, height: miniH }}
@@ -708,6 +710,7 @@ export function FlowMapCanvas({
 				</div>
 			) : null}
 
+			{workspaceMode === 'map' ? (
 			<div className="flow-map-zoom-bar" role="toolbar" aria-label="Zoom">
 				<button type="button" className="zoom-btn" onClick={() => zoomBy(-0.1)} aria-label="Zoom out">
 					−
@@ -738,6 +741,7 @@ export function FlowMapCanvas({
 					</button>
 				)}
 			</div>
+			) : null}
 		</div>
 	);
 }

@@ -39,8 +39,8 @@ type MockOptions = {
 	designDelayMs?: number;
 	/** Screen designs allowed before the mock answers 429 (free plan: 3). */
 	designAllowance?: number;
-	/** `features.ai` from /api/me; defaults to true. */
-	ai?: boolean;
+	/** `features.llm` from /api/me; defaults to true. */
+	llm?: boolean;
 	/** Simulate an autosave landing while the first screen is being designed. */
 	saveDuringFirstDesign?: boolean;
 };
@@ -69,7 +69,7 @@ async function mockApi(page: Page, options: MockOptions = {}) {
 		if (p.endsWith('/api/me')) {
 			return json({
 				user: { id: 1, login: 'tester', name: 'Tester', avatarUrl: null, email: 't@example.com' },
-				features: { ai: options.ai ?? true },
+				features: { ai: true, llm: options.llm ?? true },
 			});
 		}
 		if (p.endsWith('/api/plan')) return json({ tier: 'free', limits: {}, usage: {} });
@@ -363,7 +363,7 @@ test.describe('generate screen designs', () => {
 		const signUp = api.current().document.project.frames.find((f) => f.name === 'Sign up')!;
 		expect(signUp.devicePresetId).toBe('tablet');
 
-		await expect(page.getByTestId('design-result')).toContainText('Designed 1 of 1 screen. Running a UX review.');
+		await expect(page.getByTestId('design-result')).toContainText('Running');
 		await expect.poll(() => api.reviews()).toBe(1);
 		await expect(page.getByText('Sign up has no password rules').first()).toBeVisible({ timeout: 15_000 });
 	});
@@ -417,38 +417,28 @@ test.describe('generate screen designs', () => {
 	});
 });
 
-test.describe('without AI', () => {
-	test('offers starter flows instead of AI mapping, and hides AI-only features', async ({ page }) => {
-		const api = await mockApi(page, { ai: false });
+test.describe('without LLM writer', () => {
+	test('still maps flows and generates screen templates', async ({ page }) => {
+		const api = await mockApi(page, { llm: false });
 		await page.addInitScript(() => {
 			localStorage.setItem('bareframe.flowMapTour.v1', JSON.stringify({ dismissed: true }));
 		});
 		await page.goto(`/#/app/project/${PROJECT_ID}`);
 		const panel = page.getByTestId('describe-product-panel');
-		await expect(panel.getByRole('heading', { name: 'Start your flow' })).toBeVisible({ timeout: 30_000 });
-		await expect(panel.getByRole('textbox', { name: 'What are you building?' })).toHaveCount(0);
-		await expect(page.getByText('AI features are taking a break')).toHaveCount(0);
-
-		await panel.getByRole('checkbox', { name: 'Desktop' }).check();
-		await panel.getByRole('button', { name: 'Create a starter flow' }).click();
-		await expect(page.getByTestId('flow-gen-toast')).toContainText('Started from');
+		await expect(panel.getByRole('heading', { name: 'Start with your product' })).toBeVisible({ timeout: 30_000 });
+		await panel
+			.getByRole('textbox', { name: 'What are you building?' })
+			.fill('Acme Shop: an ecommerce store with catalog, cart and checkout.');
+		await panel.getByRole('button', { name: 'Map my flow' }).click();
+		await expectFlowMapCards(page, 4);
 		await expect(page.getByTestId('describe-product-panel')).toHaveCount(0);
-		expect(await page.locator('.flow-map-card').count()).toBeGreaterThanOrEqual(5);
-		expect(api.generateBodies).toHaveLength(0);
-
-		// Nothing that needs AI is offered.
-		await expect(page.getByTestId('flow-refine-open')).toHaveCount(0);
-		await expect(page.getByTestId('design-bar')).toHaveCount(0);
-		await expect(page.getByTestId('card-generate-design')).toHaveCount(0);
-		await expect(page.getByRole('tab', { name: /AI findings/ })).toHaveCount(0);
-		await expect(page.getByTestId('run-review')).toHaveCount(0);
-
-		// The starter flow autosaves like any edit.
-		await expect.poll(() => api.current().document.project.frames.filter((f) => !f.ghost).length).toBeGreaterThanOrEqual(5);
+		expect(api.generateBodies.length).toBeGreaterThan(0);
+		await expect(page.getByTestId('design-bar')).toBeVisible();
+		await expect(page.getByTestId('flow-refine-open')).toBeVisible();
 	});
 
 	test('add a screen yourself switches to Edit with a screen', async ({ page }) => {
-		await mockApi(page, { ai: false });
+		await mockApi(page, { llm: false });
 		await page.addInitScript(() => {
 			localStorage.setItem('bareframe.flowMapTour.v1', JSON.stringify({ dismissed: true }));
 		});

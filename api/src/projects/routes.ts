@@ -80,6 +80,23 @@ export function createProjectsRouter(pool: pg.Pool, config: import('../config.js
 		);
 	});
 
+	router.delete('/projects/:projectId', async (c) => {
+		try {
+			const actor = getActor(c);
+			if (actor.kind === 'token') return c.json({ error: 'Forbidden' }, 403);
+			const projectId = c.req.param('projectId');
+			await assertProjectAccess(pool, projectId, actor, 'projects:write');
+			const { rowCount } = await pool.query(`DELETE FROM projects WHERE id = $1 AND owner_user_id = $2`, [
+				projectId,
+				actor.userId,
+			]);
+			if (!rowCount) return c.json({ error: 'Not found' }, 404);
+			return c.json({ ok: true });
+		} catch (err) {
+			return handleProjectError(c, err);
+		}
+	});
+
 	router.get('/projects/:projectId', async (c) => {
 		try {
 			const actor = getActor(c);

@@ -129,7 +129,7 @@ export function PricingPage() {
 
 			<p className="pricing__enterprise bx-hint">
 				Need SSO, security review or a larger org rollout?{' '}
-				<a href={SALES_HREF}>Contact us</a>, we quote separately; there is no self-serve Team plan.
+				<a href={SALES_HREF}>Contact us</a>, we quote separately. There is no self-serve Team plan.
 			</p>
 
 			<section className="faq" aria-labelledby="faq-title">

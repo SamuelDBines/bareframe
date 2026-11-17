@@ -18,18 +18,16 @@ import {
   patchReviewIssue,
   processReviewRun,
 } from './process-review.js';
+import { createDeterministicReviewLlm } from './deterministic.js';
 
 function reviewLlmForProject(config: Config, projectDoc: import('@bareframe/designer-core').ProjectDocument) {
+  if (config.llmAdapter === 'openai_compatible' && config.llmApiKey && config.llmBaseUrl && config.llmModel) {
+    return createOpenAiCompatibleReviewLlm(config, projectDoc);
+  }
   if (config.llmAdapter === 'fixture' || config.nodeEnv === 'test') {
     return createFixtureReviewLlm(projectDoc);
   }
-  if (config.llmAdapter === 'disabled') {
-    return null;
-  }
-  if (config.llmAdapter === 'openai_compatible') {
-    return createOpenAiCompatibleReviewLlm(config, projectDoc);
-  }
-  return createFixtureReviewLlm(projectDoc);
+  return createDeterministicReviewLlm(projectDoc);
 }
 
 export function createReviewsRouter(pool: pg.Pool, config: Config) {
@@ -66,25 +64,12 @@ export function createReviewsRouter(pool: pg.Pool, config: Config) {
         actor,
         actor.kind === 'token' ? 'reviews:write' : undefined,
       );
-      if (config.llmAdapter === 'disabled') {
-        return c.json(
-          {
-            error: 'llm_not_configured',
-            message:
-              'AI review requires an LLM. Set LLM_API_BASE_URL, LLM_API_KEY, and LLM_MODEL (or LLM_ADAPTER=fixture for development).',
-          },
-          503,
-        );
-      }
       if (actor.kind === 'token') {
         await assertFeature(pool, actor.userId, 'mcpStudioTools');
       }
       await assertCanRunReview(pool, actor.userId);
       const runId = await createReviewRun(pool, projectId, actor.userId);
       const llm = reviewLlmForProject(config, project.document);
-      if (!llm) {
-        return c.json({ error: 'llm_not_configured' }, 503);
-      }
       if (process.env.REVIEW_INLINE === '1' || config.nodeEnv === 'test') {
         await processReviewRun(pool, runId, actor.userId, llm);
       } else {

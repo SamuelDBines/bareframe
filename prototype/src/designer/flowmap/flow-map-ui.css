@@ -1,6 +1,9 @@
 /* Flow map canvas, uses the product tokens from styles/product.css. */
 
 .flow-map-workspace {
+	--flow-z-canvas-chrome: 20;
+	--flow-z-onboarding: 200;
+	--flow-z-dialog: 300;
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -15,6 +18,17 @@
 	flex: 1;
 	min-height: 0;
 	width: 100%;
+}
+
+.flow-map-stage--onboarding .flow-map-zoom-bar,
+.flow-map-stage--onboarding .flow-map-minimap,
+.flow-map-stage--onboarding .flow-map-connect-hint {
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.flow-map-stage--onboarding .describe-panel {
+	z-index: var(--flow-z-onboarding);
 }
 
 .flow-map-stage--with-link .flow-map-viewport {
@@ -656,7 +670,7 @@
 	border: 1px solid var(--bx-border);
 	box-shadow: var(--bx-shadow);
 	cursor: pointer;
-	z-index: 5;
+	z-index: var(--flow-z-canvas-chrome);
 }
 
 .flow-map-minimap svg {
@@ -694,7 +708,7 @@
 	background: rgb(255 255 255 / 96%);
 	border: 1px solid var(--bx-border);
 	box-shadow: var(--bx-shadow);
-	z-index: 5;
+	z-index: var(--flow-z-canvas-chrome);
 }
 
 .zoom-btn {
@@ -1280,7 +1294,7 @@
 	background: var(--bx-surface);
 	border: 1px solid var(--bx-border);
 	box-shadow: var(--bx-shadow-lg);
-	z-index: 5;
+	z-index: var(--flow-z-onboarding);
 }
 
 .describe-panel h2 {
@@ -1439,7 +1453,7 @@
 	color: var(--bx-surface);
 	font-size: 0.88rem;
 	box-shadow: var(--bx-shadow);
-	z-index: 6;
+	z-index: var(--flow-z-onboarding);
 	/* Status only: never block the canvas underneath. */
 	pointer-events: none;
 }

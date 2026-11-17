@@ -197,7 +197,7 @@ export function WebsiteCaptureSetupPage() {
 	const connected = (status?.eventCount ?? 0) > 0;
 	const hasScreens = (status?.screenshotCount ?? 0) > 0;
 	const step = wizard.step;
-	const returnTo = `/app/project/${projectId}/website-setup?url=${encodeURIComponent(websiteUrl)}`;
+	const returnTo = `/#/app/project/${projectId}/website-setup?url=${encodeURIComponent(websiteUrl)}`;
 
 	const canContinueStep1 =
 		wizard.method === 'capture'

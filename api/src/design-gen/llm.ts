@@ -7,6 +7,7 @@ import {
 } from '@bareframe/designer-core';
 import type { Config } from '../config.js';
 import { NO_EMDASH_INSTRUCTION } from '../llm/copy-style.js';
+import { templateDesignStates } from './template-design.js';
 
 export type DesignGenerationInput = {
 	productDescription: string;
@@ -62,10 +63,19 @@ export function createOpenAiCompatibleDesignLlm(config: Config): DesignLlm {
 	};
 }
 
-/** Deterministic stand-in (LLM_ADAPTER=fixture): builds a plausible screen from the brief. */
+/** Deterministic stand-in: templates from the component library and the brief. */
 export function createFixtureDesignLlm(): DesignLlm {
 	return {
 		async generateDesign(input) {
+			const templated = templateDesignStates(
+				input.screenName,
+				input.brief,
+				input.outgoingActions,
+				input.device,
+			);
+			if (Object.keys(templated).length > 0) {
+				return { states: templated };
+			}
 			const content = input.brief.keyContent
 				.map((item): DesignTreeNode | null => {
 				const lower = item.toLowerCase();
@@ -122,9 +132,18 @@ export function setDesignLlmForTests(llm: DesignLlm | null) {
 	testOverride = llm;
 }
 
-export function designLlmForConfig(config: Config): DesignLlm | null {
+export function designLlmForConfig(config: Config): DesignLlm {
 	if (testOverride) return testOverride;
-	if (config.llmAdapter === 'disabled') return null;
-	if (config.llmAdapter === 'openai_compatible') return createOpenAiCompatibleDesignLlm(config);
+	if (config.llmAdapter === 'openai_compatible') {
+		try {
+			return createOpenAiCompatibleDesignLlm(config);
+		} catch {
+			return createFixtureDesignLlm();
+		}
+	}
 	return createFixtureDesignLlm();
+}
+
+export function designUsesLlm(config: Config): boolean {
+	return config.llmAdapter === 'openai_compatible' && Boolean(config.llmApiKey && config.llmBaseUrl && config.llmModel);
 }

@@ -11,6 +11,7 @@ export type GenerateFlowResult = {
 	connections: number;
 	refined: boolean;
 	repairs: string[];
+	source?: 'llm' | 'template';
 };
 
 export async function generateFlow(
@@ -86,5 +87,9 @@ export function useGenerateFlow(projectId: string | undefined) {
 
 export function flowResultMessage(result: GenerateFlowResult): string {
 	const base = `${result.refined ? 'Updated the flow' : 'Mapped'}: ${result.screens} screen${result.screens === 1 ? '' : 's'}, ${result.connections} link${result.connections === 1 ? '' : 's'}`;
-	return result.repairs.length ? `${base}. Fixed ${result.repairs.length} problem${result.repairs.length === 1 ? '' : 's'} in the AI’s answer.` : `${base}.`;
+	const templateNote = result.source === 'template' ? ' Used a starter template from your description (no AI writer).' : '';
+	if (result.repairs.length) {
+		return `${base}. Fixed ${result.repairs.length} problem${result.repairs.length === 1 ? '' : 's'} in the AI’s answer.${templateNote}`;
+	}
+	return `${base}.${templateNote}`;
 }

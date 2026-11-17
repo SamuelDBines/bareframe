@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { friendlyError } from '../../app/apiError';
 import { fetchPlan, openBillingPortal, startProCheckout } from '../../app/reviewApi';
 import { githubSignInUrl, useAuth } from '../../auth/AuthContext';
-import { listProjects, type ApiProjectSummary } from '../../designer/projectApi';
+import { deleteProject, listProjects, type ApiProjectSummary } from '../../designer/projectApi';
+import { ProjectCardMenu } from './ProjectCardMenu';
 import { githubAuthReturnTo } from '../../sites/urls';
 import { NewProjectDialog, type StartKind } from './NewProjectDialog';
 
@@ -225,6 +226,12 @@ export function AppHomePage() {
 					{list.map((p) => (
 						<li key={p.id}>
 							<Link to={`/app/project/${p.id}`} className="project-card">
+								<ProjectCardMenu
+									projectId={p.id}
+									projectName={p.name}
+									onDelete={deleteProject}
+									onDeleted={() => setProjects((rows) => (rows ?? []).filter((row) => row.id !== p.id))}
+								/>
 								<span className="project-card__thumb" aria-hidden>
 									<i />
 									<span />

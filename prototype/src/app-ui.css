@@ -672,6 +672,7 @@
 }
 
 .project-card {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	gap: 0.3rem;
@@ -689,6 +690,48 @@
 	transition:
 		transform var(--bx-med) var(--bx-ease),
 		box-shadow var(--bx-med) var(--bx-ease);
+}
+
+.project-card__menu {
+	position: absolute;
+	top: 0.45rem;
+	right: 0.35rem;
+	z-index: 2;
+}
+
+.project-card__menu-btn {
+	min-width: 2.25rem;
+	min-height: 2.25rem;
+}
+
+.project-card__menu-popover {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	margin-top: 0.25rem;
+	min-width: 10rem;
+	padding: 0.35rem;
+	border-radius: var(--bx-radius-md);
+	border: 1px solid var(--bx-border);
+	background: var(--bx-surface);
+	box-shadow: var(--bx-shadow);
+}
+
+.project-card__menu-danger {
+	display: block;
+	width: 100%;
+	padding: 0.5rem 0.65rem;
+	border: 0;
+	border-radius: var(--bx-radius-sm);
+	background: transparent;
+	color: var(--bx-danger, #b42318);
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.project-card__menu-danger:hover {
+	background: color-mix(in srgb, var(--bx-danger, #b42318) 8%, transparent);
 }
 
 .project-card:hover {

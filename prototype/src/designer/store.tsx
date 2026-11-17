@@ -156,6 +156,9 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 				ui: {
 					...state.ui,
 					activePageId: project.pages[0]?.id ?? state.ui.activePageId,
+					selectedFrameId: null,
+					selectedNodeId: null,
+					mobilePanel: 'none',
 					camera: { ...project.canvas },
 				},
 			};

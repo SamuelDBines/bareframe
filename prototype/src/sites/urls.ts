@@ -45,7 +45,11 @@ export function githubAuthReturnTo(hashPath = '/'): string {
 		return `${DESIGNER_SITE_URL}/#${normalized}`;
 	}
 	if (normalized.startsWith('/designer')) {
+		const mapped = normalized.replace(/^\/designer/, '/app') || '/app';
+		return `/#${mapped}`;
+	}
+	if (normalized.startsWith('/app') || normalized.startsWith('/sign-') || normalized.startsWith('/demo')) {
 		return `/#${normalized}`;
 	}
-	return `/#/designer${normalized === '/' ? '' : normalized}`;
+	return `/#${normalized === '/' ? '' : normalized}`;
 }

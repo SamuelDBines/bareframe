@@ -9,7 +9,7 @@ import type { Frame } from '../types';
 export type ScreenDesignResult = {
 	version: number;
 	document: ProjectDocument;
-	design: { device: DesignDevice; states: string[]; repairs: string[] };
+	design: { device: DesignDevice; states: string[]; repairs: string[]; source?: 'llm' | 'template' };
 };
 
 export async function generateScreenDesign(
@@ -77,6 +77,8 @@ export function useDesignQueue(projectId: string | undefined) {
 			let designed = 0;
 			let error: string | null = null;
 			let version: number | null = null;
+			let usedTemplate = false;
+			let usedLlm = false;
 			for (const [index, frame] of frames.entries()) {
 				if (cancelledRef.current) break;
 				setQueue((q) => ({ ...q, done: index, currentFrameId: frame.id, currentName: frame.name }));
@@ -97,6 +99,8 @@ export function useDesignQueue(projectId: string | undefined) {
 					}
 					version = result.version;
 					designed += 1;
+					if (result.design.source === 'template') usedTemplate = true;
+					if (result.design.source === 'llm') usedLlm = true;
 					dispatch({ type: 'hydrateProject', project: fromProjectDocument(result.document), remoteVersion: result.version });
 				} catch (e) {
 					if (controller.signal.aborted) break;
@@ -108,9 +112,12 @@ export function useDesignQueue(projectId: string | undefined) {
 			}
 			const cancelled = cancelledRef.current;
 			const parts = [`Designed ${designed} of ${frames.length} screen${frames.length === 1 ? '' : 's'}`];
+			if (designed > 0 && !error && usedTemplate && !usedLlm) {
+				parts.push('using component templates (no AI writer)');
+			}
 			if (cancelled) parts.push('Cancelled');
-			const reviewing = designed > 0 && review && !review.demo && !review.aiUnavailable;
-			if (reviewing) parts.push('Running a UX review');
+			const reviewing = designed > 0 && review && !review.demo;
+			if (reviewing) parts.push('Running checks (orphans, dead ends, accessibility)');
 			setQueue({ ...IDLE, message: `${parts.join('. ')}.`, error });
 			if (reviewing) void review.runReview();
 		},

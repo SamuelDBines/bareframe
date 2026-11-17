@@ -40,5 +40,15 @@ describe('returnTo', () => {
 				'https://designer.bareframe.org/#/editor',
 			),
 		).toBe('https://designer.bareframe.org/#/editor');
+		expect(resolvePostAuthRedirect('https://bareframe.org', '/app')).toBe('https://bareframe.org/#/app');
+		expect(
+			resolvePostAuthRedirect(
+				'https://bareframe.org',
+				'/app/project/abc/website-setup?url=https%3A%2F%2Fexample.com',
+			),
+		).toBe('https://bareframe.org/#/app/project/abc/website-setup?url=https%3A%2F%2Fexample.com');
+		expect(resolvePostAuthRedirect('https://bareframe.org', '/#/app/settings')).toBe(
+			'https://bareframe.org/#/app/settings',
+		);
 	});
 });

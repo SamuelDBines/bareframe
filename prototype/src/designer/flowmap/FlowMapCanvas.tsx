@@ -97,6 +97,7 @@ function FlowMapCard({
 	page,
 	themeId,
 	customTokens,
+	projectId,
 	selected,
 	dimmed,
 	onSelect,
@@ -124,6 +125,7 @@ function FlowMapCard({
 	annotations: Annotation[];
 	issues: ReviewIssue[] | null;
 	zoom: number;
+	projectId?: string;
 	connectMode?: boolean;
 	connectSource?: boolean;
 	readOnly?: boolean;
@@ -215,6 +217,7 @@ function FlowMapCard({
 						page={page}
 						themeId={themeId}
 						customTokens={customTokens}
+						projectId={projectId}
 						selectedNodeId={null}
 						onSelectNode={() => undefined}
 					/>
@@ -270,6 +273,7 @@ function FlowMapCard({
 }
 
 export function FlowMapCanvas({
+	projectId,
 	connectMode,
 	connectFromFrameId,
 	onConnectFrameSelect,
@@ -281,6 +285,7 @@ export function FlowMapCanvas({
 	designBusy,
 	workspaceMode = 'map',
 }: {
+	projectId?: string;
 	workspaceMode?: 'map' | 'edit';
 	connectMode?: boolean;
 	onGenerateDesign?: (frame: Frame) => void;
@@ -625,6 +630,7 @@ export function FlowMapCanvas({
 								page={page}
 								themeId={themeId}
 								customTokens={project.customTokenOverrides}
+								projectId={projectId}
 								selected={selected === frame.id}
 								dimmed={!linked}
 								onSelect={() => {

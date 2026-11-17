@@ -26,7 +26,8 @@ function renderNode(
 	frameWidth: number,
 	trial: StyleTrial | undefined,
 	selectedNodeId: string | null,
-	protoHotspotNodeIds?: Set<string>,
+	protoHotspotNodeIds: Set<string> | undefined,
+	projectAssetUrl: ((assetId: string) => string) | undefined,
 ): string {
 	if (!isVisible(node, breakpointForWidth(frameWidth))) return '';
 
@@ -37,6 +38,14 @@ function renderNode(
 	if (node.type === 'text') {
 		const tag = node.content?.textTag ?? 'p';
 		return `<${tag} class="bf-node" data-node-id="${node.id}"${sel}${hotspot} style="${layoutCss(layout)}margin:0;">${escapeHtml(node.content?.text ?? '')}</${tag}>`;
+	}
+
+	if (node.type === 'image' && node.image) {
+		const src = projectAssetUrl
+			? projectAssetUrl(node.image.assetId)
+			: `asset://${node.image.assetId}`;
+		const alt = escapeHtml(node.image.alt ?? '');
+		return `<img class="bf-node bf-screenshot" data-node-id="${node.id}"${sel}${hotspot} src="${escapeHtml(src)}" alt="${alt}" style="${layoutCss(layout)};max-width:100%;height:auto;display:block;object-fit:cover;width:100%;" />`;
 	}
 
 	if (node.type === 'instance' && node.instance) {
@@ -71,7 +80,9 @@ function renderNode(
 	const childHtml = node.children
 		.map((cid) => {
 			const child = page.nodes[cid];
-			return child ? renderNode(child, page, frameWidth, trial, selectedNodeId, protoHotspotNodeIds) : '';
+			return child
+				? renderNode(child, page, frameWidth, trial, selectedNodeId, protoHotspotNodeIds, projectAssetUrl)
+				: '';
 		})
 		.join('');
 
@@ -101,6 +112,7 @@ export function buildFramePreviewDoc(opts: {
 	selectedNodeId: string | null;
 	protoHotspotNodeIds?: string[];
 	assetBase: string;
+	projectAssetUrl?: (assetId: string) => string;
 	previewCss?: string;
 	/** @deprecated use previewCss */
 	themeCss?: string;
@@ -113,7 +125,9 @@ export function buildFramePreviewDoc(opts: {
 		.map(([k, v]) => `${k}:${v};`)
 		.join('');
 
-	const inner = root ? renderNode(root, page, frameWidth, trial, selectedNodeId, hotspotSet) : '';
+	const inner = root
+		? renderNode(root, page, frameWidth, trial, selectedNodeId, hotspotSet, opts.projectAssetUrl)
+		: '';
 
 	const styles =
 		previewCss ??

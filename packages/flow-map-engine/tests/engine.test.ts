@@ -18,6 +18,19 @@ describe('discoverRoutes', () => {
 		});
 		expect(routes.map((r) => r.path).sort()).toEqual(['/', '/about']);
 	});
+
+	it('discovers hash-router SPA links', async () => {
+		const html =
+			'<html><body><a href="/#/pricing">Pricing</a><a href="#/docs">Docs</a></body></html>';
+		const routes = await discoverRoutes({
+			startUrl: 'https://app.example/',
+			maxPages: 10,
+			fetchHtml: async () => html,
+		});
+		const paths = routes.map((r) => r.path).sort();
+		expect(paths.some((p) => p.includes('pricing'))).toBe(true);
+		expect(paths.some((p) => p.includes('docs'))).toBe(true);
+	});
 });
 
 describe('auditPageMetrics', () => {

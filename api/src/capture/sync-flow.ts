@@ -14,6 +14,7 @@ import {
 	ProjectAccessError,
 } from '../db/projects.js';
 import { mapCaptureEventsToFlow } from './event-mapping.js';
+import { mapCaptureShotsToImport } from './import-shots.js';
 
 function clearPageFrames(doc: ProjectDocument, pageId: string): ProjectDocument {
 	const frameIds = new Set(doc.project.frames.filter((f) => f.pageId === pageId).map((f) => f.id));
@@ -97,7 +98,8 @@ export async function syncCaptureFlowMap(
 			);
 		}
 
-		const imported = applyImportScreenshots(document, shots, links, ctx, { pageId: pageId! });
+		const mapped = mapCaptureShotsToImport(shots, links);
+		const imported = applyImportScreenshots(document, mapped.shots, mapped.links, ctx, { pageId: pageId! });
 		document = imported.document;
 
 		const ownerId = actor.userId;

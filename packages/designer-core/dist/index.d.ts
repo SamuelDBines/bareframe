@@ -486,13 +486,15 @@ declare function parseProjectCommand(input: unknown): ProjectCommand;
 declare function createEmptyProjectDocument(id: string, name: string, themeId: string | undefined, ctx: Pick<CommandContext, 'newId'>): ProjectDocument;
 declare function applyProjectCommand(document: ProjectDocument, command: ProjectCommand, ctx: CommandContext): CommandResult;
 type ImportScreenshotShot = {
-    assetId: string;
+    routePath: string;
+    assetId?: string;
+    error?: string;
     title?: string;
     url?: string;
 };
 type ImportScreenshotLink = {
-    fromAssetId: string;
-    toAssetId: string;
+    fromRoutePath: string;
+    toRoutePath: string;
     label?: string;
     trigger?: string;
 };

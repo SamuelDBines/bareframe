@@ -38,7 +38,7 @@ export function createFlowMapRouter(pool: pg.Pool, config: Config) {
 				baseVersion: number;
 				url?: string;
 				routes?: string[];
-				viewports?: ('mobile' | 'desktop')[];
+				viewports?: ('mobile' | 'tablet' | 'desktop')[];
 				maxPages?: number;
 				auditRules?: Record<string, unknown>;
 			}>();

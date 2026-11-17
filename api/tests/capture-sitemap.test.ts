@@ -9,6 +9,7 @@ import { loadConfig } from '../src/config.js';
 import { createPool, upsertUser } from '../src/db/index.js';
 import { createProject, createProjectToken } from '../src/db/projects.js';
 import { setupTestDb, testConfig } from '../src/test-utils.js';
+import { closePlaywrightBrowser } from '../src/render/playwright-capture.js';
 import { resetProjectEventBusForTests } from '../src/projects/events.js';
 
 describe('mapCaptureEventsToFlow', () => {
@@ -181,6 +182,7 @@ describe.skipIf(!process.env.DATABASE_URL)('sitemap import', () => {
 
 	afterAll(async () => {
 		fixtureServer?.close();
+		await closePlaywrightBrowser();
 		await pool.end();
 	});
 
@@ -205,7 +207,8 @@ describe.skipIf(!process.env.DATABASE_URL)('sitemap import', () => {
 		);
 		expect(result.routeCount).toBeGreaterThanOrEqual(2);
 		expect(result.connectorCount).toBeGreaterThanOrEqual(1);
-	});
+		expect(result.screenshotCount).toBeGreaterThanOrEqual(2);
+	}, 120_000);
 
 	it('imports routes when LLM is not configured', async () => {
 		const prevAdapter = process.env.LLM_ADAPTER;
@@ -235,6 +238,7 @@ describe.skipIf(!process.env.DATABASE_URL)('sitemap import', () => {
 			);
 			expect(result.routeCount).toBeGreaterThanOrEqual(2);
 			expect(result.connectorCount).toBeGreaterThanOrEqual(1);
+			expect(result.screenshotCount).toBeGreaterThanOrEqual(2);
 		} finally {
 			if (prevAdapter === undefined) delete process.env.LLM_ADAPTER;
 			else process.env.LLM_ADAPTER = prevAdapter;
@@ -243,5 +247,5 @@ describe.skipIf(!process.env.DATABASE_URL)('sitemap import', () => {
 			if (prevBase === undefined) delete process.env.LLM_API_BASE_URL;
 			else process.env.LLM_API_BASE_URL = prevBase;
 		}
-	});
+	}, 120_000);
 });

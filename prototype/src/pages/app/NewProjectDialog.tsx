@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { friendlyError, isAiUnavailable } from '../../app/apiError';
-import { importFigmaDesign, importSitemap } from '../../app/reviewApi';
+import { createFlowMap, importFigmaDesign, waitForFlowMapJob } from '../../app/reviewApi';
 import { fetchPackageConfig, startPackageGeneration } from '../../designer/packageApi';
 import { createProject } from '../../designer/projectApi';
 import { looksLikeWebsiteUrl, websiteHostname } from './websiteImportUtils';
@@ -17,7 +17,7 @@ const STARTS: { id: StartKind; title: string; body: string; icon: string }[] = [
 		body: 'Installed capture on your site (free) or server crawl (Pro).',
 		icon: '↗',
 	},
-	{ id: 'sitemap', title: 'Sitemap', body: 'Fast structure-only map from sitemap.xml (Pro).', icon: '☰' },
+	{ id: 'sitemap', title: 'Sitemap', body: 'Crawl sitemap.xml and capture real page screenshots (Pro).', icon: '☰' },
 ];
 
 type Props = {
@@ -84,7 +84,8 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 			} else if (kind === 'sitemap') {
 				const url = siteUrl.trim();
 				const p = await createProject(`Sitemap: ${new URL(url).hostname}`);
-				await importSitemap(p.id, url, p.version);
+				const { jobId } = await createFlowMap(p.id, url, p.version, { maxPages: 20 });
+				await waitForFlowMapJob(p.id, jobId);
 				navigate(`/app/project/${p.id}`);
 			} else {
 				const { jobId } = await startPackageGeneration({

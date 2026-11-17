@@ -118,6 +118,18 @@ describe.skipIf(!databaseUrl)('create_flow_map', () => {
 		};
 		expect(doc.document.project.frames.length).toBeGreaterThanOrEqual(2);
 		expect(doc.document.project.connectors.length).toBeGreaterThan(0);
+		const imageNodes = doc.document.project.pages.flatMap((p) =>
+			Object.values((p as { nodes: Record<string, { type?: string; image?: { assetId: string } }> }).nodes).filter(
+				(n) => n.type === 'image' && n.image?.assetId,
+			),
+		);
+		expect(imageNodes.length).toBeGreaterThanOrEqual(2);
+		const assetRes = await fetch(
+			`${apiBase}/api/projects/${projectId}/assets/${imageNodes[0]!.image!.assetId}`,
+			{ headers: { Authorization: `Bearer ${token}` } },
+		);
+		expect(assetRes.status).toBe(200);
+		expect(assetRes.headers.get('content-type')).toMatch(/image\//);
 	}, 120_000);
 
 	it('builds a flow map from URL crawl and screenshots when LLM is not configured', async () => {

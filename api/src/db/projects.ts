@@ -9,6 +9,7 @@ import {
 	parseProjectCommand,
 	type ProjectDocument,
 } from '@bareframe/designer-core';
+import { mapCaptureShotsToImport } from '../capture/import-shots.js';
 import { hashToken } from '../auth/crypto.js';
 import { assertScreenCountForUser } from '../plans/limits.js';
 import { mapProjectRow, normalizeUserId } from './normalize.js';
@@ -272,7 +273,15 @@ export async function applyImportScreenshotsTx(
 		if (!row) throw new ProjectAccessError('Project not found', 404);
 		if (row.version !== input.baseVersion) throw new VersionConflictError(row.version);
 		const document = normalizeDocument(row.document, row.id, row.name);
-		const result = applyImportScreenshots(document, input.shots, input.links, ctx);
+		const mapped = mapCaptureShotsToImport(
+			input.shots.map((s, i) => ({
+				assetId: s.assetId,
+				title: s.title,
+				url: s.url ?? `https://imported.screen/${i}`,
+			})),
+			input.links,
+		);
+		const result = applyImportScreenshots(document, mapped.shots, mapped.links, ctx);
 		const ownerId = input.actor.kind === 'user' ? input.actor.userId : input.actor.userId;
 		await assertScreenCountForUser(pool, ownerId, result.document);
 		const nextVersion = row.version + 1;

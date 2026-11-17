@@ -464,7 +464,7 @@ function applyProjectCommand(document, command, ctx) {
 }
 function applyImportScreenshots(document, shots, links, ctx, opts) {
   let doc = document;
-  const frameByAsset = /* @__PURE__ */ new Map();
+  const frameByRoute = /* @__PURE__ */ new Map();
   for (const shot of shots) {
     const pageId = opts?.pageId ?? doc.project.pages[0]?.id;
     if (!pageId) throw new CommandError("Project has no pages", "no_pages");
@@ -481,25 +481,41 @@ function applyImportScreenshots(document, shots, links, ctx, opts) {
     );
     doc = frameRes.document;
     const frameId = frameRes.effects.frameId;
-    frameByAsset.set(shot.assetId, frameId);
-    const imageRes = applyProjectCommand(
-      doc,
-      {
-        type: "add_image_node",
-        pageId,
-        parentNodeId: page.rootNodeId,
-        assetId: shot.assetId,
-        name: shot.title ?? "Screenshot"
-      },
-      ctx
-    );
-    doc = imageRes.document;
+    frameByRoute.set(shot.routePath, frameId);
+    if (shot.assetId) {
+      const imageRes = applyProjectCommand(
+        doc,
+        {
+          type: "add_image_node",
+          pageId,
+          parentNodeId: page.rootNodeId,
+          assetId: shot.assetId,
+          name: shot.title ?? "Screenshot"
+        },
+        ctx
+      );
+      doc = imageRes.document;
+    }
+    if (shot.error) {
+      const ann = applyProjectCommand(
+        doc,
+        {
+          type: "add_annotation",
+          frameId,
+          kind: "note",
+          target: { kind: "rect", x: 16, y: 48, w: 300, h: 72 },
+          text: shot.error
+        },
+        ctx
+      );
+      doc = ann.document;
+    }
   }
-  const newFrames = shots.map((s) => frameByAsset.get(s.assetId)).filter(Boolean).map((id) => doc.project.frames.find((f) => f.id === id));
+  const newFrames = shots.map((s) => frameByRoute.get(s.routePath)).filter(Boolean).map((id) => doc.project.frames.find((f) => f.id === id));
   layoutFramesInFlowRow(newFrames);
   for (const link of links) {
-    const from = frameByAsset.get(link.fromAssetId);
-    const to = frameByAsset.get(link.toAssetId);
+    const from = frameByRoute.get(link.fromRoutePath);
+    const to = frameByRoute.get(link.toRoutePath);
     if (!from || !to) continue;
     const res = applyProjectCommand(
       doc,
@@ -514,7 +530,7 @@ function applyImportScreenshots(document, shots, links, ctx, opts) {
     );
     doc = res.document;
   }
-  return { document: doc, effects: { frameIds: [...frameByAsset.values()] } };
+  return { document: doc, effects: { frameIds: [...frameByRoute.values()] } };
 }
 
 // src/flowLayout.ts

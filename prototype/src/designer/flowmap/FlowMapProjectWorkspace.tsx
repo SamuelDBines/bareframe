@@ -167,6 +167,7 @@ export function FlowMapProjectWorkspace({
 			>
 				{showLinkPanel ? <FlowMapScreenLinkPanel /> : null}
 				<FlowMapCanvas
+					projectId={cloudProjectId ?? undefined}
 					readOnly={readOnly}
 					hideEmptyState={showDescribe}
 					workspaceMode={mode}

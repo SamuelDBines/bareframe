@@ -1,29 +1,15 @@
-import { URL } from 'node:url';
-import {
-	auditPageMetrics,
-	discoverRoutes,
-	summarizeFindings,
-	VIEWPORT_SIZES,
-	type AuditFinding,
-	type PageLink,
-	type ViewportPreset,
-} from '@bareframe/flow-map-engine';
 import type pg from 'pg';
-import {
-	applyImportScreenshots,
-	applyProjectCommand,
-	createDefaultCommandContext,
-	type ProjectDocument,
-} from '@bareframe/designer-core';
-import { isValidComponentSlug } from '../catalog/components.js';
+import type { ProjectDocument } from '@bareframe/designer-core';
 import {
 	getFlowMapJob,
 	insertAuditFindings,
+	updateFlowMapJobProgress,
 	updateFlowMapJobStatus,
 	type FlowMapInput,
 } from '../db/flow-map-jobs.js';
 import { getProjectById } from '../db/projects.js';
 import { completeRenderJob, failRenderJob } from '../db/render-jobs.js';
+import { runWebsiteScreenshotImport } from '../website-import/run.js';
 import { capturePageWithPlaywright, type BrowserCapture } from './playwright-capture.js';
 import { isAllowedPublicUrl } from './ssrf.js';
 
@@ -53,126 +39,29 @@ export async function processFlowMapJob(
 			throw new Error(`Version conflict (current ${project.version})`);
 		}
 
-		const viewports: ViewportPreset[] =
-			payload.viewports?.length ? payload.viewports : ['mobile'];
-		const maxPages = payload.maxPages ?? 20;
-
-		const origin = new URL(startUrl).origin;
-		const routes = await discoverRoutes({
-			startUrl,
-			seedRoutes: payload.routes,
-			maxPages,
-			fetchHtml: async (url) => {
-				if (!isAllowedPublicUrl(url)) throw new Error('Blocked URL during crawl');
-				const res = await fetch(url, { redirect: 'follow' });
-				return res.text();
+		const built = await runWebsiteScreenshotImport(
+			pool,
+			{
+				startUrl,
+				projectId,
+				baseVersion: project.version,
+				document: project.document as ProjectDocument,
+				maxPages: payload.maxPages,
+				viewports: payload.viewports,
+				seedRoutes: payload.routes,
+				auditRules: payload.auditRules,
+				canvasName: `Flow map: ${new URL(startUrl).hostname}`,
+				onProgress: async (p) => {
+					await updateFlowMapJobProgress(pool, flowMapJobId, p);
+				},
 			},
-			fetchSitemap: async (o) => {
-				try {
-					const res = await fetch(`${o}/sitemap.xml`, { redirect: 'follow' });
-					if (!res.ok) return null;
-					return res.text();
-				} catch {
-					return null;
-				}
-			},
-		});
-
-		const ctx = createDefaultCommandContext(isValidComponentSlug);
-		let document = project.document as ProjectDocument;
-		const pageTitle = `Flow map: ${new URL(startUrl).hostname}`;
-		const canvasRes = applyProjectCommand(
-			document,
-			{ type: 'create_canvas', name: pageTitle, presetId: 'mobile' },
-			ctx,
+			capture,
 		);
-		document = canvasRes.document;
-		const pageId = canvasRes.effects.pageId as string;
 
-		const allFindings: AuditFinding[] = [];
-		const shots: { assetId: string; title?: string; url?: string }[] = [];
-		const links: PageLink[] = [];
-		const pathToAsset = new Map<string, string>();
-
-		for (const route of routes) {
-			const pageUrl = `${origin}${route.path === '/' ? '' : route.path}`;
-			const vp = VIEWPORT_SIZES[viewports[0] ?? 'mobile'];
-			const captured = await capture(pool, projectId, pageUrl, vp.width, vp.height);
-			shots.push({ assetId: captured.assetId, title: route.path, url: pageUrl });
-			pathToAsset.set(route.path, captured.assetId);
-			allFindings.push(...auditPageMetrics(captured.metrics, payload.auditRules ?? {}));
-			for (const link of captured.outboundLinks) {
-				links.push({
-					fromPath: route.path,
-					toPath: link.path,
-					label: link.label,
-					trigger: link.trigger,
-				});
-			}
-		}
-
-		const importLinks = links
-			.filter((l) => l.fromPath !== l.toPath)
-			.map((l) => {
-				const from = pathToAsset.get(l.fromPath);
-				const to = pathToAsset.get(l.toPath);
-				if (!from || !to) return null;
-				return {
-					fromAssetId: from,
-					toAssetId: to,
-					label: l.label,
-					trigger: l.trigger,
-				};
-			})
-			.filter(Boolean) as {
-			fromAssetId: string;
-			toAssetId: string;
-			label?: string;
-			trigger?: string;
-		}[];
-
-		const imported = applyImportScreenshots(document, shots, importLinks, ctx, { pageId });
-		document = imported.document;
-
-		const summary = summarizeFindings(allFindings);
-		const summaryFrameId = (imported.effects.frameIds as string[])[0];
-		if (summaryFrameId) {
-			const ann = applyProjectCommand(
-				document,
-				{
-					type: 'add_annotation',
-					frameId: summaryFrameId,
-					kind: 'note',
-					target: { kind: 'rect', x: 16, y: 16, w: 320, h: 80 },
-					text: summary,
-				},
-				ctx,
-			);
-			document = ann.document;
-		}
-
-		for (const f of allFindings) {
-			const shotIndex = shots.findIndex((s) => s.url === f.pageUrl);
-			const frameId = (imported.effects.frameIds as string[])[shotIndex];
-			if (!frameId) continue;
-			const ann = applyProjectCommand(
-				document,
-				{
-					type: 'add_annotation',
-					frameId,
-					kind: 'callout',
-					target: { kind: 'rect', x: 12, y: 48, w: 280, h: 40 },
-					text: f.message,
-				},
-				ctx,
-			);
-			document = ann.document;
-		}
-
-		const newVersion = project.version + 1;
+		const newVersion = built.version;
 		await pool.query(
 			`UPDATE projects SET document = $2, version = $3, updated_at = NOW() WHERE id = $1`,
-			[projectId, JSON.stringify(document), newVersion],
+			[projectId, JSON.stringify(built.document), newVersion],
 		);
 		await pool.query(
 			`INSERT INTO project_revisions (project_id, version, command, actor_type, actor_ref)
@@ -180,12 +69,13 @@ export async function processFlowMapJob(
 			[projectId, newVersion, JSON.stringify({ type: 'create_flow_map', flowMapJobId }), renderJobId],
 		);
 
-		await insertAuditFindings(pool, flowMapJobId, allFindings);
+		await insertAuditFindings(pool, flowMapJobId, built.findings);
 		const result = {
 			version: newVersion,
-			pageId,
-			pageCount: routes.length,
-			findingsSummary: summary,
+			pageId: built.pageId,
+			pageCount: built.pageCount,
+			findingsSummary: built.findingsSummary,
+			failedRoutes: built.failedRoutes,
 			canvasPath: `/#/app/project/${projectId}`,
 		};
 		await updateFlowMapJobStatus(pool, flowMapJobId, 'completed', result);
@@ -201,11 +91,12 @@ export async function processFlowMapJob(
 export async function processScreenshotUrlJob(
 	pool: pg.Pool,
 	jobId: string,
-	payload: { url: string; viewport?: ViewportPreset; projectId?: string },
+	payload: { url: string; viewport?: import('@bareframe/flow-map-engine').ViewportPreset; projectId?: string },
 	capture: BrowserCapture = capturePageWithPlaywright,
 ): Promise<void> {
 	try {
 		if (!isAllowedPublicUrl(payload.url)) throw new Error('URL not allowed');
+		const { VIEWPORT_SIZES } = await import('@bareframe/flow-map-engine');
 		const vp = VIEWPORT_SIZES[payload.viewport ?? 'mobile'];
 		const projectId = payload.projectId;
 		if (!projectId) throw new Error('projectId required for screenshot storage');
@@ -237,7 +128,7 @@ export async function processRenderFrameJob(
 		const doc = project.document as ProjectDocument;
 		const annotations = payload.withAnnotations ? doc.project.annotations : [];
 		const { buildFrameRenderHtml } = await import('./frame-preview.js');
-		const { getProjectAsset } = await import('../db/projects.js');
+		const { getProjectAsset, insertProjectAsset } = await import('../db/projects.js');
 		let html = buildFrameRenderHtml({
 			document: doc,
 			frameId: payload.frameId,
@@ -266,7 +157,6 @@ export async function processRenderFrameJob(
 		const png = await page.screenshot({ type: 'png' });
 		await context.close();
 		await browser.close();
-		const { insertProjectAsset } = await import('../db/projects.js');
 		const assetId = await insertProjectAsset(pool, payload.projectId, 'image/png', Buffer.from(png));
 		await completeRenderJob(pool, jobId, { assetId, frameId: payload.frameId });
 	} catch (err) {
@@ -291,4 +181,4 @@ export async function getFlowMapJobByRenderJob(pool: pg.Pool, renderJobId: strin
 	return rows[0] ?? null;
 }
 
-void getFlowMapJobByRenderJob;
+void getFlowMapJob;

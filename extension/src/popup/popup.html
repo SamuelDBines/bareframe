@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Bareframe Capture</title>
+		<link rel="stylesheet" href="./popup.css" />
+	</head>
+	<body>
+		<header>
+			<strong>Bareframe Capture</strong>
+			<span id="rec-dot" class="rec-dot" hidden>REC</span>
+		</header>
+
+		<section class="panel">
+			<label>
+				API base
+				<input id="apiBase" type="url" placeholder="https://bareframe.org" />
+			</label>
+			<label>
+				Token
+				<input id="token" type="password" placeholder="bf_proj_ or bf_acc_" autocomplete="off" />
+			</label>
+			<label>
+				Project
+				<select id="projectId">
+					<option value="">Pick a project</option>
+				</select>
+			</label>
+			<button id="reload-projects" type="button" class="ghost">Load projects</button>
+		</section>
+
+		<nav class="tabs" role="tablist">
+			<button type="button" class="tab active" data-tab="flow" role="tab">Record flow</button>
+			<button type="button" class="tab" data-tab="note" role="tab">Quick note</button>
+		</nav>
+
+		<section id="tab-flow" class="tab-panel">
+			<div class="actions">
+				<button id="record" type="button">Start recording</button>
+				<button id="stop" type="button" disabled>Stop</button>
+				<button id="upload" type="button" disabled>Upload flow</button>
+			</div>
+			<p class="hint">Recording starts only when you click Start. Password fields are blurred in screenshots.</p>
+			<div id="steps" class="steps"></div>
+		</section>
+
+		<section id="tab-note" class="tab-panel hidden">
+			<label>
+				Where
+				<input id="note-where" type="text" placeholder="Page area" />
+			</label>
+			<label>
+				Issue
+				<textarea id="note-issue" rows="3" placeholder="What is wrong or confusing?"></textarea>
+			</label>
+			<label class="check">
+				<input id="note-shot" type="checkbox" checked />
+				Include screenshot
+			</label>
+			<div class="actions">
+				<button id="pick" type="button" class="ghost">Pick element</button>
+				<button id="submit-note" type="button">Send note</button>
+			</div>
+			<p id="picked" class="hint"></p>
+		</section>
+
+		<script type="module" src="./popup.ts"></script>
+	</body>
+</html>

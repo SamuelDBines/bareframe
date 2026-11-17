@@ -1,6 +1,6 @@
-# Browser extension design (future)
+# Browser extension
 
-Bareframe project notes support a **capture API** for a Manifest V3 Chrome extension that logs UX issues while browsing a live site. The extension is not implemented yet; this document describes the intended contract.
+Bareframe ships a Manifest V3 Chrome extension in `extension/` (build with `pnpm run extension:build`). It records click-through flows and UX notes against a project using the capture APIs below.
 
 ## Goals
 

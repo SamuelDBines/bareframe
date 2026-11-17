@@ -126,7 +126,7 @@ describe('auth flow', () => {
 		expect(res.status).toBe(200);
 		const body = await res.json();
 		expect(body.user).toBeNull();
-		expect(body.features).toEqual({ ai: true, llm: true });
+		expect(body.features).toEqual({ ai: true, llm: false });
 	});
 
 	it('/api/me says when the LLM writer is off', async () => {

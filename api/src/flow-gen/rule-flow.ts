@@ -39,11 +39,31 @@ const AUTH_APP_FLOW: FlowSpec = {
 	],
 };
 
+function defaultFlow(description: string): FlowSpec {
+	const product = description.split(/[.\n]/)[0]!.trim().slice(0, 60) || 'your product';
+	return {
+		screens: [
+			{ id: 'welcome', name: 'Welcome', purpose: `Introduce ${product}`, keyContent: ['Value proposition', 'Get started button', 'Sign in link'], states: ['default'] },
+			{ id: 'sign-up', name: 'Sign up', purpose: 'Create an account', keyContent: ['Email field', 'Password field', 'Create account button'], states: ['default', 'loading', 'error'] },
+			{ id: 'home', name: 'Home', purpose: 'See what needs attention today', keyContent: ['Summary cards', 'Recent items list', 'New item button'], states: ['default', 'empty', 'loading'] },
+			{ id: 'item-detail', name: 'Item detail', purpose: 'Review and edit one item', keyContent: ['Title', 'Details', 'Save button'], states: ['default', 'error'] },
+			{ id: 'settings', name: 'Settings', purpose: 'Manage account and preferences', keyContent: ['Profile', 'Notifications', 'Sign out'], states: ['default', 'success'] },
+		],
+		connections: [
+			{ from: 'welcome', to: 'sign-up', trigger: 'Get started' },
+			{ from: 'sign-up', to: 'home', trigger: 'Create account' },
+			{ from: 'home', to: 'item-detail', trigger: 'Open item' },
+			{ from: 'item-detail', to: 'home', trigger: 'Save' },
+			{ from: 'home', to: 'settings', trigger: 'Settings' },
+		],
+	};
+}
+
 function pickStarter(description: string): FlowSpec {
 	const lower = description.toLowerCase();
 	if (/\b(shop|store|checkout|cart|ecommerce|commerce)\b/.test(lower)) return CHECKOUT_FLOW;
 	if (/\b(auth|sign up|signup|login|saas|app|platform)\b/.test(lower)) return AUTH_APP_FLOW;
-	return AUTH_APP_FLOW;
+	return defaultFlow(description);
 }
 
 /** Keyword and platform based flow when no LLM is available. */

@@ -126,13 +126,13 @@ describe('auth flow', () => {
 		expect(res.status).toBe(200);
 		const body = await res.json();
 		expect(body.user).toBeNull();
-		expect(body.features).toEqual({ ai: true });
+		expect(body.features).toEqual({ ai: true, llm: true });
 	});
 
-	it('/api/me says when AI features are off', async () => {
+	it('/api/me says when the LLM writer is off', async () => {
 		const app = createTestApp(pool, github, { ...testConfig, llmAdapter: 'disabled' });
 		const body = await (await app.request('/api/me')).json();
-		expect(body.features).toEqual({ ai: false });
+		expect(body.features).toEqual({ ai: true, llm: false });
 	});
 
 	it('logout clears the session', async () => {

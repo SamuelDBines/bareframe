@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 type Props = {
 	projectId: string;
@@ -37,12 +38,12 @@ export function ProjectCardMenu({ projectId, projectName, onDeleted, onDelete }:
 		setError(null);
 		try {
 			await onDelete(projectId);
-			setConfirmOpen(false);
 			onDeleted();
 		} catch (e) {
 			setError(e instanceof Error ? e.message : 'We could not delete that project.');
 		} finally {
 			setBusy(false);
+			setConfirmOpen(false);
 		}
 	}
 
@@ -81,36 +82,45 @@ export function ProjectCardMenu({ projectId, projectName, onDeleted, onDelete }:
 					</div>
 				) : null}
 			</div>
-			{confirmOpen ? (
-				<div className="bx-dialog-backdrop" role="presentation" onMouseDown={() => !busy && setConfirmOpen(false)}>
-					<div
-						className="bx-dialog bx-dialog--danger"
-						role="alertdialog"
-						aria-labelledby="delete-project-title"
-						aria-describedby="delete-project-desc"
-						data-testid="delete-project-dialog"
-						onMouseDown={(e) => e.stopPropagation()}
-					>
-						<h2 id="delete-project-title">Delete “{projectName}”?</h2>
-						<p id="delete-project-desc">
-							This removes the project, flow map, designs and reviews. This cannot be undone.
-						</p>
-						{error ? (
-							<p className="bx-notice bx-notice--warn" role="alert">
-								{error}
-							</p>
-						) : null}
-						<div className="bx-dialog__actions">
-							<button type="button" className="btn btn-secondary" disabled={busy} onClick={() => setConfirmOpen(false)}>
-								Cancel
-							</button>
-							<button type="button" className="btn btn-danger" disabled={busy} data-testid="confirm-delete-project" onClick={() => void confirmDelete()}>
-								{busy ? 'Deleting…' : 'Delete project'}
-							</button>
-						</div>
-					</div>
-				</div>
-			) : null}
+			{confirmOpen
+				? createPortal(
+						<div className="bx-dialog-backdrop" role="presentation" onMouseDown={() => !busy && setConfirmOpen(false)}>
+							<div
+								className="bx-dialog bx-dialog--danger"
+								role="alertdialog"
+								aria-labelledby="delete-project-title"
+								aria-describedby="delete-project-desc"
+								data-testid="delete-project-dialog"
+								onMouseDown={(e) => e.stopPropagation()}
+							>
+								<h2 id="delete-project-title">Delete “{projectName}”?</h2>
+								<p id="delete-project-desc">
+									This removes the project, flow map, designs and reviews. This cannot be undone.
+								</p>
+								{error ? (
+									<p className="bx-notice bx-notice--warn" role="alert">
+										{error}
+									</p>
+								) : null}
+								<div className="bx-dialog__actions">
+									<button type="button" className="btn btn-secondary" disabled={busy} onClick={() => setConfirmOpen(false)}>
+										Cancel
+									</button>
+									<button
+										type="button"
+										className="btn btn-danger"
+										disabled={busy}
+										data-testid="confirm-delete-project"
+										onClick={() => void confirmDelete()}
+									>
+										{busy ? 'Deleting…' : 'Delete project'}
+									</button>
+								</div>
+							</div>
+						</div>,
+						document.body,
+					)
+				: null}
 		</>
 	);
 }

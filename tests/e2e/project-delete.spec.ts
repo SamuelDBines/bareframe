@@ -38,7 +38,11 @@ test('deletes a project from the card menu', async ({ page, isMobile }) => {
 	const dialog = page.getByTestId('delete-project-dialog');
 	await expect(dialog).toBeVisible();
 	await expect(dialog).toContainText('To delete');
+	const deleteReq = page.waitForResponse(
+		(res) => res.request().method() === 'DELETE' && res.url().includes(`/api/projects/${PROJECT_ID}`),
+	);
 	await page.getByTestId('confirm-delete-project').click();
+	await deleteReq;
 	await expect(cardName).toHaveCount(0);
 	if (!isMobile) {
 		await expect(page.getByTestId(`project-menu-${PROJECT_ID}`)).toHaveCount(0);

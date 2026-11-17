@@ -34,6 +34,22 @@ async function mockApi(page: Page) {
 }
 
 test('sign-up and GitHub install preserve the website configure return URL', async ({ page }) => {
+	await page.addInitScript((id: string) => {
+		sessionStorage.setItem(
+			`bf_website_import_${id}`,
+			JSON.stringify({
+				v: 1,
+				step: 3,
+				method: 'capture',
+				screenshots: true,
+				privacyAcknowledged: true,
+				repo: 'acme/web',
+				branch: 'main',
+				filePath: 'index.html',
+				tokenIssued: true,
+			}),
+		);
+	}, PROJECT_ID);
 	await mockApi(page);
 	await page.goto('/#/sign-up');
 	const signInHref = await page.getByRole('link', { name: 'Continue with GitHub' }).getAttribute('href');

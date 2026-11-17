@@ -36,20 +36,20 @@ test('onboarding modal stays above canvas chrome on an empty map', async ({ page
 	const panel = page.getByTestId('describe-product-panel');
 	await expect(panel).toBeVisible({ timeout: 30_000 });
 	await expect(panel.getByText('Prefer to start by hand? Switch to Edit and add a screen.')).toBeVisible();
-	const footer = panel.getByText('Prefer to start by hand? Switch to Edit and add a screen.');
 	const zoom = page.getByTestId('flow-map-zoom-bar');
 	await expect(zoom).toHaveCount(0);
 	await expect(page.getByTestId('design-bar')).toHaveCount(0);
 	await expect(page.locator('.canvas-subtoolbar')).toHaveCount(0);
 	await expect(page.locator('.device-viewport-switch--canvas')).toHaveCount(0);
-	const footerBox = await footer.boundingBox();
-	expect(footerBox).toBeTruthy();
-	if (footerBox) {
-		const obscured = await page.evaluate((y) => {
-			const el = document.elementFromPoint(window.innerWidth / 2, y + 6);
+	const panelBox = await panel.boundingBox();
+	expect(panelBox).toBeTruthy();
+	if (panelBox) {
+		const sampleY = panelBox.y + panelBox.height * 0.85;
+		const topmost = await page.evaluate(({ x, y }) => {
+			const el = document.elementFromPoint(x, y);
 			return el?.closest('.describe-panel') != null;
-		}, footerBox.y + footerBox.height - 8);
-		expect(obscured).toBe(true);
+		}, { x: panelBox.x + panelBox.width / 2, y: sampleY });
+		expect(topmost).toBe(true);
 	}
 });
 

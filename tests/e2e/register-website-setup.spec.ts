@@ -2,6 +2,8 @@ import { expect, test, type Page, type Route } from '@playwright/test';
 import { createEmptyProjectDocument } from '../../packages/designer-core/dist/index.js';
 
 const PROJECT_ID = 'p-reg-flow';
+let idSeq = 0;
+const newId = (prefix: string) => `${prefix}-e2e-${++idSeq}`;
 const WEBSITE = 'https://example.com';
 
 async function mockApi(page: Page) {
@@ -23,7 +25,7 @@ async function mockApi(page: Page) {
 			return json({ eventCount: 0, screenshotCount: 0, distinctUrlCount: 0 });
 		}
 		if (p.endsWith(`/api/projects/${PROJECT_ID}`)) {
-			const doc = createEmptyProjectDocument(PROJECT_ID, 'example.com', 'light');
+			const doc = createEmptyProjectDocument(PROJECT_ID, 'example.com', 'light', { newId });
 			return json({ id: PROJECT_ID, name: 'example.com', version: 1, document: doc });
 		}
 		if (p.endsWith('/events')) return route.fulfill({ status: 204, body: '' });

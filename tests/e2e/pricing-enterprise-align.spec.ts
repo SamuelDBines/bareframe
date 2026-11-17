@@ -22,18 +22,19 @@ async function assertEnterpriseBlockAligned(page: import('@playwright/test').Pag
 		const offersBox = offersEl.getBoundingClientRect();
 		const plansBox = plansEl.getBoundingClientRect();
 		const enterpriseBox = enterpriseEl.getBoundingClientRect();
-		const offersCenter = offersBox.left + offersBox.width / 2;
+		const plansCenter = plansBox.left + plansBox.width / 2;
 		const enterpriseCenter = enterpriseBox.left + enterpriseBox.width / 2;
+		const offersCenter = offersBox.left + offersBox.width / 2;
 		return {
-			offersCenterDelta: Math.abs(offersCenter - (window.innerWidth / 2)),
-			enterpriseCenterDelta: Math.abs(enterpriseCenter - offersCenter),
+			plansEnterpriseDelta: Math.abs(enterpriseCenter - plansCenter),
+			offersCenterDelta: Math.abs(offersCenter - plansCenter),
 			widthDelta: Math.abs(plansBox.width - enterpriseBox.width),
 		};
 	});
 
 	expect(metrics).not.toBeNull();
-	expect(metrics!.offersCenterDelta).toBeLessThan(3);
-	expect(metrics!.enterpriseCenterDelta).toBeLessThan(2);
+	expect(metrics!.plansEnterpriseDelta).toBeLessThan(2);
+	expect(metrics!.offersCenterDelta).toBeLessThan(2);
 	expect(metrics!.widthDelta).toBeLessThan(2);
 }
 

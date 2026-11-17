@@ -31,14 +31,15 @@ test('deletes a project from the card menu', async ({ page, isMobile }) => {
 	const deleted = { value: false };
 	await mockApi(page, deleted);
 	await page.goto('/#/app');
-	await expect(page.getByText('To delete')).toBeVisible({ timeout: 15_000 });
+	const cardName = page.locator('.project-card__name', { hasText: 'To delete' });
+	await expect(cardName).toBeVisible({ timeout: 15_000 });
 	await page.getByTestId(`project-menu-${PROJECT_ID}`).click();
 	await page.getByRole('menuitem', { name: 'Delete project' }).click();
 	const dialog = page.getByTestId('delete-project-dialog');
 	await expect(dialog).toBeVisible();
 	await expect(dialog).toContainText('To delete');
 	await page.getByTestId('confirm-delete-project').click();
-	await expect(page.getByText('To delete')).toHaveCount(0);
+	await expect(cardName).toHaveCount(0);
 	if (!isMobile) {
 		await expect(page.getByTestId(`project-menu-${PROJECT_ID}`)).toHaveCount(0);
 	}

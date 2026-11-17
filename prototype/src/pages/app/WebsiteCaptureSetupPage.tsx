@@ -3,7 +3,6 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { friendlyError } from '../../app/apiError';
 import {
 	createFlowMap,
-	fetchFlowMapJob,
 	fetchPlan,
 	waitForFlowMapJob,
 	startProCheckout,

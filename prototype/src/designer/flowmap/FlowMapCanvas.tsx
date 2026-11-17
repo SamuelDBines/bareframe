@@ -667,7 +667,7 @@ export function FlowMapCanvas({
 				</div>
 			) : null}
 
-			{frames.length > 0 && workspaceMode === 'map' ? (
+			{frames.length > 0 && workspaceMode === 'map' && !hideEmptyState ? (
 				<div
 					className="flow-map-minimap"
 					style={{ width: miniW, height: miniH }}
@@ -710,8 +710,8 @@ export function FlowMapCanvas({
 				</div>
 			) : null}
 
-			{workspaceMode === 'map' ? (
-			<div className="flow-map-zoom-bar" role="toolbar" aria-label="Zoom">
+			{workspaceMode === 'map' && frames.length > 0 && !hideEmptyState ? (
+			<div className="flow-map-zoom-bar" role="toolbar" aria-label="Zoom" data-testid="flow-map-zoom-bar">
 				<button type="button" className="zoom-btn" onClick={() => zoomBy(-0.1)} aria-label="Zoom out">
 					−
 				</button>

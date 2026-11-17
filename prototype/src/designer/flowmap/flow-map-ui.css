@@ -20,10 +20,18 @@
 	width: 100%;
 }
 
+.flow-map-workspace--onboarding .design-bar,
 .flow-map-stage--onboarding .flow-map-zoom-bar,
 .flow-map-stage--onboarding .flow-map-minimap,
-.flow-map-stage--onboarding .flow-map-connect-hint {
-	visibility: hidden;
+.flow-map-stage--onboarding .flow-map-connect-hint,
+.flow-map-stage--onboarding .flow-gen-toast {
+	display: none;
+	pointer-events: none;
+}
+
+.flow-map-stage--onboarding .flow-map-viewport .canvas-subtoolbar,
+.flow-map-stage--onboarding .device-viewport-switch--canvas {
+	display: none;
 	pointer-events: none;
 }
 

@@ -84,53 +84,55 @@ export function PricingPage() {
 				</p>
 			</header>
 
-			<div className="plans plans--two">
-				{PLANS.map((plan) => (
-					<article
-						key={plan.id}
-						className={`plan${plan.popular ? ' plan--popular' : ''}`}
-						aria-labelledby={`plan-${plan.id}`}
-					>
-						{plan.popular ? <span className="plan__badge">Popular</span> : null}
-						<h2 id={`plan-${plan.id}`} className="plan__name">
-							{plan.name}
-						</h2>
-						<p className="plan__blurb">{plan.blurb}</p>
-						<p className="plan__price">
-							{plan.price ? (
-								<>
-									<span className="plan__amount" data-testid={plan.id === 'pro' ? 'plan-pro-amount' : undefined}>
-										{plan.price}
-									</span>
-									<span className="plan__unit">{plan.unit}</span>
-								</>
+			<section className="pricing__offers" data-testid="pricing-offers">
+				<div className="plans plans--two" data-testid="pricing-plans">
+					{PLANS.map((plan) => (
+						<article
+							key={plan.id}
+							className={`plan${plan.popular ? ' plan--popular' : ''}`}
+							aria-labelledby={`plan-${plan.id}`}
+						>
+							{plan.popular ? <span className="plan__badge">Popular</span> : null}
+							<h2 id={`plan-${plan.id}`} className="plan__name">
+								{plan.name}
+							</h2>
+							<p className="plan__blurb">{plan.blurb}</p>
+							<p className="plan__price">
+								{plan.price ? (
+									<>
+										<span className="plan__amount" data-testid={plan.id === 'pro' ? 'plan-pro-amount' : undefined}>
+											{plan.price}
+										</span>
+										<span className="plan__unit">{plan.unit}</span>
+									</>
+								) : (
+									<span className="plan__amount">Custom</span>
+								)}
+							</p>
+							<p className="plan__note">{plan.note}</p>
+							{plan.cta.to ? (
+								<Link to={plan.cta.to} className={`btn ${plan.popular ? 'btn-primary' : 'btn-secondary'} plan__cta`}>
+									{plan.cta.label}
+								</Link>
 							) : (
-								<span className="plan__amount">Custom</span>
+								<a href={plan.cta.href} className="btn btn-secondary plan__cta">
+									{plan.cta.label}
+								</a>
 							)}
-						</p>
-						<p className="plan__note">{plan.note}</p>
-						{plan.cta.to ? (
-							<Link to={plan.cta.to} className={`btn ${plan.popular ? 'btn-primary' : 'btn-secondary'} plan__cta`}>
-								{plan.cta.label}
-							</Link>
-						) : (
-							<a href={plan.cta.href} className="btn btn-secondary plan__cta">
-								{plan.cta.label}
-							</a>
-						)}
-						<ul className="plan__features">
-							{plan.features.map((f) => (
-								<li key={f}>{f}</li>
-							))}
-						</ul>
-					</article>
-				))}
-			</div>
+							<ul className="plan__features">
+								{plan.features.map((f) => (
+									<li key={f}>{f}</li>
+								))}
+							</ul>
+						</article>
+					))}
+				</div>
 
-			<p className="pricing__enterprise bx-hint">
-				Need SSO, security review or a larger org rollout?{' '}
-				<a href={SALES_HREF}>Contact us</a>, we quote separately. There is no self-serve Team plan.
-			</p>
+				<p className="pricing__enterprise bx-hint" data-testid="pricing-enterprise">
+					Need SSO, security review or a larger org rollout?{' '}
+					<a href={SALES_HREF}>Contact us</a>, we quote separately. There is no self-serve Team plan.
+				</p>
+			</section>
 
 			<section className="faq" aria-labelledby="faq-title">
 				<h2 id="faq-title">Questions</h2>

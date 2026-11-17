@@ -123,7 +123,7 @@ export function FlowMapProjectWorkspace({
 		<div
 			className={`flow-map-workspace${
 				notesOpen && cloudProjectId ? ' flow-map-workspace--notes-open' : ''
-			}`}
+			}${showDescribe ? ' flow-map-workspace--onboarding' : ''}`}
 			data-testid="flow-map-workspace"
 		>
 			<FlowMapToolbar
@@ -149,7 +149,7 @@ export function FlowMapProjectWorkspace({
 				notesOpen={notesOpen}
 				onNotesOpenChange={setNotesOpen}
 			/>
-			{canUseDesignTools && !flowIsEmpty ? (
+			{canUseDesignTools && !flowIsEmpty && !showDescribe ? (
 				<DesignBar
 					device={designDevice}
 					onDeviceChange={setDesignDevice}

@@ -326,6 +326,51 @@ function createFrame(
 	};
 }
 
+/** Blank canvas for cloud projects before the server document loads (avoids demo frames flashing on screen). */
+export function createEmptyDesignerProject(
+	name = 'New flow',
+	defaultTheme: ThemeId = 'light',
+): DesignerProject {
+	const baseLayout = {
+		mode: 'stack' as const,
+		gap: 16,
+		padding: [0, 0, 0, 0] as [number, number, number, number],
+		align: 'stretch' as const,
+		justify: 'start' as const,
+		widthMode: 'fill' as const,
+		heightMode: 'hug' as const,
+	};
+	const page: Page = {
+		id: PAGE_ID,
+		name: 'Home',
+		routePath: '/',
+		rootNodeId: ROOT_ID,
+		nodes: {
+			[ROOT_ID]: {
+				id: ROOT_ID,
+				name: 'Page root',
+				type: 'stack',
+				parentId: null,
+				children: [],
+				layout: baseLayout,
+			},
+		},
+	};
+
+	return {
+		id: 'proj-pending',
+		name,
+		defaultThemeId: defaultTheme,
+		pages: [page],
+		frames: [],
+		trials: [],
+		customTokenOverrides: {},
+		connectors: [],
+		annotations: [],
+		canvas: { zoom: 1, x: 0, y: 0 },
+	};
+}
+
 export function createInitialProject(defaultTheme: ThemeId = 'light'): DesignerProject {
 	const page: Page = {
 		id: PAGE_ID,

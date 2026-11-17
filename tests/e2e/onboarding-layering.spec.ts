@@ -37,8 +37,11 @@ test('onboarding modal stays above canvas chrome on an empty map', async ({ page
 	await expect(panel).toBeVisible({ timeout: 30_000 });
 	await expect(panel.getByText('Prefer to start by hand? Switch to Edit and add a screen.')).toBeVisible();
 	const footer = panel.getByText('Prefer to start by hand? Switch to Edit and add a screen.');
-	const zoom = page.locator('.flow-map-zoom-bar');
-	await expect(zoom).toBeHidden();
+	const zoom = page.getByTestId('flow-map-zoom-bar');
+	await expect(zoom).toHaveCount(0);
+	await expect(page.getByTestId('design-bar')).toHaveCount(0);
+	await expect(page.locator('.canvas-subtoolbar')).toHaveCount(0);
+	await expect(page.locator('.device-viewport-switch--canvas')).toHaveCount(0);
 	const footerBox = await footer.boundingBox();
 	expect(footerBox).toBeTruthy();
 	if (footerBox) {
@@ -48,4 +51,16 @@ test('onboarding modal stays above canvas chrome on an empty map', async ({ page
 		}, footerBox.y + footerBox.height - 8);
 		expect(obscured).toBe(true);
 	}
+});
+
+test('empty map mode keeps canvas chrome hidden before any screens exist', async ({ page }) => {
+	await mockEmptyProject(page);
+	await page.addInitScript(() => {
+		localStorage.setItem('bareframe.flowMapTour.v1', JSON.stringify({ dismissed: true }));
+	});
+	await page.goto(`/#/app/project/${PROJECT_ID}`);
+	await expect(page.getByTestId('describe-product-panel')).toBeVisible({ timeout: 30_000 });
+	await expect(page.getByTestId('flow-mode-map')).toHaveAttribute('aria-selected', 'true');
+	await expect(page.getByTestId('flow-map-zoom-bar')).toHaveCount(0);
+	await expect(page.getByTestId('design-bar')).toHaveCount(0);
 });

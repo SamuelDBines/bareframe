@@ -206,4 +206,42 @@ describe.skipIf(!process.env.DATABASE_URL)('sitemap import', () => {
 		expect(result.routeCount).toBeGreaterThanOrEqual(2);
 		expect(result.connectorCount).toBeGreaterThanOrEqual(1);
 	});
+
+	it('imports routes when LLM is not configured', async () => {
+		const prevAdapter = process.env.LLM_ADAPTER;
+		const prevKey = process.env.LLM_API_KEY;
+		const prevBase = process.env.LLM_API_BASE_URL;
+		process.env.LLM_ADAPTER = 'disabled';
+		delete process.env.LLM_API_KEY;
+		delete process.env.LLM_API_BASE_URL;
+		process.env.RENDER_ALLOW_HOSTS = '127.0.0.1';
+		try {
+			const user = await upsertUser(pool, {
+				githubId: 904,
+				login: 'sitemap-no-llm',
+				name: null,
+				avatarUrl: null,
+				email: null,
+			});
+			await pool.query(`UPDATE users SET plan_tier = 'pro' WHERE id = $1`, [user.id]);
+			const created = await createProject(pool, user.id, 'Sitemap no LLM');
+			const { importSitemapIntoProject } = await import('../src/sitemap/import-sitemap.js');
+			const result = await importSitemapIntoProject(
+				pool,
+				created.id,
+				user.id,
+				created.version,
+				`${fixtureBase}/`,
+			);
+			expect(result.routeCount).toBeGreaterThanOrEqual(2);
+			expect(result.connectorCount).toBeGreaterThanOrEqual(1);
+		} finally {
+			if (prevAdapter === undefined) delete process.env.LLM_ADAPTER;
+			else process.env.LLM_ADAPTER = prevAdapter;
+			if (prevKey === undefined) delete process.env.LLM_API_KEY;
+			else process.env.LLM_API_KEY = prevKey;
+			if (prevBase === undefined) delete process.env.LLM_API_BASE_URL;
+			else process.env.LLM_API_BASE_URL = prevBase;
+		}
+	});
 });

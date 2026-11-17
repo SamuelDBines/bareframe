@@ -119,7 +119,7 @@ export function DesignerWorkspace({
 	);
 
 	return (
-		<DesignerProvider>
+		<DesignerProvider seed={projectId ? 'empty' : 'demo'}>
 			<AppCanvasChromeProvider value={chrome}>
 				<DesignerCloudSync
 					projectId={projectId}

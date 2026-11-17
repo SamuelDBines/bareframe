@@ -72,7 +72,9 @@ export function ProjectCardMenu({ projectId, projectName, onDeleted, onDelete }:
 							type="button"
 							role="menuitem"
 							className="project-card__menu-danger"
-							onClick={() => {
+							onClick={(e) => {
+								e.preventDefault();
+								e.stopPropagation();
 								setOpen(false);
 								setConfirmOpen(true);
 							}}

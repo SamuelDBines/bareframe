@@ -42,6 +42,15 @@ export async function listProjects(): Promise<ApiProjectSummary[]> {
 	return data.projects;
 }
 
+export async function deleteProject(projectId: string): Promise<void> {
+	await parseJson(
+		await fetch(`/api/projects/${projectId}`, {
+			method: 'DELETE',
+			credentials: 'include',
+		}),
+	);
+}
+
 export async function createProject(name: string): Promise<{
 	id: string;
 	name: string;

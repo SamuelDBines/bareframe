@@ -81,10 +81,10 @@ describe('applyProjectCommand', () => {
 		const imported = applyImportScreenshots(
 			doc,
 			[
-				{ assetId: 'asset-a', title: 'A' },
-				{ assetId: 'asset-b', title: 'B' },
+				{ routePath: '/a', assetId: 'asset-a', title: 'A' },
+				{ routePath: '/b', assetId: 'asset-b', title: 'B' },
 			],
-			[{ fromAssetId: 'asset-a', toAssetId: 'asset-b', label: 'Go' }],
+			[{ fromRoutePath: '/a', toRoutePath: '/b', label: 'Go' }],
 			ctx,
 		);
 		expect(imported.document.project.frames.length).toBeGreaterThanOrEqual(2);

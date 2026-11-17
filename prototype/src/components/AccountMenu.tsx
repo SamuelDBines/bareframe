@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import type { AuthUser } from '../auth/AuthContext';
+import { UserAvatar } from './UserAvatar';
 
 type Props = {
 	user: AuthUser;
@@ -109,13 +110,7 @@ export function AccountMenu({ user, onSignOut, settingsTo = '/app/settings' }: P
 				onClick={() => (open ? close() : openMenu())}
 				onKeyDown={onTriggerKeyDown}
 			>
-				{user.avatarUrl ? (
-					<img className="user-avatar" src={user.avatarUrl} alt="" width={32} height={32} />
-				) : (
-					<span className="user-avatar user-avatar--initial" aria-hidden>
-						{user.login.slice(0, 1).toUpperCase()}
-					</span>
-				)}
+				<UserAvatar user={user} />
 				<span className="account-menu__name">{displayName}</span>
 			</button>
 			{open ? (

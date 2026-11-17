@@ -20,7 +20,7 @@ import {
 } from './frameLayout';
 import { boundsForFlowMapFrames } from './flowmap/flowMapLayout';
 import { duplicatePageTree } from './flowmap/duplicatePage';
-import { createInitialProject, PAGE_ID } from './initialProject';
+import { createEmptyDesignerProject, createInitialProject, PAGE_ID } from './initialProject';
 import type {
 	Annotation,
 	CompareMode,
@@ -156,6 +156,9 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 				ui: {
 					...state.ui,
 					activePageId: project.pages[0]?.id ?? state.ui.activePageId,
+					selectedFrameId: null,
+					selectedNodeId: null,
+					mobilePanel: 'none',
 					camera: { ...project.canvas },
 				},
 			};
@@ -686,24 +689,27 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 	}
 }
 
-const initialProject = createInitialProject();
+export type DesignerBootstrap = 'demo' | 'empty';
 
-const initialState: DesignerState = {
-	project: initialProject,
-	ui: {
-		activePageId: PAGE_ID,
-		selectedFrameId: 'frame-iphone',
-		selectedNodeId: null,
-		editScope: 'base',
-		compare: null,
-		assistantOpen: false,
-		panning: false,
-		camera: { ...initialProject.canvas },
-		mobilePanel: 'none',
-	},
-	history: [initialProject],
-	historyIndex: 0,
-};
+function buildInitialState(seed: DesignerBootstrap): DesignerState {
+	const project = seed === 'empty' ? createEmptyDesignerProject() : createInitialProject();
+	return {
+		project,
+		ui: {
+			activePageId: project.pages[0]?.id ?? PAGE_ID,
+			selectedFrameId: project.frames[0]?.id ?? null,
+			selectedNodeId: null,
+			editScope: 'base',
+			compare: null,
+			assistantOpen: false,
+			panning: false,
+			camera: { ...project.canvas },
+			mobilePanel: 'none',
+		},
+		history: [project],
+		historyIndex: 0,
+	};
+}
 
 type DesignerContextValue = {
 	state: DesignerState;
@@ -714,8 +720,14 @@ type DesignerContextValue = {
 
 const DesignerContext = createContext<DesignerContextValue | null>(null);
 
-export function DesignerProvider({ children }: { children: ReactNode }) {
-	const [state, dispatch] = useReducer(reducer, initialState);
+export function DesignerProvider({
+	children,
+	seed = 'demo',
+}: {
+	children: ReactNode;
+	seed?: DesignerBootstrap;
+}) {
+	const [state, dispatch] = useReducer(reducer, seed, buildInitialState);
 	const stateRef = useRef(state);
 	stateRef.current = state;
 

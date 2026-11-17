@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { friendlyError } from '../../app/apiError';
-import { createFlowMap, fetchPlan, importSitemap, startProCheckout } from '../../app/reviewApi';
+import {
+	createFlowMap,
+	fetchPlan,
+	waitForFlowMapJob,
+	startProCheckout,
+	type FlowMapJobStatus,
+} from '../../app/reviewApi';
 import {
 	fetchWebsiteCaptureStatus,
 	previewInstallPr,
@@ -39,6 +45,7 @@ export function WebsiteCaptureSetupPage() {
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [notice, setNotice] = useState<string | null>(null);
+	const [importProgress, setImportProgress] = useState<string | null>(null);
 
 	const scriptOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://bareframe.org';
 	const hostname = useMemo(() => {
@@ -120,34 +127,47 @@ export function WebsiteCaptureSetupPage() {
 		}
 	}
 
-	async function runPublicCrawl() {
+	async function runWebsiteImport(method: 'crawl' | 'sitemap') {
 		if (planTier !== 'pro') return;
 		setBusy(true);
 		setError(null);
+		setImportProgress(method === 'crawl' ? 'Discovering pages…' : 'Reading sitemap…');
 		try {
-			await createFlowMap(projectId, websiteUrl, projectVersion);
+			const viewports: ('mobile' | 'tablet' | 'desktop')[] = wizard.screenshots
+				? ['mobile', 'tablet', 'desktop']
+				: ['mobile'];
+			const { jobId } = await createFlowMap(projectId, websiteUrl, projectVersion, {
+				maxPages: 20,
+				viewports,
+			});
+			await waitForFlowMapJob(projectId, jobId, (job: FlowMapJobStatus) => {
+				const progress = job.result?.progress;
+				if (progress) {
+					const label = progress.current
+						? `Capturing ${progress.done + 1} of ${progress.total}: ${progress.current}`
+						: `Capturing ${progress.done} of ${progress.total} pages…`;
+					setImportProgress(label);
+					return;
+				}
+			});
+			setImportProgress(null);
 			persistWizard({ ...wizard, step: WIZARD_STEPS.length - 1 });
 			await refreshStatus();
+			setNotice('Website import finished. Open the project map to review screenshots.');
 		} catch (e) {
-			setError(friendlyError(e, 'Public crawl failed.'));
+			setError(friendlyError(e, 'Website import failed.'));
 		} finally {
 			setBusy(false);
+			setImportProgress(null);
 		}
 	}
 
+	async function runPublicCrawl() {
+		await runWebsiteImport('crawl');
+	}
+
 	async function runSitemap() {
-		if (planTier !== 'pro') return;
-		setBusy(true);
-		setError(null);
-		try {
-			await importSitemap(projectId, websiteUrl, projectVersion);
-			persistWizard({ ...wizard, step: WIZARD_STEPS.length - 1 });
-			await refreshStatus();
-		} catch (e) {
-			setError(friendlyError(e, 'Sitemap import failed.'));
-		} finally {
-			setBusy(false);
-		}
+		await runWebsiteImport('sitemap');
 	}
 
 	async function previewPr() {
@@ -197,7 +217,7 @@ export function WebsiteCaptureSetupPage() {
 	const connected = (status?.eventCount ?? 0) > 0;
 	const hasScreens = (status?.screenshotCount ?? 0) > 0;
 	const step = wizard.step;
-	const returnTo = `/app/project/${projectId}/website-setup?url=${encodeURIComponent(websiteUrl)}`;
+	const returnTo = `/#/app/project/${projectId}/website-setup?url=${encodeURIComponent(websiteUrl)}`;
 
 	const canContinueStep1 =
 		wizard.method === 'capture'
@@ -511,6 +531,11 @@ export function WebsiteCaptureSetupPage() {
 			</footer>
 
 			{notice ? <p className="bx-hint">{notice}</p> : null}
+			{importProgress ? (
+				<p className="bx-hint" role="status" data-testid="website-import-progress">
+					{importProgress}
+				</p>
+			) : null}
 			{error ? (
 				<div className="bx-notice bx-notice--warn" role="alert">
 					<p>{error}</p>

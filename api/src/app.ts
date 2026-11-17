@@ -60,7 +60,7 @@ export function createApp(deps: AppDeps): Hono {
 	registerStripeWebhookRoute(app, pool, config);
 
 	app.get('/api/auth/github', (c) => {
-		const returnTo = normalizeReturnTo(c.req.query('returnTo'), config.designerPublicUrl);
+		const returnTo = normalizeReturnTo(c.req.query('returnTo'), config.designerPublicUrl, config.publicUrl);
 		const state = randomToken(16);
 		setOAuthStateCookie(c, { state, returnTo, purpose: 'signin' }, config.sessionSecret, cookieSettings);
 
@@ -70,7 +70,7 @@ export function createApp(deps: AppDeps): Hono {
 	});
 
 	app.get('/api/auth/github/install', (c) => {
-		const returnTo = normalizeReturnTo(c.req.query('returnTo'), config.designerPublicUrl);
+		const returnTo = normalizeReturnTo(c.req.query('returnTo'), config.designerPublicUrl, config.publicUrl);
 		const state = randomToken(16);
 		setOAuthStateCookie(c, { state, returnTo, purpose: 'install' }, config.sessionSecret, cookieSettings);
 		const redirectUri = `${config.publicUrl}/api/auth/github/callback`;
@@ -93,7 +93,7 @@ export function createApp(deps: AppDeps): Hono {
 			return c.text('Invalid OAuth state', 400);
 		}
 
-		const returnTo = isSafeReturnTo(stored.returnTo, config.designerPublicUrl)
+		const returnTo = isSafeReturnTo(stored.returnTo, config.designerPublicUrl, config.publicUrl)
 			? stored.returnTo
 			: '/';
 		const redirectUri = `${config.publicUrl}/api/auth/github/callback`;
@@ -132,8 +132,10 @@ export function createApp(deps: AppDeps): Hono {
 	});
 
 	app.get('/api/me', async (c) => {
-		// Lets the app hide AI-only features up front instead of failing when they're used.
-		const features = { ai: config.llmAdapter !== 'disabled' };
+		const llmConfigured =
+			config.llmAdapter === 'openai_compatible' &&
+			Boolean(config.llmApiKey && config.llmBaseUrl && config.llmModel);
+		const features = { ai: true, llm: llmConfigured };
 		const token = readSignedCookie(c, SESSION_COOKIE, config.sessionSecret);
 		if (!token) return c.json({ user: null, features });
 

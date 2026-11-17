@@ -16,7 +16,7 @@ export type FlowMapInput = {
 	baseVersion: number;
 	url?: string;
 	routes?: string[];
-	viewports?: ('mobile' | 'desktop')[];
+	viewports?: ('mobile' | 'tablet' | 'desktop')[];
 	maxPages?: number;
 	auditRules?: Record<string, unknown>;
 	actorUserId: number;
@@ -35,6 +35,17 @@ export async function createFlowMapJob(
 		[id, projectId, renderJobId, JSON.stringify(input)],
 	);
 	return id;
+}
+
+export async function updateFlowMapJobProgress(
+	pool: pg.Pool,
+	jobId: string,
+	progress: { done: number; total: number; current?: string },
+): Promise<void> {
+	await pool.query(`UPDATE flow_map_jobs SET result = $2 WHERE id = $1 AND status = 'running'`, [
+		jobId,
+		JSON.stringify({ progress }),
+	]);
 }
 
 export async function updateFlowMapJobStatus(

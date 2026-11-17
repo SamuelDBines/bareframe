@@ -118,5 +118,64 @@ describe.skipIf(!databaseUrl)('create_flow_map', () => {
 		};
 		expect(doc.document.project.frames.length).toBeGreaterThanOrEqual(2);
 		expect(doc.document.project.connectors.length).toBeGreaterThan(0);
+		const imageNodes = doc.document.project.pages.flatMap((p) =>
+			Object.values((p as { nodes: Record<string, { type?: string; image?: { assetId: string } }> }).nodes).filter(
+				(n) => n.type === 'image' && n.image?.assetId,
+			),
+		);
+		expect(imageNodes.length).toBeGreaterThanOrEqual(2);
+		const assetRes = await fetch(
+			`${apiBase}/api/projects/${projectId}/assets/${imageNodes[0]!.image!.assetId}`,
+			{ headers: { Authorization: `Bearer ${token}` } },
+		);
+		expect(assetRes.status).toBe(200);
+		expect(assetRes.headers.get('content-type')).toMatch(/image\//);
+	}, 120_000);
+
+	it('builds a flow map from URL crawl and screenshots when LLM is not configured', async () => {
+		const prevAdapter = process.env.LLM_ADAPTER;
+		const prevKey = process.env.LLM_API_KEY;
+		const prevBase = process.env.LLM_API_BASE_URL;
+		process.env.LLM_ADAPTER = 'disabled';
+		delete process.env.LLM_API_KEY;
+		delete process.env.LLM_API_BASE_URL;
+		try {
+			const projectRes = await fetch(`${apiBase}/api/projects/${projectId}`, {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			const project = (await projectRes.json()) as { version: number };
+
+			const res = await fetch(`${apiBase}/api/projects/${projectId}/flow-maps`, {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${token}`,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					baseVersion: project.version,
+					url: `${fixtureBase}/`,
+					maxPages: 5,
+				}),
+			});
+			expect(res.status).toBe(202);
+			const { jobId } = (await res.json()) as { jobId: string };
+
+			const jobRes = await fetch(`${apiBase}/api/projects/${projectId}/flow-maps/${jobId}`, {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			const job = (await jobRes.json()) as {
+				status: string;
+				result: { pageCount: number };
+			};
+			expect(job.status).toBe('completed');
+			expect(job.result.pageCount).toBeGreaterThanOrEqual(2);
+		} finally {
+			if (prevAdapter === undefined) delete process.env.LLM_ADAPTER;
+			else process.env.LLM_ADAPTER = prevAdapter;
+			if (prevKey === undefined) delete process.env.LLM_API_KEY;
+			else process.env.LLM_API_KEY = prevKey;
+			if (prevBase === undefined) delete process.env.LLM_API_BASE_URL;
+			else process.env.LLM_API_BASE_URL = prevBase;
+		}
 	}, 120_000);
 });

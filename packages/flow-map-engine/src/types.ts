@@ -1,7 +1,8 @@
-export type ViewportPreset = 'mobile' | 'desktop';
+export type ViewportPreset = 'mobile' | 'tablet' | 'desktop';
 
 export const VIEWPORT_SIZES: Record<ViewportPreset, { width: number; height: number }> = {
 	mobile: { width: 390, height: 844 },
+	tablet: { width: 834, height: 1112 },
 	desktop: { width: 1280, height: 800 },
 };
 
@@ -35,6 +36,7 @@ export type AuditFinding = {
 export type PageCaptureMetrics = {
 	url: string;
 	path: string;
+	title?: string;
 	scrollWidth: number;
 	clientWidth: number;
 	hasHeader: boolean;

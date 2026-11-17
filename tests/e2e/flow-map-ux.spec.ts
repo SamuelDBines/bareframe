@@ -21,7 +21,14 @@ async function visitEditableFlowMap(page: Page) {
 	await page.goto('/#/app/project/local-draft');
 	await expect(page.getByTestId('flow-map-workspace')).toBeVisible({ timeout: 30_000 });
 	await page.getByTestId('flow-mode-edit').click();
+	const startBlank = page.getByTestId('start-blank');
+	if (await startBlank.isVisible()) {
+		await startBlank.click();
+	} else {
+		await page.getByTestId('flow-add-screen').click();
+	}
 	await expect(page.getByTestId('flow-add-screen')).toBeVisible();
+	await expect(page.getByTestId('flow-map-card-hit').first()).toBeVisible();
 }
 
 async function visitDemoReview(page: Page) {

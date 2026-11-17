@@ -50,6 +50,12 @@ async function mockNotesApi(page: Page) {
 		ghost: false,
 	};
 	document.project.frames = [frame];
+	document.project.productBrief = {
+		description: 'Notes demo',
+		platform: 'mobile',
+		platforms: ['mobile'],
+		updatedAt: new Date().toISOString(),
+	};
 
 	await page.route('**/api/**', async (route: Route) => {
 		const req = route.request();

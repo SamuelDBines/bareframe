@@ -86,15 +86,58 @@ export async function importSitemap(projectId: string, url: string, baseVersion:
   }>;
 }
 
-export async function createFlowMap(projectId: string, url: string, baseVersion: number) {
+export type FlowMapJobStatus = {
+  id: string;
+  status: string;
+  error?: string | null;
+  result?: {
+    progress?: { done: number; total: number; current?: string };
+    pageCount?: number;
+    failedRoutes?: { routePath: string; error: string }[];
+  };
+};
+
+export async function createFlowMap(
+  projectId: string,
+  url: string,
+  baseVersion: number,
+  opts?: { maxPages?: number; viewports?: ('mobile' | 'tablet' | 'desktop')[] },
+) {
   const res = await fetch(`/api/projects/${projectId}/flow-maps`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ url, baseVersion }),
+    body: JSON.stringify({ url, baseVersion, maxPages: opts?.maxPages, viewports: opts?.viewports }),
   });
   if (!res.ok) await apiFail(res, 'Import failed');
-  return res.json();
+  return res.json() as Promise<{ jobId: string; renderJobId: string; status: string }>;
+}
+
+export async function fetchFlowMapJob(projectId: string, jobId: string): Promise<FlowMapJobStatus> {
+  const res = await fetch(`/api/projects/${projectId}/flow-maps/${jobId}`, {
+    credentials: 'include',
+  });
+  if (!res.ok) await apiFail(res, 'Could not load import status');
+  return res.json() as Promise<FlowMapJobStatus>;
+}
+
+export async function waitForFlowMapJob(
+  projectId: string,
+  jobId: string,
+  onProgress?: (job: FlowMapJobStatus) => void,
+): Promise<FlowMapJobStatus> {
+  const started = Date.now();
+  const timeoutMs = 15 * 60_000;
+  while (Date.now() - started < timeoutMs) {
+    const job = await fetchFlowMapJob(projectId, jobId);
+    onProgress?.(job);
+    if (job.status === 'completed') return job;
+    if (job.status === 'failed') {
+      throw new Error(job.error ?? 'Website import failed');
+    }
+    await new Promise((r) => setTimeout(r, 800));
+  }
+  throw new Error('Website import timed out');
 }
 
 export async function fetchFigmaTokenStatus() {

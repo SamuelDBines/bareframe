@@ -97,6 +97,7 @@ function FlowMapCard({
 	page,
 	themeId,
 	customTokens,
+	projectId,
 	selected,
 	dimmed,
 	onSelect,
@@ -124,6 +125,7 @@ function FlowMapCard({
 	annotations: Annotation[];
 	issues: ReviewIssue[] | null;
 	zoom: number;
+	projectId?: string;
 	connectMode?: boolean;
 	connectSource?: boolean;
 	readOnly?: boolean;
@@ -215,6 +217,7 @@ function FlowMapCard({
 						page={page}
 						themeId={themeId}
 						customTokens={customTokens}
+						projectId={projectId}
 						selectedNodeId={null}
 						onSelectNode={() => undefined}
 					/>
@@ -270,6 +273,7 @@ function FlowMapCard({
 }
 
 export function FlowMapCanvas({
+	projectId,
 	connectMode,
 	connectFromFrameId,
 	onConnectFrameSelect,
@@ -279,7 +283,10 @@ export function FlowMapCanvas({
 	onGenerateDesign,
 	designingFrameId,
 	designBusy,
+	workspaceMode = 'map',
 }: {
+	projectId?: string;
+	workspaceMode?: 'map' | 'edit';
 	connectMode?: boolean;
 	onGenerateDesign?: (frame: Frame) => void;
 	designingFrameId?: string | null;
@@ -623,6 +630,7 @@ export function FlowMapCanvas({
 								page={page}
 								themeId={themeId}
 								customTokens={project.customTokenOverrides}
+								projectId={projectId}
 								selected={selected === frame.id}
 								dimmed={!linked}
 								onSelect={() => {
@@ -665,7 +673,7 @@ export function FlowMapCanvas({
 				</div>
 			) : null}
 
-			{frames.length > 0 ? (
+			{frames.length > 0 && workspaceMode === 'map' && !hideEmptyState ? (
 				<div
 					className="flow-map-minimap"
 					style={{ width: miniW, height: miniH }}
@@ -708,7 +716,8 @@ export function FlowMapCanvas({
 				</div>
 			) : null}
 
-			<div className="flow-map-zoom-bar" role="toolbar" aria-label="Zoom">
+			{workspaceMode === 'map' && frames.length > 0 && !hideEmptyState ? (
+			<div className="flow-map-zoom-bar" role="toolbar" aria-label="Zoom" data-testid="flow-map-zoom-bar">
 				<button type="button" className="zoom-btn" onClick={() => zoomBy(-0.1)} aria-label="Zoom out">
 					−
 				</button>
@@ -738,6 +747,7 @@ export function FlowMapCanvas({
 					</button>
 				)}
 			</div>
+			) : null}
 		</div>
 	);
 }

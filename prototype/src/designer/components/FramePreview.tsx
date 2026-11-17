@@ -15,6 +15,7 @@ type Props = {
 	protoHotspotNodeIds?: string[];
 	/** Lock iframe document to frame height (prototype player, avoids iframe clipping tall trees). */
 	lockDocumentHeight?: boolean;
+	projectId?: string;
 };
 
 function designerAssetBase(): string {
@@ -31,6 +32,7 @@ export const FramePreview = memo(function FramePreview({
 	onSelectNode,
 	protoHotspotNodeIds,
 	lockDocumentHeight,
+	projectId,
 }: Props) {
 	const ref = useRef<HTMLIFrameElement>(null);
 	const [ready, setReady] = useState(false);
@@ -45,6 +47,7 @@ export const FramePreview = memo(function FramePreview({
 			const assetBase = designerAssetBase();
 			const previewCss = await loadFramePreviewStyles(assetBase, themeId);
 			if (cancelled) return;
+			const origin = window.location.origin;
 			el.srcdoc = buildFramePreviewDoc({
 				page,
 				frameWidth: frame.width,
@@ -55,6 +58,9 @@ export const FramePreview = memo(function FramePreview({
 				selectedNodeId,
 				protoHotspotNodeIds,
 				assetBase,
+				projectAssetUrl: projectId
+					? (assetId) => `${origin}/api/projects/${projectId}/assets/${assetId}`
+					: undefined,
 				previewCss,
 			});
 		})();
@@ -62,7 +68,18 @@ export const FramePreview = memo(function FramePreview({
 		return () => {
 			cancelled = true;
 		};
-	}, [page, frame.width, frame.height, themeId, customTokens, trial, selectedNodeId, protoHotspotNodeIds, lockDocumentHeight]);
+	}, [
+		page,
+		frame.width,
+		frame.height,
+		themeId,
+		customTokens,
+		trial,
+		selectedNodeId,
+		protoHotspotNodeIds,
+		lockDocumentHeight,
+		projectId,
+	]);
 
 	useEffect(() => {
 		const el = ref.current;

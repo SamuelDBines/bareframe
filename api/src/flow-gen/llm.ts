@@ -1,13 +1,13 @@
 import { createOpenAiCompatibleAdapter } from '@bareframe/package-generator';
 import {
 	FLOW_SPEC_SCHEMA_HINT,
-	slugifyScreenId,
 	type FlowDevice,
 	type FlowPlatform,
 	type FlowSpec,
 } from '@bareframe/designer-core';
 import type { Config } from '../config.js';
 import { NO_EMDASH_INSTRUCTION } from '../llm/copy-style.js';
+import { ruleBasedFlowSpec } from './rule-flow.js';
 
 export type FlowGenerationInput = {
 	description: string;
@@ -84,36 +84,7 @@ export function createOpenAiCompatibleFlowLlm(config: Config): FlowLlm {
 export function createFixtureFlowLlm(): FlowLlm {
 	return {
 		async generateFlow(input) {
-			if (input.current && input.instruction) {
-				const match = /add (?:an? )?(.+?)(?: screen| page)?$/i.exec(input.instruction.trim());
-				const name = (match?.[1] ?? 'New screen').replace(/^\w/, (c) => c.toUpperCase()).slice(0, 40);
-				const id = slugifyScreenId(name);
-				const last = input.current.screens[input.current.screens.length - 1];
-				return {
-					screens: [...input.current.screens, { id, name, purpose: `Added: ${input.instruction}`, keyContent: [name], states: ['default'] }],
-					connections: [
-						...input.current.connections,
-						...(last ? [{ from: last.id, to: id, trigger: `Open ${name.toLowerCase()}` }] : []),
-					],
-				};
-			}
-			const product = input.description.split(/[.\n]/)[0]!.trim().slice(0, 60) || 'your product';
-			return {
-				screens: [
-					{ id: 'welcome', name: 'Welcome', purpose: `Introduce ${product}`, keyContent: ['Value proposition', 'Get started button', 'Sign in link'], states: ['default'] },
-					{ id: 'sign-up', name: 'Sign up', purpose: 'Create an account', keyContent: ['Email field', 'Password field', 'Create account button'], states: ['default', 'loading', 'error'] },
-					{ id: 'home', name: 'Home', purpose: 'See what needs attention today', keyContent: ['Summary cards', 'Recent items list', 'New item button'], states: ['default', 'empty', 'loading'] },
-					{ id: 'item-detail', name: 'Item detail', purpose: 'Review and edit one item', keyContent: ['Title', 'Details', 'Save button'], states: ['default', 'error'] },
-					{ id: 'settings', name: 'Settings', purpose: 'Manage account and preferences', keyContent: ['Profile', 'Notifications', 'Sign out'], states: ['default', 'success'] },
-				],
-				connections: [
-					{ from: 'welcome', to: 'sign-up', trigger: 'Get started' },
-					{ from: 'sign-up', to: 'home', trigger: 'Create account' },
-					{ from: 'home', to: 'item-detail', trigger: 'Open item' },
-					{ from: 'item-detail', to: 'home', trigger: 'Save' },
-					{ from: 'home', to: 'settings', trigger: 'Settings' },
-				],
-			};
+			return ruleBasedFlowSpec(input);
 		},
 	};
 }
@@ -125,9 +96,18 @@ export function setFlowLlmForTests(llm: FlowLlm | null) {
 	testOverride = llm;
 }
 
-export function flowLlmForConfig(config: Config): FlowLlm | null {
+export function flowLlmForConfig(config: Config): FlowLlm {
 	if (testOverride) return testOverride;
-	if (config.llmAdapter === 'disabled') return null;
-	if (config.llmAdapter === 'openai_compatible') return createOpenAiCompatibleFlowLlm(config);
+	if (config.llmAdapter === 'openai_compatible') {
+		try {
+			return createOpenAiCompatibleFlowLlm(config);
+		} catch {
+			return createFixtureFlowLlm();
+		}
+	}
 	return createFixtureFlowLlm();
+}
+
+export function flowUsesLlm(config: Config): boolean {
+	return config.llmAdapter === 'openai_compatible' && Boolean(config.llmApiKey && config.llmBaseUrl && config.llmModel);
 }

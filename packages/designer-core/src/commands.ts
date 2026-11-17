@@ -439,14 +439,16 @@ export function applyProjectCommand(
 }
 
 export type ImportScreenshotShot = {
-	assetId: string;
+	routePath: string;
+	assetId?: string;
+	error?: string;
 	title?: string;
 	url?: string;
 };
 
 export type ImportScreenshotLink = {
-	fromAssetId: string;
-	toAssetId: string;
+	fromRoutePath: string;
+	toRoutePath: string;
 	label?: string;
 	trigger?: string;
 };
@@ -459,7 +461,7 @@ export function applyImportScreenshots(
 	opts?: { pageId?: string },
 ): CommandResult {
 	let doc = document;
-	const frameByAsset = new Map<string, string>();
+	const frameByRoute = new Map<string, string>();
 
 	for (const shot of shots) {
 		const pageId = opts?.pageId ?? doc.project.pages[0]?.id;
@@ -477,30 +479,46 @@ export function applyImportScreenshots(
 		);
 		doc = frameRes.document;
 		const frameId = frameRes.effects.frameId as string;
-		frameByAsset.set(shot.assetId, frameId);
-		const imageRes = applyProjectCommand(
-			doc,
-			{
-				type: 'add_image_node',
-				pageId,
-				parentNodeId: page.rootNodeId,
-				assetId: shot.assetId,
-				name: shot.title ?? 'Screenshot',
-			},
-			ctx,
-		);
-		doc = imageRes.document;
+		frameByRoute.set(shot.routePath, frameId);
+		if (shot.assetId) {
+			const imageRes = applyProjectCommand(
+				doc,
+				{
+					type: 'add_image_node',
+					pageId,
+					parentNodeId: page.rootNodeId,
+					assetId: shot.assetId,
+					name: shot.title ?? 'Screenshot',
+				},
+				ctx,
+			);
+			doc = imageRes.document;
+		}
+		if (shot.error) {
+			const ann = applyProjectCommand(
+				doc,
+				{
+					type: 'add_annotation',
+					frameId,
+					kind: 'note',
+					target: { kind: 'rect', x: 16, y: 48, w: 300, h: 72 },
+					text: shot.error,
+				},
+				ctx,
+			);
+			doc = ann.document;
+		}
 	}
 
 	const newFrames = shots
-		.map((s) => frameByAsset.get(s.assetId))
+		.map((s) => frameByRoute.get(s.routePath))
 		.filter(Boolean)
 		.map((id) => doc.project.frames.find((f) => f.id === id)!);
 	layoutFramesInFlowRow(newFrames);
 
 	for (const link of links) {
-		const from = frameByAsset.get(link.fromAssetId);
-		const to = frameByAsset.get(link.toAssetId);
+		const from = frameByRoute.get(link.fromRoutePath);
+		const to = frameByRoute.get(link.toRoutePath);
 		if (!from || !to) continue;
 		const res = applyProjectCommand(
 			doc,
@@ -516,5 +534,5 @@ export function applyImportScreenshots(
 		doc = res.document;
 	}
 
-	return { document: doc, effects: { frameIds: [...frameByAsset.values()] } };
+	return { document: doc, effects: { frameIds: [...frameByRoute.values()] } };
 }

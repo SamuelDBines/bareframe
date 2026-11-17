@@ -32,6 +32,10 @@ export function isSitemapIndexXml(xml: string): boolean {
 
 export function titleFromPath(path: string): string {
 	if (path === '/' || path === '') return 'Home';
+	if (path.startsWith('/#/')) {
+		const hashSeg = path.slice(3).split('/').filter(Boolean).pop();
+		if (hashSeg) return decodeURIComponent(hashSeg).replace(/[-_]/g, ' ');
+	}
 	const segment = path.split('/').filter(Boolean).pop();
 	if (!segment) return path;
 	return decodeURIComponent(segment).replace(/[-_]/g, ' ');

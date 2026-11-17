@@ -149,7 +149,7 @@ export async function buildFlowFromRecordingTx(
 		document = canvasRes.document;
 		const pageId = canvasRes.effects.pageId as string;
 
-		const shots: { assetId: string; title?: string; url?: string }[] = [];
+		const shots: { assetId: string; title?: string; url: string }[] = [];
 		const links: {
 			fromAssetId: string;
 			toAssetId: string;
@@ -157,7 +157,6 @@ export async function buildFlowFromRecordingTx(
 			trigger?: string;
 		}[] = [];
 
-		const urlToAsset = new Map<string, string>();
 		let prevAsset: string | null = null;
 
 		for (const step of steps) {
@@ -174,10 +173,11 @@ export async function buildFlowFromRecordingTx(
 				});
 			}
 			prevAsset = assetId;
-			urlToAsset.set(step.url, assetId);
 		}
 
-		const imported = applyImportScreenshots(document, shots, links, ctx, { pageId });
+		const { mapCaptureShotsToImport } = await import('../capture/import-shots.js');
+		const mapped = mapCaptureShotsToImport(shots, links);
+		const imported = applyImportScreenshots(document, mapped.shots, mapped.links, ctx, { pageId });
 		document = imported.document;
 		const frameIds = imported.effects.frameIds as string[];
 

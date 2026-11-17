@@ -75,10 +75,13 @@ export function DescribeProductPanel({ projectId, aiAvailable, onGenerated, onAd
 				>
 					Start from a template
 				</button>
-				<button type="button" className="btn btn-ghost" onClick={onAddScreen} disabled={busy}>
+				<button type="button" className="btn btn-ghost" onClick={onAddScreen} disabled={busy} data-testid="start-blank">
 					Add a screen yourself
 				</button>
 			</div>
+			<p className="describe-panel__alt bx-hint">
+				Prefer to start by hand? Switch to Edit and add a screen.
+			</p>
 		</section>
 	);
 }

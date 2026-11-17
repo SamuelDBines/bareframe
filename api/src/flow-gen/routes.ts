@@ -20,7 +20,7 @@ import { assertProjectAccess, replaceProjectDocument, tokenHasScope } from '../d
 import { PLAN_LIMITS, getUserPlanTier, refundGeneration, reserveGeneration } from '../plans/limits.js';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from '../projects/auth.js';
 import { publishProjectUpdate } from '../projects/events.js';
-import { flowLlmForConfig, type FlowGenerationInput, type FlowLlm } from './llm.js';
+import { flowLlmForConfig, flowUsesLlm, type FlowGenerationInput, type FlowLlm } from './llm.js';
 
 const generateBodySchema = z.object({
 	baseVersion: z.number().int().nonnegative(),
@@ -93,15 +93,7 @@ export function createFlowGenerationRouter(pool: pg.Pool, config: Config) {
 			const platform = body.platforms ? platformForDevices(platforms) : (body.platform ?? brief?.platform ?? 'mobile');
 
 			const llm = flowLlmForConfig(config);
-			if (!llm) {
-				return c.json(
-					{
-						error: 'llm_not_configured',
-						message: 'Flow generation needs an LLM. Set LLM_API_BASE_URL, LLM_API_KEY and LLM_MODEL (or LLM_ADAPTER=fixture).',
-					},
-					503,
-				);
-			}
+			const usedLlm = flowUsesLlm(config);
 
 			await reserveGeneration(pool, actor.userId, 'flow');
 			reserved = true;
@@ -148,6 +140,7 @@ export function createFlowGenerationRouter(pool: pg.Pool, config: Config) {
 				refined: refining,
 				repairs,
 				attempts: result.attempts,
+				source: usedLlm ? 'llm' : 'template',
 			});
 		} catch (err) {
 			return handleProjectError(c, err);

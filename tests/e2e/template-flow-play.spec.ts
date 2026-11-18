@@ -52,6 +52,6 @@ test('sign-in flow template plays in prototype', async ({ page }) => {
 	await expect(page.locator('[data-testid="flow-map-card-hit"]')).toHaveCount(4);
 	await page.getByTestId('flow-mode-prototype').click();
 	await expect(page.getByTestId('prototype-player')).toBeVisible();
-	await page.locator('.proto-hotspot').first().click({ force: true });
+	await page.getByRole('button', { name: /go to/i }).first().click();
 	await expect(page.getByTestId('proto-screen-fit')).toBeVisible();
 });

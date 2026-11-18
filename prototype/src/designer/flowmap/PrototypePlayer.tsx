@@ -136,11 +136,15 @@ export function PrototypePlayer({ onExit, viewportKind: controlledViewport, onVi
 			const stageRect = stage.getBoundingClientRect();
 			const marginX = stageRect.width < 520 ? 16 : 48;
 			const marginY = stageRect.height < 640 ? 20 : 32;
+			const flowGap = 16;
+			// Scale device chrome only; connector hotspots stay full size (transform on the whole stack
+			// left an oversized layout box that stole clicks below the mock).
+			const stageHForDevice = Math.max(120, stageRect.height - flowH - flowGap);
 			const nextScale = prototypeStageScale(
 				metrics.outerW,
-				metrics.outerH + flowH + 16,
+				metrics.outerH,
 				stageRect.width,
-				stageRect.height,
+				stageHForDevice,
 				marginX,
 				marginY,
 			);
@@ -179,6 +183,8 @@ export function PrototypePlayer({ onExit, viewportKind: controlledViewport, onVi
 	}, [toast]);
 
 	const step = history.length + 1;
+	const scaledDeviceW = metrics ? metrics.outerW * stageScale : 0;
+	const scaledDeviceH = metrics ? metrics.outerH * stageScale : 0;
 
 	return createPortal(
 		<div className="proto" role="dialog" aria-modal="true" aria-label="Prototype preview" data-testid="prototype-player">
@@ -228,20 +234,20 @@ export function PrototypePlayer({ onExit, viewportKind: controlledViewport, onVi
 					<div
 						className="proto__stage-slot"
 						style={{
-							width: metrics.outerW * stageScale,
-							height: (metrics.outerH + flowBlockHeight + 16) * stageScale,
+							width: scaledDeviceW,
+							height: scaledDeviceH + flowBlockHeight + 16,
 							maxWidth: '100%',
 						}}
 					>
 						<div
 							className="proto__device-stack"
-							style={{
-								width: metrics.outerW,
-								transform: `scale(${stageScale})`,
-								transformOrigin: 'top center',
-							}}
+							style={{ width: scaledDeviceW, maxWidth: '100%' }}
 							data-viewport={viewportKind}
 							data-stage-scale={Math.round(stageScale * 1000) / 1000}
+						>
+						<div
+							className="proto__device-scale"
+							style={{ width: scaledDeviceW, height: scaledDeviceH }}
 						>
 						<div
 							className={`proto__device proto__device--${viewportKind}`}
@@ -250,6 +256,8 @@ export function PrototypePlayer({ onExit, viewportKind: controlledViewport, onVi
 								height: metrics.outerH,
 								padding: chromeStyle.padding,
 								borderRadius: chromeStyle.radius,
+								transform: `scale(${stageScale})`,
+								transformOrigin: 'top center',
 							}}
 						>
 							<div
@@ -296,6 +304,7 @@ export function PrototypePlayer({ onExit, viewportKind: controlledViewport, onVi
 									</div>
 								</div>
 							</div>
+						</div>
 						</div>
 
 						<div className="proto__flow" ref={flowRef}>

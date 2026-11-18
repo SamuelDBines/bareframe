@@ -935,7 +935,13 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 1rem;
-	transform-origin: top center;
+}
+
+.proto__device-scale {
+	flex-shrink: 0;
+	display: flex;
+	justify-content: center;
+	overflow: hidden;
 }
 
 .proto__device {
@@ -978,6 +984,8 @@
 }
 
 .proto__flow {
+	position: relative;
+	z-index: 1;
 	width: min(100%, 420px);
 	display: flex;
 	flex-direction: column;
@@ -1052,6 +1060,10 @@
 	text-align: center;
 	font-size: 0.8rem;
 	color: #b9b4d9;
+}
+
+.proto__hint {
+	pointer-events: none;
 }
 
 .flow-map-toolbar__tools {

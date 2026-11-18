@@ -1,6 +1,9 @@
 import { expect, test } from './fixtures';
 import { deviceForPlaywrightProject, templatePreviewSrcDoc } from './templatePreviewHtml.js';
 
+// Keep pixel diffs stable across desktop and mobile Playwright projects on CI.
+test.use({ deviceScaleFactor: 1 });
+
 const LOGIN_VARIANTS = ['classic', 'social-first', 'magic-link', 'split-hero', 'minimal'] as const;
 const REGISTER_VARIANTS = ['classic', 'multi-step', 'social-plus-email', 'invite'] as const;
 

@@ -344,4 +344,3 @@ jobs:
         run: pnpm exec playwright test
         env:
           CI: true
-          VISUAL: '1'

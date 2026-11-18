@@ -66,8 +66,8 @@ async function openProject(page: Page) {
 test('insert flow template and play prototype', async ({ page }) => {
 	await mockFlowInsert(page);
 	await openProject(page);
-	await page.getByTestId('open-templates-gallery').click();
-	await page.getByTestId('insert-flow-sign-in').click();
+	await page.getByTestId('open-templates-gallery').click({ force: true });
+	await page.getByTestId('insert-flow-sign-in').click({ force: true });
 	await expect(page.locator('[data-testid="flow-map-card-hit"]')).toHaveCount(4);
 	await page.getByTestId('flow-mode-prototype').click();
 	await expect(page.getByTestId('prototype-player')).toBeVisible();

@@ -19,6 +19,8 @@ async function mountPreview(
 	}, srcdoc);
 	const frame = page.frameLocator('#frame');
 	await expect(frame.locator('body')).toBeVisible({ timeout: 20_000 });
+	await frame.locator('body').evaluate(() => document.fonts?.ready ?? Promise.resolve());
+	await page.waitForTimeout(150);
 	return frame;
 }
 

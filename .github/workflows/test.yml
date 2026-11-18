@@ -5,7 +5,9 @@ on:
   pull_request:
 
 concurrency:
-  group: test-${{ github.workflow }}-${{ github.ref }}
+  # push uses refs/heads/*; pull_request uses refs/pull/*/merge, so key off branch name
+  # to avoid two full Playwright suites at once on the same PR branch.
+  group: test-${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 
 permissions:

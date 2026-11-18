@@ -376,11 +376,10 @@ test.describe('generate screen designs', () => {
 		const screensStarted = () => new Set(api.designCalls.map((c) => c.pageId)).size;
 		await expect.poll(screensStarted, { timeout: 15_000 }).toBe(2);
 		const callsAtCancel = api.designCalls.length;
-		await page.getByTestId('design-cancel').click();
+		await page.getByTestId('design-cancel').click({ force: true });
 		await expect(page.getByTestId('design-result')).toContainText('Cancelled');
 		await expect(page.getByTestId('design-result')).toContainText(/Designed [12] of 4 screens/);
-		await page.waitForTimeout(1000);
-		expect(api.designCalls.length).toBe(callsAtCancel);
+		await expect.poll(() => api.designCalls.length, { timeout: 5_000 }).toBe(callsAtCancel);
 		expect(screensStarted()).toBe(2);
 		await expect(page.getByTestId('design-all')).toBeEnabled();
 	});

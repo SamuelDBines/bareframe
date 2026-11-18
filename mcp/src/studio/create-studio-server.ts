@@ -31,6 +31,8 @@ export const STUDIO_TOOL_NAMES = [
 	'add_note',
 	'update_note',
 	'check_url',
+	'list_templates',
+	'insert_template',
 ] as const;
 
 type ProjectSummary = { id: string; name: string; version: number; updatedAt?: string };
@@ -856,6 +858,60 @@ export function createBareframeStudioMcpServer(api: StudioApiClient): McpServer 
 			const data = await api.request(`/api/public/check-url`, {
 				method: 'POST',
 				body: JSON.stringify({ url }),
+			});
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'list_templates',
+		{
+			description: 'List Bareframe screen and flow templates (filter by category).',
+			inputSchema: { category: z.string().optional() },
+		},
+		async (args) => {
+			const q = args.category ? `?category=${encodeURIComponent(args.category)}` : '';
+			const data = await api.request(`/api/templates${q}`);
+			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+		},
+	);
+
+	server.registerTool(
+		'insert_template',
+		{
+			description: 'Insert a screen or flow template into a project document.',
+			inputSchema: {
+				projectId: z.string(),
+				kind: z.enum(['screen', 'flow']),
+				screenTemplateId: z.string().optional(),
+				variantId: z.string().optional(),
+				flowTemplateId: z.string().optional(),
+				device: z.enum(['phone', 'tablet', 'desktop']).optional(),
+				devices: z.array(z.enum(['mobile', 'tablet', 'desktop'])).optional(),
+				merge: z.boolean().optional(),
+			},
+		},
+		async (args) => {
+			const project = await loadProject(args.projectId);
+			const body =
+				args.kind === 'flow'
+					? {
+							kind: 'flow',
+							flowTemplateId: args.flowTemplateId,
+							devices: args.devices ?? ['mobile'],
+							merge: args.merge,
+							baseVersion: project.version,
+						}
+					: {
+							kind: 'screen',
+							screenTemplateId: args.screenTemplateId,
+							variantId: args.variantId,
+							device: args.device ?? 'phone',
+							baseVersion: project.version,
+						};
+			const data = await api.request(`/api/projects/${args.projectId}/templates/insert`, {
+				method: 'POST',
+				body: JSON.stringify(body),
 			});
 			return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
 		},

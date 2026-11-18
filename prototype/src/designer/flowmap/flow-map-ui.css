@@ -935,7 +935,13 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 1rem;
-	transform-origin: top center;
+}
+
+.proto__device-scale {
+	flex-shrink: 0;
+	display: flex;
+	justify-content: center;
+	overflow: hidden;
 }
 
 .proto__device {
@@ -978,6 +984,8 @@
 }
 
 .proto__flow {
+	position: relative;
+	z-index: 1;
 	width: min(100%, 420px);
 	display: flex;
 	flex-direction: column;
@@ -1052,6 +1060,10 @@
 	text-align: center;
 	font-size: 0.8rem;
 	color: #b9b4d9;
+}
+
+.proto__hint {
+	pointer-events: none;
 }
 
 .flow-map-toolbar__tools {
@@ -1511,6 +1523,78 @@
 	padding: 0.45rem 0.75rem;
 	background: var(--bx-surface);
 	border-bottom: 1px solid var(--bx-border);
+}
+
+.design-bar__devices.device-viewport-switch--canvas button.is-active {
+	background: color-mix(in srgb, var(--bx-accent) 18%, var(--bx-surface));
+	color: var(--bx-text);
+	box-shadow: inset 0 0 0 1px var(--bx-accent);
+}
+
+.templates-gallery-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 120;
+	background: rgb(12 10 24 / 42%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+}
+
+.templates-gallery {
+	width: min(920px, 100%);
+	max-height: min(84vh, 720px);
+	overflow: auto;
+	background: var(--bx-surface);
+	border: 1px solid var(--bx-border);
+	border-radius: 12px;
+	padding: 1rem;
+}
+
+.templates-gallery__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.75rem;
+}
+
+.templates-gallery__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 0.75rem;
+}
+
+.templates-card {
+	border: 1px solid var(--bx-border);
+	border-radius: 10px;
+	padding: 0.75rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.templates-gallery__foot {
+	margin-top: 1rem;
+	border-top: 1px solid var(--bx-border);
+	padding-top: 0.75rem;
+}
+
+.flow-map-variant-rail {
+	position: absolute;
+	left: 12px;
+	bottom: 72px;
+	z-index: 6;
+	width: min(280px, calc(100% - 24px));
+	background: var(--bx-surface);
+	border: 1px solid var(--bx-border);
+	border-radius: 10px;
+	padding: 0.65rem;
+	box-shadow: 0 8px 24px rgb(12 10 24 / 12%);
+}
+
+.variant-swap .field {
+	margin: 0;
 }
 
 .design-bar__progress {

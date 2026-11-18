@@ -18,8 +18,10 @@ import {
 import { panCamera, setCameraZoomAtScreenPoint, zoomCameraAroundPoint, type Camera } from '../camera';
 import type { ContextMenuState } from './FlowMapContextMenu';
 import { useProjectNotes } from './ProjectNotesContext';
+import type { DesignDevice, DesignSpec } from '@bareframe/designer-core';
+import { resolveMapPreviewPage } from './resolveMapPreviewPage';
+import { mapThumbSizeForDevice } from './designViewport';
 
-const THUMB_SCALE = FLOW_CARD_WIDTH / 393;
 const SEV_LABEL: Record<Severity, string> = { critical: 'Critical', major: 'Major', minor: 'Minor', info: 'Info' };
 
 function applyWorldTransform(el: HTMLElement | null, camera: Camera) {
@@ -113,9 +115,17 @@ function FlowMapCard({
 	onGenerateDesign,
 	designing,
 	designBusy,
+	previewDevice,
+	previewDesigns,
+	productDescription,
+	outgoingActions,
 }: {
 	frame: Frame;
 	page: Page;
+	previewDevice: DesignDevice;
+	previewDesigns: Map<string, DesignSpec>;
+	productDescription: string;
+	outgoingActions: string[];
 	themeId: ThemeId;
 	customTokens: Record<string, string>;
 	selected: boolean;
@@ -138,7 +148,12 @@ function FlowMapCard({
 }) {
 	const review = useReview();
 	const projectNotes = useProjectNotes();
-	const hasDesign = (page.nodes[page.rootNodeId]?.children.length ?? 0) > 0;
+	const previewPage = useMemo(
+		() => resolveMapPreviewPage(page, previewDevice, previewDesigns, productDescription, outgoingActions),
+		[page, previewDevice, previewDesigns, productDescription, outgoingActions],
+	);
+	const thumb = mapThumbSizeForDevice(previewDevice);
+	const hasDesign = (previewPage.nodes[previewPage.rootNodeId]?.children.length ?? 0) > 0;
 	const dragRef = useRef<{ x: number; y: number; ox: number; oy: number; moved: boolean } | null>(null);
 	const notes = annotations.filter((a) => a.kind === 'note');
 	const projectNoteOpenCount = projectNotes?.openCountByFrame.get(frame.id) ?? 0;
@@ -155,8 +170,9 @@ function FlowMapCard({
 				width: FLOW_CARD_WIDTH,
 				height: FLOW_CARD_HEIGHT,
 				['--flow-thumb-height' as string]: `${FLOW_THUMB_HEIGHT}px`,
-				['--flow-thumb-scale' as string]: String(THUMB_SCALE),
+				['--flow-thumb-scale' as string]: String(thumb.scale),
 			}}
+			data-map-preview-device={previewDevice}
 			onPointerDown={(e) => {
 				if (e.button !== 0) return;
 				e.stopPropagation();
@@ -213,8 +229,8 @@ function FlowMapCard({
 			<div className="flow-map-card__thumb">
 				<div className="flow-map-card__thumb-inner" aria-hidden>
 					<FramePreview
-						frame={{ ...frame, width: 393, height: 520 }}
-						page={page}
+						frame={{ ...frame, width: thumb.width, height: thumb.height }}
+						page={previewPage}
 						themeId={themeId}
 						customTokens={customTokens}
 						projectId={projectId}
@@ -284,9 +300,15 @@ export function FlowMapCanvas({
 	designingFrameId,
 	designBusy,
 	workspaceMode = 'map',
+	previewDevice = 'phone',
+	previewDesigns,
+	productDescription,
 }: {
 	projectId?: string;
 	workspaceMode?: 'map' | 'edit';
+	previewDevice?: DesignDevice;
+	previewDesigns?: Map<string, import('@bareframe/designer-core').DesignSpec>;
+	productDescription?: string;
 	connectMode?: boolean;
 	onGenerateDesign?: (frame: Frame) => void;
 	designingFrameId?: string | null;
@@ -615,6 +637,11 @@ export function FlowMapCanvas({
 						if (!page) return null;
 						const themeId = (frame.themeId ?? project.defaultThemeId) as ThemeId;
 						const anns = project.annotations.filter((a) => a.frameId === frame.id);
+						const outgoingActions = project.connectors
+							.filter((c) => c.fromFrameId === frame.id)
+							.map((c) => c.label ?? 'Next');
+						const designs = previewDesigns ?? new Map();
+						const desc = productDescription ?? project.productBrief?.description ?? project.name;
 						const linked =
 							!selected ||
 							selected === frame.id ||
@@ -652,6 +679,10 @@ export function FlowMapCanvas({
 									const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
 									openContextMenu(rect.left + rect.width / 2, rect.top + 8, fr);
 								}}
+								previewDevice={previewDevice}
+								previewDesigns={designs}
+								productDescription={desc}
+								outgoingActions={outgoingActions}
 							/>
 						);
 					})}

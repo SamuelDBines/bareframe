@@ -166,7 +166,6 @@ var CommandError = class extends Error {
     this.code = code;
     this.name = "CommandError";
   }
-  code;
 };
 function parseProjectCommand(input) {
   return projectCommandSchema.parse(input);
@@ -666,7 +665,6 @@ var FlowSpecError = class extends Error {
     this.issues = issues;
     this.name = "FlowSpecError";
   }
-  issues;
 };
 var STATE_ALIASES = {
   default: "default",
@@ -961,7 +959,6 @@ var DesignSpecError = class extends Error {
     this.issues = issues;
     this.name = "DesignSpecError";
   }
-  issues;
 };
 function isRecord2(v) {
   return typeof v === "object" && v !== null && !Array.isArray(v);
@@ -1169,6 +1166,5701 @@ function attachConnectorButtonNodes(document, pageId, frameId) {
   return notes;
 }
 
+// src/templateLibrary/types.ts
+var TEMPLATE_LIBRARY_VERSION = 1;
+var TEMPLATE_CATEGORIES = [
+  "auth",
+  "onboarding",
+  "app",
+  "content",
+  "commerce",
+  "utility"
+];
+
+// src/templateLibrary/nodes.ts
+function h1(text2) {
+  return { type: "heading", level: 1, text: text2 };
+}
+function h2(text2) {
+  return { type: "heading", level: 2, text: text2 };
+}
+function copy(text2) {
+  return { type: "text", text: text2 };
+}
+function field(label, placeholder) {
+  return { type: "input", props: { label, placeholder: placeholder ?? label } };
+}
+function btn(label, variant2 = "primary") {
+  return { type: "button", props: { label, variant: variant2 } };
+}
+function card(title, body, variant2 = "outlined") {
+  return { type: "card", props: { title, body, variant: variant2 } };
+}
+function alert(text2, variant2 = "info") {
+  return { type: "alert", props: { text: text2, variant: variant2 } };
+}
+function badge(label, variant2 = "default") {
+  return { type: "badge", props: { label, variant: variant2 } };
+}
+function stack(children, gap = 16, padding = 24) {
+  return { type: "stack", gap, padding, children };
+}
+function row(children, gap = 16, padding = 0) {
+  return { type: "row", gap, padding, children };
+}
+function section(children, gap = 12, padding = 16) {
+  return { type: "section", gap, padding, children };
+}
+function columnOrSplit(device, single, split) {
+  if (device === "phone") return stack(single);
+  return row([stack(split[0]), stack(split[1])], 24);
+}
+function primaryActions(labels) {
+  const buttons = labels.map((label, i) => btn(label, i === 0 ? "primary" : "secondary"));
+  return labels.length > 1 ? row(buttons, 12) : stack(buttons);
+}
+
+// src/templateLibrary/a11y.ts
+function walk(tree, path, issues) {
+  if (tree.type === "heading") {
+    return;
+  }
+  if (tree.type === "input") {
+    if (!tree.props.label?.trim()) issues.push({ path, message: "Input missing label" });
+    return;
+  }
+  if ("props" in tree && tree.type === "button") {
+    if (!tree.props.label?.trim()) issues.push({ path, message: "Button missing label" });
+    return;
+  }
+  if ("children" in tree) {
+    tree.children.forEach((c, i) => walk(c, `${path}.children[${i}]`, issues));
+  }
+}
+function checkDesignTreeA11y(tree) {
+  const issues = [];
+  walk(tree, "root", issues);
+  let hasH1 = false;
+  const scan = (n) => {
+    if (n.type === "heading" && n.level === 1) hasH1 = true;
+    if ("children" in n) n.children.forEach(scan);
+  };
+  scan(tree);
+  if (!hasH1) issues.push({ path: "root", message: "Missing level-1 heading" });
+  return issues;
+}
+
+// src/templateLibrary/screenBuilder.ts
+function variant(id, title, summary, hotspots, build) {
+  return { id, title, summary, hotspots, build };
+}
+function defineScreen(meta) {
+  if (meta.variants.length < 2) {
+    throw new Error(`${meta.id}: screen templates need at least 2 variants`);
+  }
+  return meta;
+}
+
+// src/templateLibrary/screens/about.ts
+var about_default = defineScreen({
+  id: "about",
+  category: "utility",
+  title: "About",
+  description: "Company story",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("About"),
+        copy("Company story"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for About.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("about") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("about") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("About"),
+        copy("Company story"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for About.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("about") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("about") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/api-keys.ts
+var api_keys_default = defineScreen({
+  id: "api-keys",
+  category: "app",
+  title: "API keys",
+  description: "Tokens for integrations",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("API keys"),
+        copy("Tokens for integrations"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for API keys.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("api-keys") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("api-keys") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("API keys"),
+        copy("Tokens for integrations"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for API keys.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("api-keys") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("api-keys") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/blog-list.ts
+var blog_list_default = defineScreen({
+  id: "blog-list",
+  category: "utility",
+  title: "Blog",
+  description: "Article index",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Blog"),
+        copy("Article index"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Blog.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("blog-list") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("blog-list") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Blog"),
+        copy("Article index"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Blog.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("blog-list") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("blog-list") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/blog-post.ts
+var blog_post_default = defineScreen({
+  id: "blog-post",
+  category: "utility",
+  title: "Blog post",
+  description: "One article",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Blog post"),
+        copy("One article"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Blog post.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("blog-post") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("blog-post") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Blog post"),
+        copy("One article"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Blog post.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("blog-post") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("blog-post") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/booking-confirm.ts
+var booking_confirm_default = defineScreen({
+  id: "booking-confirm",
+  category: "commerce",
+  title: "Confirm booking",
+  description: "Review and pay",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Confirm booking"),
+        copy("Review and pay"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Confirm booking.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-confirm") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-confirm") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Confirm booking"),
+        copy("Review and pay"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Confirm booking.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-confirm") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-confirm") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/booking-details.ts
+var booking_details_default = defineScreen({
+  id: "booking-details",
+  category: "commerce",
+  title: "Your details",
+  description: "Contact for booking",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Your details"),
+        copy("Contact for booking"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Your details.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-details") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-details") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Your details"),
+        copy("Contact for booking"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Your details.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-details") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-details") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/booking-reschedule.ts
+var booking_reschedule_default = defineScreen({
+  id: "booking-reschedule",
+  category: "commerce",
+  title: "Reschedule",
+  description: "Change appointment",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Reschedule"),
+        copy("Change appointment"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Reschedule.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-reschedule") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-reschedule") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Reschedule"),
+        copy("Change appointment"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Reschedule.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-reschedule") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-reschedule") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/booking-search.ts
+var booking_search_default = defineScreen({
+  id: "booking-search",
+  category: "commerce",
+  title: "Find availability",
+  description: "Pick service and date",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Find availability"),
+        copy("Pick service and date"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Find availability.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-search") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-search") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Find availability"),
+        copy("Pick service and date"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Find availability.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-search") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-search") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/booking-slot.ts
+var booking_slot_default = defineScreen({
+  id: "booking-slot",
+  category: "commerce",
+  title: "Pick a slot",
+  description: "Choose time",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Pick a slot"),
+        copy("Choose time"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Pick a slot.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-slot") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-slot") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Pick a slot"),
+        copy("Choose time"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Pick a slot.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("booking-slot") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("booking-slot") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/bottom-sheet.ts
+var bottom_sheet_default = defineScreen({
+  id: "bottom-sheet",
+  category: "utility",
+  title: "Bottom sheet",
+  description: "Sheet over content",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Bottom sheet"),
+        copy("Sheet over content"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Bottom sheet.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("bottom-sheet") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("bottom-sheet") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Bottom sheet"),
+        copy("Sheet over content"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Bottom sheet.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("bottom-sheet") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("bottom-sheet") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/bulk-actions.ts
+var bulk_actions_default = defineScreen({
+  id: "bulk-actions",
+  category: "app",
+  title: "Bulk actions",
+  description: "Select many rows",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Bulk actions"),
+        copy("Select many rows"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Bulk actions.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("bulk-actions") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("bulk-actions") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Bulk actions"),
+        copy("Select many rows"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Bulk actions.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("bulk-actions") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("bulk-actions") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/cart.ts
+var cart_default = defineScreen({
+  id: "cart",
+  category: "commerce",
+  title: "Cart",
+  description: "Review basket before checkout",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Checkout", "Keep shopping"],
+      (device) => stack([
+        h1("Cart"),
+        copy("Review basket before checkout"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Cart.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("cart") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("cart") ? [field("Search")] : [],
+        btn("Checkout", "primary"),
+        btn("Keep shopping", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Checkout", "Keep shopping"],
+      (device) => stack([
+        h1("Cart"),
+        copy("Review basket before checkout"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Cart.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("cart") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("cart") ? [field("Search")] : [],
+        btn("Checkout", "primary"),
+        btn("Keep shopping", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Checkout", "Keep shopping"],
+      (device) => stack([
+        h1("Cart"),
+        copy("Review basket before checkout"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Cart.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("cart") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("cart") ? [field("Search")] : [],
+        btn("Checkout", "primary"),
+        btn("Keep shopping", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/category-browse.ts
+var category_browse_default = defineScreen({
+  id: "category-browse",
+  category: "commerce",
+  title: "Category",
+  description: "Products in one category",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Category"),
+        copy("Products in one category"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Category.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("category-browse") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("category-browse") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Category"),
+        copy("Products in one category"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Category.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("category-browse") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("category-browse") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/change-credentials.ts
+var change_credentials_default = defineScreen({
+  id: "change-credentials",
+  category: "auth",
+  title: "Change credentials",
+  description: "Update email or password",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Change credentials"),
+        copy("Update email or password"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Change credentials.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("change-credentials") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("change-credentials") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Change credentials"),
+        copy("Update email or password"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Change credentials.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("change-credentials") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("change-credentials") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/checkout.ts
+var checkout_default = defineScreen({
+  id: "checkout",
+  category: "commerce",
+  title: "Checkout",
+  description: "Shipping and payment",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Place order", "Pay now"],
+      (device) => stack([
+        h1("Checkout"),
+        copy("Shipping and payment"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Checkout.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("checkout") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("checkout") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Place order", "secondary"),
+        btn("Pay now", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Place order"],
+      (device) => stack([
+        h1("Checkout"),
+        copy("Shipping and payment"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Checkout.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("checkout") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("checkout") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Place order", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Place order"],
+      (device) => stack([
+        h1("Checkout"),
+        copy("Shipping and payment"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Checkout.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("checkout") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("checkout") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Place order", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/comments.ts
+var comments_default = defineScreen({
+  id: "comments",
+  category: "content",
+  title: "Comments",
+  description: "Thread under a post",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Comments"),
+        copy("Thread under a post"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Comments.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("comments") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("comments") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Comments"),
+        copy("Thread under a post"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Comments.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("comments") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("comments") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/compose-post.ts
+var compose_post_default = defineScreen({
+  id: "compose-post",
+  category: "content",
+  title: "Compose",
+  description: "Write a new post",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Compose"),
+        copy("Write a new post"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Compose.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("compose-post") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("compose-post") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Compose"),
+        copy("Write a new post"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Compose.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("compose-post") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("compose-post") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/contact.ts
+var contact_default = defineScreen({
+  id: "contact",
+  category: "utility",
+  title: "Contact",
+  description: "Get in touch",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Contact"),
+        copy("Get in touch"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Contact.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("contact") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("contact") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Contact"),
+        copy("Get in touch"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Contact.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("contact") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("contact") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/contact-support.ts
+var contact_support_default = defineScreen({
+  id: "contact-support",
+  category: "utility",
+  title: "Contact support",
+  description: "Send a message",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Contact support"),
+        copy("Send a message"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Contact support.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("contact-support") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("contact-support") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Contact support"),
+        copy("Send a message"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Contact support.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("contact-support") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("contact-support") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/cookies-banner.ts
+var cookies_banner_default = defineScreen({
+  id: "cookies-banner",
+  category: "utility",
+  title: "Cookies",
+  description: "Consent banner",
+  variants: [
+    variant(
+      "default",
+      "Default",
+      "Standard",
+      ["Accept", "Manage preferences"],
+      () => stack([h1("Cookies"), copy("Consent banner."), btn("Accept", "primary")])
+    ),
+    variant(
+      "detailed",
+      "Detailed",
+      "More copy",
+      ["Accept all", "Reject non-essential"],
+      () => stack([
+        h1("Cookies"),
+        card("Summary", "Plain language summary of how we use data."),
+        btn("Accept all", "primary"),
+        btn("Reject non-essential", "ghost")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/dashboard.ts
+var dashboard_default = defineScreen({
+  id: "dashboard",
+  category: "app",
+  title: "Dashboard",
+  description: "Summary and shortcuts",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Dashboard"),
+        copy("Summary and shortcuts"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Dashboard.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("dashboard") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("dashboard") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Dashboard"),
+        copy("Summary and shortcuts"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Dashboard.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("dashboard") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("dashboard") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Dashboard"),
+        copy("Summary and shortcuts"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Dashboard.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("dashboard") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("dashboard") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/delete-account.ts
+var delete_account_default = defineScreen({
+  id: "delete-account",
+  category: "auth",
+  title: "Delete account",
+  description: "Confirm account deletion",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Delete account"),
+        copy("Confirm account deletion"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Delete account.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("delete-account") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("delete-account") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Delete account"),
+        copy("Confirm account deletion"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Delete account.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("delete-account") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("delete-account") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/empty-state.ts
+var empty_state_default = defineScreen({
+  id: "empty-state",
+  category: "utility",
+  title: "Empty state",
+  description: "No data yet",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Empty state"),
+        copy("No data yet"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Empty state.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("empty-state") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("empty-state") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Empty state"),
+        copy("No data yet"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Empty state.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("empty-state") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("empty-state") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Empty state"),
+        copy("No data yet"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Empty state.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("empty-state") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("empty-state") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "social-first",
+      "Social first",
+      "SSO buttons prominent",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Empty state"),
+        copy("No data yet"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Empty state.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("empty-state") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("empty-state") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/error-404.ts
+var error_404_default = defineScreen({
+  id: "error-404",
+  category: "utility",
+  title: "Not found",
+  description: "404 page",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Not found"),
+        copy("404 page"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Not found.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("error-404") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("error-404") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Not found"),
+        copy("404 page"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Not found.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("error-404") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("error-404") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/error-500.ts
+var error_500_default = defineScreen({
+  id: "error-500",
+  category: "utility",
+  title: "Server error",
+  description: "500 page",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Server error"),
+        copy("500 page"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Server error.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("error-500") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("error-500") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Server error"),
+        copy("500 page"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Server error.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("error-500") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("error-500") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/features.ts
+var features_default = defineScreen({
+  id: "features",
+  category: "utility",
+  title: "Features",
+  description: "Product capabilities",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Features"),
+        copy("Product capabilities"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Features.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("features") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("features") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Features"),
+        copy("Product capabilities"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Features.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("features") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("features") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/feed.ts
+var feed_default = defineScreen({
+  id: "feed",
+  category: "content",
+  title: "Feed",
+  description: "Timeline of posts",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Feed"),
+        copy("Timeline of posts"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Feed.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("feed") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("feed") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Feed"),
+        copy("Timeline of posts"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Feed.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("feed") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("feed") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/follow-suggestions.ts
+var follow_suggestions_default = defineScreen({
+  id: "follow-suggestions",
+  category: "content",
+  title: "Discover people",
+  description: "Who to follow",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Discover people"),
+        copy("Who to follow"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Discover people.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("follow-suggestions") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("follow-suggestions") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Discover people"),
+        copy("Who to follow"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Discover people.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("follow-suggestions") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("follow-suggestions") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/forgot-password.ts
+var forgot_password_default = defineScreen({
+  id: "forgot-password",
+  category: "auth",
+  title: "Forgot password",
+  description: "Request a password reset",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Send reset link", "Back to sign in"],
+      (device) => stack([
+        h1("Forgot password"),
+        copy("Request a password reset"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Forgot password.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("forgot-password") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("forgot-password") ? [field("Search")] : [],
+        btn("Send reset link", "primary"),
+        btn("Back to sign in", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Send reset link", "Back to sign in"],
+      (device) => stack([
+        h1("Forgot password"),
+        copy("Request a password reset"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Forgot password.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("forgot-password") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("forgot-password") ? [field("Search")] : [],
+        btn("Send reset link", "primary"),
+        btn("Back to sign in", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Send reset link", "Back to sign in"],
+      (device) => stack([
+        h1("Forgot password"),
+        copy("Request a password reset"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Forgot password.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("forgot-password") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("forgot-password") ? [field("Search")] : [],
+        btn("Send reset link", "primary"),
+        btn("Back to sign in", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/form-create.ts
+var form_create_default = defineScreen({
+  id: "form-create",
+  category: "app",
+  title: "Create form",
+  description: "Add or edit a record",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Create form"),
+        copy("Add or edit a record"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Create form.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("form-create") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("form-create") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Create form"),
+        copy("Add or edit a record"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Create form.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("form-create") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("form-create") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Create form"),
+        copy("Add or edit a record"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Create form.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("form-create") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("form-create") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/generic-form.ts
+var generic_form_default = defineScreen({
+  id: "generic-form",
+  category: "utility",
+  title: "Generic form",
+  description: "Fallback form layout",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Generic form"),
+        copy("Fallback form layout"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Generic form.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("generic-form") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("generic-form") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Generic form"),
+        copy("Fallback form layout"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Generic form.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("generic-form") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("generic-form") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/help-article.ts
+var help_article_default = defineScreen({
+  id: "help-article",
+  category: "utility",
+  title: "Help article",
+  description: "Read an answer",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Help article"),
+        copy("Read an answer"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Help article.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("help-article") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("help-article") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Help article"),
+        copy("Read an answer"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Help article.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("help-article") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("help-article") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/help-center.ts
+var help_center_default = defineScreen({
+  id: "help-center",
+  category: "utility",
+  title: "Help center",
+  description: "Search help articles",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Search", "Contact us"],
+      (device) => stack([
+        h1("Help center"),
+        copy("Search help articles"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Help center.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("help-center") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("help-center") ? [field("Search")] : [],
+        btn("Search", "primary"),
+        btn("Contact us", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Search", "Contact us"],
+      (device) => stack([
+        h1("Help center"),
+        copy("Search help articles"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Help center.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("help-center") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("help-center") ? [field("Search")] : [],
+        btn("Search", "primary"),
+        btn("Contact us", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/invite-teammates.ts
+var invite_teammates_default = defineScreen({
+  id: "invite-teammates",
+  category: "onboarding",
+  title: "Invite teammates",
+  description: "Send invites by email",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Invite teammates"),
+        copy("Send invites by email"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Invite teammates.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("invite-teammates") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("invite-teammates") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Invite teammates"),
+        copy("Send invites by email"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Invite teammates.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("invite-teammates") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("invite-teammates") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/legal-privacy.ts
+var legal_privacy_default = defineScreen({
+  id: "legal-privacy",
+  category: "utility",
+  title: "Privacy policy",
+  description: "Data use",
+  variants: [
+    variant(
+      "default",
+      "Default",
+      "Standard",
+      ["Accept", "Manage preferences"],
+      () => stack([h1("Privacy policy"), copy("Data use."), btn("Accept", "primary")])
+    ),
+    variant(
+      "detailed",
+      "Detailed",
+      "More copy",
+      ["Accept all", "Reject non-essential"],
+      () => stack([
+        h1("Privacy policy"),
+        card("Summary", "Plain language summary of how we use data."),
+        btn("Accept all", "primary"),
+        btn("Reject non-essential", "ghost")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/legal-terms.ts
+var legal_terms_default = defineScreen({
+  id: "legal-terms",
+  category: "utility",
+  title: "Terms of service",
+  description: "Legal terms",
+  variants: [
+    variant(
+      "default",
+      "Default",
+      "Standard",
+      ["Accept", "Manage preferences"],
+      () => stack([h1("Terms of service"), copy("Legal terms."), btn("Accept", "primary")])
+    ),
+    variant(
+      "detailed",
+      "Detailed",
+      "More copy",
+      ["Accept all", "Reject non-essential"],
+      () => stack([
+        h1("Terms of service"),
+        card("Summary", "Plain language summary of how we use data."),
+        btn("Accept all", "primary"),
+        btn("Reject non-essential", "ghost")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/list.ts
+var list_default = defineScreen({
+  id: "list",
+  category: "app",
+  title: "List",
+  description: "Rows of items",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("List"),
+        copy("Rows of items"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for List.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("list") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("list") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("List"),
+        copy("Rows of items"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for List.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("list") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("list") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("List"),
+        copy("Rows of items"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for List.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("list") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("list") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/login.ts
+function passwordFields() {
+  return [field("Email", "you@example.com"), field("Password", "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022")];
+}
+var login_default = defineScreen({
+  id: "login",
+  category: "auth",
+  title: "Log in",
+  description: "Sign in to an existing account",
+  variants: [
+    variant(
+      "classic",
+      "Email and password",
+      "Centered form with primary sign-in and account links",
+      ["Sign in", "Forgot password?", "Create account"],
+      (device) => stack([
+        h1("Welcome back"),
+        copy("Sign in to continue to your workspace."),
+        ...passwordFields(),
+        btn("Sign in", "primary"),
+        row([btn("Forgot password?", "ghost"), btn("Create account", "ghost")], 8),
+        ...device !== "phone" ? [card("Tip", "Use your work email if your team invited you.", "ghost")] : []
+      ], 20, 28)
+    ),
+    variant(
+      "social-first",
+      "Social first",
+      "SSO buttons above the email form",
+      ["Continue with Google", "Continue with Apple", "Sign in", "Create account"],
+      () => stack([
+        h1("Log in"),
+        btn("Continue with Google", "primary"),
+        btn("Continue with Apple", "secondary"),
+        alert("We never post on your behalf.", "info"),
+        copy("Or use your email"),
+        ...passwordFields(),
+        btn("Sign in", "primary"),
+        btn("Create account", "ghost")
+      ], 16, 28)
+    ),
+    variant(
+      "magic-link",
+      "Magic link",
+      "Passwordless email sign-in",
+      ["Send magic link", "Use password instead", "Create account"],
+      (device) => stack([
+        h1("Sign in with email"),
+        copy("We will email you a secure link. No password needed."),
+        field("Email", "you@example.com"),
+        btn("Send magic link", "primary"),
+        btn("Use password instead", "ghost"),
+        btn("Create account", "ghost"),
+        ...device === "desktop" ? [card("Secure login", "Links expire in 15 minutes.", "outlined")] : []
+      ], 18, 28)
+    ),
+    variant(
+      "split-hero",
+      "Split hero",
+      "Marketing panel beside the form on large screens",
+      ["Sign in", "Forgot password?", "Create account"],
+      (device) => {
+        const hero = [
+          card("Ship faster", "Bareframe turns flows into clickable prototypes in minutes.", "elevated"),
+          badge("Trusted by product teams", "success")
+        ];
+        const form = [
+          h1("Log in"),
+          ...passwordFields(),
+          btn("Sign in", "primary"),
+          btn("Forgot password?", "ghost"),
+          btn("Create account", "secondary")
+        ];
+        return columnOrSplit(device, [...hero, ...form], [hero, form]);
+      }
+    ),
+    variant(
+      "minimal",
+      "Minimal",
+      "Compact sign-in for embedded or modal use",
+      ["Sign in", "Create account"],
+      () => stack(
+        [
+          h1("Sign in"),
+          field("Email", "Email"),
+          field("Password", "Password"),
+          btn("Sign in", "primary"),
+          btn("Create account", "ghost")
+        ],
+        12,
+        20
+      )
+    )
+  ]
+});
+
+// src/templateLibrary/screens/logout.ts
+var logout_default = defineScreen({
+  id: "logout",
+  category: "auth",
+  title: "Log out",
+  description: "Sign out confirmation",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Log out"),
+        copy("Sign out confirmation"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Log out.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("logout") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("logout") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Log out"),
+        copy("Sign out confirmation"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Log out.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("logout") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("logout") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/maintenance.ts
+var maintenance_default = defineScreen({
+  id: "maintenance",
+  category: "utility",
+  title: "Maintenance",
+  description: "Downtime notice",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Maintenance"),
+        copy("Downtime notice"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Maintenance.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("maintenance") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("maintenance") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Maintenance"),
+        copy("Downtime notice"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Maintenance.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("maintenance") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("maintenance") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/marketing-home.ts
+var marketing_home_default = defineScreen({
+  id: "marketing-home",
+  category: "utility",
+  title: "Marketing home",
+  description: "Landing hero and CTA",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Get started", "Sign in", "See pricing"],
+      (device) => stack([
+        h1("Marketing home"),
+        copy("Landing hero and CTA"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Marketing home.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("marketing-home") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("marketing-home") ? [field("Search")] : [],
+        btn("Get started", "primary"),
+        btn("Sign in", "secondary"),
+        btn("See pricing", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Get started", "Sign in"],
+      (device) => stack([
+        h1("Marketing home"),
+        copy("Landing hero and CTA"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Marketing home.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("marketing-home") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("marketing-home") ? [field("Search")] : [],
+        btn("Get started", "primary"),
+        btn("Sign in", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Get started", "Sign in"],
+      (device) => stack([
+        h1("Marketing home"),
+        copy("Landing hero and CTA"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Marketing home.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("marketing-home") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("marketing-home") ? [field("Search")] : [],
+        btn("Get started", "primary"),
+        btn("Sign in", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/messages.ts
+var messages_default = defineScreen({
+  id: "messages",
+  category: "content",
+  title: "Messages",
+  description: "Chat inbox",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Messages"),
+        copy("Chat inbox"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Messages.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("messages") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("messages") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Messages"),
+        copy("Chat inbox"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Messages.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("messages") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("messages") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/my-tickets.ts
+var my_tickets_default = defineScreen({
+  id: "my-tickets",
+  category: "utility",
+  title: "My tickets",
+  description: "Open requests",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("My tickets"),
+        copy("Open requests"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for My tickets.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("my-tickets") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("my-tickets") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("My tickets"),
+        copy("Open requests"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for My tickets.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("my-tickets") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("my-tickets") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/notifications.ts
+var notifications_default = defineScreen({
+  id: "notifications",
+  category: "content",
+  title: "Notifications",
+  description: "Activity alerts",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Notifications"),
+        copy("Activity alerts"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Notifications.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("notifications") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("notifications") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Notifications"),
+        copy("Activity alerts"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Notifications.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("notifications") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("notifications") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/offline-state.ts
+var offline_state_default = defineScreen({
+  id: "offline-state",
+  category: "utility",
+  title: "Offline",
+  description: "No network",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Offline"),
+        copy("No network"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Offline.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("offline-state") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("offline-state") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Offline"),
+        copy("No network"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Offline.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("offline-state") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("offline-state") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/onboarding.ts
+var onboarding_default = defineScreen({
+  id: "onboarding",
+  category: "onboarding",
+  title: "Onboarding",
+  description: "Welcome and first steps",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Onboarding"),
+        copy("Welcome and first steps"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Onboarding.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("onboarding") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("onboarding") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Onboarding"),
+        copy("Welcome and first steps"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Onboarding.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("onboarding") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("onboarding") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Onboarding"),
+        copy("Welcome and first steps"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Onboarding.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("onboarding") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("onboarding") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/order-confirmation.ts
+var order_confirmation_default = defineScreen({
+  id: "order-confirmation",
+  category: "commerce",
+  title: "Order confirmed",
+  description: "Receipt and next steps",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Order confirmed"),
+        copy("Receipt and next steps"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Order confirmed.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("order-confirmation") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("order-confirmation") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Order confirmed"),
+        copy("Receipt and next steps"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Order confirmed.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("order-confirmation") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("order-confirmation") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/order-history.ts
+var order_history_default = defineScreen({
+  id: "order-history",
+  category: "commerce",
+  title: "Order history",
+  description: "Past purchases",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Order history"),
+        copy("Past purchases"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Order history.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("order-history") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("order-history") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Order history"),
+        copy("Past purchases"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Order history.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("order-history") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("order-history") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/payment.ts
+var payment_default = defineScreen({
+  id: "payment",
+  category: "commerce",
+  title: "Payment",
+  description: "Pay with card or wallet",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Payment"),
+        copy("Pay with card or wallet"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Payment.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("payment") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("payment") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Payment"),
+        copy("Pay with card or wallet"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Payment.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("payment") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("payment") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/payment-failure.ts
+var payment_failure_default = defineScreen({
+  id: "payment-failure",
+  category: "commerce",
+  title: "Payment failed",
+  description: "Retry or change method",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Payment failed"),
+        copy("Retry or change method"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Payment failed.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("payment-failure") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("payment-failure") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Payment failed"),
+        copy("Retry or change method"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Payment failed.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("payment-failure") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("payment-failure") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/permissions-prompt.ts
+var permissions_prompt_default = defineScreen({
+  id: "permissions-prompt",
+  category: "onboarding",
+  title: "Permissions",
+  description: "Notifications or location access",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Permissions"),
+        copy("Notifications or location access"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Permissions.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("permissions-prompt") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("permissions-prompt") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Permissions"),
+        copy("Notifications or location access"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Permissions.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("permissions-prompt") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("permissions-prompt") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/plan-select.ts
+var plan_select_default = defineScreen({
+  id: "plan-select",
+  category: "onboarding",
+  title: "Choose plan",
+  description: "Pick a subscription tier",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Choose plan"),
+        copy("Pick a subscription tier"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Choose plan.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("plan-select") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("plan-select") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Choose plan"),
+        copy("Pick a subscription tier"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Choose plan.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("plan-select") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("plan-select") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Choose plan"),
+        copy("Pick a subscription tier"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Choose plan.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("plan-select") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("plan-select") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/post-detail.ts
+var post_detail_default = defineScreen({
+  id: "post-detail",
+  category: "content",
+  title: "Post",
+  description: "Single post thread",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Post"),
+        copy("Single post thread"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Post.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("post-detail") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("post-detail") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Post"),
+        copy("Single post thread"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Post.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("post-detail") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("post-detail") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/pricing.ts
+var pricing_default = defineScreen({
+  id: "pricing",
+  category: "utility",
+  title: "Pricing",
+  description: "Plans and tiers",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Choose plan", "Contact sales"],
+      (device) => stack([
+        h1("Pricing"),
+        copy("Plans and tiers"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Pricing.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("pricing") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("pricing") ? [field("Search")] : [],
+        btn("Choose plan", "primary"),
+        btn("Contact sales", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Choose plan", "Contact sales"],
+      (device) => stack([
+        h1("Pricing"),
+        copy("Plans and tiers"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Pricing.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("pricing") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("pricing") ? [field("Search")] : [],
+        btn("Choose plan", "primary"),
+        btn("Contact sales", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Choose plan", "Contact sales"],
+      (device) => stack([
+        h1("Pricing"),
+        copy("Plans and tiers"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Pricing.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("pricing") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("pricing") ? [field("Search")] : [],
+        btn("Choose plan", "primary"),
+        btn("Contact sales", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/product-catalog.ts
+var product_catalog_default = defineScreen({
+  id: "product-catalog",
+  category: "commerce",
+  title: "Product catalog",
+  description: "Browse all products",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Product catalog"),
+        copy("Browse all products"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Product catalog.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("product-catalog") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("product-catalog") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Product catalog"),
+        copy("Browse all products"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Product catalog.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("product-catalog") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("product-catalog") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Product catalog"),
+        copy("Browse all products"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Product catalog.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("product-catalog") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("product-catalog") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/product-detail.ts
+var product_detail_default = defineScreen({
+  id: "product-detail",
+  category: "commerce",
+  title: "Product detail",
+  description: "One item to buy",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Product detail"),
+        copy("One item to buy"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Product detail.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("product-detail") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("product-detail") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Product detail"),
+        copy("One item to buy"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Product detail.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("product-detail") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("product-detail") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Product detail"),
+        copy("One item to buy"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Product detail.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("product-detail") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("product-detail") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/profile-setup.ts
+var profile_setup_default = defineScreen({
+  id: "profile-setup",
+  category: "onboarding",
+  title: "Profile setup",
+  description: "Collect name and role",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Profile setup"),
+        copy("Collect name and role"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Profile setup.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("profile-setup") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("profile-setup") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Profile setup"),
+        copy("Collect name and role"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Profile setup.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("profile-setup") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("profile-setup") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Profile setup"),
+        copy("Collect name and role"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Profile setup.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("profile-setup") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("profile-setup") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/pull-refresh-list.ts
+var pull_refresh_list_default = defineScreen({
+  id: "pull-refresh-list",
+  category: "utility",
+  title: "Refresh list",
+  description: "Pull to refresh pattern",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Refresh list"),
+        copy("Pull to refresh pattern"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Refresh list.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("pull-refresh-list") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("pull-refresh-list") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Refresh list"),
+        copy("Pull to refresh pattern"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Refresh list.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("pull-refresh-list") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("pull-refresh-list") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/record-detail.ts
+var record_detail_default = defineScreen({
+  id: "record-detail",
+  category: "app",
+  title: "Detail",
+  description: "View one record",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Detail"),
+        copy("View one record"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Detail.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("record-detail") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("record-detail") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Detail"),
+        copy("View one record"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Detail.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("record-detail") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("record-detail") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Detail"),
+        copy("View one record"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Detail.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("record-detail") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("record-detail") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/register.ts
+var register_default = defineScreen({
+  id: "register",
+  category: "auth",
+  title: "Register",
+  description: "Create a new account",
+  variants: [
+    variant(
+      "classic",
+      "Single step",
+      "Full registration on one screen",
+      ["Create account", "Sign in"],
+      (device) => stack([
+        h1("Create your account"),
+        copy("Start with a free workspace. Upgrade any time."),
+        field("Full name", "Your name"),
+        field("Work email", "you@company.com"),
+        field("Password", "At least 8 characters"),
+        btn("Create account", "primary"),
+        btn("Sign in", "ghost"),
+        ...device !== "phone" ? [alert("By continuing you agree to our terms and privacy policy.", "info")] : []
+      ], 18, 28)
+    ),
+    variant(
+      "multi-step",
+      "Multi-step",
+      "Step one of a short wizard",
+      ["Continue", "Sign in"],
+      () => stack([
+        badge("Step 1 of 3", "outline"),
+        h1("Your details"),
+        copy("Tell us who you are. You can invite teammates next."),
+        field("Full name", "Your name"),
+        field("Work email", "you@company.com"),
+        field("Password", "Create a password"),
+        btn("Continue", "primary"),
+        btn("Sign in", "ghost")
+      ], 16, 28)
+    ),
+    variant(
+      "social-plus-email",
+      "Social plus email",
+      "SSO options with email signup below",
+      ["Continue with Google", "Create account", "Sign in"],
+      (device) => {
+        const body = [
+          h1("Get started free"),
+          btn("Continue with Google", "primary"),
+          btn("Continue with Apple", "secondary"),
+          copy("Or register with email"),
+          field("Work email", "you@company.com"),
+          field("Password", "Create a password"),
+          btn("Create account", "primary"),
+          btn("Sign in", "ghost")
+        ];
+        if (device === "tablet" || device === "desktop") {
+          body.splice(1, 0, card("Teams", "Unlimited viewers on every plan.", "outlined"));
+        }
+        return stack(body, 16, 28);
+      }
+    ),
+    variant(
+      "invite",
+      "Invite acceptance",
+      "Join a team from an email invite",
+      ["Join workspace", "Sign in"],
+      () => stack([
+        h1("You are invited"),
+        card("Acme product team", "Sam invited you as a designer.", "elevated"),
+        field("Full name", "Your name"),
+        field("Password", "Choose a password"),
+        btn("Join workspace", "primary"),
+        btn("Sign in", "ghost")
+      ], 16, 28)
+    )
+  ]
+});
+
+// src/templateLibrary/screens/reset-password.ts
+var reset_password_default = defineScreen({
+  id: "reset-password",
+  category: "auth",
+  title: "Reset password",
+  description: "Choose a new password",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Save password", "Back to sign in"],
+      (device) => stack([
+        h1("Reset password"),
+        copy("Choose a new password"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Reset password.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("reset-password") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("reset-password") ? [field("Search")] : [],
+        btn("Save password", "primary"),
+        btn("Back to sign in", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Save password", "Back to sign in"],
+      (device) => stack([
+        h1("Reset password"),
+        copy("Choose a new password"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Reset password.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("reset-password") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("reset-password") ? [field("Search")] : [],
+        btn("Save password", "primary"),
+        btn("Back to sign in", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Save password", "Back to sign in"],
+      (device) => stack([
+        h1("Reset password"),
+        copy("Choose a new password"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Reset password.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("reset-password") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("reset-password") ? [field("Search")] : [],
+        btn("Save password", "primary"),
+        btn("Back to sign in", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/returns.ts
+var returns_default = defineScreen({
+  id: "returns",
+  category: "commerce",
+  title: "Returns",
+  description: "Start a return request",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Returns"),
+        copy("Start a return request"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Returns.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("returns") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("returns") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Returns"),
+        copy("Start a return request"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Returns.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("returns") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("returns") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/search.ts
+var search_default = defineScreen({
+  id: "search",
+  category: "commerce",
+  title: "Search",
+  description: "Find products or content",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Search"),
+        copy("Find products or content"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Search.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("search") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("search") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Search"),
+        copy("Find products or content"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Search.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("search") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("search") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Search"),
+        copy("Find products or content"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Search.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("search") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("search") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/search-results.ts
+var search_results_default = defineScreen({
+  id: "search-results",
+  category: "content",
+  title: "Search results",
+  description: "Query matches",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Search results"),
+        copy("Query matches"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Search results.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("search-results") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("search-results") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Search results"),
+        copy("Query matches"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Search results.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("search-results") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("search-results") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/settings.ts
+var settings_default = defineScreen({
+  id: "settings",
+  category: "app",
+  title: "Settings",
+  description: "Account preferences",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Settings"),
+        copy("Account preferences"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Settings.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("settings") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("settings") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Settings"),
+        copy("Account preferences"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Settings.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("settings") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("settings") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Settings"),
+        copy("Account preferences"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Settings.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("settings") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("settings") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/settings-billing.ts
+var settings_billing_default = defineScreen({
+  id: "settings-billing",
+  category: "app",
+  title: "Billing",
+  description: "Plan and invoices",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Billing"),
+        copy("Plan and invoices"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Billing.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("settings-billing") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("settings-billing") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Billing"),
+        copy("Plan and invoices"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Billing.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("settings-billing") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("settings-billing") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/settings-security.ts
+var settings_security_default = defineScreen({
+  id: "settings-security",
+  category: "app",
+  title: "Security",
+  description: "Password and 2FA",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Security"),
+        copy("Password and 2FA"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Security.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("settings-security") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("settings-security") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Security"),
+        copy("Password and 2FA"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Security.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("settings-security") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("settings-security") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/settings-team.ts
+var settings_team_default = defineScreen({
+  id: "settings-team",
+  category: "app",
+  title: "Team",
+  description: "Members and roles",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Team"),
+        copy("Members and roles"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Team.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("settings-team") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("settings-team") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Team"),
+        copy("Members and roles"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Team.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("settings-team") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("settings-team") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/splash.ts
+var splash_default = defineScreen({
+  id: "splash",
+  category: "utility",
+  title: "Splash",
+  description: "App launch screen",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Splash"),
+        copy("App launch screen"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Splash.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("splash") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("splash") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Splash"),
+        copy("App launch screen"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Splash.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("splash") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("splash") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/subscription-cancel.ts
+var subscription_cancel_default = defineScreen({
+  id: "subscription-cancel",
+  category: "app",
+  title: "Cancel subscription",
+  description: "Offboarding from paid plan",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Cancel subscription"),
+        copy("Offboarding from paid plan"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Cancel subscription.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("subscription-cancel") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("subscription-cancel") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Cancel subscription"),
+        copy("Offboarding from paid plan"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Cancel subscription.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("subscription-cancel") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("subscription-cancel") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/tab-shell.ts
+var tab_shell_default = defineScreen({
+  id: "tab-shell",
+  category: "utility",
+  title: "App shell",
+  description: "Tab bar navigation",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("App shell"),
+        copy("Tab bar navigation"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for App shell.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("tab-shell") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("tab-shell") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("App shell"),
+        copy("Tab bar navigation"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for App shell.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("tab-shell") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("tab-shell") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/ticket-submitted.ts
+var ticket_submitted_default = defineScreen({
+  id: "ticket-submitted",
+  category: "utility",
+  title: "Ticket sent",
+  description: "Confirmation",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Ticket sent"),
+        copy("Confirmation"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Ticket sent.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("ticket-submitted") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("ticket-submitted") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Ticket sent"),
+        copy("Confirmation"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Ticket sent.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("ticket-submitted") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("ticket-submitted") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/two-factor.ts
+var two_factor_default = defineScreen({
+  id: "two-factor",
+  category: "auth",
+  title: "Two-factor auth",
+  description: "Enter a second factor code",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Two-factor auth"),
+        copy("Enter a second factor code"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Two-factor auth.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("two-factor") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("two-factor") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Two-factor auth"),
+        copy("Enter a second factor code"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Two-factor auth.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("two-factor") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("two-factor") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Two-factor auth"),
+        copy("Enter a second factor code"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Two-factor auth.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("two-factor") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("two-factor") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/upgrade-paywall.ts
+var upgrade_paywall_default = defineScreen({
+  id: "upgrade-paywall",
+  category: "app",
+  title: "Upgrade",
+  description: "Pro feature gate",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Upgrade"),
+        copy("Pro feature gate"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Upgrade.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("upgrade-paywall") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("upgrade-paywall") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Upgrade"),
+        copy("Pro feature gate"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Upgrade.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("upgrade-paywall") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("upgrade-paywall") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/user-profile.ts
+var user_profile_default = defineScreen({
+  id: "user-profile",
+  category: "content",
+  title: "Profile",
+  description: "Public user page",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Profile"),
+        copy("Public user page"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Profile.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("user-profile") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("user-profile") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Profile"),
+        copy("Public user page"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Profile.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("user-profile") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("user-profile") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/verify-email.ts
+var verify_email_default = defineScreen({
+  id: "verify-email",
+  category: "auth",
+  title: "Verify email",
+  description: "Confirm email or phone",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Verify email"),
+        copy("Confirm email or phone"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Verify email.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("verify-email") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("verify-email") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Verify email"),
+        copy("Confirm email or phone"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Verify email.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("verify-email") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("verify-email") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    ),
+    variant(
+      "split",
+      "Split view",
+      "Hero beside form on large screens",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Verify email"),
+        copy("Confirm email or phone"),
+        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Verify email.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("verify-email") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("verify-email") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/wishlist.ts
+var wishlist_default = defineScreen({
+  id: "wishlist",
+  category: "commerce",
+  title: "Wishlist",
+  description: "Saved items",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Wishlist"),
+        copy("Saved items"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Wishlist.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("wishlist") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("wishlist") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Wishlist"),
+        copy("Saved items"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Wishlist.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("wishlist") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("wishlist") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/screens/workspace-create.ts
+var workspace_create_default = defineScreen({
+  id: "workspace-create",
+  category: "onboarding",
+  title: "Create workspace",
+  description: "Name a team workspace",
+  variants: [
+    variant(
+      "classic",
+      "Classic",
+      "Standard layout",
+      ["Continue", "Back", "Save"],
+      (device) => stack([
+        h1("Create workspace"),
+        copy("Name a team workspace"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Create workspace.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("workspace-create") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("workspace-create") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary"),
+        btn("Save", "secondary")
+      ])
+    ),
+    variant(
+      "compact",
+      "Compact",
+      "Tighter spacing",
+      ["Continue", "Back"],
+      (device) => stack([
+        h1("Create workspace"),
+        copy("Name a team workspace"),
+        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Create workspace.", "elevated")] : [],
+        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("workspace-create") ? [field("Email"), field("Password")] : [],
+        ...["search", "product-catalog", "help-center", "feed", "list"].includes("workspace-create") ? [field("Search")] : [],
+        btn("Continue", "primary"),
+        btn("Back", "secondary")
+      ])
+    )
+  ]
+});
+
+// src/templateLibrary/flows/blog.ts
+var FLOW = {
+  id: "blog",
+  category: "utility",
+  title: "Blog",
+  description: "List and read articles",
+  spec: {
+    "screens": [
+      {
+        "id": "blog-list",
+        "name": "Blog",
+        "purpose": "Template: blog-list",
+        "keyContent": [
+          "Blog content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "blog-post",
+        "name": "Article",
+        "purpose": "Template: blog-post",
+        "keyContent": [
+          "Article content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "blog-list",
+        "to": "blog-post",
+        "trigger": "Read more"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "blog-list": "classic",
+    "blog-post": "classic"
+  }
+};
+var blog_default = FLOW;
+
+// src/templateLibrary/flows/booking.ts
+var FLOW2 = {
+  id: "booking",
+  category: "commerce",
+  title: "Book appointment",
+  description: "Search, slot, details, confirm",
+  spec: {
+    "screens": [
+      {
+        "id": "booking-search",
+        "name": "Services",
+        "purpose": "Template: booking-search",
+        "keyContent": [
+          "Services content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "booking-slot",
+        "name": "Pick time",
+        "purpose": "Template: booking-slot",
+        "keyContent": [
+          "Pick time content"
+        ],
+        "states": [
+          "default",
+          "empty"
+        ]
+      },
+      {
+        "id": "booking-details",
+        "name": "Details",
+        "purpose": "Template: booking-details",
+        "keyContent": [
+          "Details content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "booking-confirm",
+        "name": "Confirm",
+        "purpose": "Template: booking-confirm",
+        "keyContent": [
+          "Confirm content"
+        ],
+        "states": [
+          "default",
+          "success"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "booking-search",
+        "to": "booking-slot",
+        "trigger": "Continue"
+      },
+      {
+        "from": "booking-slot",
+        "to": "booking-details",
+        "trigger": "Select time"
+      },
+      {
+        "from": "booking-details",
+        "to": "booking-confirm",
+        "trigger": "Continue"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "booking-search": "classic",
+    "booking-slot": "classic",
+    "booking-details": "classic",
+    "booking-confirm": "classic"
+  }
+};
+var booking_default = FLOW2;
+
+// src/templateLibrary/flows/booking-reschedule.ts
+var FLOW3 = {
+  id: "booking-reschedule",
+  category: "commerce",
+  title: "Reschedule booking",
+  description: "Change an appointment",
+  spec: {
+    "screens": [
+      {
+        "id": "booking-confirm",
+        "name": "Booking",
+        "purpose": "Template: booking-confirm",
+        "keyContent": [
+          "Booking content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "booking-reschedule",
+        "name": "Reschedule",
+        "purpose": "Template: booking-reschedule",
+        "keyContent": [
+          "Reschedule content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "booking-slot",
+        "name": "New time",
+        "purpose": "Template: booking-slot",
+        "keyContent": [
+          "New time content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "booking-confirm",
+        "to": "booking-reschedule",
+        "trigger": "Reschedule"
+      },
+      {
+        "from": "booking-reschedule",
+        "to": "booking-slot",
+        "trigger": "Choose new time"
+      },
+      {
+        "from": "booking-slot",
+        "to": "booking-confirm",
+        "trigger": "Confirm"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "booking-confirm": "classic",
+    "booking-reschedule": "classic",
+    "booking-slot": "classic"
+  }
+};
+var booking_reschedule_default2 = FLOW3;
+
+// src/templateLibrary/flows/cancel-subscription.ts
+var FLOW4 = {
+  id: "cancel-subscription",
+  category: "app",
+  title: "Cancel subscription",
+  description: "Leave paid plan",
+  spec: {
+    "screens": [
+      {
+        "id": "settings-billing",
+        "name": "Billing",
+        "purpose": "Template: settings-billing",
+        "keyContent": [
+          "Billing content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "subscription-cancel",
+        "name": "Cancel",
+        "purpose": "Template: subscription-cancel",
+        "keyContent": [
+          "Cancel content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "settings-billing",
+        "to": "subscription-cancel",
+        "trigger": "Cancel plan"
+      },
+      {
+        "from": "subscription-cancel",
+        "to": "dashboard",
+        "trigger": "Confirm cancellation"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "settings-billing": "classic",
+    "subscription-cancel": "classic",
+    "dashboard": "classic"
+  }
+};
+var cancel_subscription_default = FLOW4;
+
+// src/templateLibrary/flows/checkout.ts
+var FLOW5 = {
+  id: "checkout",
+  category: "commerce",
+  title: "Shop checkout",
+  description: "Browse, cart, checkout, and confirmation",
+  spec: {
+    "screens": [
+      {
+        "id": "product-catalog",
+        "name": "Catalog",
+        "purpose": "Template: product-catalog",
+        "keyContent": [
+          "Catalog content"
+        ],
+        "states": [
+          "default",
+          "empty"
+        ]
+      },
+      {
+        "id": "product-detail",
+        "name": "Product",
+        "purpose": "Template: product-detail",
+        "keyContent": [
+          "Product content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "cart",
+        "name": "Cart",
+        "purpose": "Template: cart",
+        "keyContent": [
+          "Cart content"
+        ],
+        "states": [
+          "default",
+          "empty"
+        ]
+      },
+      {
+        "id": "checkout",
+        "name": "Checkout",
+        "purpose": "Template: checkout",
+        "keyContent": [
+          "Checkout content"
+        ],
+        "states": [
+          "default",
+          "error"
+        ]
+      },
+      {
+        "id": "order-confirmation",
+        "name": "Confirmed",
+        "purpose": "Template: order-confirmation",
+        "keyContent": [
+          "Confirmed content"
+        ],
+        "states": [
+          "success"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "product-catalog",
+        "to": "product-detail",
+        "trigger": "Open product"
+      },
+      {
+        "from": "product-detail",
+        "to": "cart",
+        "trigger": "Add to basket"
+      },
+      {
+        "from": "cart",
+        "to": "checkout",
+        "trigger": "Checkout"
+      },
+      {
+        "from": "checkout",
+        "to": "order-confirmation",
+        "trigger": "Place order"
+      },
+      {
+        "from": "cart",
+        "to": "product-catalog",
+        "trigger": "Keep shopping"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "product-catalog": "classic",
+    "product-detail": "classic",
+    "cart": "classic",
+    "checkout": "classic",
+    "order-confirmation": "classic"
+  }
+};
+var checkout_default2 = FLOW5;
+
+// src/templateLibrary/flows/guest-checkout.ts
+var FLOW6 = {
+  id: "guest-checkout",
+  category: "commerce",
+  title: "Guest checkout",
+  description: "Checkout without an account",
+  spec: {
+    "screens": [
+      {
+        "id": "cart",
+        "name": "Cart",
+        "purpose": "Template: cart",
+        "keyContent": [
+          "Cart content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "checkout",
+        "name": "Checkout",
+        "purpose": "Template: checkout",
+        "keyContent": [
+          "Checkout content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "payment-failure",
+        "name": "Payment failed",
+        "purpose": "Template: payment-failure",
+        "keyContent": [
+          "Payment failed content"
+        ],
+        "states": [
+          "error"
+        ]
+      },
+      {
+        "id": "order-confirmation",
+        "name": "Confirmed",
+        "purpose": "Template: order-confirmation",
+        "keyContent": [
+          "Confirmed content"
+        ],
+        "states": [
+          "success"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "cart",
+        "to": "checkout",
+        "trigger": "Checkout"
+      },
+      {
+        "from": "checkout",
+        "to": "order-confirmation",
+        "trigger": "Place order"
+      },
+      {
+        "from": "checkout",
+        "to": "payment-failure",
+        "trigger": "Pay now"
+      },
+      {
+        "from": "payment-failure",
+        "to": "checkout",
+        "trigger": "Try again"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "cart": "classic",
+    "checkout": "classic",
+    "payment-failure": "classic",
+    "order-confirmation": "classic"
+  }
+};
+var guest_checkout_default = FLOW6;
+
+// src/templateLibrary/flows/invite-sign-up.ts
+var FLOW7 = {
+  id: "invite-sign-up",
+  category: "onboarding",
+  title: "Invite acceptance",
+  description: "Accept invite and join workspace",
+  spec: {
+    "screens": [
+      {
+        "id": "register",
+        "name": "Join team",
+        "purpose": "Template: register",
+        "keyContent": [
+          "Join team content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "workspace-create",
+        "name": "Workspace",
+        "purpose": "Template: workspace-create",
+        "keyContent": [
+          "Workspace content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "invite-teammates",
+        "name": "Invite",
+        "purpose": "Template: invite-teammates",
+        "keyContent": [
+          "Invite content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "register",
+        "to": "workspace-create",
+        "trigger": "Create account"
+      },
+      {
+        "from": "workspace-create",
+        "to": "invite-teammates",
+        "trigger": "Continue"
+      },
+      {
+        "from": "invite-teammates",
+        "to": "dashboard",
+        "trigger": "Skip for now"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "register": "classic",
+    "workspace-create": "classic",
+    "invite-teammates": "classic",
+    "dashboard": "classic"
+  }
+};
+var invite_sign_up_default = FLOW7;
+
+// src/templateLibrary/flows/magic-link-sign-in.ts
+var FLOW8 = {
+  id: "magic-link-sign-in",
+  category: "auth",
+  title: "Magic link sign in",
+  description: "Email link login and dashboard",
+  spec: {
+    "screens": [
+      {
+        "id": "login",
+        "name": "Log in",
+        "purpose": "Template: login",
+        "keyContent": [
+          "Log in content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "verify-email",
+        "name": "Check email",
+        "purpose": "Template: verify-email",
+        "keyContent": [
+          "Check email content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "login",
+        "to": "verify-email",
+        "trigger": "Send magic link"
+      },
+      {
+        "from": "verify-email",
+        "to": "dashboard",
+        "trigger": "Continue"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "login": "classic",
+    "verify-email": "classic",
+    "dashboard": "classic"
+  }
+};
+var magic_link_sign_in_default = FLOW8;
+
+// src/templateLibrary/flows/marketing-site.ts
+var FLOW9 = {
+  id: "marketing-site",
+  category: "utility",
+  title: "Marketing site",
+  description: "Home, features, pricing, contact",
+  spec: {
+    "screens": [
+      {
+        "id": "marketing-home",
+        "name": "Home",
+        "purpose": "Template: marketing-home",
+        "keyContent": [
+          "Home content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "features",
+        "name": "Features",
+        "purpose": "Template: features",
+        "keyContent": [
+          "Features content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "pricing",
+        "name": "Pricing",
+        "purpose": "Template: pricing",
+        "keyContent": [
+          "Pricing content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "contact",
+        "name": "Contact",
+        "purpose": "Template: contact",
+        "keyContent": [
+          "Contact content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "legal-terms",
+        "name": "Terms",
+        "purpose": "Template: legal-terms",
+        "keyContent": [
+          "Terms content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "marketing-home",
+        "to": "features",
+        "trigger": "See features"
+      },
+      {
+        "from": "marketing-home",
+        "to": "pricing",
+        "trigger": "See pricing"
+      },
+      {
+        "from": "features",
+        "to": "contact",
+        "trigger": "Contact"
+      },
+      {
+        "from": "pricing",
+        "to": "marketing-home",
+        "trigger": "Get started"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "marketing-home": "classic",
+    "features": "classic",
+    "pricing": "classic",
+    "contact": "classic",
+    "legal-terms": "classic"
+  }
+};
+var marketing_site_default = FLOW9;
+
+// src/templateLibrary/flows/messages-chat.ts
+var FLOW10 = {
+  id: "messages-chat",
+  category: "content",
+  title: "Messages",
+  description: "Inbox and thread",
+  spec: {
+    "screens": [
+      {
+        "id": "messages",
+        "name": "Inbox",
+        "purpose": "Template: messages",
+        "keyContent": [
+          "Inbox content"
+        ],
+        "states": [
+          "default",
+          "empty"
+        ]
+      },
+      {
+        "id": "user-profile",
+        "name": "Contact",
+        "purpose": "Template: user-profile",
+        "keyContent": [
+          "Contact content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "messages",
+        "to": "user-profile",
+        "trigger": "Open contact"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "messages": "classic",
+    "user-profile": "classic"
+  }
+};
+var messages_chat_default = FLOW10;
+
+// src/templateLibrary/flows/mobile-shell.ts
+var FLOW11 = {
+  id: "mobile-shell",
+  category: "utility",
+  title: "Mobile app shell",
+  description: "Splash and tab shell",
+  spec: {
+    "screens": [
+      {
+        "id": "splash",
+        "name": "Splash",
+        "purpose": "Template: splash",
+        "keyContent": [
+          "Splash content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "tab-shell",
+        "name": "Home",
+        "purpose": "Template: tab-shell",
+        "keyContent": [
+          "Home content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "pull-refresh-list",
+        "name": "List",
+        "purpose": "Template: pull-refresh-list",
+        "keyContent": [
+          "List content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "splash",
+        "to": "tab-shell",
+        "trigger": "Continue"
+      },
+      {
+        "from": "tab-shell",
+        "to": "pull-refresh-list",
+        "trigger": "Open list"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "splash": "classic",
+    "tab-shell": "classic",
+    "pull-refresh-list": "classic"
+  }
+};
+var mobile_shell_default = FLOW11;
+
+// src/templateLibrary/flows/order-returns.ts
+var FLOW12 = {
+  id: "order-returns",
+  category: "commerce",
+  title: "Orders and returns",
+  description: "History and return flow",
+  spec: {
+    "screens": [
+      {
+        "id": "order-history",
+        "name": "Orders",
+        "purpose": "Template: order-history",
+        "keyContent": [
+          "Orders content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "order-confirmation",
+        "name": "Order detail",
+        "purpose": "Template: order-confirmation",
+        "keyContent": [
+          "Order detail content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "returns",
+        "name": "Return",
+        "purpose": "Template: returns",
+        "keyContent": [
+          "Return content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "order-history",
+        "to": "order-confirmation",
+        "trigger": "View order"
+      },
+      {
+        "from": "order-confirmation",
+        "to": "returns",
+        "trigger": "Start return"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "order-history": "classic",
+    "order-confirmation": "classic",
+    "returns": "classic"
+  }
+};
+var order_returns_default = FLOW12;
+
+// src/templateLibrary/flows/plan-onboarding.ts
+var FLOW13 = {
+  id: "plan-onboarding",
+  category: "onboarding",
+  title: "Plan selection onboarding",
+  description: "Pick a plan after signup",
+  spec: {
+    "screens": [
+      {
+        "id": "plan-select",
+        "name": "Choose plan",
+        "purpose": "Template: plan-select",
+        "keyContent": [
+          "Choose plan content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "pricing",
+        "name": "Pricing",
+        "purpose": "Template: pricing",
+        "keyContent": [
+          "Pricing content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "checkout",
+        "name": "Checkout",
+        "purpose": "Template: checkout",
+        "keyContent": [
+          "Checkout content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "success"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "plan-select",
+        "to": "pricing",
+        "trigger": "See all plans"
+      },
+      {
+        "from": "pricing",
+        "to": "checkout",
+        "trigger": "Choose plan"
+      },
+      {
+        "from": "checkout",
+        "to": "dashboard",
+        "trigger": "Place order"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "plan-select": "classic",
+    "pricing": "classic",
+    "checkout": "classic",
+    "dashboard": "classic"
+  }
+};
+var plan_onboarding_default = FLOW13;
+
+// src/templateLibrary/flows/saas-crud.ts
+var FLOW14 = {
+  id: "saas-crud",
+  category: "app",
+  title: "List, detail, edit",
+  description: "Core SaaS CRUD journey",
+  spec: {
+    "screens": [
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "list",
+        "name": "List",
+        "purpose": "Template: list",
+        "keyContent": [
+          "List content"
+        ],
+        "states": [
+          "default",
+          "empty"
+        ]
+      },
+      {
+        "id": "record-detail",
+        "name": "Detail",
+        "purpose": "Template: record-detail",
+        "keyContent": [
+          "Detail content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "form-create",
+        "name": "Edit",
+        "purpose": "Template: form-create",
+        "keyContent": [
+          "Edit content"
+        ],
+        "states": [
+          "default",
+          "error"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "dashboard",
+        "to": "list",
+        "trigger": "View all"
+      },
+      {
+        "from": "list",
+        "to": "record-detail",
+        "trigger": "Open"
+      },
+      {
+        "from": "record-detail",
+        "to": "form-create",
+        "trigger": "Edit"
+      },
+      {
+        "from": "form-create",
+        "to": "list",
+        "trigger": "Save"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "dashboard": "classic",
+    "list": "classic",
+    "record-detail": "classic",
+    "form-create": "classic"
+  }
+};
+var saas_crud_default = FLOW14;
+
+// src/templateLibrary/flows/search-detail.ts
+var FLOW15 = {
+  id: "search-detail",
+  category: "content",
+  title: "Search to detail",
+  description: "Search, open a result, and view detail",
+  spec: {
+    "screens": [
+      {
+        "id": "search",
+        "name": "Search",
+        "purpose": "Template: search",
+        "keyContent": [
+          "Search content"
+        ],
+        "states": [
+          "default",
+          "empty"
+        ]
+      },
+      {
+        "id": "search-results",
+        "name": "Results",
+        "purpose": "Template: search-results",
+        "keyContent": [
+          "Results content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "record-detail",
+        "name": "Detail",
+        "purpose": "Template: record-detail",
+        "keyContent": [
+          "Detail content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "search",
+        "to": "search-results",
+        "trigger": "Search"
+      },
+      {
+        "from": "search-results",
+        "to": "record-detail",
+        "trigger": "Open"
+      },
+      {
+        "from": "record-detail",
+        "to": "search-results",
+        "trigger": "Back"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "search": "classic",
+    "search-results": "classic",
+    "record-detail": "classic"
+  }
+};
+var search_detail_default = FLOW15;
+
+// src/templateLibrary/flows/settings-account.ts
+var FLOW16 = {
+  id: "settings-account",
+  category: "app",
+  title: "Settings and account",
+  description: "Dashboard to settings, billing, security, and logout",
+  spec: {
+    "screens": [
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "settings",
+        "name": "Settings",
+        "purpose": "Template: settings",
+        "keyContent": [
+          "Settings content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "settings-billing",
+        "name": "Billing",
+        "purpose": "Template: settings-billing",
+        "keyContent": [
+          "Billing content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "settings-security",
+        "name": "Security",
+        "purpose": "Template: settings-security",
+        "keyContent": [
+          "Security content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "logout",
+        "name": "Log out",
+        "purpose": "Template: logout",
+        "keyContent": [
+          "Log out content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "dashboard",
+        "to": "settings",
+        "trigger": "Settings"
+      },
+      {
+        "from": "settings",
+        "to": "settings-billing",
+        "trigger": "Billing"
+      },
+      {
+        "from": "settings",
+        "to": "settings-security",
+        "trigger": "Security"
+      },
+      {
+        "from": "settings",
+        "to": "logout",
+        "trigger": "Log out"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "dashboard": "classic",
+    "settings": "classic",
+    "settings-billing": "classic",
+    "settings-security": "classic",
+    "logout": "classic"
+  }
+};
+var settings_account_default = FLOW16;
+
+// src/templateLibrary/flows/sign-in.ts
+var FLOW17 = {
+  id: "sign-in",
+  category: "auth",
+  title: "Sign in",
+  description: "Log in, reset password, and reach the dashboard",
+  spec: {
+    "screens": [
+      {
+        "id": "login",
+        "name": "Log in",
+        "purpose": "Template: login",
+        "keyContent": [
+          "Log in content"
+        ],
+        "states": [
+          "default",
+          "error"
+        ]
+      },
+      {
+        "id": "forgot-password",
+        "name": "Forgot password",
+        "purpose": "Template: forgot-password",
+        "keyContent": [
+          "Forgot password content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "reset-password",
+        "name": "Reset password",
+        "purpose": "Template: reset-password",
+        "keyContent": [
+          "Reset password content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "login",
+        "to": "dashboard",
+        "trigger": "Sign in"
+      },
+      {
+        "from": "login",
+        "to": "forgot-password",
+        "trigger": "Forgot password?"
+      },
+      {
+        "from": "forgot-password",
+        "to": "reset-password",
+        "trigger": "Send reset link"
+      },
+      {
+        "from": "reset-password",
+        "to": "login",
+        "trigger": "Save password"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "login": "classic",
+    "forgot-password": "classic",
+    "reset-password": "classic",
+    "dashboard": "classic"
+  }
+};
+var sign_in_default = FLOW17;
+
+// src/templateLibrary/flows/sign-up.ts
+var FLOW18 = {
+  id: "sign-up",
+  category: "auth",
+  title: "Sign up and onboarding",
+  description: "Register, verify, set up profile, and land on dashboard",
+  spec: {
+    "screens": [
+      {
+        "id": "register",
+        "name": "Register",
+        "purpose": "Template: register",
+        "keyContent": [
+          "Register content"
+        ],
+        "states": [
+          "default",
+          "error"
+        ]
+      },
+      {
+        "id": "verify-email",
+        "name": "Verify email",
+        "purpose": "Template: verify-email",
+        "keyContent": [
+          "Verify email content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "onboarding",
+        "name": "Onboarding",
+        "purpose": "Template: onboarding",
+        "keyContent": [
+          "Onboarding content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "profile-setup",
+        "name": "Profile",
+        "purpose": "Template: profile-setup",
+        "keyContent": [
+          "Profile content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "register",
+        "to": "verify-email",
+        "trigger": "Create account"
+      },
+      {
+        "from": "verify-email",
+        "to": "onboarding",
+        "trigger": "Verify"
+      },
+      {
+        "from": "onboarding",
+        "to": "profile-setup",
+        "trigger": "Continue"
+      },
+      {
+        "from": "profile-setup",
+        "to": "dashboard",
+        "trigger": "Continue"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "register": "classic",
+    "verify-email": "classic",
+    "onboarding": "classic",
+    "profile-setup": "classic",
+    "dashboard": "classic"
+  }
+};
+var sign_up_default = FLOW18;
+
+// src/templateLibrary/flows/social-feed.ts
+var FLOW19 = {
+  id: "social-feed",
+  category: "content",
+  title: "Social feed",
+  description: "Feed, post, comments, profile",
+  spec: {
+    "screens": [
+      {
+        "id": "feed",
+        "name": "Feed",
+        "purpose": "Template: feed",
+        "keyContent": [
+          "Feed content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "compose-post",
+        "name": "Compose",
+        "purpose": "Template: compose-post",
+        "keyContent": [
+          "Compose content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "post-detail",
+        "name": "Post",
+        "purpose": "Template: post-detail",
+        "keyContent": [
+          "Post content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "comments",
+        "name": "Comments",
+        "purpose": "Template: comments",
+        "keyContent": [
+          "Comments content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "user-profile",
+        "name": "Profile",
+        "purpose": "Template: user-profile",
+        "keyContent": [
+          "Profile content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "feed",
+        "to": "compose-post",
+        "trigger": "New post"
+      },
+      {
+        "from": "feed",
+        "to": "post-detail",
+        "trigger": "Open post"
+      },
+      {
+        "from": "post-detail",
+        "to": "comments",
+        "trigger": "View comments"
+      },
+      {
+        "from": "post-detail",
+        "to": "user-profile",
+        "trigger": "View profile"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "feed": "classic",
+    "compose-post": "classic",
+    "post-detail": "classic",
+    "comments": "classic",
+    "user-profile": "classic"
+  }
+};
+var social_feed_default = FLOW19;
+
+// src/templateLibrary/flows/sso-sign-in.ts
+var FLOW20 = {
+  id: "sso-sign-in",
+  category: "auth",
+  title: "SSO sign in",
+  description: "Social login path",
+  spec: {
+    "screens": [
+      {
+        "id": "login",
+        "name": "Log in",
+        "purpose": "Template: login",
+        "keyContent": [
+          "Log in content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "two-factor",
+        "name": "2FA",
+        "purpose": "Template: two-factor",
+        "keyContent": [
+          "2FA content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "login",
+        "to": "two-factor",
+        "trigger": "Continue with Google"
+      },
+      {
+        "from": "two-factor",
+        "to": "dashboard",
+        "trigger": "Verify"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "login": "classic",
+    "two-factor": "classic",
+    "dashboard": "classic"
+  }
+};
+var sso_sign_in_default = FLOW20;
+
+// src/templateLibrary/flows/support-ticket.ts
+var FLOW21 = {
+  id: "support-ticket",
+  category: "utility",
+  title: "Support request",
+  description: "Help centre to ticket",
+  spec: {
+    "screens": [
+      {
+        "id": "help-center",
+        "name": "Help",
+        "purpose": "Template: help-center",
+        "keyContent": [
+          "Help content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "help-article",
+        "name": "Article",
+        "purpose": "Template: help-article",
+        "keyContent": [
+          "Article content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "contact-support",
+        "name": "Contact",
+        "purpose": "Template: contact-support",
+        "keyContent": [
+          "Contact content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "ticket-submitted",
+        "name": "Sent",
+        "purpose": "Template: ticket-submitted",
+        "keyContent": [
+          "Sent content"
+        ],
+        "states": [
+          "success"
+        ]
+      },
+      {
+        "id": "my-tickets",
+        "name": "My tickets",
+        "purpose": "Template: my-tickets",
+        "keyContent": [
+          "My tickets content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "help-center",
+        "to": "help-article",
+        "trigger": "Open article"
+      },
+      {
+        "from": "help-article",
+        "to": "contact-support",
+        "trigger": "Still need help"
+      },
+      {
+        "from": "contact-support",
+        "to": "ticket-submitted",
+        "trigger": "Send"
+      },
+      {
+        "from": "ticket-submitted",
+        "to": "my-tickets",
+        "trigger": "View my requests"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "help-center": "classic",
+    "help-article": "classic",
+    "contact-support": "classic",
+    "ticket-submitted": "classic",
+    "my-tickets": "classic"
+  }
+};
+var support_ticket_default = FLOW21;
+
+// src/templateLibrary/flows/upgrade-paywall.ts
+var FLOW22 = {
+  id: "upgrade-paywall",
+  category: "app",
+  title: "Upgrade flow",
+  description: "Hit paywall and upgrade",
+  spec: {
+    "screens": [
+      {
+        "id": "dashboard",
+        "name": "Dashboard",
+        "purpose": "Template: dashboard",
+        "keyContent": [
+          "Dashboard content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "upgrade-paywall",
+        "name": "Upgrade",
+        "purpose": "Template: upgrade-paywall",
+        "keyContent": [
+          "Upgrade content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "pricing",
+        "name": "Pricing",
+        "purpose": "Template: pricing",
+        "keyContent": [
+          "Pricing content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "checkout",
+        "name": "Checkout",
+        "purpose": "Template: checkout",
+        "keyContent": [
+          "Checkout content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "dashboard",
+        "to": "upgrade-paywall",
+        "trigger": "Upgrade"
+      },
+      {
+        "from": "upgrade-paywall",
+        "to": "pricing",
+        "trigger": "See plans"
+      },
+      {
+        "from": "pricing",
+        "to": "checkout",
+        "trigger": "Choose plan"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "dashboard": "classic",
+    "upgrade-paywall": "classic",
+    "pricing": "classic",
+    "checkout": "classic"
+  }
+};
+var upgrade_paywall_default2 = FLOW22;
+
+// src/templateLibrary/flows/wishlist-shop.ts
+var FLOW23 = {
+  id: "wishlist-shop",
+  category: "commerce",
+  title: "Wishlist",
+  description: "Save items and buy",
+  spec: {
+    "screens": [
+      {
+        "id": "wishlist",
+        "name": "Wishlist",
+        "purpose": "Template: wishlist",
+        "keyContent": [
+          "Wishlist content"
+        ],
+        "states": [
+          "default",
+          "empty"
+        ]
+      },
+      {
+        "id": "product-detail",
+        "name": "Product",
+        "purpose": "Template: product-detail",
+        "keyContent": [
+          "Product content"
+        ],
+        "states": [
+          "default"
+        ]
+      },
+      {
+        "id": "cart",
+        "name": "Cart",
+        "purpose": "Template: cart",
+        "keyContent": [
+          "Cart content"
+        ],
+        "states": [
+          "default"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "wishlist",
+        "to": "product-detail",
+        "trigger": "Open product"
+      },
+      {
+        "from": "product-detail",
+        "to": "cart",
+        "trigger": "Add to basket"
+      }
+    ]
+  },
+  defaultScreenVariants: {
+    "wishlist": "classic",
+    "product-detail": "classic",
+    "cart": "classic"
+  }
+};
+var wishlist_shop_default = FLOW23;
+
+// src/templateLibrary/registry.ts
+var SCREEN_TEMPLATES = [about_default, api_keys_default, blog_list_default, blog_post_default, booking_confirm_default, booking_details_default, booking_reschedule_default, booking_search_default, booking_slot_default, bottom_sheet_default, bulk_actions_default, cart_default, category_browse_default, change_credentials_default, checkout_default, comments_default, compose_post_default, contact_default, contact_support_default, cookies_banner_default, dashboard_default, delete_account_default, empty_state_default, error_404_default, error_500_default, features_default, feed_default, follow_suggestions_default, forgot_password_default, form_create_default, generic_form_default, help_article_default, help_center_default, invite_teammates_default, legal_privacy_default, legal_terms_default, list_default, login_default, logout_default, maintenance_default, marketing_home_default, messages_default, my_tickets_default, notifications_default, offline_state_default, onboarding_default, order_confirmation_default, order_history_default, payment_default, payment_failure_default, permissions_prompt_default, plan_select_default, post_detail_default, pricing_default, product_catalog_default, product_detail_default, profile_setup_default, pull_refresh_list_default, record_detail_default, register_default, reset_password_default, returns_default, search_default, search_results_default, settings_default, settings_billing_default, settings_security_default, settings_team_default, splash_default, subscription_cancel_default, tab_shell_default, ticket_submitted_default, two_factor_default, upgrade_paywall_default, user_profile_default, verify_email_default, wishlist_default, workspace_create_default];
+var FLOW_TEMPLATES = [blog_default, booking_default, booking_reschedule_default2, cancel_subscription_default, checkout_default2, guest_checkout_default, invite_sign_up_default, magic_link_sign_in_default, marketing_site_default, messages_chat_default, mobile_shell_default, order_returns_default, plan_onboarding_default, saas_crud_default, search_detail_default, settings_account_default, sign_in_default, sign_up_default, social_feed_default, sso_sign_in_default, support_ticket_default, upgrade_paywall_default2, wishlist_shop_default];
+var screenById = new Map(
+  SCREEN_TEMPLATES.map((s) => [s.id, s])
+);
+var flowById = new Map(FLOW_TEMPLATES.map((f) => [f.id, f]));
+function listScreenTemplates() {
+  return [...SCREEN_TEMPLATES];
+}
+function getScreenTemplate(id) {
+  const tpl = screenById.get(id);
+  if (!tpl) throw new Error(`Unknown screen template "${id}"`);
+  return tpl;
+}
+function listFlowTemplates() {
+  return [...FLOW_TEMPLATES];
+}
+function getFlowTemplate(id) {
+  const tpl = flowById.get(id);
+  if (!tpl) throw new Error(`Unknown flow template "${id}"`);
+  return tpl;
+}
+var SCREEN_TEMPLATE_IDS = ["about", "api-keys", "blog-list", "blog-post", "booking-confirm", "booking-details", "booking-reschedule", "booking-search", "booking-slot", "bottom-sheet", "bulk-actions", "cart", "category-browse", "change-credentials", "checkout", "comments", "compose-post", "contact", "contact-support", "cookies-banner", "dashboard", "delete-account", "empty-state", "error-404", "error-500", "features", "feed", "follow-suggestions", "forgot-password", "form-create", "generic-form", "help-article", "help-center", "invite-teammates", "legal-privacy", "legal-terms", "list", "login", "logout", "maintenance", "marketing-home", "messages", "my-tickets", "notifications", "offline-state", "onboarding", "order-confirmation", "order-history", "payment", "payment-failure", "permissions-prompt", "plan-select", "post-detail", "pricing", "product-catalog", "product-detail", "profile-setup", "pull-refresh-list", "record-detail", "register", "reset-password", "returns", "search", "search-results", "settings", "settings-billing", "settings-security", "settings-team", "splash", "subscription-cancel", "tab-shell", "ticket-submitted", "two-factor", "upgrade-paywall", "user-profile", "verify-email", "wishlist", "workspace-create"];
+var FLOW_TEMPLATE_IDS = ["blog", "booking", "booking-reschedule", "cancel-subscription", "checkout", "guest-checkout", "invite-sign-up", "magic-link-sign-in", "marketing-site", "messages-chat", "mobile-shell", "order-returns", "plan-onboarding", "saas-crud", "search-detail", "settings-account", "sign-in", "sign-up", "social-feed", "sso-sign-in", "support-ticket", "upgrade-paywall", "wishlist-shop"];
+
+// src/templateLibrary/render.ts
+var NAME_TO_SCREEN = [
+  { pattern: /\b(log\s*in|sign\s*in)\b/i, id: "login" },
+  { pattern: /\b(sign\s*up|register|create account)\b/i, id: "register" },
+  { pattern: /\b(forgot|reset)\s*password\b/i, id: "forgot-password" },
+  { pattern: /\breset\b.*\bpassword\b/i, id: "reset-password" },
+  { pattern: /\b(verify|confirm)\s*(email|phone|otp)\b/i, id: "verify-email" },
+  { pattern: /\bonboarding|welcome tour|get started\b/i, id: "onboarding" },
+  { pattern: /\bdashboard|overview\b/i, id: "dashboard" },
+  { pattern: /\bsettings|preferences\b/i, id: "settings" },
+  { pattern: /\bprofile\b/i, id: "user-profile" },
+  { pattern: /\b(cart|basket)\b/i, id: "cart" },
+  { pattern: /\bcheckout\b/i, id: "checkout" },
+  { pattern: /\b(order|confirmation|receipt)\b/i, id: "order-confirmation" },
+  { pattern: /\bpricing|plans\b/i, id: "pricing" },
+  { pattern: /\b(search results|results for)\b/i, id: "search-results" },
+  { pattern: /\b(search|find)\b/i, id: "search" },
+  { pattern: /\b(product)\s*detail\b/i, id: "product-detail" },
+  { pattern: /\b(item|record)\s*detail\b/i, id: "record-detail" },
+  { pattern: /\b(list|catalog|browse|feed|inbox)\b/i, id: "list" },
+  { pattern: /\bempty\b/i, id: "empty-state" },
+  { pattern: /\b404|not found\b/i, id: "error-404" },
+  { pattern: /\bnotification/i, id: "notifications" },
+  { pattern: /\bhelp|support|ticket/i, id: "help-center" },
+  { pattern: /\bmessage|chat\b/i, id: "messages" },
+  { pattern: /\bpayment\b/i, id: "payment" },
+  { pattern: /\bsplash\b/i, id: "splash" }
+];
+function inferScreenTemplateId(screenName, purpose) {
+  const hay = `${screenName} ${purpose}`;
+  for (const row2 of NAME_TO_SCREEN) {
+    if (row2.pattern.test(hay)) return row2.id;
+  }
+  return null;
+}
+function pickVariantId(templateId, brief, outgoingActions, variantId) {
+  const tpl = getScreenTemplate(templateId);
+  if (variantId && tpl.variants.some((v) => v.id === variantId)) return variantId;
+  const labels = new Set(outgoingActions.map((l) => l.toLowerCase()));
+  for (const v of tpl.variants) {
+    if (v.hotspots.some((h) => labels.has(h.toLowerCase()))) return v.id;
+  }
+  if (brief.keyContent.some((k) => /magic|sso|social|google|apple/i.test(k))) {
+    const social = tpl.variants.find((v) => /social|sso|magic/i.test(v.id));
+    if (social) return social.id;
+  }
+  return tpl.variants[0].id;
+}
+function buildScreenVariantTree(templateId, variantId, device) {
+  const tpl = getScreenTemplate(templateId);
+  const variant2 = tpl.variants.find((v) => v.id === variantId) ?? tpl.variants[0];
+  return variant2.build(device);
+}
+function templateDesignStatesForBrief(screenName, brief, outgoingActions, device, variantId) {
+  const id = inferScreenTemplateId(screenName, brief.purpose) ?? inferScreenTemplateId(screenName, screenName);
+  const templateId = id ?? "generic-form";
+  const vid = pickVariantId(templateId, brief, outgoingActions, variantId);
+  const defaultTree = buildScreenVariantTree(templateId, vid, device);
+  const states = { default: defaultTree };
+  if (brief.states.includes("empty")) {
+    states.empty = buildScreenVariantTree("empty-state", "classic", device);
+  }
+  if (brief.states.includes("loading")) {
+    states.loading = buildScreenVariantTree("empty-state", "compact", device);
+  }
+  if (brief.states.includes("error")) {
+    states.error = buildScreenVariantTree("error-500", "classic", device);
+  }
+  if (brief.states.includes("success")) {
+    states.success = buildScreenVariantTree("order-confirmation", "classic", device);
+  }
+  return states;
+}
+function listTemplateScreensForApi() {
+  return listScreenTemplates();
+}
+
+// src/templateLibrary/insert.ts
+function applyScreenTemplateToPage(document, options) {
+  const doc = structuredClone(document);
+  const page = doc.project.pages.find((p) => p.id === options.pageId);
+  if (!page) throw new Error("page not found");
+  const tpl = getScreenTemplate(options.screenTemplateId);
+  const brief = {
+    key: page.brief?.key ?? page.id,
+    purpose: options.brief?.purpose ?? tpl.description,
+    keyContent: options.brief?.keyContent ?? tpl.variants[0].hotspots.map(String),
+    states: page.brief?.states ?? ["default"]
+  };
+  const variantId = pickVariantId(options.screenTemplateId, brief, brief.keyContent, options.variantId);
+  const tree = buildScreenVariantTree(options.screenTemplateId, variantId, options.device);
+  const idx = doc.project.pages.findIndex((p) => p.id === page.id);
+  doc.project.pages[idx] = {
+    ...designToNodes({ ...page, name: options.screenName ?? page.name }, tree, options.newId),
+    brief: {
+      ...brief,
+      templateId: options.screenTemplateId,
+      templateVariant: variantId
+    }
+  };
+  return doc;
+}
+function designDeviceFromOptions(options) {
+  if (options.platforms?.includes("desktop")) return "desktop";
+  if (options.platforms?.includes("tablet")) return "tablet";
+  return "phone";
+}
+function paintFlowScreens(doc, flow, screens, screenId, newId, device) {
+  for (const screen of screens) {
+    const templateId = screen.purpose.replace(/^Template:\s*/, "");
+    const key = screenId(screen.id);
+    const page = doc.project.pages.find((p) => (p.brief?.key ?? p.id) === key);
+    if (!page) continue;
+    try {
+      const variantId = flow.defaultScreenVariants[templateId] ?? getScreenTemplate(templateId).variants[0].id;
+      const tree = buildScreenVariantTree(templateId, variantId, device);
+      const idx = doc.project.pages.findIndex((p) => p.id === page.id);
+      doc.project.pages[idx] = {
+        ...designToNodes(page, tree, newId),
+        brief: {
+          ...page.brief ?? { key, purpose: screen.purpose, keyContent: screen.keyContent, states: screen.states },
+          templateId,
+          templateVariant: variantId
+        }
+      };
+    } catch {
+    }
+  }
+}
+function flowBounds(frames) {
+  if (!frames.length) return { maxRight: 0 };
+  return { maxRight: Math.max(...frames.map((f) => f.x + (f.width ?? FLOW_CARD_WIDTH))) };
+}
+function insertFlowTemplate(document, options) {
+  const flow = getFlowTemplate(options.flowTemplateId);
+  const { spec } = repairFlowSpec(flow.spec);
+  const device = designDeviceFromOptions(options);
+  if (!options.merge) {
+    const applied = applyFlowSpec(document, spec, options);
+    paintFlowScreens(applied.document, flow, spec.screens, (id) => id, options.newId, device);
+    return applied;
+  }
+  const prefix = `${options.flowTemplateId}-`;
+  const merged = {
+    screens: spec.screens.map((s) => ({ ...s, id: `${prefix}${s.id}` })),
+    connections: spec.connections.map((c) => ({
+      from: `${prefix}${c.from}`,
+      to: `${prefix}${c.to}`,
+      trigger: c.trigger
+    }))
+  };
+  const existing = structuredClone(document);
+  const ghost = existing.project.frames.filter((f) => f.ghost);
+  const real = existing.project.frames.filter((f) => !f.ghost);
+  const offset = flowBounds(real).maxRight + FLOW_CARD_GAP_X;
+  const { document: fresh, screenFrameIds } = applyFlowSpec(
+    { ...existing, project: { ...existing.project, pages: [], frames: ghost, connectors: [] } },
+    merged,
+    options
+  );
+  paintFlowScreens(fresh, flow, spec.screens, (id) => `${prefix}${id}`, options.newId, device);
+  for (const frame of fresh.project.frames) {
+    if (!frame.ghost) {
+      frame.x += offset;
+    }
+  }
+  const mergedDoc = {
+    ...existing,
+    project: {
+      ...existing.project,
+      pages: [...existing.project.pages, ...fresh.project.pages],
+      frames: [...existing.project.frames, ...fresh.project.frames],
+      connectors: [...existing.project.connectors, ...fresh.project.connectors],
+      annotations: [...existing.project.annotations, ...fresh.project.annotations],
+      productBrief: fresh.project.productBrief ?? existing.project.productBrief
+    }
+  };
+  return { document: mergedDoc, screenFrameIds };
+}
+
+// src/templateLibrary/swapVariant.ts
+function resolvePageTemplateId(page) {
+  const explicit = page.brief?.templateId;
+  if (explicit) {
+    try {
+      getScreenTemplate(explicit);
+      return explicit;
+    } catch {
+    }
+  }
+  const purpose = page.brief?.purpose?.replace(/^Template:\s*/, "") ?? "";
+  if (purpose) {
+    try {
+      getScreenTemplate(purpose);
+      return purpose;
+    } catch {
+    }
+  }
+  return inferScreenTemplateId(page.name, page.brief?.purpose ?? "");
+}
+function variantsForPage(page) {
+  const id = resolvePageTemplateId(page);
+  if (!id) return null;
+  const tpl = getScreenTemplate(id);
+  const current = page.brief?.templateVariant;
+  return { templateId: id, title: tpl.title, variants: tpl.variants, currentVariantId: current };
+}
+function swapScreenVariant(document, pageId, frameId, variantId, device, newId) {
+  const doc = structuredClone(document);
+  const pageIndex = doc.project.pages.findIndex((p) => p.id === pageId);
+  const page = doc.project.pages[pageIndex];
+  if (!page) throw new Error("page not found");
+  const templateId = resolvePageTemplateId(page);
+  if (!templateId) throw new Error("no template for screen");
+  const tpl = getScreenTemplate(templateId);
+  if (!tpl.variants.some((v) => v.id === variantId)) throw new Error("unknown variant");
+  const tree = buildScreenVariantTree(templateId, variantId, device);
+  const brief = {
+    ...page.brief ?? { key: page.id, purpose: "", keyContent: [], states: ["default"] },
+    templateId,
+    templateVariant: variantId,
+    purpose: page.brief?.purpose || tpl.description
+  };
+  doc.project.pages[pageIndex] = {
+    ...designToNodes(page, tree, newId),
+    brief
+  };
+  attachConnectorButtonNodes(doc, pageId, frameId);
+  return doc;
+}
+
 // src/index.ts
 function defaultNewId(prefix) {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
@@ -1200,14 +6892,27 @@ export {
   FLOW_PLATFORMS,
   FLOW_PLATFORM_PRESET,
   FLOW_SPEC_SCHEMA_HINT,
+  FLOW_TEMPLATE_IDS,
   FLOW_THUMB_HEIGHT,
   FlowSpecError,
   SCREEN_STATES,
+  SCREEN_TEMPLATE_IDS,
+  TEMPLATE_CATEGORIES,
+  TEMPLATE_LIBRARY_VERSION,
+  alert,
   applyFlowSpec,
   applyImportScreenshots,
   applyProjectCommand,
+  applyScreenTemplateToPage,
   attachConnectorButtonNodes,
   autoPlaceFrame,
+  badge,
+  btn,
+  buildScreenVariantTree,
+  card,
+  checkDesignTreeA11y,
+  columnOrSplit,
+  copy,
   countDesignNodes,
   createDefaultCommandContext,
   createEmptyProjectDocument,
@@ -1215,17 +6920,36 @@ export {
   designToNodes,
   deviceDimensions,
   devicesForPlatform,
+  field,
   flowSpecFromDocument,
   getDevicePreset,
+  getFlowTemplate,
+  getScreenTemplate,
+  h1,
+  h2,
+  inferScreenTemplateId,
+  insertFlowTemplate,
   isEmptyFlow,
   layeredFlowLayout,
   layoutFramesInFlowRow,
+  listFlowTemplates,
   listPageButtons,
+  listScreenTemplates,
+  listTemplateScreensForApi,
   parseProjectCommand,
+  pickVariantId,
   platformForDevices,
+  primaryActions,
   projectCommandSchema,
   repairDesignSpec,
   repairFlowSpec,
+  resolvePageTemplateId,
+  row,
   screenKeyForPage,
-  slugifyScreenId
+  section,
+  slugifyScreenId,
+  stack,
+  swapScreenVariant,
+  templateDesignStatesForBrief,
+  variantsForPage
 };

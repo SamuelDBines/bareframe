@@ -63,6 +63,9 @@ type ScreenBrief = {
     purpose: string;
     keyContent: string[];
     states: ('default' | 'empty' | 'loading' | 'error' | 'success')[];
+    /** When set, the screen was inserted from the template library. */
+    templateId?: string;
+    templateVariant?: string;
 };
 type ProductBrief = {
     description: string;
@@ -715,7 +718,126 @@ declare function listPageButtons(page: Page): {
  */
 declare function attachConnectorButtonNodes(document: ProjectDocument, pageId: string, frameId: string): string[];
 
+/** Library version bumps when variants or hotspot names change. */
+declare const TEMPLATE_LIBRARY_VERSION = 1;
+declare const TEMPLATE_CATEGORIES: readonly ["auth", "onboarding", "app", "content", "commerce", "utility"];
+type TemplateCategory = (typeof TEMPLATE_CATEGORIES)[number];
+type ScreenTemplateId = 'about' | 'api-keys' | 'blog-list' | 'blog-post' | 'booking-confirm' | 'booking-details' | 'booking-reschedule' | 'booking-search' | 'booking-slot' | 'bottom-sheet' | 'bulk-actions' | 'cart' | 'category-browse' | 'change-credentials' | 'checkout' | 'comments' | 'compose-post' | 'contact' | 'contact-support' | 'cookies-banner' | 'dashboard' | 'delete-account' | 'empty-state' | 'error-404' | 'error-500' | 'features' | 'feed' | 'follow-suggestions' | 'forgot-password' | 'form-create' | 'generic-form' | 'help-article' | 'help-center' | 'invite-teammates' | 'legal-privacy' | 'legal-terms' | 'list' | 'login' | 'logout' | 'maintenance' | 'marketing-home' | 'messages' | 'my-tickets' | 'notifications' | 'offline-state' | 'onboarding' | 'order-confirmation' | 'order-history' | 'payment' | 'payment-failure' | 'permissions-prompt' | 'plan-select' | 'post-detail' | 'pricing' | 'product-catalog' | 'product-detail' | 'profile-setup' | 'pull-refresh-list' | 'record-detail' | 'register' | 'reset-password' | 'returns' | 'search' | 'search-results' | 'settings' | 'settings-billing' | 'settings-security' | 'settings-team' | 'splash' | 'subscription-cancel' | 'tab-shell' | 'ticket-submitted' | 'two-factor' | 'upgrade-paywall' | 'user-profile' | 'verify-email' | 'wishlist' | 'workspace-create';
+type FlowTemplateId = 'blog' | 'booking' | 'booking-reschedule' | 'cancel-subscription' | 'checkout' | 'guest-checkout' | 'invite-sign-up' | 'magic-link-sign-in' | 'marketing-site' | 'messages-chat' | 'mobile-shell' | 'order-returns' | 'plan-onboarding' | 'saas-crud' | 'search-detail' | 'settings-account' | 'sign-in' | 'sign-up' | 'social-feed' | 'sso-sign-in' | 'support-ticket' | 'upgrade-paywall' | 'wishlist-shop';
+type ScreenTemplateVariantMeta = {
+    id: string;
+    title: string;
+    summary: string;
+    /** Button labels that connectors can target. */
+    hotspots: readonly string[];
+    build: (device: DesignDevice) => DesignTreeNode;
+};
+type ScreenTemplateMeta = {
+    id: ScreenTemplateId;
+    category: TemplateCategory;
+    title: string;
+    description: string;
+    variants: readonly ScreenTemplateVariantMeta[];
+};
+type FlowTemplateMeta = {
+    id: FlowTemplateId;
+    category: TemplateCategory;
+    title: string;
+    description: string;
+    spec: FlowSpec;
+    defaultScreenVariants: Partial<Record<ScreenTemplateId, string>>;
+};
+type ScreenTemplateListItem = {
+    libraryVersion: number;
+    id: ScreenTemplateId;
+    category: TemplateCategory;
+    title: string;
+    description: string;
+    variants: {
+        id: string;
+        title: string;
+        summary: string;
+        hotspots: string[];
+    }[];
+};
+type FlowTemplateListItem = {
+    libraryVersion: number;
+    id: FlowTemplateId;
+    category: TemplateCategory;
+    title: string;
+    description: string;
+    screenCount: number;
+    connectionCount: number;
+};
+
+declare function h1(text: string): DesignTreeNode;
+declare function h2(text: string): DesignTreeNode;
+declare function copy(text: string): DesignTreeNode;
+declare function field(label: string, placeholder?: string): DesignTreeNode;
+declare function btn(label: string, variant?: 'primary' | 'secondary' | 'ghost'): DesignTreeNode;
+declare function card(title: string, body: string, variant?: 'outlined' | 'elevated' | 'ghost'): DesignTreeNode;
+declare function alert(text: string, variant?: 'info' | 'success' | 'warning' | 'danger'): DesignTreeNode;
+declare function badge(label: string, variant?: 'default' | 'success' | 'outline'): DesignTreeNode;
+declare function stack(children: DesignTreeNode[], gap?: number, padding?: number): DesignTreeNode;
+declare function row(children: DesignTreeNode[], gap?: number, padding?: number): DesignTreeNode;
+declare function section(children: DesignTreeNode[], gap?: number, padding?: number): DesignTreeNode;
+/** Wider layouts use a row on tablet and desktop when split is requested. */
+declare function columnOrSplit(device: DesignDevice, single: DesignTreeNode[], split: [DesignTreeNode[], DesignTreeNode[]]): DesignTreeNode;
+declare function primaryActions(labels: string[]): DesignTreeNode;
+
+type A11yIssue = {
+    path: string;
+    message: string;
+};
+/** Basic checks: labelled controls, heading present. */
+declare function checkDesignTreeA11y(tree: DesignTreeNode): A11yIssue[];
+
+declare function inferScreenTemplateId(screenName: string, purpose: string): ScreenTemplateId | null;
+declare function pickVariantId(templateId: ScreenTemplateId, brief: ScreenBrief, outgoingActions: string[], variantId?: string): string;
+declare function buildScreenVariantTree(templateId: ScreenTemplateId, variantId: string, device: DesignDevice): DesignTreeNode;
+declare function templateDesignStatesForBrief(screenName: string, brief: ScreenBrief, outgoingActions: string[], device: DesignDevice, variantId?: string): Record<string, DesignTreeNode>;
+declare function listTemplateScreensForApi(): ScreenTemplateMeta[];
+
+type InsertScreenTemplateOptions = {
+    projectId?: string;
+    pageId?: string;
+    screenTemplateId: ScreenTemplateId;
+    variantId?: string;
+    device: DesignDevice;
+    brief?: Partial<ScreenBrief>;
+    screenName?: string;
+    newId: (prefix: string) => string;
+};
+/** Apply a screen template variant to an existing page (default state nodes). */
+declare function applyScreenTemplateToPage(document: ProjectDocument, options: InsertScreenTemplateOptions): ProjectDocument;
+type InsertFlowTemplateOptions = ApplyFlowSpecOptions & {
+    flowTemplateId: FlowTemplateId;
+    merge?: boolean;
+};
+/** Insert a flow without removing existing screens; offset new frames to the right. */
+declare function insertFlowTemplate(document: ProjectDocument, options: InsertFlowTemplateOptions): {
+    document: ProjectDocument;
+    screenFrameIds: Record<string, string>;
+};
+
+declare function resolvePageTemplateId(page: Page): ScreenTemplateId | null;
+declare function variantsForPage(page: Page): {
+    templateId: ScreenTemplateId;
+    title: string;
+    variants: readonly ScreenTemplateVariantMeta[];
+    currentVariantId: string | undefined;
+} | null;
+/** Swap layout variant; connector button labels are re-matched on the frame. */
+declare function swapScreenVariant(document: ProjectDocument, pageId: string, frameId: string, variantId: string, device: DesignDevice, newId: (prefix: string) => string): ProjectDocument;
+
+declare function listScreenTemplates(): ScreenTemplateMeta[];
+declare function getScreenTemplate(id: ScreenTemplateId): ScreenTemplateMeta;
+declare function listFlowTemplates(): FlowTemplateMeta[];
+declare function getFlowTemplate(id: FlowTemplateId): FlowTemplateMeta;
+declare const SCREEN_TEMPLATE_IDS: readonly ["about", "api-keys", "blog-list", "blog-post", "booking-confirm", "booking-details", "booking-reschedule", "booking-search", "booking-slot", "bottom-sheet", "bulk-actions", "cart", "category-browse", "change-credentials", "checkout", "comments", "compose-post", "contact", "contact-support", "cookies-banner", "dashboard", "delete-account", "empty-state", "error-404", "error-500", "features", "feed", "follow-suggestions", "forgot-password", "form-create", "generic-form", "help-article", "help-center", "invite-teammates", "legal-privacy", "legal-terms", "list", "login", "logout", "maintenance", "marketing-home", "messages", "my-tickets", "notifications", "offline-state", "onboarding", "order-confirmation", "order-history", "payment", "payment-failure", "permissions-prompt", "plan-select", "post-detail", "pricing", "product-catalog", "product-detail", "profile-setup", "pull-refresh-list", "record-detail", "register", "reset-password", "returns", "search", "search-results", "settings", "settings-billing", "settings-security", "settings-team", "splash", "subscription-cancel", "tab-shell", "ticket-submitted", "two-factor", "upgrade-paywall", "user-profile", "verify-email", "wishlist", "workspace-create"];
+declare const FLOW_TEMPLATE_IDS: readonly ["blog", "booking", "booking-reschedule", "cancel-subscription", "checkout", "guest-checkout", "invite-sign-up", "magic-link-sign-in", "marketing-site", "messages-chat", "mobile-shell", "order-returns", "plan-onboarding", "saas-crud", "search-detail", "settings-account", "sign-in", "sign-up", "social-feed", "sso-sign-in", "support-ticket", "upgrade-paywall", "wishlist-shop"];
+
 declare function defaultNewId(prefix: string): string;
 declare function createDefaultCommandContext(isValidComponentSlug: (slug: string) => boolean): CommandContext;
 
-export { type Annotation, type AnnotationTarget, type ApplyFlowSpecOptions, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, DESIGN_COMPONENTS, DESIGN_DEVICES, DESIGN_LAYOUTS, DESIGN_LIMITS, DESIGN_SPEC_SCHEMA_HINT, type DesignComponent, type DesignDevice, type DesignLayout, type DesignNode, type DesignSpec, DesignSpecError, type DesignStateName, type DesignTreeNode, type DesignerProject, type DevicePreset, FLOW_CARD_GAP_X, FLOW_CARD_GAP_Y, FLOW_CARD_HEIGHT, FLOW_CARD_WIDTH, FLOW_DEVICES, FLOW_LABEL_HEIGHT, FLOW_LIMITS, FLOW_ORIGIN_X, FLOW_ORIGIN_Y, FLOW_PLATFORMS, FLOW_PLATFORM_PRESET, FLOW_SPEC_SCHEMA_HINT, FLOW_THUMB_HEIGHT, type FlowConnection, type FlowDevice, type FlowPlatform, type FlowScreen, type FlowSpec, FlowSpecError, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type LayoutMode, type LayoutModel, type Page, type ProductBrief, type ProjectCommand, type ProjectDocument, SCREEN_STATES, type ScreenBrief, type ScreenState, type SizingMode, type StyleModel, type StyleTrial, type ThemeId, applyFlowSpec, applyImportScreenshots, applyProjectCommand, attachConnectorButtonNodes, autoPlaceFrame, countDesignNodes, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, designToNodes, deviceDimensions, devicesForPlatform, flowSpecFromDocument, getDevicePreset, isEmptyFlow, layeredFlowLayout, layoutFramesInFlowRow, listPageButtons, parseProjectCommand, platformForDevices, projectCommandSchema, repairDesignSpec, repairFlowSpec, screenKeyForPage, slugifyScreenId };
+export { type A11yIssue, type Annotation, type AnnotationTarget, type ApplyFlowSpecOptions, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, DESIGN_COMPONENTS, DESIGN_DEVICES, DESIGN_LAYOUTS, DESIGN_LIMITS, DESIGN_SPEC_SCHEMA_HINT, type DesignComponent, type DesignDevice, type DesignLayout, type DesignNode, type DesignSpec, DesignSpecError, type DesignStateName, type DesignTreeNode, type DesignerProject, type DevicePreset, FLOW_CARD_GAP_X, FLOW_CARD_GAP_Y, FLOW_CARD_HEIGHT, FLOW_CARD_WIDTH, FLOW_DEVICES, FLOW_LABEL_HEIGHT, FLOW_LIMITS, FLOW_ORIGIN_X, FLOW_ORIGIN_Y, FLOW_PLATFORMS, FLOW_PLATFORM_PRESET, FLOW_SPEC_SCHEMA_HINT, FLOW_TEMPLATE_IDS, FLOW_THUMB_HEIGHT, type FlowConnection, type FlowDevice, type FlowPlatform, type FlowScreen, type FlowSpec, FlowSpecError, type FlowTemplateId, type FlowTemplateListItem, type FlowTemplateMeta, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type InsertFlowTemplateOptions, type InsertScreenTemplateOptions, type LayoutMode, type LayoutModel, type Page, type ProductBrief, type ProjectCommand, type ProjectDocument, SCREEN_STATES, SCREEN_TEMPLATE_IDS, type ScreenBrief, type ScreenState, type ScreenTemplateId, type ScreenTemplateListItem, type ScreenTemplateMeta, type ScreenTemplateVariantMeta, type SizingMode, type StyleModel, type StyleTrial, TEMPLATE_CATEGORIES, TEMPLATE_LIBRARY_VERSION, type TemplateCategory, type ThemeId, alert, applyFlowSpec, applyImportScreenshots, applyProjectCommand, applyScreenTemplateToPage, attachConnectorButtonNodes, autoPlaceFrame, badge, btn, buildScreenVariantTree, card, checkDesignTreeA11y, columnOrSplit, copy, countDesignNodes, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, designToNodes, deviceDimensions, devicesForPlatform, field, flowSpecFromDocument, getDevicePreset, getFlowTemplate, getScreenTemplate, h1, h2, inferScreenTemplateId, insertFlowTemplate, isEmptyFlow, layeredFlowLayout, layoutFramesInFlowRow, listFlowTemplates, listPageButtons, listScreenTemplates, listTemplateScreensForApi, parseProjectCommand, pickVariantId, platformForDevices, primaryActions, projectCommandSchema, repairDesignSpec, repairFlowSpec, resolvePageTemplateId, row, screenKeyForPage, section, slugifyScreenId, stack, swapScreenVariant, templateDesignStatesForBrief, variantsForPage };

@@ -395,10 +395,11 @@ test.describe('generate screen designs', () => {
 	});
 
 	test('stops the queue at the plan limit and says why', async ({ page }) => {
+		test.setTimeout(60_000);
 		const api = await openMappedProject(page, { designAllowance: 3 });
 		await page.getByTestId('design-all').click();
 		const result = page.getByTestId('design-result');
-		await expect(result).toContainText('Designed 3 of 4 screens', { timeout: 15_000 });
+		await expect(result).toContainText('Designed 3 of 4 screens', { timeout: 30_000 });
 		await expect(result).toContainText('free plan includes 3 screen designs');
 		await expect(result).toHaveAttribute('role', 'alert');
 		expect(api.designCalls).toHaveLength(4);

@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { friendlyError, isAiUnavailable } from '../../app/apiError';
 import { createFlowMap, importFigmaDesign, waitForFlowMapJob } from '../../app/reviewApi';
 import { fetchPackageConfig, startPackageGeneration } from '../../designer/packageApi';
-import { createProject } from '../../designer/projectApi';
+import { createProject, fetchProject } from '../../designer/projectApi';
 import { looksLikeWebsiteUrl, websiteHostname } from './websiteImportUtils';
 
-export type StartKind = 'brief' | 'figma' | 'url' | 'sitemap';
+export type StartKind = 'brief' | 'figma' | 'url' | 'sitemap' | 'template';
 
 const STARTS: { id: StartKind; title: string; body: string; icon: string }[] = [
+	{ id: 'template', title: 'Template flow', body: 'Pick a linked journey you can play on the map right away.', icon: '◫' },
 	{ id: 'figma', title: 'Figma file', body: 'Frames become screens, prototype links become connectors.', icon: 'F' },
 	{ id: 'brief', title: 'Short brief', body: 'Describe the product and we draft the journey for you.', icon: '✎' },
 	{
@@ -37,12 +38,24 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 	const [aiReady, setAiReady] = useState<boolean | null>(null);
 	const [busy, setBusy] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [flowTemplateId, setFlowTemplateId] = useState('sign-in');
+	const [flowOptions, setFlowOptions] = useState<{ id: string; title: string }[]>([]);
 	const dialogRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		fetchPackageConfig()
 			.then((c) => setAiReady(Boolean(c.llmConfigured)))
 			.catch(() => setAiReady(false));
+		void fetch('/api/templates', { credentials: 'include' })
+			.then((r) => (r.ok ? r.json() : null))
+			.then((data) => {
+				const flows = (data?.flows ?? []) as { id: string; title: string }[];
+				if (flows.length) {
+					setFlowOptions(flows);
+					setFlowTemplateId(flows[0]!.id);
+				}
+			})
+			.catch(() => undefined);
 	}, []);
 
 	useEffect(() => {
@@ -65,7 +78,8 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 		((kind === 'figma' && /figma\.com\//.test(figmaUrl)) ||
 			(kind === 'url' && siteUrlValid) ||
 			(kind === 'sitemap' && !sitemapRequiresPro && siteUrlValid) ||
-			(kind === 'brief' && aiReady === true && idea.trim().length > 8));
+			(kind === 'brief' && aiReady === true && idea.trim().length > 8) ||
+			(kind === 'template' && flowOptions.some((f) => f.id === flowTemplateId)));
 
 	async function submit(e: React.FormEvent) {
 		e.preventDefault();
@@ -86,6 +100,24 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 				const p = await createProject(`Sitemap: ${new URL(url).hostname}`);
 				const { jobId } = await createFlowMap(p.id, url, p.version, { maxPages: 20 });
 				await waitForFlowMapJob(p.id, jobId);
+				navigate(`/app/project/${p.id}`);
+			} else if (kind === 'template') {
+				const title = flowOptions.find((f) => f.id === flowTemplateId)?.title ?? 'Template flow';
+				const p = await createProject(title);
+				const remote = await fetchProject(p.id);
+				const res = await fetch(`/api/projects/${p.id}/templates/insert`, {
+					method: 'POST',
+					credentials: 'include',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						kind: 'flow',
+						flowTemplateId,
+						devices: ['mobile'],
+						merge: false,
+						baseVersion: remote.version,
+					}),
+				});
+				if (!res.ok) throw new Error('template insert failed');
 				navigate(`/app/project/${p.id}`);
 			} else {
 				const { jobId } = await startPackageGeneration({
@@ -271,6 +303,28 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 						</>
 					) : null}
 
+					{kind === 'template' ? (
+						<label className="field">
+							<span>Flow template</span>
+							<select
+								value={flowTemplateId}
+								onChange={(e) => setFlowTemplateId(e.target.value)}
+								data-testid="new-project-flow-template"
+							>
+								{flowOptions.length === 0 ? (
+									<option value="sign-in">Sign in (loading…)</option>
+								) : (
+									flowOptions.map((f) => (
+										<option key={f.id} value={f.id}>
+											{f.title}
+										</option>
+									))
+								)}
+							</select>
+							<p className="bx-hint">Screens arrive linked so you can run the prototype immediately.</p>
+						</label>
+					) : null}
+
 					{kind === 'brief' ? (
 						<>
 							<label className="field">
@@ -331,6 +385,8 @@ export function NewProjectDialog({ initial = 'figma', planTier, onClose }: Props
 								? 'Setting up…'
 								: kind === 'brief'
 									? 'Draft my flow'
+									: kind === 'template'
+										? 'Create from template'
 									: kind === 'url'
 										? 'Continue to website setup'
 										: 'Create flow map'}

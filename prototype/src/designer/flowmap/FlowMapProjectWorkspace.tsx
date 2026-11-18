@@ -12,12 +12,16 @@ import { RefineFlowDialog } from './RefineFlowDialog';
 import { DesignBar } from './DesignBar';
 import { useDesignQueue } from './designGenApi';
 import type { DesignDevice } from '@bareframe/designer-core';
+import { designDeviceToViewport, viewportToDesignDevice } from './designViewport';
+import { useScreenDesigns } from './useScreenDesigns';
 import { PrototypePlayer } from './PrototypePlayer';
 import { FlowMapScreenLinkPanel } from './FlowMapScreenLinkPanel';
 import './flow-map-ui.css';
 import { useAuth } from '../../auth/AuthContext';
 import { ProjectNotesPanel } from './ProjectNotesPanel';
 import { ProjectNotesProvider } from './ProjectNotesContext';
+import { TemplatesGallery } from './TemplatesGallery';
+import { VariantSwapPanel } from './VariantSwapPanel';
 
 type Props = {
 	readOnly?: boolean;
@@ -50,8 +54,10 @@ export function FlowMapProjectWorkspace({
 		return first === 'tablet' ? 'tablet' : first === 'desktop' ? 'desktop' : 'phone';
 	});
 	const designs = useDesignQueue(chrome.projectId);
+	const screenDesigns = useScreenDesigns(chrome.projectId);
 	const { status: authStatus } = useAuth();
 	const [notesOpen, setNotesOpen] = useState(false);
+	const [templatesOpen, setTemplatesOpen] = useState(false);
 	const cloudProjectId =
 		!readOnly && authStatus === 'authenticated' && chrome.projectId ? chrome.projectId : undefined;
 
@@ -71,6 +77,10 @@ export function FlowMapProjectWorkspace({
 		return state.project.pages.every((p) => (p.nodes[p.rootNodeId]?.children.length ?? 0) === 0) && !state.project.productBrief;
 	}, [state.project]);
 	const showDescribe = canGenerate && flowIsEmpty && !startedByHand;
+	const variantFrame =
+		mode === 'map' && !showDescribe && state.ui.selectedFrameId
+			? state.project.frames.find((f) => f.id === state.ui.selectedFrameId && !f.ghost)
+			: null;
 	const tourAutoEligible = !readOnly && screenCount <= 1 && !showDescribe;
 
 	useEffect(() => {
@@ -78,6 +88,18 @@ export function FlowMapProjectWorkspace({
 			dispatch({ type: 'setPrototypeEntryFrame', frameId: prototypeStartFrameId });
 		}
 	}, [dispatch, prototypeStartFrameId]);
+
+	useEffect(() => {
+		if (!designs.queue.running && designs.queue.done > 0) {
+			void fetch(`/api/projects/${chrome.projectId}/screen-designs`, { credentials: 'include' })
+				.then((r) => (r.ok ? r.json() : null))
+				.then((data) => {
+					if (data?.designs) screenDesigns.mergeDesigns(data.designs);
+				})
+				.catch(() => undefined);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [designs.queue.running, designs.queue.done]);
 
 	useEffect(() => {
 		if (!flowToast) return;
@@ -145,6 +167,7 @@ export function FlowMapProjectWorkspace({
 				readOnly={readOnly}
 				onStartTour={() => setTourOpen(true)}
 				onRefineFlow={canUseDesignTools && !flowIsEmpty ? () => setRefineOpen(true) : undefined}
+				onOpenTemplates={canGenerate ? () => setTemplatesOpen(true) : undefined}
 				showNotes={Boolean(cloudProjectId)}
 				notesOpen={notesOpen}
 				onNotesOpenChange={setNotesOpen}
@@ -165,9 +188,17 @@ export function FlowMapProjectWorkspace({
 					notesOpen && cloudProjectId ? ' flow-map-stage--with-notes' : ''
 				}${showDescribe ? ' flow-map-stage--onboarding' : ''}`}
 			>
-				{showLinkPanel ? <FlowMapScreenLinkPanel /> : null}
+				{showLinkPanel ? <FlowMapScreenLinkPanel previewDevice={designDevice} /> : null}
+				{variantFrame ? (
+					<aside className="flow-map-variant-rail" data-testid="flow-map-variant-rail">
+						<VariantSwapPanel frame={variantFrame} previewDevice={designDevice} />
+					</aside>
+				) : null}
 				<FlowMapCanvas
 					projectId={cloudProjectId ?? undefined}
+					previewDevice={designDevice}
+					previewDesigns={screenDesigns.designsByKey}
+					productDescription={state.project.productBrief?.description ?? state.project.name}
 					readOnly={readOnly}
 					hideEmptyState={showDescribe}
 					workspaceMode={mode}
@@ -245,7 +276,14 @@ export function FlowMapProjectWorkspace({
 			{refineOpen && chrome.projectId ? (
 				<RefineFlowDialog projectId={chrome.projectId} onClose={() => setRefineOpen(false)} onDone={setFlowToast} />
 			) : null}
-			{playing ? <PrototypePlayer onExit={() => setPlaying(false)} /> : null}
+			{playing ? (
+				<PrototypePlayer
+					onExit={() => setPlaying(false)}
+					viewportKind={designDeviceToViewport(designDevice)}
+					onViewportKindChange={(k) => setDesignDevice(viewportToDesignDevice(k))}
+					previewDesigns={screenDesigns.designsByKey}
+				/>
+			) : null}
 			<FlowMapContextMenu
 				menu={contextMenu}
 				onClose={() => setContextMenu(null)}
@@ -254,6 +292,7 @@ export function FlowMapProjectWorkspace({
 				onRequestDelete={(frame, connectorCount) => setPendingDelete({ frame, connectors: connectorCount })}
 				onGenerateDesign={canUseDesignTools && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
 				designBusy={designs.queue.running}
+				previewDevice={designDevice}
 				onAddScreen={() => {
 					setMode('edit');
 					dispatch({ type: 'addFrame', presetId: 'iphone-15' });
@@ -269,6 +308,14 @@ export function FlowMapProjectWorkspace({
 				}}
 			/>
 			<FlowMapTour open={tourOpen} onOpenChange={setTourOpen} autoEligible={tourAutoEligible} />
+			{templatesOpen && chrome.projectId ? (
+				<TemplatesGallery
+					projectId={chrome.projectId}
+					open={templatesOpen}
+					onClose={() => setTemplatesOpen(false)}
+					onInserted={setFlowToast}
+				/>
+			) : null}
 		</div>
 	);
 

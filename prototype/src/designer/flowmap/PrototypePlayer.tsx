@@ -15,6 +15,9 @@ import {
 import { useDesigner } from '../store';
 import type { Connector, Frame } from '../types';
 import { copyShareLink } from './FlowMapToolbar';
+import type { DesignSpec } from '@bareframe/designer-core';
+import { resolveMapPreviewPage } from './resolveMapPreviewPage';
+import { viewportToDesignDevice } from './designViewport';
 
 /** Entry screen: explicit override, else first screen nothing links to (falls back to left-most). */
 function entryFrame(frames: Frame[], connectors: Connector[], explicitEntryFrameId?: string | null) {
@@ -30,7 +33,14 @@ function entryFrame(frames: Frame[], connectors: Connector[], explicitEntryFrame
  * Full-screen click-through. Hotspots come from the connectors leaving the
  * current screen; number keys follow them, Backspace goes back, Esc exits.
  */
-export function PrototypePlayer({ onExit }: { onExit: () => void }) {
+type PlayerProps = {
+	onExit: () => void;
+	viewportKind?: PrototypeViewportKind;
+	onViewportKindChange?: (kind: PrototypeViewportKind) => void;
+	previewDesigns?: Map<string, DesignSpec>;
+};
+
+export function PrototypePlayer({ onExit, viewportKind: controlledViewport, onViewportKindChange, previewDesigns }: PlayerProps) {
 	const { state } = useDesigner();
 	const chrome = useAppCanvasChrome();
 	const { project } = state;
@@ -45,7 +55,9 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 	const [currentId, setCurrentId] = useState<string | null>(start?.id ?? null);
 	const [history, setHistory] = useState<string[]>([]);
 	const [toast, setToast] = useState<string | null>(null);
-	const [viewportKind, setViewportKind] = useState<PrototypeViewportKind>('phone');
+	const [localViewport, setLocalViewport] = useState<PrototypeViewportKind>('phone');
+	const viewportKind = controlledViewport ?? localViewport;
+	const setViewportKind = onViewportKindChange ?? setLocalViewport;
 	const [stageScale, setStageScale] = useState(1);
 	const [flowBlockHeight, setFlowBlockHeight] = useState(0);
 	const closeRef = useRef<HTMLButtonElement>(null);
@@ -70,9 +82,22 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 	const chromeStyle = PROTOTYPE_DEVICE_CHROME[viewportKind];
 
 	useEffect(() => {
-		if (!frame) return;
-		setViewportKind(prototypeViewportKindForFrame(frame));
-	}, [frame?.id]);
+		if (controlledViewport != null || !frame) return;
+		setLocalViewport(prototypeViewportKindForFrame(frame));
+	}, [frame?.id, controlledViewport]);
+
+	const previewPage = useMemo(() => {
+		if (!page || !frame) return null;
+		const device = viewportToDesignDevice(viewportKind);
+		const outgoingLabels = outgoing.map((c) => c.label ?? 'Next');
+		return resolveMapPreviewPage(
+			page,
+			device,
+			previewDesigns ?? new Map(),
+			project.productBrief?.description ?? project.name,
+			outgoingLabels,
+		);
+	}, [page, frame, viewportKind, previewDesigns, project.productBrief?.description, project.name, outgoing]);
 
 	const go = (to: string) => {
 		if (!frame) return;
@@ -111,11 +136,15 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 			const stageRect = stage.getBoundingClientRect();
 			const marginX = stageRect.width < 520 ? 16 : 48;
 			const marginY = stageRect.height < 640 ? 20 : 32;
+			const flowGap = 16;
+			// Scale device chrome only; connector hotspots stay full size (transform on the whole stack
+			// left an oversized layout box that stole clicks below the mock).
+			const stageHForDevice = Math.max(120, stageRect.height - flowH - flowGap);
 			const nextScale = prototypeStageScale(
 				metrics.outerW,
-				metrics.outerH + flowH + 16,
+				metrics.outerH,
 				stageRect.width,
-				stageRect.height,
+				stageHForDevice,
 				marginX,
 				marginY,
 			);
@@ -154,6 +183,8 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 	}, [toast]);
 
 	const step = history.length + 1;
+	const scaledDeviceW = metrics ? metrics.outerW * stageScale : 0;
+	const scaledDeviceH = metrics ? metrics.outerH * stageScale : 0;
 
 	return createPortal(
 		<div className="proto" role="dialog" aria-modal="true" aria-label="Prototype preview" data-testid="prototype-player">
@@ -203,20 +234,20 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 					<div
 						className="proto__stage-slot"
 						style={{
-							width: metrics.outerW * stageScale,
-							height: (metrics.outerH + flowBlockHeight + 16) * stageScale,
+							width: scaledDeviceW,
+							height: scaledDeviceH + flowBlockHeight + 16,
 							maxWidth: '100%',
 						}}
 					>
 						<div
 							className="proto__device-stack"
-							style={{
-								width: metrics.outerW,
-								transform: `scale(${stageScale})`,
-								transformOrigin: 'top center',
-							}}
+							style={{ width: scaledDeviceW, maxWidth: '100%' }}
 							data-viewport={viewportKind}
 							data-stage-scale={Math.round(stageScale * 1000) / 1000}
+						>
+						<div
+							className="proto__device-scale"
+							style={{ width: scaledDeviceW, height: scaledDeviceH }}
 						>
 						<div
 							className={`proto__device proto__device--${viewportKind}`}
@@ -225,6 +256,8 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 								height: metrics.outerH,
 								padding: chromeStyle.padding,
 								borderRadius: chromeStyle.radius,
+								transform: `scale(${stageScale})`,
+								transformOrigin: 'top center',
 							}}
 						>
 							<div
@@ -257,7 +290,7 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 									>
 										<FramePreview
 											frame={frame}
-											page={page}
+											page={previewPage ?? page}
 											themeId={themeId}
 											customTokens={project.customTokenOverrides}
 											selectedNodeId={null}
@@ -271,6 +304,7 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 									</div>
 								</div>
 							</div>
+						</div>
 						</div>
 
 						<div className="proto__flow" ref={flowRef}>

@@ -17,7 +17,12 @@ type Props = {
 export function DesignBar({ device, onDeviceChange, queue, screenCount, onGenerateAll, onCancel, onDismiss }: Props) {
 	return (
 		<section className="design-bar" aria-label="Screen designs" data-testid="design-bar">
-			<DeviceViewportSwitcher value={device} onChange={onDeviceChange} aria-label="Design device" className="design-bar__devices" />
+			<DeviceViewportSwitcher
+				value={device}
+				onChange={onDeviceChange}
+				aria-label="Preview and design sizes"
+				className="design-bar__devices device-viewport-switch--canvas"
+			/>
 			{queue.running ? (
 				<div className="design-bar__progress">
 					<p role="status" data-testid="design-progress">

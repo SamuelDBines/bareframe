@@ -35,6 +35,7 @@ import { createPackagesRouter } from './packages/routes.js';
 import { createReviewsRouter, createPublicShareRouter } from './reviews/routes.js';
 import { createFlowGenerationRouter } from './flow-gen/routes.js';
 import { createDesignGenerationRouter } from './design-gen/routes.js';
+import { createTemplatesRouter } from './templates/routes.js';
 import { createBillingRouter, registerStripeWebhookRoute } from './billing/routes.js';
 import { createFigmaRouter } from './figma/routes.js';
 import { createPublicToolsRouter } from './public/check-url.js';
@@ -167,6 +168,7 @@ export function createApp(deps: AppDeps): Hono {
 	app.route('/api', createReviewsRouter(pool, config));
 	app.route('/api', createFlowGenerationRouter(pool, config));
 	app.route('/api', createDesignGenerationRouter(pool, config));
+	app.route('/api', createTemplatesRouter(pool, config));
 	app.route('/api', createBillingRouter(pool, config));
 	app.route('/api', createFigmaRouter(pool, config));
 	app.route('/api', createSitemapRouter(pool, config));

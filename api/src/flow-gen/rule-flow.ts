@@ -1,8 +1,10 @@
 import {
+	getFlowTemplate,
 	slugifyScreenId,
 	type FlowDevice,
 	type FlowPlatform,
 	type FlowSpec,
+	type FlowTemplateId,
 } from '@bareframe/designer-core';
 import type { FlowGenerationInput } from './llm.js';
 
@@ -39,6 +41,16 @@ const AUTH_APP_FLOW: FlowSpec = {
 	],
 };
 
+const TEMPLATE_KEYWORD_FLOWS: { pattern: RegExp; id: FlowTemplateId }[] = [
+	{ pattern: /\b(shop|store|checkout|cart|ecommerce|commerce)\b/i, id: 'checkout' },
+	{ pattern: /\b(book|appointment|schedule)\b/i, id: 'booking' },
+	{ pattern: /\b(support|help|ticket)\b/i, id: 'support-ticket' },
+	{ pattern: /\b(marketing|landing|website)\b/i, id: 'marketing-site' },
+	{ pattern: /\b(social|feed|post)\b/i, id: 'social-feed' },
+	{ pattern: /\b(sign\s*up|signup|register|onboard)\b/i, id: 'sign-up' },
+	{ pattern: /\b(sign\s*in|login|auth)\b/i, id: 'sign-in' },
+];
+
 function defaultFlow(description: string): FlowSpec {
 	const product = description.split(/[.\n]/)[0]!.trim().slice(0, 60) || 'your product';
 	return {
@@ -61,6 +73,9 @@ function defaultFlow(description: string): FlowSpec {
 
 function pickStarter(description: string): FlowSpec {
 	const lower = description.toLowerCase();
+	for (const row of TEMPLATE_KEYWORD_FLOWS) {
+		if (row.pattern.test(lower)) return getFlowTemplate(row.id).spec;
+	}
 	if (/\b(shop|store|checkout|cart|ecommerce|commerce)\b/.test(lower)) return CHECKOUT_FLOW;
 	if (/\b(auth|sign up|signup|login|saas|app|platform)\b/.test(lower)) return AUTH_APP_FLOW;
 	return defaultFlow(description);

@@ -72,6 +72,9 @@ export type ScreenBrief = {
 	purpose: string;
 	keyContent: string[];
 	states: ('default' | 'empty' | 'loading' | 'error' | 'success')[];
+	/** When set, the screen was inserted from the template library. */
+	templateId?: string;
+	templateVariant?: string;
 };
 
 export type ProductBrief = {

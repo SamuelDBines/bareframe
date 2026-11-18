@@ -11,7 +11,7 @@ export const PROTOTYPE_VIEWPORT_PRESETS: Record<
 	PrototypeViewportKind,
 	{ id: string; label: string; width: number; height: number }
 > = {
-	phone: { id: 'mobile', label: 'Phone', width: 390, height: 844 },
+	phone: { id: 'mobile', label: 'Mobile', width: 390, height: 844 },
 	tablet: { id: 'tablet', label: 'Tablet', width: 768, height: 1024 },
 	desktop: { id: 'desktop-1440', label: 'Desktop', width: 1440, height: 900 },
 };

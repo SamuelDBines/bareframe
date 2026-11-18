@@ -108,7 +108,7 @@ type Action =
 	| { type: 'setCustomToken'; token: string; value: string }
 	| { type: 'assistantOpen'; open: boolean }
 	| { type: 'applyAgentAction'; action: string; args?: Record<string, unknown> }
-	| { type: 'hydrateProject'; project: DesignerProject; remoteVersion?: number };
+	| { type: 'hydrateProject'; project: DesignerProject; remoteVersion?: number; preserveSelection?: boolean };
 
 function reducer(state: DesignerState, action: Action): DesignerState {
 	switch (action.type) {
@@ -147,6 +147,12 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 			return { ...state, ui: { ...state.ui, assistantOpen: action.open } };
 		case 'hydrateProject': {
 			const project = cloneProject(action.project);
+			const keepFrame =
+				action.preserveSelection &&
+				state.ui.selectedFrameId &&
+				project.frames.some((f) => f.id === state.ui.selectedFrameId)
+					? state.ui.selectedFrameId
+					: null;
 			return {
 				...state,
 				project,
@@ -156,7 +162,7 @@ function reducer(state: DesignerState, action: Action): DesignerState {
 				ui: {
 					...state.ui,
 					activePageId: project.pages[0]?.id ?? state.ui.activePageId,
-					selectedFrameId: null,
+					selectedFrameId: keepFrame,
 					selectedNodeId: null,
 					mobilePanel: 'none',
 					camera: { ...project.canvas },

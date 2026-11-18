@@ -14,6 +14,7 @@ import {
 	type AuthActor,
 } from './projects.js';
 import { isValidComponentSlug } from '../catalog/components.js';
+import { mapCaptureShotsToImport } from '../capture/import-shots.js';
 
 export type CaptureFlowStepInput = {
 	stepIndex: number;
@@ -53,12 +54,12 @@ export function dedupeCaptureStepsByUrl<T extends { url: string }>(steps: T[]): 
 export function urlAssetSequence(
 	steps: { url: string; assetId: string; click?: CaptureFlowStepInput['click'] }[],
 ): {
-	shots: { assetId: string; title?: string; url?: string }[];
+	shots: { assetId: string; title?: string; url: string }[];
 	links: { fromAssetId: string; toAssetId: string; label?: string; trigger?: string }[];
 	hotspots: { assetId: string; click: NonNullable<CaptureFlowStepInput['click']> }[];
 } {
 	const urlToAsset = new Map<string, string>();
-	const shots: { assetId: string; title?: string; url?: string }[] = [];
+	const shots: { assetId: string; title?: string; url: string }[] = [];
 	const links: {
 		fromAssetId: string;
 		toAssetId: string;
@@ -163,15 +164,16 @@ export async function buildFlowFromCaptureStepsTx(
 		document = canvasRes.document;
 		const pageId = canvasRes.effects.pageId as string;
 
-		const imported = applyImportScreenshots(document, shots, links, ctx, { pageId });
+		const mapped = mapCaptureShotsToImport(shots, links);
+		const imported = applyImportScreenshots(document, mapped.shots, mapped.links, ctx, { pageId });
 		document = imported.document;
 		const frameIds = imported.effects.frameIds as string[];
 
 		const assetToFrame = new Map<string, string>();
-		for (let i = 0; i < shots.length; i++) {
-			const shot = shots[i]!;
+		for (let i = 0; i < mapped.shots.length; i++) {
+			const shot = mapped.shots[i]!;
 			const frameId = frameIds[i];
-			if (!frameId) continue;
+			if (!frameId || !shot.assetId) continue;
 			assetToFrame.set(shot.assetId, frameId);
 		}
 
@@ -226,8 +228,8 @@ export async function buildFlowFromCaptureStepsTx(
 			version: newVersion,
 			pageId,
 			frameIds,
-			screenCount: shots.length,
-			connectorCount: links.length,
+			screenCount: mapped.shots.length,
+			connectorCount: mapped.links.length,
 		};
 	} catch (e) {
 		await client.query('ROLLBACK');

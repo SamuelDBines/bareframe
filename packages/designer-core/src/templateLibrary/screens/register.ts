@@ -13,19 +13,21 @@ export default defineScreen({
 			'Single step',
 			'Full registration on one screen',
 			['Create account', 'Sign in'],
-			(device) =>
-				n.stack([
-					n.h1('Create your account'),
-					n.copy('Start with a free workspace. Upgrade any time.'),
-					n.field('Full name', 'Your name'),
-					n.field('Work email', 'you@company.com'),
-					n.field('Password', 'At least 8 characters'),
-					n.btn('Create account', 'primary'),
-					n.btn('Sign in', 'ghost'),
-					...(device !== 'phone'
-						? [n.alert('By continuing you agree to our terms and privacy policy.', 'info')]
-						: []),
-				], 18, 28),
+			() =>
+				n.stack(
+					[
+						n.h1('Create your account'),
+						n.copy('Start with a free workspace. Upgrade any time.'),
+						n.field('Full name', 'Your name'),
+						n.field('Work email', 'you@company.com'),
+						n.field('Password', 'At least 8 characters'),
+						n.btn('Create account', 'primary'),
+						n.btn('Sign in', 'ghost'),
+						n.alert('By continuing you agree to our terms and privacy policy.', 'info'),
+					],
+					18,
+					28,
+				),
 		),
 		variant(
 			'multi-step',

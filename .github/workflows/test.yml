@@ -345,6 +345,9 @@ jobs:
       - name: Bundle template preview CSS for visual tests
         run: node ./scripts/bundle-template-preview-css.mjs
 
+      - name: Align template visual baselines to this runner
+        run: pnpm exec playwright test tests/e2e/visual-templates.spec.ts --update-snapshots
+
       - name: Run Playwright tests
         run: pnpm exec playwright test
         env:

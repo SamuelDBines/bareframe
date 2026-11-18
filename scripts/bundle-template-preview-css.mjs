@@ -11,7 +11,7 @@ const bundle = [
 	light,
 	read('assets/frame-preview/bareframe-ui.css'),
 	read('assets/frame-preview/button.css'),
-	'html, body, .bf-node, button, input { font-family: ui-sans-serif, system-ui, sans-serif !important; -webkit-font-smoothing: auto; }',
+	'html, body, .bf-node, button, input { font-family: ui-sans-serif, system-ui, sans-serif !important; -webkit-font-smoothing: auto; text-rendering: geometricPrecision; }',
 ].join('\n');
 const outPath = path.join(root, 'tests/e2e/templatePreviewCss.bundle.css');
 fs.writeFileSync(outPath, bundle);

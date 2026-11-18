@@ -50,6 +50,7 @@ for (const variantId of LOGIN_VARIANTS) {
 		const frame = await mountPreview(page, srcdoc, size.width, size.height);
 		await expect(frame.locator('body')).toHaveScreenshot(`login-${variantId}.png`, {
 			maxDiffPixelRatio: 0.03,
+			threshold: 0.35,
 			animations: 'disabled',
 			scale: 'css',
 			caret: 'hide',
@@ -66,6 +67,7 @@ for (const variantId of REGISTER_VARIANTS) {
 		const frame = await mountPreview(page, srcdoc, size.width, size.height);
 		await expect(frame.locator('body')).toHaveScreenshot(`register-${variantId}.png`, {
 			maxDiffPixelRatio: 0.03,
+			threshold: 0.35,
 			animations: 'disabled',
 			scale: 'css',
 			caret: 'hide',

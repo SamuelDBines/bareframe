@@ -1413,4 +1413,4 @@
 	animation: bf-spin 0.7s linear infinite;
 }
 
-html, body, .bf-node, button, input { font-family: ui-sans-serif, system-ui, sans-serif !important; -webkit-font-smoothing: auto; }
+html, body, .bf-node, button, input { font-family: ui-sans-serif, system-ui, sans-serif !important; -webkit-font-smoothing: auto; text-rendering: geometricPrecision; }

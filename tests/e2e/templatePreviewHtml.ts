@@ -18,21 +18,11 @@ const SIZES: Record<DesignDevice, { width: number; height: number }> = {
 	desktop: { width: 1440, height: 900 },
 };
 
-let cachedPreviewCss: string | undefined;
+const BUNDLE_PATH = path.join(REPO_ROOT, 'tests/e2e/templatePreviewCss.bundle.css');
 
-/** Inline theme + frame preview CSS so srcdoc does not depend on Pages layout or webfonts. */
+/** CSS bundled on CI immediately before Playwright; committed copy keeps local runs aligned. */
 export function templatePreviewCss(): string {
-	if (cachedPreviewCss) return cachedPreviewCss;
-	const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, 'public', rel), 'utf8');
-	const light = read('themes/light.css').replace(/@import\s+['"]\.\/layout\.css['"]\s*;?\s*/g, '');
-	cachedPreviewCss = [
-		read('themes/layout.css'),
-		light,
-		read('assets/frame-preview/bareframe-ui.css'),
-		read('assets/frame-preview/button.css'),
-		'html, body, .bf-node, button, input { font-family: ui-sans-serif, system-ui, sans-serif !important; -webkit-font-smoothing: auto; }',
-	].join('\n');
-	return cachedPreviewCss;
+	return fs.readFileSync(BUNDLE_PATH, 'utf8');
 }
 
 export function deviceForPlaywrightProject(projectName: string): DesignDevice {

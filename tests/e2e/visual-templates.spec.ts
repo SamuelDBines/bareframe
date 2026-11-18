@@ -33,6 +33,7 @@ for (const variantId of LOGIN_VARIANTS) {
 		await expect(frame.locator('body')).toHaveScreenshot(`login-${variantId}.png`, {
 			maxDiffPixelRatio: 0.03,
 			animations: 'disabled',
+			scale: 'css',
 		});
 	});
 }
@@ -46,6 +47,7 @@ for (const variantId of REGISTER_VARIANTS) {
 		await expect(frame.locator('body')).toHaveScreenshot(`register-${variantId}.png`, {
 			maxDiffPixelRatio: 0.03,
 			animations: 'disabled',
+			scale: 'css',
 		});
 	});
 }

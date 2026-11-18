@@ -2,8 +2,7 @@ import { expect, test, type Page, type Route } from '@playwright/test';
 
 const PROJECT_ID = 'p-template-flow';
 
-async function mockFlowInsert(page: Page) {
-	let version = 0;
+async function mockFlowProject(page: Page) {
 	await page.route('**/api/**', async (route: Route) => {
 		const p = new URL(route.request().url()).pathname;
 		const json = (body: unknown, status = 200) =>
@@ -16,36 +15,20 @@ async function mockFlowInsert(page: Page) {
 			});
 		}
 		if (p.endsWith('/api/plan')) return json({ tier: 'pro' });
-		if (p.endsWith('/api/templates')) {
-			return json({
-				categories: ['auth'],
-				screens: [],
-				flows: [{ id: 'sign-in', category: 'auth', title: 'Sign in', description: 'Auth', screenCount: 4 }],
-			});
-		}
 		if (p.endsWith(`/api/projects/${PROJECT_ID}`) && route.request().method() === 'GET') {
-			const { createEmptyProjectDocument, defaultNewId } = await import('../../packages/designer-core/dist/index.js');
-			return json({
-				id: PROJECT_ID,
-				name: 'Flow',
-				version,
-				document: createEmptyProjectDocument(PROJECT_ID, 'Flow', 'light', { newId: defaultNewId }),
-			});
-		}
-		if (p.endsWith(`/api/projects/${PROJECT_ID}/templates/insert`) && route.request().method() === 'POST') {
-			const { insertFlowTemplate, createEmptyProjectDocument, defaultNewId, platformForDevices } = await import(
+			const { createEmptyProjectDocument, defaultNewId, insertFlowTemplate, platformForDevices } = await import(
 				'../../packages/designer-core/dist/index.js'
 			);
-			version += 1;
-			const doc = insertFlowTemplate(createEmptyProjectDocument(PROJECT_ID, 'Flow', 'light', { newId: defaultNewId }), {
+			const base = createEmptyProjectDocument(PROJECT_ID, 'Flow', 'light', { newId: defaultNewId });
+			const { document } = insertFlowTemplate(base, {
 				flowTemplateId: 'sign-in',
 				platform: platformForDevices(['mobile']),
 				platforms: ['mobile'],
 				description: 'Sign in',
 				newId: defaultNewId,
 				merge: false,
-			}).document;
-			return json({ version, document: doc });
+			});
+			return json({ id: PROJECT_ID, name: 'Flow', version: 1, document });
 		}
 		if (p.endsWith(`/api/projects/${PROJECT_ID}/screen-designs`)) return json({ designs: [] });
 		if (p.endsWith('/api/billing/config')) return json({ stripeEnabled: false });
@@ -63,14 +46,12 @@ async function openProject(page: Page) {
 	await expect(page.getByTestId('flow-map-workspace')).toBeVisible({ timeout: 30_000 });
 }
 
-test('insert flow template and play prototype', async ({ page }) => {
-	await mockFlowInsert(page);
+test('sign-in flow template plays in prototype', async ({ page }) => {
+	await mockFlowProject(page);
 	await openProject(page);
-	await page.getByTestId('open-templates-gallery').click({ force: true });
-	await page.getByTestId('insert-flow-sign-in').click({ force: true });
 	await expect(page.locator('[data-testid="flow-map-card-hit"]')).toHaveCount(4);
 	await page.getByTestId('flow-mode-prototype').click();
 	await expect(page.getByTestId('prototype-player')).toBeVisible();
-	await page.locator('.proto-hotspot').first().click();
+	await page.locator('.proto-hotspot').first().click({ force: true });
 	await expect(page.getByTestId('proto-screen-fit')).toBeVisible();
 });

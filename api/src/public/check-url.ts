@@ -2,7 +2,9 @@ import { Hono } from 'hono';
 import type pg from 'pg';
 import { isAllowedPublicUrl } from '../render/ssrf.js';
 import { auditPageMetrics } from '@bareframe/flow-map-engine';
+import { insertRenderJob, waitForRenderJob } from '../db/render-jobs.js';
 import { capturePublicUrlCheck } from '../render/playwright-capture.js';
+import { loadConfig } from '../config.js';
 
 const publicChecks = new Map<string, number[]>();
 
@@ -42,7 +44,23 @@ export function createPublicToolsRouter(pool: pg.Pool) {
     }
 
     try {
-      const captured = await capturePublicUrlCheck(url, 390, 844);
+      const config = loadConfig();
+      const inlineBrowser =
+        process.env.RENDER_INLINE === '1' || config.nodeEnv === 'test' || config.nodeEnv === 'development';
+      let captured: Awaited<ReturnType<typeof capturePublicUrlCheck>>;
+      if (inlineBrowser) {
+        captured = await capturePublicUrlCheck(url, 390, 844);
+      } else {
+        const jobId = await insertRenderJob(pool, 'url_check', {
+          url,
+          width: 390,
+          height: 844,
+        });
+        const result = (await waitForRenderJob(pool, jobId)) as Awaited<
+          ReturnType<typeof capturePublicUrlCheck>
+        >;
+        captured = result;
+      }
       const findings = auditPageMetrics(captured.metrics, {});
       await pool.query(
         `INSERT INTO url_check_log (url, is_public, result) VALUES ($1, true, $2)`,

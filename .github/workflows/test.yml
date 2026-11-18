@@ -59,6 +59,9 @@ jobs:
           node ../../mcp/scripts/bundle-catalog.mjs
           cd ../package-generator && npm install && npm run build
 
+      - name: Playwright lockstep (npm vs Docker base)
+        run: node ./scripts/check-playwright-lockstep.mjs
+
       - name: Install API dependencies
         working-directory: api
         run: npm ci
@@ -110,6 +113,11 @@ jobs:
         run: |
           set -euo pipefail
           docker run --rm --entrypoint id bareframe-render-worker:ci | grep -q 'uid=10001'
+
+      - name: Render worker Playwright smoke (Chromium screenshot)
+        run: |
+          set -euo pipefail
+          docker run --rm bareframe-render-worker:ci node ./scripts/render-worker-docker-smoke.mjs
 
   mcp:
     runs-on: ubuntu-24.04
@@ -295,6 +303,9 @@ jobs:
 
       - name: Check for em/en dashes in authored content
         run: pnpm run check:no-em-dashes
+
+      - name: Playwright lockstep (npm vs Docker base)
+        run: pnpm run check:playwright-lockstep
 
       - name: Build library + sync public/dist and public/themes
         run: pnpm run build

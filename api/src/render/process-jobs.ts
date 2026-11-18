@@ -10,7 +10,11 @@ import {
 import { getProjectById } from '../db/projects.js';
 import { completeRenderJob, failRenderJob } from '../db/render-jobs.js';
 import { runWebsiteScreenshotImport } from '../website-import/run.js';
-import { capturePageWithPlaywright, type BrowserCapture } from './playwright-capture.js';
+import {
+	capturePageWithPlaywright,
+	capturePublicUrlCheck,
+	type BrowserCapture,
+} from './playwright-capture.js';
 import { isAllowedPublicUrl } from './ssrf.js';
 
 export type FlowMapPayload = FlowMapInput & {
@@ -84,6 +88,22 @@ export async function processFlowMapJob(
 		const message = err instanceof Error ? err.message : 'Flow map failed';
 		await updateFlowMapJobStatus(pool, flowMapJobId, 'failed', undefined, message);
 		await failRenderJob(pool, renderJobId, message);
+		throw err;
+	}
+}
+
+export async function processUrlCheckJob(
+	pool: pg.Pool,
+	jobId: string,
+	payload: { url: string; width: number; height: number },
+): Promise<void> {
+	try {
+		if (!isAllowedPublicUrl(payload.url)) throw new Error('URL not allowed');
+		const captured = await capturePublicUrlCheck(payload.url, payload.width, payload.height);
+		await completeRenderJob(pool, jobId, captured);
+	} catch (err) {
+		const message = err instanceof Error ? err.message : 'URL check failed';
+		await failRenderJob(pool, jobId, message);
 		throw err;
 	}
 }

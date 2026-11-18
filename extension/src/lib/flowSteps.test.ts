@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { dedupeStepsForUpload, normalizePageUrl, stepsToCapturePayload } from './flowSteps.js';
+import {
+	type CaptureClick,
+	dedupeStepsForUpload,
+	normalizeCaptureClick,
+	normalizePageUrl,
+	stepsToCapturePayload,
+} from './flowSteps.js';
 
 describe('flowSteps', () => {
 	it('normalizes URLs', () => {
@@ -13,6 +19,11 @@ describe('flowSteps', () => {
 			{ url: 'https://a/', title: 'A again', capturedAt: '', viewport: { width: 1, height: 1 } },
 		];
 		expect(dedupeStepsForUpload(steps)).toHaveLength(2);
+	});
+
+	it('strips click without coordinates', () => {
+		expect(normalizeCaptureClick({ name: 'Go' } as CaptureClick)).toBeUndefined();
+		expect(normalizeCaptureClick({ x: 1, y: 2, name: 'Go' })).toEqual({ x: 1, y: 2, name: 'Go' });
 	});
 
 	it('maps steps to API payload indices', () => {

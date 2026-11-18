@@ -4,6 +4,10 @@ import type { Server } from 'node:http';
 import { createPool, upsertUser } from '../src/db/index.js';
 import { createProject, createProjectToken } from '../src/db/projects.js';
 import { dedupeCaptureStepsByUrl, urlAssetSequence } from '../src/db/capture-flow.js';
+import {
+	CaptureFlowValidationError,
+	validateCaptureFlowSteps,
+} from '../src/db/capture-flow-validate.js';
 import { setupTestDb, testConfig, createTestApp } from '../src/test-utils.js';
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -24,6 +28,26 @@ describe('capture flow helpers', () => {
 			'https://a.test/',
 			'https://b.test/',
 		]);
+	});
+
+	it('rejects clicks that carry metadata without coordinates', () => {
+		expect(() =>
+			validateCaptureFlowSteps([
+				{
+					stepIndex: 0,
+					url: 'https://a.test/',
+					capturedAt: new Date().toISOString(),
+					viewport: { width: 1, height: 1 },
+				},
+				{
+					stepIndex: 1,
+					url: 'https://b.test/',
+					capturedAt: new Date().toISOString(),
+					viewport: { width: 1, height: 1 },
+					click: { name: 'Next' },
+				},
+			]),
+		).toThrow(CaptureFlowValidationError);
 	});
 
 	it('reuses assets when the same URL is visited twice', () => {
@@ -136,5 +160,44 @@ describe.skipIf(!databaseUrl)('capture flow API', () => {
 		};
 		expect(doc.document.project.frames.length).toBeGreaterThan(1);
 		expect(doc.document.project.connectors.length).toBe(2);
+	});
+
+	it('returns 400 when click coordinates are missing', async () => {
+		const projectRes = await fetch(`${apiBase}/api/projects/${projectId}`, {
+			headers: { Authorization: `Bearer ${token}` },
+		});
+		const project = (await projectRes.json()) as { version: number };
+
+		const res = await fetch(`${apiBase}/api/projects/${projectId}/capture/flow`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${token}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				name: 'Bad click',
+				baseVersion: project.version,
+				steps: [
+					{
+						stepIndex: 0,
+						url: 'https://example.com/a',
+						capturedAt: new Date().toISOString(),
+						viewport: { width: 390, height: 844 },
+						imageBase64: tinyPng.toString('base64'),
+					},
+					{
+						stepIndex: 1,
+						url: 'https://example.com/b',
+						capturedAt: new Date().toISOString(),
+						viewport: { width: 390, height: 844 },
+						click: { name: 'Checkout' },
+						imageBase64: tinyPng.toString('base64'),
+					},
+				],
+			}),
+		});
+		expect(res.status).toBe(400);
+		const body = (await res.json()) as { message: string };
+		expect(body.message).toContain('x and y');
 	});
 });

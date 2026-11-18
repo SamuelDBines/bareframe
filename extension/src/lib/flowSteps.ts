@@ -41,6 +41,16 @@ export function dedupeStepsForUpload(steps: RecordedStep[]): RecordedStep[] {
 	return out;
 }
 
+export function normalizeCaptureClick(click?: CaptureClick): CaptureClick | undefined {
+	if (!click) return undefined;
+	if (!Number.isFinite(click.x) || !Number.isFinite(click.y)) return undefined;
+	return {
+		...click,
+		w: Number.isFinite(click.w) ? click.w : undefined,
+		h: Number.isFinite(click.h) ? click.h : undefined,
+	};
+}
+
 export function stepsToCapturePayload(steps: RecordedStep[]): {
 	stepIndex: number;
 	url: string;
@@ -57,7 +67,7 @@ export function stepsToCapturePayload(steps: RecordedStep[]): {
 		title: step.title,
 		capturedAt: step.capturedAt,
 		viewport: step.viewport,
-		click: step.click,
+		click: normalizeCaptureClick(step.click),
 		contentType: 'image/png',
 	}));
 }

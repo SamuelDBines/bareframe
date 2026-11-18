@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
 	buildScreenVariantTree,
 	createEmptyProjectDocument,
@@ -7,11 +10,30 @@ import {
 } from '../../packages/designer-core/dist/index.js';
 import { buildFramePreviewDoc } from '../../prototype/src/designer/framePreviewDoc.ts';
 
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
 const SIZES: Record<DesignDevice, { width: number; height: number }> = {
 	phone: { width: 390, height: 844 },
 	tablet: { width: 768, height: 1024 },
 	desktop: { width: 1440, height: 900 },
 };
+
+let cachedPreviewCss: string | undefined;
+
+/** Inline theme + frame preview CSS so srcdoc does not depend on Pages layout or webfonts. */
+export function templatePreviewCss(): string {
+	if (cachedPreviewCss) return cachedPreviewCss;
+	const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, 'public', rel), 'utf8');
+	const light = read('themes/light.css').replace(/@import\s+['"]\.\/layout\.css['"]\s*;?\s*/g, '');
+	cachedPreviewCss = [
+		read('themes/layout.css'),
+		light,
+		read('assets/frame-preview/bareframe-ui.css'),
+		read('assets/frame-preview/button.css'),
+		'html, body, .bf-node, button, input { font-family: ui-sans-serif, system-ui, sans-serif !important; -webkit-font-smoothing: auto; }',
+	].join('\n');
+	return cachedPreviewCss;
+}
 
 export function deviceForPlaywrightProject(projectName: string): DesignDevice {
 	if (projectName.includes('mobile')) return 'phone';
@@ -49,6 +71,7 @@ export function templatePreviewSrcDoc(
 		tokenOverrides: {
 			'--bf-theme-font-family': 'ui-sans-serif, system-ui, sans-serif',
 		},
+		previewCss: templatePreviewCss(),
 		selectedNodeId: null,
 		assetBase,
 	});

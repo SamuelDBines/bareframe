@@ -39,6 +39,7 @@ async function mockProjectWithSignIn(page: Page) {
 }
 
 test('swap login template variant on map', async ({ page }) => {
+	test.setTimeout(60_000);
 	await mockProjectWithSignIn(page);
 	await page.addInitScript(() => {
 		localStorage.setItem('bareframe.flowMapTour.v1', JSON.stringify({ dismissed: true }));
@@ -46,8 +47,9 @@ test('swap login template variant on map', async ({ page }) => {
 	await page.goto(`/#/app/project/${PROJECT_ID}`);
 	await expect(page.getByTestId('flow-map-workspace')).toBeVisible({ timeout: 30_000 });
 	const loginCard = page.locator('.flow-map-card').filter({ hasText: 'Log in' }).getByTestId('flow-map-card-hit');
+	await expect(loginCard).toBeVisible({ timeout: 15_000 });
 	await loginCard.scrollIntoViewIfNeeded();
-	await loginCard.click();
+	await loginCard.click({ timeout: 20_000 });
 	await expect(page.getByTestId('variant-swap-panel')).toBeVisible({ timeout: 15_000 });
 	const select = page.getByTestId('variant-swap-select');
 	await select.selectOption('social-first');

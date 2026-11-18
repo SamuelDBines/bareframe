@@ -22,6 +22,7 @@ import { AccountSettingsPage } from './pages/app/AccountSettingsPage';
 import { AppHomePage } from './pages/app/AppHomePage';
 import { AppProjectPage } from './pages/app/AppProjectPage';
 import { WebsiteCaptureSetupPage } from './pages/app/WebsiteCaptureSetupPage';
+import { ExtensionSetupPage } from './pages/app/ExtensionSetupPage';
 import { ShareCanvasPage } from './pages/app/ShareCanvasPage';
 import { DemoJourneyReviewPage, DemoShareCanvasPage } from './pages/app/DemoJourneyReviewPage';
 import { NewProductPage } from './pages/designer/NewProductPage';
@@ -74,6 +75,7 @@ export default function App() {
 						<Route path="app" element={<AppHomePage />} />
 						<Route path="app/project/:projectId" element={<AppProjectPage />} />
 						<Route path="app/project/:projectId/website-setup" element={<WebsiteCaptureSetupPage />} />
+						<Route path="app/project/:projectId/extension" element={<ExtensionSetupPage />} />
 						<Route path="app/product/new" element={<NewProductPage appMode />} />
 						<Route path="app/product/generating/:jobId" element={<PackageGeneratingPage appMode />} />
 						<Route path="app/product/:packageId" element={<PackageReviewPage appMode />} />

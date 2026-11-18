@@ -8,6 +8,7 @@ import { DesignerEditor } from './pages/designer/Editor';
 import { DesignerLayout } from './pages/designer/DesignerLayout';
 import { ExportPage } from './pages/designer/Export';
 import { RecordingsPage } from './pages/designer/Recordings';
+import { ExtensionSetupPage } from './pages/app/ExtensionSetupPage';
 import { ProjectSettingsPage } from './pages/designer/ProjectSettings';
 import { ThemesWorkspace } from './pages/designer/ThemesWorkspace';
 import { NewProductPage } from './pages/designer/NewProductPage';
@@ -40,6 +41,7 @@ export default function DesignerApp() {
 								<Route path="settings/agent" element={<AgentSettingsPage />} />
 								<Route path="settings/project/:projectId" element={<ProjectSettingsPage />} />
 								<Route path="recordings/:projectId" element={<RecordingsPage />} />
+								<Route path="settings/project/:projectId/extension" element={<ExtensionSetupPage />} />
 							</Route>
 						</Route>
 					</Routes>

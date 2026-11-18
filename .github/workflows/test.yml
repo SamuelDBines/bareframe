@@ -309,6 +309,9 @@ jobs:
       - name: Playwright lockstep (npm vs Docker base)
         run: pnpm run check:playwright-lockstep
 
+      - name: Build and test Chrome extension
+        run: pnpm run extension:build && pnpm run extension:test && pnpm run extension:zip
+
       - name: Build library + sync public/dist and public/themes
         run: pnpm run build
 

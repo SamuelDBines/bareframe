@@ -32,8 +32,9 @@ export function RecordingsPage() {
         title={projectName || 'Recordings'}
         lead={
           <>
-            Install the Chrome extension in <code>extension/</code>, paste a project upload token with{' '}
-            <code>recordings:upload</code>, and upload a recorded journey. Recordings expire after 90 days.
+            Install the Chrome extension from{' '}
+            <Link to={designerPath(`/settings/project/${projectId}/extension`)}>extension setup</Link>, paste a token
+            with <code>capture:write</code>, and upload a recorded journey. Recordings expire after 90 days.
           </>
         }
         actions={

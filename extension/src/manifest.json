@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Bareframe Capture",
+  "version": "0.2.0",
+  "description": "Record click-through flows and capture UX notes for Bareframe.",
+  "permissions": ["activeTab", "storage", "tabs", "scripting", "webNavigation"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Bareframe Capture"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "commands": {
+    "quick-note": {
+      "suggested_key": {
+        "default": "Alt+Shift+N",
+        "mac": "Alt+Shift+N"
+      },
+      "description": "Focus quick note in the popup"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png"
+  }
+}

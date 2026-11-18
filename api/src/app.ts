@@ -43,6 +43,7 @@ import { createWebsiteCaptureRouter } from './capture/setup-routes.js';
 import { createSitemapRouter } from './sitemap/routes.js';
 import { createAccountRouter } from './account/routes.js';
 import { createNotesRouter } from './notes/routes.js';
+import { createCaptureFlowRouter } from './capture/flow-routes.js';
 
 export type AppDeps = {
 	config: Config;
@@ -160,6 +161,7 @@ export function createApp(deps: AppDeps): Hono {
 	app.route('/api', createAccountRouter(pool, config));
 	app.route('/api', createProjectsRouter(pool, config));
 	app.route('/api', createNotesRouter(pool, config));
+	app.route('/api', createCaptureFlowRouter(pool, config));
 	app.route('/api', createFlowMapRouter(pool, config));
 	app.route('/api', createPackagesRouter(pool, config));
 	app.route('/api', createReviewsRouter(pool, config));

@@ -17,19 +17,19 @@ export default defineConfig({
 	projects: [
 		{
 			name: 'chromium-desktop',
-			use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+			use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
 		},
 		{
 			name: 'webkit-desktop',
-			use: { ...devices['Desktop Safari'], viewport: { width: 1440, height: 900 } },
+			use: { ...devices['Desktop Safari'], viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
 		},
 		{
 			name: 'chromium-mobile',
-			use: { ...devices['Pixel 7'] },
+			use: { ...devices['Pixel 7'], deviceScaleFactor: 1 },
 		},
 		{
 			name: 'webkit-mobile',
-			use: { ...devices['iPhone 14'] },
+			use: { ...devices['iPhone 14'], deviceScaleFactor: 1 },
 		},
 	],
 	webServer: process.env.PW_NO_SERVER

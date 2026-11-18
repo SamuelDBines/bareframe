@@ -49,22 +49,22 @@ export default defineScreen({
 			'Social plus email',
 			'SSO options with email signup below',
 			['Continue with Google', 'Create account', 'Sign in'],
-			(device: DesignDevice) => {
-				const body: DesignTreeNode[] = [
-					n.h1('Get started free'),
-					n.btn('Continue with Google', 'primary'),
-					n.btn('Continue with Apple', 'secondary'),
-					n.copy('Or register with email'),
-					n.field('Work email', 'you@company.com'),
-					n.field('Password', 'Create a password'),
-					n.btn('Create account', 'primary'),
-					n.btn('Sign in', 'ghost'),
-				];
-				if (device === 'tablet' || device === 'desktop') {
-					body.splice(1, 0, n.card('Teams', 'Unlimited viewers on every plan.', 'outlined'));
-				}
-				return n.stack(body, 16, 28);
-			},
+			(_device: DesignDevice) =>
+				n.stack(
+					[
+						n.h1('Get started free'),
+						n.copy('Unlimited viewers on every plan.'),
+						n.btn('Continue with Google', 'primary'),
+						n.btn('Continue with Apple', 'secondary'),
+						n.copy('Or register with email'),
+						n.field('Work email', 'you@company.com'),
+						n.field('Password', 'Create a password'),
+						n.btn('Create account', 'primary'),
+						n.btn('Sign in', 'ghost'),
+					],
+					16,
+					28,
+				),
 		),
 		variant(
 			'invite',

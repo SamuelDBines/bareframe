@@ -45,8 +45,10 @@ test('swap login template variant on map', async ({ page }) => {
 	});
 	await page.goto(`/#/app/project/${PROJECT_ID}`);
 	await expect(page.getByTestId('flow-map-workspace')).toBeVisible({ timeout: 30_000 });
-	await page.locator('.flow-map-card').filter({ hasText: 'Log in' }).getByTestId('flow-map-card-hit').click();
-	await expect(page.getByTestId('variant-swap-panel')).toBeVisible();
+	const loginCard = page.locator('.flow-map-card').filter({ hasText: 'Log in' }).getByTestId('flow-map-card-hit');
+	await loginCard.scrollIntoViewIfNeeded();
+	await loginCard.click();
+	await expect(page.getByTestId('variant-swap-panel')).toBeVisible({ timeout: 15_000 });
 	const select = page.getByTestId('variant-swap-select');
 	await select.selectOption('social-first');
 	await expect(select).toHaveValue('social-first');

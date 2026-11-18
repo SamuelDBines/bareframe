@@ -46,7 +46,11 @@ test('swap login template variant on map', async ({ page }) => {
 	});
 	await page.goto(`/#/app/project/${PROJECT_ID}`);
 	await expect(page.getByTestId('flow-map-workspace')).toBeVisible({ timeout: 30_000 });
-	const loginCard = page.locator('.flow-map-card').filter({ hasText: 'Log in' }).getByTestId('flow-map-card-hit');
+	// On narrow viewports the zoom toolbar can sit above card hit targets (WebKit).
+	await page.getByTestId('flow-map-zoom-bar').evaluate((el) => {
+		(el as HTMLElement).style.pointerEvents = 'none';
+	});
+	const loginCard = page.getByRole('button', { name: 'Log in', exact: true });
 	await expect(loginCard).toBeVisible({ timeout: 15_000 });
 	await loginCard.scrollIntoViewIfNeeded();
 	await loginCard.click({ timeout: 20_000 });

@@ -91,7 +91,14 @@ export function urlAssetSequence(
 					label,
 					trigger: 'click',
 				});
-				hotspots.push({ assetId: fromAsset, click: step.click });
+				if (
+					typeof step.click.x === 'number' &&
+					Number.isFinite(step.click.x) &&
+					typeof step.click.y === 'number' &&
+					Number.isFinite(step.click.y)
+				) {
+					hotspots.push({ assetId: fromAsset, click: step.click });
+				}
 			}
 		}
 		prevUrl = step.url;

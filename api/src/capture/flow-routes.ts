@@ -5,6 +5,10 @@ import {
 	buildFlowFromCaptureStepsTx,
 	type CaptureFlowStepInput,
 } from '../db/capture-flow.js';
+import {
+	CaptureFlowValidationError,
+	validateCaptureFlowSteps,
+} from '../db/capture-flow-validate.js';
 import { assertProjectAccess, tokenHasScope, VersionConflictError } from '../db/projects.js';
 import { createProjectAuthMiddleware, getActor, handleProjectError } from '../projects/auth.js';
 import { publishProjectUpdate } from '../projects/events.js';
@@ -60,6 +64,15 @@ export function createCaptureFlowRouter(pool: pg.Pool, config: Config) {
 
 			if (!build) {
 				return c.json({ ok: true, built: false, stepCount: body.steps.length }, 202);
+			}
+
+			try {
+				validateCaptureFlowSteps(body.steps);
+			} catch (err) {
+				if (err instanceof CaptureFlowValidationError) {
+					return c.json({ error: 'Invalid capture flow', message: err.message }, 400);
+				}
+				throw err;
 			}
 
 			const result = await buildFlowFromCaptureStepsTx(

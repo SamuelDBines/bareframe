@@ -1,9 +1,6 @@
 import { expect, test } from './fixtures';
 import { deviceForPlaywrightProject, templatePreviewSrcDoc } from './templatePreviewHtml.js';
 
-// Keep pixel diffs stable across desktop and mobile Playwright projects on CI.
-test.use({ deviceScaleFactor: 1 });
-
 const LOGIN_VARIANTS = ['classic', 'social-first', 'magic-link', 'split-hero', 'minimal'] as const;
 const REGISTER_VARIANTS = ['classic', 'multi-step', 'social-plus-email', 'invite'] as const;
 
@@ -49,11 +46,13 @@ for (const variantId of LOGIN_VARIANTS) {
 		const device = deviceForPlaywrightProject(testInfo.project.name);
 		const srcdoc = templatePreviewSrcDoc('login', variantId, device, `${baseURL}/`);
 		const size = device === 'phone' ? { width: 390, height: 844 } : { width: 1440, height: 900 };
+		if (device === 'phone') await page.setViewportSize(size);
 		const frame = await mountPreview(page, srcdoc, size.width, size.height);
 		await expect(frame.locator('body')).toHaveScreenshot(`login-${variantId}.png`, {
 			maxDiffPixelRatio: 0.03,
 			animations: 'disabled',
 			scale: 'css',
+			caret: 'hide',
 		});
 	});
 }
@@ -63,11 +62,13 @@ for (const variantId of REGISTER_VARIANTS) {
 		const device = deviceForPlaywrightProject(testInfo.project.name);
 		const srcdoc = templatePreviewSrcDoc('register', variantId, device, `${baseURL}/`);
 		const size = device === 'phone' ? { width: 390, height: 844 } : { width: 1440, height: 900 };
+		if (device === 'phone') await page.setViewportSize(size);
 		const frame = await mountPreview(page, srcdoc, size.width, size.height);
 		await expect(frame.locator('body')).toHaveScreenshot(`register-${variantId}.png`, {
 			maxDiffPixelRatio: 0.03,
 			animations: 'disabled',
 			scale: 'css',
+			caret: 'hide',
 		});
 	});
 }

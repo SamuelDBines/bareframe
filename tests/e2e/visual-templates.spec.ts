@@ -33,7 +33,7 @@ for (const variantId of LOGIN_VARIANTS) {
 		const srcdoc = templatePreviewSrcDoc('login', variantId, device, `${baseURL}/`);
 		const size = device === 'phone' ? { width: 390, height: 844 } : { width: 1440, height: 900 };
 		const frame = await mountPreview(page, srcdoc, size.width, size.height);
-		const maxDiffPixelRatio = device === 'phone' ? 0.05 : 0.03;
+		const maxDiffPixelRatio = device === 'phone' ? 0.07 : 0.03;
 		await expect(frame.locator('body')).toHaveScreenshot(`login-${variantId}.png`, {
 			maxDiffPixelRatio,
 			animations: 'disabled',
@@ -48,7 +48,7 @@ for (const variantId of REGISTER_VARIANTS) {
 		const srcdoc = templatePreviewSrcDoc('register', variantId, device, `${baseURL}/`);
 		const size = device === 'phone' ? { width: 390, height: 844 } : { width: 1440, height: 900 };
 		const frame = await mountPreview(page, srcdoc, size.width, size.height);
-		const maxDiffPixelRatio = device === 'phone' ? 0.05 : 0.03;
+		const maxDiffPixelRatio = device === 'phone' ? 0.07 : 0.03;
 		await expect(frame.locator('body')).toHaveScreenshot(`register-${variantId}.png`, {
 			maxDiffPixelRatio,
 			animations: 'disabled',

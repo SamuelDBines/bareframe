@@ -15,7 +15,7 @@ importers:
         specifier: ^2.29.7
         version: 2.31.1(@types/node@25.6.0)
       '@playwright/test':
-        specifier: ^1.60.0
+        specifier: 1.60.0
         version: 1.60.0
       '@stencil/core':
         specifier: ^4.43.4
@@ -27,7 +27,7 @@ importers:
         specifier: ^0.27.3
         version: 0.27.3
       playwright:
-        specifier: ^1.60.0
+        specifier: 1.60.0
         version: 1.60.0
       react-docgen-typescript:
         specifier: ^2.4.0

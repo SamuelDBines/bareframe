@@ -1,7 +1,7 @@
 import type pg from 'pg';
 import { randomUUID } from 'node:crypto';
 
-export type RenderJobKind = 'screenshot_url' | 'render_frame' | 'flow_map';
+export type RenderJobKind = 'screenshot_url' | 'render_frame' | 'flow_map' | 'url_check';
 export type RenderJobStatus = 'pending' | 'running' | 'completed' | 'failed';
 
 export type RenderJobRow = {
@@ -95,4 +95,25 @@ export async function getRenderJob(pool: pg.Pool, jobId: string): Promise<Render
 		[jobId],
 	);
 	return rows[0] ?? null;
+}
+
+export async function waitForRenderJob(
+	pool: pg.Pool,
+	jobId: string,
+	timeoutMs = 45_000,
+	pollMs = 400,
+): Promise<unknown> {
+	const deadline = Date.now() + timeoutMs;
+	for (;;) {
+		const job = await getRenderJob(pool, jobId);
+		if (!job) throw new Error('Render job not found');
+		if (job.status === 'completed') return job.result;
+		if (job.status === 'failed') {
+			throw new Error(job.error_message ?? 'Render job failed');
+		}
+		if (Date.now() >= deadline) {
+			throw new Error('Render job timed out');
+		}
+		await new Promise((resolve) => setTimeout(resolve, pollMs));
+	}
 }

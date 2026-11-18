@@ -31,6 +31,24 @@ spec:
           env:
             - name: RENDER_WORKER_POLL_MS
               value: "1500"
+            - name: RENDER_WORKER_HEALTH_PORT
+              value: "8081"
+          ports:
+            - name: health
+              containerPort: 8081
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 30
           resources:
             requests:
               cpu: 250m

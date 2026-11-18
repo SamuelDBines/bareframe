@@ -7,9 +7,12 @@ import {
 	processFlowMapJob,
 	processRenderFrameJob,
 	processScreenshotUrlJob,
+	processUrlCheckJob,
 	type FlowMapPayload,
 } from './process-jobs.js';
 import { closePlaywrightBrowser } from './playwright-capture.js';
+import { runPlaywrightStartupSelfCheck } from './playwright-health.js';
+import { startRenderWorkerHealthServer } from './worker-health.js';
 
 const workerId = `${hostname()}-${process.pid}`;
 const pollMs = Number(process.env.RENDER_WORKER_POLL_MS ?? 1500);
@@ -28,6 +31,12 @@ async function processOne(pool: pg.Pool): Promise<boolean> {
 				viewport?: 'mobile' | 'desktop';
 				projectId?: string;
 			});
+		} else if (job.kind === 'url_check') {
+			await processUrlCheckJob(pool, job.id, payload as {
+				url: string;
+				width: number;
+				height: number;
+			});
 		} else if (job.kind === 'render_frame') {
 			await processRenderFrameJob(pool, job.id, payload as {
 				projectId: string;
@@ -44,6 +53,9 @@ async function processOne(pool: pg.Pool): Promise<boolean> {
 async function main() {
 	const config = loadConfig();
 	const pool = createPoolFromDatabaseUrl(config.databaseUrl);
+	const healthPort = Number(process.env.RENDER_WORKER_HEALTH_PORT ?? 8081);
+	startRenderWorkerHealthServer(healthPort);
+	void runPlaywrightStartupSelfCheck();
 	console.log(`Render worker ${workerId} started`);
 
 	const shutdown = async () => {

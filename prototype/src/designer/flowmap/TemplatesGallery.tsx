@@ -55,7 +55,7 @@ export function TemplatesGallery({ projectId, open, onClose, onInserted }: Props
 				body: JSON.stringify({ ...body, baseVersion: remote.version }),
 			});
 			if (!res.ok) throw new Error('insert failed');
-			const data = (await res.json()) as { document: unknown; version: number };
+			const data = (await res.json()) as { document: import('@bareframe/designer-core').ProjectDocument; version: number };
 			dispatch({ type: 'hydrateProject', project: fromProjectDocument(data.document), remoteVersion: data.version });
 			onInserted('Template inserted on the map.');
 			onClose();

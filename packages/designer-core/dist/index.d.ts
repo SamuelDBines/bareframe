@@ -63,6 +63,9 @@ type ScreenBrief = {
     purpose: string;
     keyContent: string[];
     states: ('default' | 'empty' | 'loading' | 'error' | 'success')[];
+    /** When set, the screen was inserted from the template library. */
+    templateId?: string;
+    templateVariant?: string;
 };
 type ProductBrief = {
     description: string;
@@ -817,6 +820,16 @@ declare function insertFlowTemplate(document: ProjectDocument, options: InsertFl
     screenFrameIds: Record<string, string>;
 };
 
+declare function resolvePageTemplateId(page: Page): ScreenTemplateId | null;
+declare function variantsForPage(page: Page): {
+    templateId: ScreenTemplateId;
+    title: string;
+    variants: readonly ScreenTemplateVariantMeta[];
+    currentVariantId: string | undefined;
+} | null;
+/** Swap layout variant; connector button labels are re-matched on the frame. */
+declare function swapScreenVariant(document: ProjectDocument, pageId: string, frameId: string, variantId: string, device: DesignDevice, newId: (prefix: string) => string): ProjectDocument;
+
 declare function listScreenTemplates(): ScreenTemplateMeta[];
 declare function getScreenTemplate(id: ScreenTemplateId): ScreenTemplateMeta;
 declare function listFlowTemplates(): FlowTemplateMeta[];
@@ -827,4 +840,4 @@ declare const FLOW_TEMPLATE_IDS: readonly ["blog", "booking", "booking-reschedul
 declare function defaultNewId(prefix: string): string;
 declare function createDefaultCommandContext(isValidComponentSlug: (slug: string) => boolean): CommandContext;
 
-export { type A11yIssue, type Annotation, type AnnotationTarget, type ApplyFlowSpecOptions, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, DESIGN_COMPONENTS, DESIGN_DEVICES, DESIGN_LAYOUTS, DESIGN_LIMITS, DESIGN_SPEC_SCHEMA_HINT, type DesignComponent, type DesignDevice, type DesignLayout, type DesignNode, type DesignSpec, DesignSpecError, type DesignStateName, type DesignTreeNode, type DesignerProject, type DevicePreset, FLOW_CARD_GAP_X, FLOW_CARD_GAP_Y, FLOW_CARD_HEIGHT, FLOW_CARD_WIDTH, FLOW_DEVICES, FLOW_LABEL_HEIGHT, FLOW_LIMITS, FLOW_ORIGIN_X, FLOW_ORIGIN_Y, FLOW_PLATFORMS, FLOW_PLATFORM_PRESET, FLOW_SPEC_SCHEMA_HINT, FLOW_TEMPLATE_IDS, FLOW_THUMB_HEIGHT, type FlowConnection, type FlowDevice, type FlowPlatform, type FlowScreen, type FlowSpec, FlowSpecError, type FlowTemplateId, type FlowTemplateListItem, type FlowTemplateMeta, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type InsertFlowTemplateOptions, type InsertScreenTemplateOptions, type LayoutMode, type LayoutModel, type Page, type ProductBrief, type ProjectCommand, type ProjectDocument, SCREEN_STATES, SCREEN_TEMPLATE_IDS, type ScreenBrief, type ScreenState, type ScreenTemplateId, type ScreenTemplateListItem, type ScreenTemplateMeta, type ScreenTemplateVariantMeta, type SizingMode, type StyleModel, type StyleTrial, TEMPLATE_CATEGORIES, TEMPLATE_LIBRARY_VERSION, type TemplateCategory, type ThemeId, alert, applyFlowSpec, applyImportScreenshots, applyProjectCommand, applyScreenTemplateToPage, attachConnectorButtonNodes, autoPlaceFrame, badge, btn, buildScreenVariantTree, card, checkDesignTreeA11y, columnOrSplit, copy, countDesignNodes, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, designToNodes, deviceDimensions, devicesForPlatform, field, flowSpecFromDocument, getDevicePreset, getFlowTemplate, getScreenTemplate, h1, h2, inferScreenTemplateId, insertFlowTemplate, isEmptyFlow, layeredFlowLayout, layoutFramesInFlowRow, listFlowTemplates, listPageButtons, listScreenTemplates, listTemplateScreensForApi, parseProjectCommand, pickVariantId, platformForDevices, primaryActions, projectCommandSchema, repairDesignSpec, repairFlowSpec, row, screenKeyForPage, section, slugifyScreenId, stack, templateDesignStatesForBrief };
+export { type A11yIssue, type Annotation, type AnnotationTarget, type ApplyFlowSpecOptions, type BreakpointId, type CommandContext, CommandError, type CommandResult, type Connector, DEFAULT_DEVICE_PRESETS, DESIGN_COMPONENTS, DESIGN_DEVICES, DESIGN_LAYOUTS, DESIGN_LIMITS, DESIGN_SPEC_SCHEMA_HINT, type DesignComponent, type DesignDevice, type DesignLayout, type DesignNode, type DesignSpec, DesignSpecError, type DesignStateName, type DesignTreeNode, type DesignerProject, type DevicePreset, FLOW_CARD_GAP_X, FLOW_CARD_GAP_Y, FLOW_CARD_HEIGHT, FLOW_CARD_WIDTH, FLOW_DEVICES, FLOW_LABEL_HEIGHT, FLOW_LIMITS, FLOW_ORIGIN_X, FLOW_ORIGIN_Y, FLOW_PLATFORMS, FLOW_PLATFORM_PRESET, FLOW_SPEC_SCHEMA_HINT, FLOW_TEMPLATE_IDS, FLOW_THUMB_HEIGHT, type FlowConnection, type FlowDevice, type FlowPlatform, type FlowScreen, type FlowSpec, FlowSpecError, type FlowTemplateId, type FlowTemplateListItem, type FlowTemplateMeta, type Frame, type ImportScreenshotLink, type ImportScreenshotShot, type InsertFlowTemplateOptions, type InsertScreenTemplateOptions, type LayoutMode, type LayoutModel, type Page, type ProductBrief, type ProjectCommand, type ProjectDocument, SCREEN_STATES, SCREEN_TEMPLATE_IDS, type ScreenBrief, type ScreenState, type ScreenTemplateId, type ScreenTemplateListItem, type ScreenTemplateMeta, type ScreenTemplateVariantMeta, type SizingMode, type StyleModel, type StyleTrial, TEMPLATE_CATEGORIES, TEMPLATE_LIBRARY_VERSION, type TemplateCategory, type ThemeId, alert, applyFlowSpec, applyImportScreenshots, applyProjectCommand, applyScreenTemplateToPage, attachConnectorButtonNodes, autoPlaceFrame, badge, btn, buildScreenVariantTree, card, checkDesignTreeA11y, columnOrSplit, copy, countDesignNodes, createDefaultCommandContext, createEmptyProjectDocument, defaultNewId, designToNodes, deviceDimensions, devicesForPlatform, field, flowSpecFromDocument, getDevicePreset, getFlowTemplate, getScreenTemplate, h1, h2, inferScreenTemplateId, insertFlowTemplate, isEmptyFlow, layeredFlowLayout, layoutFramesInFlowRow, listFlowTemplates, listPageButtons, listScreenTemplates, listTemplateScreensForApi, parseProjectCommand, pickVariantId, platformForDevices, primaryActions, projectCommandSchema, repairDesignSpec, repairFlowSpec, resolvePageTemplateId, row, screenKeyForPage, section, slugifyScreenId, stack, swapScreenVariant, templateDesignStatesForBrief, variantsForPage };

@@ -2,6 +2,8 @@ import { createPortal } from 'react-dom';
 import { useEffect, useId, useRef } from 'react';
 import { useDesigner } from '../store';
 import type { Frame } from '../types';
+import type { DesignDevice } from '@bareframe/designer-core';
+import { swapVariantMenuItems } from './VariantSwapPanel';
 
 export type ContextMenuState =
 	| { kind: 'frame'; frame: Frame; x: number; y: number }
@@ -18,6 +20,7 @@ type Props = {
 	/** AI design for this screen on the chosen device; absent when generation isn't available. */
 	onGenerateDesign?: (frame: Frame) => void;
 	designBusy?: boolean;
+	previewDevice?: DesignDevice;
 };
 
 export function FlowMapContextMenu({
@@ -29,6 +32,7 @@ export function FlowMapContextMenu({
 	onAddScreen,
 	onGenerateDesign,
 	designBusy,
+	previewDevice = 'phone',
 }: Props) {
 	const { state, dispatch } = useDesigner();
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -78,7 +82,15 @@ export function FlowMapContextMenu({
 						!state.project.connectors.some((c) => c.toFrameId === frame.id);
 					const page = state.project.pages.find((p) => p.id === frame.pageId);
 					const hasDesign = (page?.nodes[page.rootNodeId]?.children.length ?? 0) > 0;
+					const swapItems = swapVariantMenuItems(
+						frame,
+						previewDevice,
+						onClose,
+						dispatch,
+						state.project,
+					);
 					return [
+						...swapItems,
 						...(onGenerateDesign
 							? [
 									{

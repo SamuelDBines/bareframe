@@ -34,7 +34,14 @@ export function applyScreenTemplateToPage(
 	const variantId = pickVariantId(options.screenTemplateId, brief, brief.keyContent, options.variantId);
 	const tree = buildScreenVariantTree(options.screenTemplateId, variantId, options.device);
 	const idx = doc.project.pages.findIndex((p) => p.id === page.id);
-	doc.project.pages[idx] = designToNodes({ ...page, name: options.screenName ?? page.name }, tree, options.newId);
+	doc.project.pages[idx] = {
+		...designToNodes({ ...page, name: options.screenName ?? page.name }, tree, options.newId),
+		brief: {
+			...brief,
+			templateId: options.screenTemplateId,
+			templateVariant: variantId,
+		},
+	};
 	return doc;
 }
 
@@ -66,7 +73,14 @@ function paintFlowScreens(
 			const variantId = flow.defaultScreenVariants[templateId] ?? getScreenTemplate(templateId).variants[0]!.id;
 			const tree = buildScreenVariantTree(templateId, variantId, device);
 			const idx = doc.project.pages.findIndex((p) => p.id === page.id);
-			doc.project.pages[idx] = designToNodes(page, tree, newId);
+			doc.project.pages[idx] = {
+				...designToNodes(page, tree, newId),
+				brief: {
+					...(page.brief ?? { key, purpose: screen.purpose, keyContent: screen.keyContent, states: screen.states }),
+					templateId,
+					templateVariant: variantId,
+				},
+			};
 		} catch {
 			/* skip */
 		}

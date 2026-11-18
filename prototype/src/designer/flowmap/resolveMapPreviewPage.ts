@@ -1,5 +1,4 @@
 import {
-	defaultNewId,
 	designToNodes,
 	screenKeyForPage,
 	type DesignDevice,

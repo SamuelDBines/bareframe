@@ -1,23 +1,49 @@
 import { expect, test } from './fixtures';
-import { buildScreenVariantTree } from '../../packages/designer-core/dist/index.js';
+import { deviceForPlaywrightProject, templatePreviewSrcDoc } from './templatePreviewHtml.js';
 
-test.describe('template visuals (VISUAL=1)', () => {
-	for (const [id, variant] of [
-		['login', 'classic'],
-		['login', 'social-first'],
-		['register', 'classic'],
-		['checkout', 'classic'],
-		['marketing-home', 'classic'],
-	] as const) {
-		test(`${id} ${variant} thumbnail`, async ({ page }, testInfo) => {
-			test.skip(!process.env.VISUAL, 'Set VISUAL=1 to enable screenshot comparison');
-			const tree = buildScreenVariantTree(id, variant, 'phone');
-			await page.setContent(
-				`<pre data-testid="tree" style="font:12px/1.4 monospace;padding:16px;white-space:pre-wrap">${JSON.stringify(tree, null, 2)}</pre>`,
-			);
-			await expect(page.getByTestId('tree')).toHaveScreenshot(`template-${id}-${variant}-${testInfo.project.name}.png`, {
-				maxDiffPixelRatio: testInfo.project.name.includes('mobile') ? 0.03 : undefined,
-			});
+const LOGIN_VARIANTS = ['classic', 'social-first', 'magic-link', 'split-hero', 'minimal'] as const;
+const REGISTER_VARIANTS = ['classic', 'multi-step', 'social-plus-email', 'invite'] as const;
+
+async function mountPreview(
+	page: import('@playwright/test').Page,
+	srcdoc: string,
+	width: number,
+	height: number,
+) {
+	await page.setContent(
+		`<!DOCTYPE html><html><body style="margin:0;background:#e8e6f0"><iframe id="frame" title="preview" style="width:${width}px;height:${height}px;border:0;display:block;margin:0 auto"></iframe></body></html>`,
+	);
+	await page.evaluate((html) => {
+		const frame = document.getElementById('frame') as HTMLIFrameElement;
+		frame.srcdoc = html;
+	}, srcdoc);
+	const frame = page.frameLocator('#frame');
+	await expect(frame.locator('body')).toBeVisible({ timeout: 20_000 });
+	return frame;
+}
+
+for (const variantId of LOGIN_VARIANTS) {
+	test(`login ${variantId} visual`, async ({ page, baseURL }, testInfo) => {
+		const device = deviceForPlaywrightProject(testInfo.project.name);
+		const srcdoc = templatePreviewSrcDoc('login', variantId, device, `${baseURL}/`);
+		const size = device === 'phone' ? { width: 390, height: 844 } : { width: 1440, height: 900 };
+		const frame = await mountPreview(page, srcdoc, size.width, size.height);
+		await expect(frame.locator('body')).toHaveScreenshot(`login-${variantId}.png`, {
+			maxDiffPixelRatio: 0.03,
+			animations: 'disabled',
 		});
-	}
-});
+	});
+}
+
+for (const variantId of REGISTER_VARIANTS) {
+	test(`register ${variantId} visual`, async ({ page, baseURL }, testInfo) => {
+		const device = deviceForPlaywrightProject(testInfo.project.name);
+		const srcdoc = templatePreviewSrcDoc('register', variantId, device, `${baseURL}/`);
+		const size = device === 'phone' ? { width: 390, height: 844 } : { width: 1440, height: 900 };
+		const frame = await mountPreview(page, srcdoc, size.width, size.height);
+		await expect(frame.locator('body')).toHaveScreenshot(`register-${variantId}.png`, {
+			maxDiffPixelRatio: 0.03,
+			animations: 'disabled',
+		});
+	});
+}

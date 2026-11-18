@@ -1,6 +1,10 @@
-import type { DesignDevice } from '../../designSpec.js';
+import type { DesignDevice, DesignTreeNode } from '../../designSpec.js';
 import { defineScreen, variant } from '../screenBuilder.js';
 import * as n from '../nodes.js';
+
+function passwordFields(): DesignTreeNode[] {
+	return [n.field('Email', 'you@example.com'), n.field('Password', '••••••••')];
+}
 
 export default defineScreen({
 	id: 'login',
@@ -10,104 +14,93 @@ export default defineScreen({
 	variants: [
 		variant(
 			'classic',
-			'Classic',
-			'Standard layout',
-			["Sign in","Forgot password?","Create account"],
-			(device: DesignDevice) =>
+			'Email and password',
+			'Centered form with primary sign-in and account links',
+			['Sign in', 'Forgot password?', 'Create account'],
+			(device) =>
 				n.stack([
-					n.h1('Log in'),
-					n.copy('Sign in to an existing account'),
-					...(device !== 'phone' && 'classic' === 'split'
-						? [n.card('Highlight', 'Visual or summary for Log in.', 'elevated')]
-						: []),
-					...(['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'change-credentials', 'profile-setup', 'booking-details', 'contact-support', 'form-create', 'checkout', 'payment', 'generic-form'].includes('login')
-						? [n.field('Email'), n.field('Password')]
-						: []),
-					...(['search', 'product-catalog', 'help-center', 'feed', 'list'].includes('login') ? [n.field('Search')] : []),
+					n.h1('Welcome back'),
+					n.copy('Sign in to continue to your workspace.'),
+					...passwordFields(),
 					n.btn('Sign in', 'primary'),
-					n.btn('Forgot password?', 'secondary'),
-					n.btn('Create account', 'secondary'),
-				]),
-		),
-		variant(
-			'compact',
-			'Compact',
-			'Tighter spacing',
-			["Sign in","Forgot password?"],
-			(device: DesignDevice) =>
-				n.stack([
-					n.h1('Log in'),
-					n.copy('Sign in to an existing account'),
-					...(device !== 'phone' && 'compact' === 'split'
-						? [n.card('Highlight', 'Visual or summary for Log in.', 'elevated')]
+					n.row([n.btn('Forgot password?', 'ghost'), n.btn('Create account', 'ghost')], 8),
+					...(device !== 'phone'
+						? [n.card('Tip', 'Use your work email if your team invited you.', 'ghost')]
 						: []),
-					...(['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'change-credentials', 'profile-setup', 'booking-details', 'contact-support', 'form-create', 'checkout', 'payment', 'generic-form'].includes('login')
-						? [n.field('Email'), n.field('Password')]
-						: []),
-					...(['search', 'product-catalog', 'help-center', 'feed', 'list'].includes('login') ? [n.field('Search')] : []),
-					n.btn('Sign in', 'primary'),
-					n.btn('Forgot password?', 'secondary'),
-				]),
-		),
-		variant(
-			'split',
-			'Split view',
-			'Hero beside form on large screens',
-			["Sign in","Forgot password?"],
-			(device: DesignDevice) =>
-				n.stack([
-					n.h1('Log in'),
-					n.copy('Sign in to an existing account'),
-					...(device !== 'phone' && 'split' === 'split'
-						? [n.card('Highlight', 'Visual or summary for Log in.', 'elevated')]
-						: []),
-					...(['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'change-credentials', 'profile-setup', 'booking-details', 'contact-support', 'form-create', 'checkout', 'payment', 'generic-form'].includes('login')
-						? [n.field('Email'), n.field('Password')]
-						: []),
-					...(['search', 'product-catalog', 'help-center', 'feed', 'list'].includes('login') ? [n.field('Search')] : []),
-					n.btn('Sign in', 'primary'),
-					n.btn('Forgot password?', 'secondary'),
-				]),
+				], 20, 28),
 		),
 		variant(
 			'social-first',
 			'Social first',
-			'SSO buttons prominent',
-			["Continue with Google","Continue with Apple","Sign in"],
-			(device: DesignDevice) =>
+			'SSO buttons above the email form',
+			['Continue with Google', 'Continue with Apple', 'Sign in', 'Create account'],
+			() =>
 				n.stack([
 					n.h1('Log in'),
-					n.copy('Sign in to an existing account'),
-					...(device !== 'phone' && 'social-first' === 'split'
-						? [n.card('Highlight', 'Visual or summary for Log in.', 'elevated')]
-						: []),
-					...(['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'change-credentials', 'profile-setup', 'booking-details', 'contact-support', 'form-create', 'checkout', 'payment', 'generic-form'].includes('login')
-						? [n.field('Email'), n.field('Password')]
-						: []),
-					...(['search', 'product-catalog', 'help-center', 'feed', 'list'].includes('login') ? [n.field('Search')] : []),
 					n.btn('Continue with Google', 'primary'),
 					n.btn('Continue with Apple', 'secondary'),
-					n.btn('Sign in', 'secondary'),
-				]),
+					n.alert('We never post on your behalf.', 'info'),
+					n.copy('Or use your email'),
+					...passwordFields(),
+					n.btn('Sign in', 'primary'),
+					n.btn('Create account', 'ghost'),
+				], 16, 28),
+		),
+		variant(
+			'magic-link',
+			'Magic link',
+			'Passwordless email sign-in',
+			['Send magic link', 'Use password instead', 'Create account'],
+			(device) =>
+				n.stack([
+					n.h1('Sign in with email'),
+					n.copy('We will email you a secure link. No password needed.'),
+					n.field('Email', 'you@example.com'),
+					n.btn('Send magic link', 'primary'),
+					n.btn('Use password instead', 'ghost'),
+					n.btn('Create account', 'ghost'),
+					...(device === 'desktop'
+						? [n.card('Secure login', 'Links expire in 15 minutes.', 'outlined')]
+						: []),
+				], 18, 28),
+		),
+		variant(
+			'split-hero',
+			'Split hero',
+			'Marketing panel beside the form on large screens',
+			['Sign in', 'Forgot password?', 'Create account'],
+			(device) => {
+				const hero: DesignTreeNode[] = [
+					n.card('Ship faster', 'Bareframe turns flows into clickable prototypes in minutes.', 'elevated'),
+					n.badge('Trusted by product teams', 'success'),
+				];
+				const form: DesignTreeNode[] = [
+					n.h1('Log in'),
+					...passwordFields(),
+					n.btn('Sign in', 'primary'),
+					n.btn('Forgot password?', 'ghost'),
+					n.btn('Create account', 'secondary'),
+				];
+				return n.columnOrSplit(device, [...hero, ...form], [hero, form]);
+			},
 		),
 		variant(
 			'minimal',
 			'Minimal',
-			'Fewest elements',
-			["Sign in"],
-			(device: DesignDevice) =>
-				n.stack([
-					n.h1('Log in'),
-					n.copy('Sign in to an existing account'),
-					...(device !== 'phone' && 'minimal' === 'split'
-						? [n.card('Highlight', 'Visual or summary for Log in.', 'elevated')]
-						: []),
-					...(['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'change-credentials', 'profile-setup', 'booking-details', 'contact-support', 'form-create', 'checkout', 'payment', 'generic-form'].includes('login')
-						? [n.field('Email'), n.field('Password')]
-						: []),
-					...(['search', 'product-catalog', 'help-center', 'feed', 'list'].includes('login') ? [n.field('Search')] : []),
-					n.btn('Sign in', 'primary'),
-				]),
-		)
+			'Compact sign-in for embedded or modal use',
+			['Sign in', 'Create account'],
+			() =>
+				n.stack(
+					[
+						n.h1('Sign in'),
+						n.field('Email', 'Email'),
+						n.field('Password', 'Password'),
+						n.btn('Sign in', 'primary'),
+						n.btn('Create account', 'ghost'),
+					],
+					12,
+					20,
+				),
+		),
 	],
 });

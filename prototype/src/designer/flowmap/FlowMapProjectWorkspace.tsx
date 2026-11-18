@@ -21,6 +21,7 @@ import { useAuth } from '../../auth/AuthContext';
 import { ProjectNotesPanel } from './ProjectNotesPanel';
 import { ProjectNotesProvider } from './ProjectNotesContext';
 import { TemplatesGallery } from './TemplatesGallery';
+import { VariantSwapPanel } from './VariantSwapPanel';
 
 type Props = {
 	readOnly?: boolean;
@@ -76,6 +77,10 @@ export function FlowMapProjectWorkspace({
 		return state.project.pages.every((p) => (p.nodes[p.rootNodeId]?.children.length ?? 0) === 0) && !state.project.productBrief;
 	}, [state.project]);
 	const showDescribe = canGenerate && flowIsEmpty && !startedByHand;
+	const variantFrame =
+		mode === 'map' && !showDescribe && state.ui.selectedFrameId
+			? state.project.frames.find((f) => f.id === state.ui.selectedFrameId && !f.ghost)
+			: null;
 	const tourAutoEligible = !readOnly && screenCount <= 1 && !showDescribe;
 
 	useEffect(() => {
@@ -183,7 +188,12 @@ export function FlowMapProjectWorkspace({
 					notesOpen && cloudProjectId ? ' flow-map-stage--with-notes' : ''
 				}${showDescribe ? ' flow-map-stage--onboarding' : ''}`}
 			>
-				{showLinkPanel ? <FlowMapScreenLinkPanel /> : null}
+				{showLinkPanel ? <FlowMapScreenLinkPanel previewDevice={designDevice} /> : null}
+				{variantFrame ? (
+					<aside className="flow-map-variant-rail" data-testid="flow-map-variant-rail">
+						<VariantSwapPanel frame={variantFrame} previewDevice={designDevice} />
+					</aside>
+				) : null}
 				<FlowMapCanvas
 					projectId={cloudProjectId ?? undefined}
 					previewDevice={designDevice}
@@ -282,6 +292,7 @@ export function FlowMapProjectWorkspace({
 				onRequestDelete={(frame, connectorCount) => setPendingDelete({ frame, connectors: connectorCount })}
 				onGenerateDesign={canUseDesignTools && !flowIsEmpty ? (frame) => void designs.designOne(frame, designDevice) : undefined}
 				designBusy={designs.queue.running}
+				previewDevice={designDevice}
 				onAddScreen={() => {
 					setMode('edit');
 					dispatch({ type: 'addFrame', presetId: 'iphone-15' });

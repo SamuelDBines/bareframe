@@ -2860,6 +2860,9 @@ var list_default = defineScreen({
 });
 
 // src/templateLibrary/screens/login.ts
+function passwordFields() {
+  return [field("Email", "you@example.com"), field("Password", "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022")];
+}
 var login_default = defineScreen({
   id: "login",
   category: "auth",
@@ -2868,79 +2871,85 @@ var login_default = defineScreen({
   variants: [
     variant(
       "classic",
-      "Classic",
-      "Standard layout",
+      "Email and password",
+      "Centered form with primary sign-in and account links",
       ["Sign in", "Forgot password?", "Create account"],
       (device) => stack([
-        h1("Log in"),
-        copy("Sign in to an existing account"),
-        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Log in.", "elevated")] : [],
-        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("login") ? [field("Email"), field("Password")] : [],
-        ...["search", "product-catalog", "help-center", "feed", "list"].includes("login") ? [field("Search")] : [],
+        h1("Welcome back"),
+        copy("Sign in to continue to your workspace."),
+        ...passwordFields(),
         btn("Sign in", "primary"),
-        btn("Forgot password?", "secondary"),
-        btn("Create account", "secondary")
-      ])
-    ),
-    variant(
-      "compact",
-      "Compact",
-      "Tighter spacing",
-      ["Sign in", "Forgot password?"],
-      (device) => stack([
-        h1("Log in"),
-        copy("Sign in to an existing account"),
-        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Log in.", "elevated")] : [],
-        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("login") ? [field("Email"), field("Password")] : [],
-        ...["search", "product-catalog", "help-center", "feed", "list"].includes("login") ? [field("Search")] : [],
-        btn("Sign in", "primary"),
-        btn("Forgot password?", "secondary")
-      ])
-    ),
-    variant(
-      "split",
-      "Split view",
-      "Hero beside form on large screens",
-      ["Sign in", "Forgot password?"],
-      (device) => stack([
-        h1("Log in"),
-        copy("Sign in to an existing account"),
-        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Log in.", "elevated")] : [],
-        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("login") ? [field("Email"), field("Password")] : [],
-        ...["search", "product-catalog", "help-center", "feed", "list"].includes("login") ? [field("Search")] : [],
-        btn("Sign in", "primary"),
-        btn("Forgot password?", "secondary")
-      ])
+        row([btn("Forgot password?", "ghost"), btn("Create account", "ghost")], 8),
+        ...device !== "phone" ? [card("Tip", "Use your work email if your team invited you.", "ghost")] : []
+      ], 20, 28)
     ),
     variant(
       "social-first",
       "Social first",
-      "SSO buttons prominent",
-      ["Continue with Google", "Continue with Apple", "Sign in"],
-      (device) => stack([
+      "SSO buttons above the email form",
+      ["Continue with Google", "Continue with Apple", "Sign in", "Create account"],
+      () => stack([
         h1("Log in"),
-        copy("Sign in to an existing account"),
-        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Log in.", "elevated")] : [],
-        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("login") ? [field("Email"), field("Password")] : [],
-        ...["search", "product-catalog", "help-center", "feed", "list"].includes("login") ? [field("Search")] : [],
         btn("Continue with Google", "primary"),
         btn("Continue with Apple", "secondary"),
-        btn("Sign in", "secondary")
-      ])
+        alert("We never post on your behalf.", "info"),
+        copy("Or use your email"),
+        ...passwordFields(),
+        btn("Sign in", "primary"),
+        btn("Create account", "ghost")
+      ], 16, 28)
+    ),
+    variant(
+      "magic-link",
+      "Magic link",
+      "Passwordless email sign-in",
+      ["Send magic link", "Use password instead", "Create account"],
+      (device) => stack([
+        h1("Sign in with email"),
+        copy("We will email you a secure link. No password needed."),
+        field("Email", "you@example.com"),
+        btn("Send magic link", "primary"),
+        btn("Use password instead", "ghost"),
+        btn("Create account", "ghost"),
+        ...device === "desktop" ? [card("Secure login", "Links expire in 15 minutes.", "outlined")] : []
+      ], 18, 28)
+    ),
+    variant(
+      "split-hero",
+      "Split hero",
+      "Marketing panel beside the form on large screens",
+      ["Sign in", "Forgot password?", "Create account"],
+      (device) => {
+        const hero = [
+          card("Ship faster", "Bareframe turns flows into clickable prototypes in minutes.", "elevated"),
+          badge("Trusted by product teams", "success")
+        ];
+        const form = [
+          h1("Log in"),
+          ...passwordFields(),
+          btn("Sign in", "primary"),
+          btn("Forgot password?", "ghost"),
+          btn("Create account", "secondary")
+        ];
+        return columnOrSplit(device, [...hero, ...form], [hero, form]);
+      }
     ),
     variant(
       "minimal",
       "Minimal",
-      "Fewest elements",
-      ["Sign in"],
-      (device) => stack([
-        h1("Log in"),
-        copy("Sign in to an existing account"),
-        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Log in.", "elevated")] : [],
-        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("login") ? [field("Email"), field("Password")] : [],
-        ...["search", "product-catalog", "help-center", "feed", "list"].includes("login") ? [field("Search")] : [],
-        btn("Sign in", "primary")
-      ])
+      "Compact sign-in for embedded or modal use",
+      ["Sign in", "Create account"],
+      () => stack(
+        [
+          h1("Sign in"),
+          field("Email", "Email"),
+          field("Password", "Password"),
+          btn("Sign in", "primary"),
+          btn("Create account", "ghost")
+        ],
+        12,
+        20
+      )
     )
   ]
 });
@@ -3934,65 +3943,71 @@ var register_default = defineScreen({
   variants: [
     variant(
       "classic",
-      "Classic",
-      "Standard layout",
-      ["Create account", "Sign in", "Continue with Google"],
-      (device) => stack([
-        h1("Register"),
-        copy("Create a new account"),
-        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Register.", "elevated")] : [],
-        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("register") ? [field("Email"), field("Password")] : [],
-        ...["search", "product-catalog", "help-center", "feed", "list"].includes("register") ? [field("Search")] : [],
-        btn("Create account", "primary"),
-        btn("Sign in", "secondary"),
-        btn("Continue with Google", "secondary")
-      ])
-    ),
-    variant(
-      "compact",
-      "Compact",
-      "Tighter spacing",
+      "Single step",
+      "Full registration on one screen",
       ["Create account", "Sign in"],
       (device) => stack([
-        h1("Register"),
-        copy("Create a new account"),
-        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Register.", "elevated")] : [],
-        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("register") ? [field("Email"), field("Password")] : [],
-        ...["search", "product-catalog", "help-center", "feed", "list"].includes("register") ? [field("Search")] : [],
+        h1("Create your account"),
+        copy("Start with a free workspace. Upgrade any time."),
+        field("Full name", "Your name"),
+        field("Work email", "you@company.com"),
+        field("Password", "At least 8 characters"),
         btn("Create account", "primary"),
-        btn("Sign in", "secondary")
-      ])
+        btn("Sign in", "ghost"),
+        ...device !== "phone" ? [alert("By continuing you agree to our terms and privacy policy.", "info")] : []
+      ], 18, 28)
     ),
     variant(
-      "split",
-      "Split view",
-      "Hero beside form on large screens",
-      ["Create account", "Sign in"],
-      (device) => stack([
-        h1("Register"),
-        copy("Create a new account"),
-        ...device !== "phone" && true ? [card("Highlight", "Visual or summary for Register.", "elevated")] : [],
-        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("register") ? [field("Email"), field("Password")] : [],
-        ...["search", "product-catalog", "help-center", "feed", "list"].includes("register") ? [field("Search")] : [],
-        btn("Create account", "primary"),
-        btn("Sign in", "secondary")
-      ])
+      "multi-step",
+      "Multi-step",
+      "Step one of a short wizard",
+      ["Continue", "Sign in"],
+      () => stack([
+        badge("Step 1 of 3", "outline"),
+        h1("Your details"),
+        copy("Tell us who you are. You can invite teammates next."),
+        field("Full name", "Your name"),
+        field("Work email", "you@company.com"),
+        field("Password", "Create a password"),
+        btn("Continue", "primary"),
+        btn("Sign in", "ghost")
+      ], 16, 28)
     ),
     variant(
-      "social-first",
-      "Social first",
-      "SSO buttons prominent",
-      ["Continue with Google", "Continue with Apple", "Create account"],
-      (device) => stack([
-        h1("Register"),
-        copy("Create a new account"),
-        ...device !== "phone" && false ? [card("Highlight", "Visual or summary for Register.", "elevated")] : [],
-        ...["login", "register", "forgot-password", "reset-password", "verify-email", "change-credentials", "profile-setup", "booking-details", "contact-support", "form-create", "checkout", "payment", "generic-form"].includes("register") ? [field("Email"), field("Password")] : [],
-        ...["search", "product-catalog", "help-center", "feed", "list"].includes("register") ? [field("Search")] : [],
-        btn("Continue with Google", "primary"),
-        btn("Continue with Apple", "secondary"),
-        btn("Create account", "secondary")
-      ])
+      "social-plus-email",
+      "Social plus email",
+      "SSO options with email signup below",
+      ["Continue with Google", "Create account", "Sign in"],
+      (device) => {
+        const body = [
+          h1("Get started free"),
+          btn("Continue with Google", "primary"),
+          btn("Continue with Apple", "secondary"),
+          copy("Or register with email"),
+          field("Work email", "you@company.com"),
+          field("Password", "Create a password"),
+          btn("Create account", "primary"),
+          btn("Sign in", "ghost")
+        ];
+        if (device === "tablet" || device === "desktop") {
+          body.splice(1, 0, card("Teams", "Unlimited viewers on every plan.", "outlined"));
+        }
+        return stack(body, 16, 28);
+      }
+    ),
+    variant(
+      "invite",
+      "Invite acceptance",
+      "Join a team from an email invite",
+      ["Join workspace", "Sign in"],
+      () => stack([
+        h1("You are invited"),
+        card("Acme product team", "Sam invited you as a designer.", "elevated"),
+        field("Full name", "Your name"),
+        field("Password", "Choose a password"),
+        btn("Join workspace", "primary"),
+        btn("Sign in", "ghost")
+      ], 16, 28)
     )
   ]
 });
@@ -6707,7 +6722,14 @@ function applyScreenTemplateToPage(document, options) {
   const variantId = pickVariantId(options.screenTemplateId, brief, brief.keyContent, options.variantId);
   const tree = buildScreenVariantTree(options.screenTemplateId, variantId, options.device);
   const idx = doc.project.pages.findIndex((p) => p.id === page.id);
-  doc.project.pages[idx] = designToNodes({ ...page, name: options.screenName ?? page.name }, tree, options.newId);
+  doc.project.pages[idx] = {
+    ...designToNodes({ ...page, name: options.screenName ?? page.name }, tree, options.newId),
+    brief: {
+      ...brief,
+      templateId: options.screenTemplateId,
+      templateVariant: variantId
+    }
+  };
   return doc;
 }
 function designDeviceFromOptions(options) {
@@ -6725,7 +6747,14 @@ function paintFlowScreens(doc, flow, screens, screenId, newId, device) {
       const variantId = flow.defaultScreenVariants[templateId] ?? getScreenTemplate(templateId).variants[0].id;
       const tree = buildScreenVariantTree(templateId, variantId, device);
       const idx = doc.project.pages.findIndex((p) => p.id === page.id);
-      doc.project.pages[idx] = designToNodes(page, tree, newId);
+      doc.project.pages[idx] = {
+        ...designToNodes(page, tree, newId),
+        brief: {
+          ...page.brief ?? { key, purpose: screen.purpose, keyContent: screen.keyContent, states: screen.states },
+          templateId,
+          templateVariant: variantId
+        }
+      };
     } catch {
     }
   }
@@ -6779,6 +6808,57 @@ function insertFlowTemplate(document, options) {
     }
   };
   return { document: mergedDoc, screenFrameIds };
+}
+
+// src/templateLibrary/swapVariant.ts
+function resolvePageTemplateId(page) {
+  const explicit = page.brief?.templateId;
+  if (explicit) {
+    try {
+      getScreenTemplate(explicit);
+      return explicit;
+    } catch {
+    }
+  }
+  const purpose = page.brief?.purpose?.replace(/^Template:\s*/, "") ?? "";
+  if (purpose) {
+    try {
+      getScreenTemplate(purpose);
+      return purpose;
+    } catch {
+    }
+  }
+  return inferScreenTemplateId(page.name, page.brief?.purpose ?? "");
+}
+function variantsForPage(page) {
+  const id = resolvePageTemplateId(page);
+  if (!id) return null;
+  const tpl = getScreenTemplate(id);
+  const current = page.brief?.templateVariant;
+  return { templateId: id, title: tpl.title, variants: tpl.variants, currentVariantId: current };
+}
+function swapScreenVariant(document, pageId, frameId, variantId, device, newId) {
+  const doc = structuredClone(document);
+  const pageIndex = doc.project.pages.findIndex((p) => p.id === pageId);
+  const page = doc.project.pages[pageIndex];
+  if (!page) throw new Error("page not found");
+  const templateId = resolvePageTemplateId(page);
+  if (!templateId) throw new Error("no template for screen");
+  const tpl = getScreenTemplate(templateId);
+  if (!tpl.variants.some((v) => v.id === variantId)) throw new Error("unknown variant");
+  const tree = buildScreenVariantTree(templateId, variantId, device);
+  const brief = {
+    ...page.brief ?? { key: page.id, purpose: "", keyContent: [], states: ["default"] },
+    templateId,
+    templateVariant: variantId,
+    purpose: page.brief?.purpose || tpl.description
+  };
+  doc.project.pages[pageIndex] = {
+    ...designToNodes(page, tree, newId),
+    brief
+  };
+  attachConnectorButtonNodes(doc, pageId, frameId);
+  return doc;
 }
 
 // src/index.ts
@@ -6863,10 +6943,13 @@ export {
   projectCommandSchema,
   repairDesignSpec,
   repairFlowSpec,
+  resolvePageTemplateId,
   row,
   screenKeyForPage,
   section,
   slugifyScreenId,
   stack,
-  templateDesignStatesForBrief
+  swapScreenVariant,
+  templateDesignStatesForBrief,
+  variantsForPage
 };

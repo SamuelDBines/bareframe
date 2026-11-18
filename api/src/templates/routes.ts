@@ -166,7 +166,14 @@ export function createTemplatesRouter(pool: pg.Pool, _config: Config) {
 				const variantId = pickVariantId(tpl.id, brief, brief.keyContent, body.variantId);
 				const tree = buildScreenVariantTree(tpl.id, variantId, device);
 				const idx = document.project.pages.findIndex((p) => p.id === page!.id);
-				document.project.pages[idx] = designToNodes(page!, tree, defaultNewId);
+				document.project.pages[idx] = {
+					...designToNodes(page!, tree, defaultNewId),
+					brief: {
+						...(page!.brief ?? { key: tpl.id, purpose: tpl.description, keyContent: [], states: ['default'] as const }),
+						templateId: tpl.id,
+						templateVariant: variantId,
+					},
+				};
 			}
 
 			const version = await replaceProjectDocument(pool, projectId, actor.userId, document, body.baseVersion);

@@ -2,9 +2,13 @@ import { useMemo, useState } from 'react';
 import type { ThemeId } from '../../theme/themes';
 import { FramePreview } from '../components/FramePreview';
 import { useDesigner } from '../store';
+import { VariantSwapPanel } from './VariantSwapPanel';
+import type { DesignDevice } from '@bareframe/designer-core';
+
+type Props = { previewDevice?: DesignDevice };
 
 /** Edit mode: pick a designed control and link it to another screen for the prototype. */
-export function FlowMapScreenLinkPanel() {
+export function FlowMapScreenLinkPanel({ previewDevice = 'phone' }: Props) {
 	const { state, dispatch } = useDesigner();
 	const { project, ui } = state;
 	const frame = project.frames.find((f) => f.id === ui.selectedFrameId);
@@ -40,6 +44,7 @@ export function FlowMapScreenLinkPanel() {
 					onSelectNode={(nodeId) => dispatch({ type: 'selectNode', nodeId })}
 				/>
 			</div>
+			<VariantSwapPanel frame={frame} previewDevice={previewDevice} />
 			<p className="bx-hint">Click a button or control in the preview, then choose a destination screen.</p>
 			<div className="field">
 				<label htmlFor="link-target-screen">Destination screen</label>

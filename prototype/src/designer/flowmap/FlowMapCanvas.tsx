@@ -22,7 +22,6 @@ import type { DesignDevice, DesignSpec } from '@bareframe/designer-core';
 import { resolveMapPreviewPage } from './resolveMapPreviewPage';
 import { mapThumbSizeForDevice } from './designViewport';
 
-const THUMB_SCALE = FLOW_CARD_WIDTH / 393;
 const SEV_LABEL: Record<Severity, string> = { critical: 'Critical', major: 'Major', minor: 'Minor', info: 'Info' };
 
 function applyWorldTransform(el: HTMLElement | null, camera: Camera) {

@@ -46,7 +46,9 @@ export function templatePreviewSrcDoc(
 		frameWidth: width,
 		frameHeight: height,
 		themeId: 'light',
-		tokenOverrides: {},
+		tokenOverrides: {
+			'--bf-theme-font-family': 'ui-sans-serif, system-ui, sans-serif',
+		},
 		selectedNodeId: null,
 		assetBase,
 	});

@@ -4,6 +4,10 @@ import { deviceForPlaywrightProject, templatePreviewSrcDoc } from './templatePre
 // Keep pixel diffs stable across desktop and mobile Playwright projects on CI.
 test.use({ deviceScaleFactor: 1 });
 
+test.beforeEach(async ({ page }) => {
+	await page.route(/\b(fonts\.googleapis|fonts\.gstatic)\.com\b/i, (route) => route.abort());
+});
+
 const LOGIN_VARIANTS = ['classic', 'social-first', 'magic-link', 'split-hero', 'minimal'] as const;
 const REGISTER_VARIANTS = ['classic', 'multi-step', 'social-plus-email', 'invite'] as const;
 
@@ -36,9 +40,16 @@ async function mountPreview(
 			),
 		);
 	});
-	await page.waitForFunction(() => {
-		const doc = (document.getElementById('frame') as HTMLIFrameElement | null)?.contentDocument;
-		return doc?.body && getComputedStyle(doc.body).opacity === '1';
+	await frame.locator('html').evaluate((root) => {
+		root.style.setProperty('--bf-theme-font-family', 'ui-sans-serif, system-ui, sans-serif');
+		const body = root.ownerDocument.body;
+		body.style.fontFamily = 'ui-sans-serif, system-ui, sans-serif';
+		body.style.setProperty('-webkit-font-smoothing', 'auto');
+	});
+	await frame.locator('body').evaluate(() => {
+		return new Promise<void>((resolve) => {
+			requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+		});
 	});
 	return frame;
 }

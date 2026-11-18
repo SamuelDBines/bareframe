@@ -15,6 +15,9 @@ import {
 import { useDesigner } from '../store';
 import type { Connector, Frame } from '../types';
 import { copyShareLink } from './FlowMapToolbar';
+import type { DesignSpec } from '@bareframe/designer-core';
+import { resolveMapPreviewPage } from './resolveMapPreviewPage';
+import { viewportToDesignDevice } from './designViewport';
 
 /** Entry screen: explicit override, else first screen nothing links to (falls back to left-most). */
 function entryFrame(frames: Frame[], connectors: Connector[], explicitEntryFrameId?: string | null) {
@@ -30,7 +33,14 @@ function entryFrame(frames: Frame[], connectors: Connector[], explicitEntryFrame
  * Full-screen click-through. Hotspots come from the connectors leaving the
  * current screen; number keys follow them, Backspace goes back, Esc exits.
  */
-export function PrototypePlayer({ onExit }: { onExit: () => void }) {
+type PlayerProps = {
+	onExit: () => void;
+	viewportKind?: PrototypeViewportKind;
+	onViewportKindChange?: (kind: PrototypeViewportKind) => void;
+	previewDesigns?: Map<string, DesignSpec>;
+};
+
+export function PrototypePlayer({ onExit, viewportKind: controlledViewport, onViewportKindChange, previewDesigns }: PlayerProps) {
 	const { state } = useDesigner();
 	const chrome = useAppCanvasChrome();
 	const { project } = state;
@@ -45,7 +55,9 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 	const [currentId, setCurrentId] = useState<string | null>(start?.id ?? null);
 	const [history, setHistory] = useState<string[]>([]);
 	const [toast, setToast] = useState<string | null>(null);
-	const [viewportKind, setViewportKind] = useState<PrototypeViewportKind>('phone');
+	const [localViewport, setLocalViewport] = useState<PrototypeViewportKind>('phone');
+	const viewportKind = controlledViewport ?? localViewport;
+	const setViewportKind = onViewportKindChange ?? setLocalViewport;
 	const [stageScale, setStageScale] = useState(1);
 	const [flowBlockHeight, setFlowBlockHeight] = useState(0);
 	const closeRef = useRef<HTMLButtonElement>(null);
@@ -70,9 +82,22 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 	const chromeStyle = PROTOTYPE_DEVICE_CHROME[viewportKind];
 
 	useEffect(() => {
-		if (!frame) return;
-		setViewportKind(prototypeViewportKindForFrame(frame));
-	}, [frame?.id]);
+		if (controlledViewport != null || !frame) return;
+		setLocalViewport(prototypeViewportKindForFrame(frame));
+	}, [frame?.id, controlledViewport]);
+
+	const previewPage = useMemo(() => {
+		if (!page || !frame) return null;
+		const device = viewportToDesignDevice(viewportKind);
+		const outgoingLabels = outgoing.map((c) => c.label ?? 'Next');
+		return resolveMapPreviewPage(
+			page,
+			device,
+			previewDesigns ?? new Map(),
+			project.productBrief?.description ?? project.name,
+			outgoingLabels,
+		);
+	}, [page, frame, viewportKind, previewDesigns, project.productBrief?.description, project.name, outgoing]);
 
 	const go = (to: string) => {
 		if (!frame) return;
@@ -257,7 +282,7 @@ export function PrototypePlayer({ onExit }: { onExit: () => void }) {
 									>
 										<FramePreview
 											frame={frame}
-											page={page}
+											page={previewPage ?? page}
 											themeId={themeId}
 											customTokens={project.customTokenOverrides}
 											selectedNodeId={null}

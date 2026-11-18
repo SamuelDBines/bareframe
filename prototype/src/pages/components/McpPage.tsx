@@ -48,6 +48,8 @@ const STUDIO_TOOLS = [
 	['generate_flow', 'Describe → flow map (plan limits apply).'],
 	['generate_screen_design', 'AI screen design for one page/device.'],
 	['generate_all_designs', 'Design every screen on a device preset.'],
+	['list_templates', 'Screen and flow template catalog (optional category filter).'],
+	['insert_template', 'Insert a screen or linked flow template into a project.'],
 	['create_click_through_prototype', 'One-shot project + flow + designs + play URL.'],
 	['list_projects', 'Projects visible to the token.'],
 	['get_project', 'Project document and version.'],

@@ -30,6 +30,7 @@ type Props = {
 	onStartTour?: () => void;
 	/** Opens the refine/regenerate dialog for an AI-mapped flow. */
 	onRefineFlow?: () => void;
+	onOpenTemplates?: () => void;
 	notesOpen?: boolean;
 	onNotesOpenChange?: (open: boolean) => void;
 	showNotes?: boolean;
@@ -74,6 +75,7 @@ export function FlowMapToolbar({
 	readOnly,
 	onStartTour,
 	onRefineFlow,
+	onOpenTemplates,
 	notesOpen,
 	onNotesOpenChange,
 	showNotes,
@@ -175,6 +177,11 @@ export function FlowMapToolbar({
 						<span className="canvas-app-toast" role="status">
 							{toast}
 						</span>
+					) : null}
+					{onOpenTemplates ? (
+						<button type="button" className="btn btn-secondary btn-sm" data-testid="open-templates-gallery" onClick={onOpenTemplates}>
+							Templates
+						</button>
 					) : null}
 					{onRefineFlow ? (
 						<button

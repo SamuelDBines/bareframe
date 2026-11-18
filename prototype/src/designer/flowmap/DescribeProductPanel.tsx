@@ -98,9 +98,7 @@ function StarterFlowChooser({ onCreated }: { onCreated: (message: string) => voi
 		const index = randomStarterIndex();
 		const starter = STARTER_FLOWS[index]!;
 		dispatch({ type: 'hydrateProject', project: projectWithStarterFlow(state.project, index, platforms) });
-		onCreated(
-			`Started from “${starter.name}”: ${starter.spec.screens.length} screens. Rename, add or remove anything to fit your product.`,
-		);
+		onCreated(`Started from “${starter.name}”. Rename, add or remove anything to fit your product.`);
 	};
 
 	return (

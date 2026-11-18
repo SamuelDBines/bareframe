@@ -22,8 +22,24 @@ async function mountPreview(
 	}, srcdoc);
 	const frame = page.frameLocator('#frame');
 	await expect(frame.locator('body')).toBeVisible({ timeout: 20_000 });
-	await frame.locator('body').evaluate(() => document.fonts?.ready ?? Promise.resolve());
-	await page.waitForTimeout(400);
+	await frame.locator('body').evaluate(async () => {
+		if (document.fonts?.ready) await document.fonts.ready;
+		const imgs = [...document.images];
+		await Promise.all(
+			imgs.map((img) =>
+				img.complete
+					? Promise.resolve()
+					: new Promise<void>((resolve) => {
+							img.addEventListener('load', () => resolve(), { once: true });
+							img.addEventListener('error', () => resolve(), { once: true });
+						}),
+			),
+		);
+	});
+	await page.waitForFunction(() => {
+		const doc = (document.getElementById('frame') as HTMLIFrameElement | null)?.contentDocument;
+		return doc?.body && getComputedStyle(doc.body).opacity === '1';
+	});
 	return frame;
 }
 
@@ -33,9 +49,8 @@ for (const variantId of LOGIN_VARIANTS) {
 		const srcdoc = templatePreviewSrcDoc('login', variantId, device, `${baseURL}/`);
 		const size = device === 'phone' ? { width: 390, height: 844 } : { width: 1440, height: 900 };
 		const frame = await mountPreview(page, srcdoc, size.width, size.height);
-		const maxDiffPixelRatio = device === 'phone' ? 0.07 : 0.03;
 		await expect(frame.locator('body')).toHaveScreenshot(`login-${variantId}.png`, {
-			maxDiffPixelRatio,
+			maxDiffPixelRatio: 0.03,
 			animations: 'disabled',
 			scale: 'css',
 		});
@@ -48,9 +63,8 @@ for (const variantId of REGISTER_VARIANTS) {
 		const srcdoc = templatePreviewSrcDoc('register', variantId, device, `${baseURL}/`);
 		const size = device === 'phone' ? { width: 390, height: 844 } : { width: 1440, height: 900 };
 		const frame = await mountPreview(page, srcdoc, size.width, size.height);
-		const maxDiffPixelRatio = device === 'phone' ? 0.07 : 0.03;
 		await expect(frame.locator('body')).toHaveScreenshot(`register-${variantId}.png`, {
-			maxDiffPixelRatio,
+			maxDiffPixelRatio: 0.03,
 			animations: 'disabled',
 			scale: 'css',
 		});
